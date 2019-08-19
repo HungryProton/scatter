@@ -38,8 +38,8 @@ func get_class():
 
 func _set_proportion(val):
 	proportion = val
-	#get_parent().update()
+	get_parent().update()
 
 func _set_path(val):
 	item_path = val
-	#get_parent().update()
+	get_parent().update()
