@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/fill.svg-ff4c65e45eb2800302d51db3a0c229f2.stex"
+path="res://.import/multimesh.svg-5a1919600743b2b0db181a67cd1f45c9.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/scatter/icons/fill.svg"
-dest_files=[ "res://.import/fill.svg-ff4c65e45eb2800302d51db3a0c229f2.stex" ]
+source_file="res://addons/scatter/icons/multimesh.svg"
+dest_files=[ "res://.import/multimesh.svg-5a1919600743b2b0db181a67cd1f45c9.stex" ]
 
 [params]
 

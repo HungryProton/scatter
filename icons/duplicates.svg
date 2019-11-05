@@ -15,7 +15,7 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
-   sodipodi:docname="item.svg">
+   sodipodi:docname="duplicates.svg">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -70,11 +70,25 @@
          style="fill:none;stroke:#ff9600;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
     <rect
-       style="stroke:#ff9600;stroke-width:0.48739031;stroke-opacity:1"
+       style="stroke:#ff9600;stroke-width:0.26458332;stroke-opacity:1"
+       id="rect4626"
+       width="0.83509111"
+       height="0.83509111"
+       x="0.72760409"
+       y="295.45383" />
+    <rect
+       style="stroke:#ff9600;stroke-width:0.26458332;stroke-opacity:1"
+       id="rect4626-6"
+       width="0.83509117"
+       height="0.83509117"
+       x="2.525944"
+       y="293.62244" />
+    <rect
+       style="stroke:#ff9600;stroke-width:0.26458332;stroke-opacity:1"
        id="rect4626-3-7"
-       width="1.5383259"
-       height="1.5383259"
-       x="1.7113056"
-       y="294.63507" />
+       width="0.83509123"
+       height="0.83509123"
+       x="2.5259438"
+       y="295.44971" />
   </g>
 </svg>

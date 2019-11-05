@@ -13,33 +13,46 @@ extends Node
 # 
 # --
 
-class_name GM_ItemArea
+class_name ScatterItem
 
 ## -- 
 ## Exported variables
 ## --
 export(int) var proportion : int = 100 setget _set_proportion
 export(String, FILE) var item_path : String setget _set_path
+export(float) var scale_modifier : float = 1.0 setget _set_scale_modifier
 
 ## --
 ## Internal variables
 ## --
+
+var _parent
 
 ## --
 ## Public methods
 ## --
 
 func get_class():
-	return "GM_ItemArea"
+	return "ScatterItem"
 
 ## --
 ## Internal methods
 ## --
 
+func _ready():
+	_parent = get_parent()
+
 func _set_proportion(val):
 	proportion = val
-	get_parent().update()
+	if _parent:
+		_parent.update()
 
 func _set_path(val):
 	item_path = val
-	get_parent().update()
+	if _parent:
+		_parent.update()
+
+func _set_scale_modifier(val):
+	scale_modifier = val
+	if _parent:
+		_parent.update()
