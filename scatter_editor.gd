@@ -19,9 +19,9 @@ func _enter_tree():
 		load("res://addons/scatter/icons/duplicates.svg")
 	)
 	add_custom_type(
-		"ScatterMultimesh", 
+		"ScatterMultiMesh", 
 		"PolygonPath",
-		load("res://addons/scatter/src/nodes/scatter_multimesh.gd"),
+		load("res://addons/scatter/src/nodes/scatter_multi_mesh.gd"),
 		load("res://addons/scatter/icons/multimesh.svg")
 	)
 	add_custom_type(

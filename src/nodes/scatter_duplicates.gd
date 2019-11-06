@@ -85,5 +85,5 @@ func _place_item(item, coords):
 	instance.rotation = rotation
 	
 	# Update item scaling
-	var s = 1 + abs(_distribution.get_float()) * scale_randomness
-	instance.scale = Vector3(s, s, s) * global_scale
+	var s = Vector3.ONE + abs(_distribution.get_float()) * scale_randomness
+	instance.scale = s * global_scale

@@ -27,9 +27,12 @@ var SimplexNoiseDistribution = load("res://addons/scatter/src/distributions/simp
 export(int) var amount : int = 10 setget _set_amount
 export(int, "Uniform", "Normal", "Simplex noise") var distribution : int = 0 setget _set_distribution
 export(int) var custom_seed : int = 0 setget _set_seed
+export(bool) var project_on_floor : bool = false
+export(float) var ray_down_length : float = 10.0
+export(float) var ray_up_length : float = 0.0
 export(Vector3) var rotation_randomness : Vector3 = Vector3(0.0, 1.0, 0.0) setget _set_rotation_randomness
-export(float) var scale_randomness : float = 1.0 setget _set_scale
-export(float) var global_scale : float = 1.0 setget _set_global_scale
+export(Vector3) var scale_randomness : Vector3 = Vector3.ONE setget _set_scale
+export(Vector3) var global_scale : Vector3 = Vector3.ONE setget _set_global_scale
 
 ## --
 ## Internal variables
@@ -78,9 +81,20 @@ func _setup_distribution():
 	_distribution.init(custom_seed)
 
 func _get_ground_position(coords):
-	# TODO : Perform a raycast along the projection axis and place item
-	# on the closest surface found
-	return 0.0
+	var space_state = get_world().get_direct_space_state()
+	var top = coords
+	var bottom = coords
+	top.y = ray_up_length
+	bottom.y = -ray_down_length
+	
+	top = to_global(top)
+	bottom = to_global(bottom)
+	
+	var hit = space_state.intersect_ray(top, bottom)
+	if hit:
+		return to_local(hit.position).y
+	else:
+		return 0.0
 
 func _set_amount(val):
 	amount = val
