@@ -1,6 +1,6 @@
 # Scatter
 
-![fill_addon](https://user-images.githubusercontent.com/52043844/63270110-cad02680-c297-11e9-8154-783eaf4320da.png)
+![scatter](https://user-images.githubusercontent.com/52043844/68284290-7ca01780-007d-11ea-979b-128ca7038787.png)
 
 Custom node that takes care to randomly place props or any other scene inside a 3D curve
 [See it in action here](https://streamable.com/1kbnz)
