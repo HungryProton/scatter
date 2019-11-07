@@ -39,3 +39,6 @@ it to make something like grass (use a **ScatterMultimesh** instead)
 + Add a **ScatterItem** as a child of your **ScatterDuplicates** node
 + In the **ScatterItem**, under the Select the **Item Path** parameter, select
   the scene you want to scatter
+
+### Licence
+MIT
