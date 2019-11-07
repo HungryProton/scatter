@@ -56,28 +56,36 @@ func _fill_area():
 func _populate_multi_mesh(item, amount):
 	var mm = _setup_multi_mesh(item, amount)
 	for i in range(0, amount):
-		var coords = _distribution.get_vector3() * size * 0.5 + center
-		if is_point_inside(coords):
-			var t = Transform()
-			
-			# Update item scaling
-			var s = Vector3.ONE + abs(_distribution.get_float()) * scale_randomness
-			t = t.scaled(s * global_scale * item.scale_modifier)
-			
-			# Update item rotation
-			var rotation = _distribution.get_vector3() * rotation_randomness
-			t = t.rotated(Vector3.RIGHT, rotation.x)
-			t = t.rotated(Vector3.UP, rotation.y)
-			t = t.rotated(Vector3.BACK, rotation.z)
-			
-			# Update item location
-			var pos_y = 0.0
-			if project_on_floor:
-				pos_y = _get_ground_position(coords)
-			t.origin = get_global_transform().origin + Vector3(coords.x, pos_y, coords.z)
-			
-			mm.multimesh.set_instance_transform(i, t)
+		var coords = _get_next_coords()
+		var t = Transform()
+		
+		# Update item scaling
+		var s = Vector3.ONE + abs(_distribution.get_float()) * scale_randomness
+		t = t.scaled(s * global_scale * item.scale_modifier)
+		
+		# Update item rotation
+		var rotation = _distribution.get_vector3() * rotation_randomness
+		t = t.rotated(Vector3.RIGHT, rotation.x)
+		t = t.rotated(Vector3.UP, rotation.y)
+		t = t.rotated(Vector3.BACK, rotation.z)
+		
+		# Update item location
+		var pos_y = 0.0
+		if project_on_floor:
+			pos_y = _get_ground_position(coords)
+		t.origin = get_global_transform().origin + Vector3(coords.x, pos_y, coords.z)
+		
+		mm.multimesh.set_instance_transform(i, t)
 
+func _get_next_coords():
+	var coords = _distribution.get_vector3() * size * 0.5 + center
+	var attempts = 0
+	var max_attempts = 200
+	while not is_point_inside(coords) and (attempts < max_attempts):
+		coords = _distribution.get_vector3() * size * 0.5 + center
+		attempts += 1
+	return coords
+	
 func _setup_multi_mesh(item, count):
 	var instance = item.get_node("MultiMeshInstance")
 	if not instance:
