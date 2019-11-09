@@ -60,13 +60,10 @@ func _fill_area():
 		_fill_area_with(i, count)
 
 func _fill_area_with(item, amount):
-	var placed_items = 0
-	while placed_items < amount:
-		var coords = _distribution.get_vector3() * size * 0.5 + center
-		if is_point_inside(coords):
-			_place_item(item, coords)
-		placed_items += 1
-		
+	for i in range(0, amount):
+		var coords = _get_next_coords()
+		_place_item(item, coords)
+
 func _place_item(item, coords):
 	if not _items_root:
 		_setup_items_root()
@@ -86,4 +83,13 @@ func _place_item(item, coords):
 	
 	# Update item scaling
 	var s = Vector3.ONE + abs(_distribution.get_float()) * scale_randomness
-	instance.scale = s * global_scale
+	instance.scale = s * global_scale * item.scale_modifier
+
+func _get_next_coords():
+	var coords = _distribution.get_vector3() * size * 0.5 + center
+	var attempts = 0
+	var max_attempts = 200
+	while not is_point_inside(coords) and (attempts < max_attempts):
+		coords = _distribution.get_vector3() * size * 0.5 + center
+		attempts += 1
+	return coords
