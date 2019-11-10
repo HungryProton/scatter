@@ -30,6 +30,13 @@ func _enter_tree():
 		load("res://addons/scatter/src/nodes/scatter_item.gd"),
 		load("res://addons/scatter/icons/item.svg")
 	)
+	add_custom_type(
+		"ScatterExclude", 
+		"PolygonPath",
+		load("res://addons/scatter/src/nodes/scatter_exclude.gd"),
+		load("res://addons/scatter/icons/item.svg")
+	)
+	
 
 func _exit_tree():
 	remove_custom_type("ScatterDuplicates")

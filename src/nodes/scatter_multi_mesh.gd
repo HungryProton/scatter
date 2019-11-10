@@ -57,9 +57,10 @@ func _populate_multi_mesh(item, amount):
 	var result = _setup_multi_mesh(item, amount)
 	var mm = result[0]
 	var src_node = result[1]
+	var exclusion_areas = item.get_exclusion_areas()
 	
 	for i in range(0, amount):
-		var coords = _get_next_coords()
+		var coords = _get_next_valid_pos(exclusion_areas)
 		var t = Transform()
 		
 		# Update item scaling
@@ -88,15 +89,6 @@ func _populate_multi_mesh(item, amount):
 		if not item.ignore_initial_position:
 			t.origin += src_node.translation
 		mm.multimesh.set_instance_transform(i, t)
-
-func _get_next_coords():
-	var coords = _distribution.get_vector3() * size * 0.5 + center
-	var attempts = 0
-	var max_attempts = 200
-	while not is_point_inside(coords) and (attempts < max_attempts):
-		coords = _distribution.get_vector3() * size * 0.5 + center
-		attempts += 1
-	return coords
 	
 func _setup_multi_mesh(item, count):
 	var instance = item.get_node("MultiMeshInstance")

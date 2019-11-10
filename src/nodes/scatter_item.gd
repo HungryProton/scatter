@@ -2,12 +2,12 @@ tool
 extends Node
 
 # --
-# GM Item Area
+# ScatterItem
 # --
-# This node must be a child of a GM_FillArea node.
+# This node must be a child of either a ScatterDuplicates or a ScatterMultimesh node.
 # Gives information about the scene we want to duplicate and spread accross
 # the given area.
-# Multiple ItemArea nodes can be attached to the same FillArea, just like
+# Multiple ScatterItems nodes can be attached to the same Scatter*, just like
 # multiple CollisionShape can be attached to a CollisionObject. 
 # --
 # 
@@ -38,6 +38,18 @@ var _parent
 func get_class():
 	return "ScatterItem"
 
+func get_exclusion_areas():
+	var result = []
+	for c in get_children():
+		if c.get_class() == "ScatterExclude":
+			result.append(c)
+	return result
+	
+func update():
+	_parent = get_parent()
+	if _parent:
+		_parent.update()
+		
 ## --
 ## Internal methods
 ## --
@@ -45,32 +57,26 @@ func get_class():
 func _ready():
 	_parent = get_parent()
 
-func _update():
-	_parent = get_parent()
-	if _parent:
-		print("Calling update")
-		_parent.update()
-
 func _set_proportion(val):
 	proportion = val
-	_update()
+	update()
 
 func _set_path(val):
 	item_path = val
-	_update()
+	update()
 
 func _set_scale_modifier(val):
 	scale_modifier = val
-	_update()
+	update()
 
 func _set_position_flag(val):
 	ignore_initial_position = val
-	_update()
+	update()
 
 func _set_rotation_flag(val):
 	ignore_initial_rotation = val
-	_update()
+	update()
 
 func _set_scale_flag(val):
 	ignore_initial_scale = val
-	_update()
+	update()

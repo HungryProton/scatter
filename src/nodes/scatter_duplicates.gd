@@ -61,10 +61,10 @@ func _fill_area():
 
 func _fill_area_with(item, amount):
 	for i in range(0, amount):
-		var coords = _get_next_coords()
-		_place_item(item, coords)
+		var pos = _get_next_valid_pos(item.get_exclusion_areas())
+		_place_item(item, pos)
 
-func _place_item(item, coords):
+func _place_item(item, pos):
 	if not _items_root:
 		_setup_items_root()
 		
@@ -74,11 +74,11 @@ func _place_item(item, coords):
 	instance.set_owner(get_tree().get_edited_scene_root())
 	
 	# Update item location
-	var pos_y = _get_ground_position(coords)
+	var pos_y = _get_ground_position(pos)
 	if item.ignore_initial_position:
-		instance.translation = Vector3(coords.x, pos_y, coords.z)
+		instance.translation = Vector3(pos.x, pos_y, pos.z)
 	else:
-		instance.translation += Vector3(coords.x, pos_y, coords.z)
+		instance.translation += Vector3(pos.x, pos_y, pos.z)
 	
 	# Update item rotation
 	var rotation = _distribution.get_vector3() * rotation_randomness
@@ -94,11 +94,3 @@ func _place_item(item, coords):
 	else:
 		instance.scale *= s * global_scale * item.scale_modifier
 
-func _get_next_coords():
-	var coords = _distribution.get_vector3() * size * 0.5 + center
-	var attempts = 0
-	var max_attempts = 200
-	while not is_point_inside(coords) and (attempts < max_attempts):
-		coords = _distribution.get_vector3() * size * 0.5 + center
-		attempts += 1
-	return coords
