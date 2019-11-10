@@ -54,27 +54,39 @@ func _fill_area():
 		_populate_multi_mesh(i, count)
 
 func _populate_multi_mesh(item, amount):
-	var mm = _setup_multi_mesh(item, amount)
+	var result = _setup_multi_mesh(item, amount)
+	var mm = result[0]
+	var src_node = result[1]
+	
 	for i in range(0, amount):
 		var coords = _get_next_coords()
 		var t = Transform()
 		
 		# Update item scaling
 		var s = Vector3.ONE + abs(_distribution.get_float()) * scale_randomness
-		t = t.scaled(s * global_scale * item.scale_modifier)
+		if item.ignore_initial_scale:
+			t = t.scaled(s * global_scale * item.scale_modifier)
+		else:
+			t = t.scaled(s * global_scale * item.scale_modifier * src_node.scale)
 		
 		# Update item rotation
 		var rotation = _distribution.get_vector3() * rotation_randomness
-		t = t.rotated(Vector3.RIGHT, rotation.x)
-		t = t.rotated(Vector3.UP, rotation.y)
-		t = t.rotated(Vector3.BACK, rotation.z)
+		if item.ignore_initial_rotation:
+			t = t.rotated(Vector3.RIGHT, rotation.x)
+			t = t.rotated(Vector3.UP, rotation.y)
+			t = t.rotated(Vector3.BACK, rotation.z)
+		else:
+			t = t.rotated(Vector3.RIGHT, rotation.x + src_node.rotation.x)
+			t = t.rotated(Vector3.UP, rotation.y + src_node.rotation.y)
+			t = t.rotated(Vector3.BACK, rotation.z + src_node.rotation.z)
 		
 		# Update item location
 		var pos_y = 0.0
 		if project_on_floor:
 			pos_y = _get_ground_position(coords)
 		t.origin = get_global_transform().origin + Vector3(coords.x, pos_y, coords.z)
-		
+		if not item.ignore_initial_position:
+			t.origin += src_node.translation
 		mm.multimesh.set_instance_transform(i, t)
 
 func _get_next_coords():
@@ -103,7 +115,7 @@ func _setup_multi_mesh(item, count):
 	instance.multimesh.transform_format = 1
 	instance.multimesh.instance_count = count
 
-	return instance
+	return [instance, mesh_instance]
 
 func _get_mesh_from_scene(node_path):
 	var target = load(node_path).instance()

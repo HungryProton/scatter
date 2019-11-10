@@ -75,15 +75,24 @@ func _place_item(item, coords):
 	
 	# Update item location
 	var pos_y = _get_ground_position(coords)
-	instance.translation = Vector3(coords.x, pos_y, coords.z)
+	if item.ignore_initial_position:
+		instance.translation = Vector3(coords.x, pos_y, coords.z)
+	else:
+		instance.translation += Vector3(coords.x, pos_y, coords.z)
 	
 	# Update item rotation
 	var rotation = _distribution.get_vector3() * rotation_randomness
-	instance.rotation += rotation
+	if item.ignore_initial_rotation:
+		instance.rotation = rotation
+	else:
+		instance.rotation += rotation
 	
 	# Update item scaling
 	var s = Vector3.ONE + abs(_distribution.get_float()) * scale_randomness
-	instance.scale = s * global_scale * item.scale_modifier
+	if item.ignore_initial_scale:
+		instance.scale = s * global_scale * item.scale_modifier
+	else:
+		instance.scale *= s * global_scale * item.scale_modifier
 
 func _get_next_coords():
 	var coords = _distribution.get_vector3() * size * 0.5 + center

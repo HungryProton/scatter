@@ -21,6 +21,9 @@ class_name ScatterItem
 export(int) var proportion : int = 100 setget _set_proportion
 export(String, FILE) var item_path : String setget _set_path
 export(float) var scale_modifier : float = 1.0 setget _set_scale_modifier
+export(bool) var ignore_initial_position : bool = false setget _set_position_flag
+export(bool) var ignore_initial_rotation : bool = false setget _set_rotation_flag
+export(bool) var ignore_initial_scale : bool = false setget _set_scale_flag
 
 ## --
 ## Internal variables
@@ -42,17 +45,32 @@ func get_class():
 func _ready():
 	_parent = get_parent()
 
+func _update():
+	_parent = get_parent()
+	if _parent:
+		print("Calling update")
+		_parent.update()
+
 func _set_proportion(val):
 	proportion = val
-	if _parent:
-		_parent.update()
+	_update()
 
 func _set_path(val):
 	item_path = val
-	if _parent:
-		_parent.update()
+	_update()
 
 func _set_scale_modifier(val):
 	scale_modifier = val
-	if _parent:
-		_parent.update()
+	_update()
+
+func _set_position_flag(val):
+	ignore_initial_position = val
+	_update()
+
+func _set_rotation_flag(val):
+	ignore_initial_rotation = val
+	_update()
+
+func _set_scale_flag(val):
+	ignore_initial_scale = val
+	_update()
