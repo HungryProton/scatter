@@ -88,6 +88,9 @@ it to make something like grass (use a **ScatterMultimesh** instead)
   - If two ScatterItems have a proportion of 50, then half the amount of instances will be of Item1 while the other half will be of Item2. 
   - Internally, the total sum of every Proportion is brought back to 100, and each value is treated like a percentage. So if you have 2 ScatterItems, the first one at 100, the second one at 50, when brought back to 100, its the same as if there where at 67 and 33 respectively. So two thirds of the instances will be made of Item1 while the remaining third will be made of Item2.
 + **Scale Modifier** : The global scale defined in the parent will be multiplied by this parameter so you can make it bigger or smaller than the other items.
++ **Ignore Initial Position** : If true, the position defined in the ItemPath source scene will be ignored. Otherwise, a random translation will be applied on top.
++ **Ignore Initial Rotation** : If true, the rotation defined in the ItemPath source scene will be ignored. Otherwise, a random rotation will be applied on top.
++ **Ignore Initial Scale** : If true, the scale defined in the ItemPath source scene will be ignored. Otherwise, a random scale will be applied on top.
 
 ### Licence
 MIT
