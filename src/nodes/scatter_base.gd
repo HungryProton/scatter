@@ -37,8 +37,8 @@ export(Vector3) var global_scale : Vector3 = Vector3.ONE setget _set_global_scal
 ## --
 ## Internal variables
 ## --
-onready var _items : Array = Array()
-onready var _exclusion_areas : Array = Array()
+var _items : Array = Array()
+var _exclusion_areas : Array = Array()
 var _total_proportion : int
 var _distribution : Distribution
 
