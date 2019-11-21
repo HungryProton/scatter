@@ -54,6 +54,7 @@ func _fill_area():
 		_populate_multi_mesh(i, count)
 
 func _populate_multi_mesh(item, amount):
+	item.translation = Vector3.ZERO
 	var result = _setup_multi_mesh(item, amount)
 	var mm = result[0]
 	var src_node = result[1]
@@ -85,7 +86,7 @@ func _populate_multi_mesh(item, amount):
 		var pos_y = 0.0
 		if project_on_floor:
 			pos_y = _get_ground_position(coords)
-		t.origin = get_global_transform().origin + Vector3(coords.x, pos_y, coords.z)
+		t.origin = Vector3(coords.x, pos_y, coords.z)
 		if not item.ignore_initial_position:
 			t.origin += src_node.translation
 		mm.multimesh.set_instance_transform(i, t)
@@ -99,6 +100,7 @@ func _setup_multi_mesh(item, count):
 		instance.set_owner(get_tree().get_edited_scene_root())
 	if not instance.multimesh:
 		instance.multimesh = MultiMesh.new()
+	instance.translation = Vector3.ZERO
 	
 	var mesh_instance = _get_mesh_from_scene(item.item_path)
 	instance.material_override = mesh_instance.get_surface_material(0)
