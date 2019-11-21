@@ -1,5 +1,5 @@
 tool
-extends Node
+extends Spatial
 
 # --
 # ScatterItem
@@ -24,6 +24,14 @@ export(float) var scale_modifier : float = 1.0 setget _set_scale_modifier
 export(bool) var ignore_initial_position : bool = false setget _set_position_flag
 export(bool) var ignore_initial_rotation : bool = false setget _set_rotation_flag
 export(bool) var ignore_initial_scale : bool = false setget _set_scale_flag
+
+## --
+## Public variables
+## --
+
+var initial_position
+var initial_rotation
+var initial_scale
 
 ## --
 ## Internal variables
@@ -63,6 +71,18 @@ func _set_proportion(val):
 
 func _set_path(val):
 	item_path = val
+	if not val:
+		return
+	
+	var instance = load(val).instance()
+	initial_position = instance.translation
+	initial_rotation = instance.rotation
+	initial_scale = instance.scale
+	instance.queue_free()
+	var root = get_node("Duplicates")
+	if root:
+		for c in root.get_children():
+			c.queue_free()
 	update()
 
 func _set_scale_modifier(val):

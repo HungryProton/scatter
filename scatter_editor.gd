@@ -26,7 +26,7 @@ func _enter_tree():
 	)
 	add_custom_type(
 		"ScatterItem", 
-		"Node",
+		"Spatial",
 		load("res://addons/scatter/src/nodes/scatter_item.gd"),
 		load("res://addons/scatter/icons/item.svg")
 	)
