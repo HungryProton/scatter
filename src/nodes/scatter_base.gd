@@ -104,6 +104,5 @@ func _is_ready():
 	set_process(true)
 	return get_tree()
 
-
 func _process(_delta) -> void:
 	pass

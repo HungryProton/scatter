@@ -9,7 +9,7 @@
 
 tool
 
-extends Resource
+extends ScatterResource
 
 class_name ScatterLogic
 
@@ -54,10 +54,3 @@ func get_next_transform(_item : ScatterItem, _index : int = -1) -> Transform:
 # Called once after every instances for a given item have been placed.
 func scatter_post_hook(_item : ScatterItem) -> void:
 	pass
-
-## --
-## Protected methods
-## --
-
-func notify_parameter_update() -> void:
-	emit_signal("parameter_updated")

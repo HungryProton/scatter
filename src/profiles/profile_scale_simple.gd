@@ -36,16 +36,16 @@ export(Resource) var distribution setget _set_distribution
 
 func _set_global_scale(val):
 	global_scale = val
-	.notify_parameter_update()
+	notify_update()
 
 func _set_randomness(val):
 	randomness = val
-	.notify_parameter_update()
+	notify_update()
 
 func _set_distribution(val):
 	if val is ScatterDistribution:
 		distribution = val
-		notify_parameter_update()
+		notify_update()
 
 ## --
 ## Public methods
@@ -57,8 +57,7 @@ func reset() -> void:
 	distribution.reset()
 
 func get_result(pos : Vector3) -> Vector3:
-	var s = Vector3.ONE + abs(distribution.get_float()) * randomness * global_scale
-	return s
+	return Vector3.ONE + abs(distribution.get_float()) * randomness * global_scale
 
 ## --
 ## Internal methods

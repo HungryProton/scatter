@@ -36,16 +36,16 @@ export(Resource) var distribution setget _set_distribution
 
 func _set_offset(val):
 	offset = val
-	notify_parameter_update()
+	.notify_parameter_update()
 
 func _set_randomness(val):
 	randomness = val
-	notify_parameter_update()
+	.notify_parameter_update()
 
 func _set_distribution(val):
 	if val is ScatterDistribution:
 		distribution = val
-		notify_parameter_update()
+		.notify_parameter_update()
 
 ## --
 ## Public methods
