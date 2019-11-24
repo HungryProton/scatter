@@ -1,20 +1,22 @@
-extends Node
+tool
+
+extends Resource
 
 # Abstract
 # Inherit this class and override its functions
 
 class_name Distribution
 
-var _seed : int = 0
+export(int) var random_seed : int = 0
 
-func init(seed_number):
-	_seed = seed_number
+func reset() -> void:
+	pass
 
-func get_float():
+func get_float() -> float:
 	return 0.0
 
-func get_vector2():
+func get_vector2() -> Vector2:
 	return Vector2(get_float(), get_float())
 
-func get_vector3():
+func get_vector3() -> Vector3:
 	return Vector3(get_float(), get_float(), get_float())
