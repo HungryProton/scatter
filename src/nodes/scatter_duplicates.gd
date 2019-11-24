@@ -41,7 +41,7 @@ func _scatter_instances_from_item(item, amount):
 		else:
 			# If not, create one
 			instance = _create_instance(item, root)
-		var t = positioning_logic.get_next_transform(item)
+		var t = scatter_logic.get_next_transform(item)
 		instance.transform = t
 	# Delete the unused instances left in the pool if any
 	if amount < child_count:

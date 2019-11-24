@@ -1,8 +1,8 @@
 tool
 
-extends Distribution
+extends ScatterDistribution
 
-class_name UniformDistribution
+class_name DistributionUniform
 
 var _rand = RandomNumberGenerator.new()
 

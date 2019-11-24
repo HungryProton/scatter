@@ -32,12 +32,11 @@ class_name ScatterMultiMesh
 ## --
 
 func _scatter_instances_from_item(item, amount):
-	print("In scatter from item for ", item.get_name(), "placing ", amount, " instances")
 	var result = _setup_multi_mesh(item, amount)
 	var mm = result[0]
 	var src_node = result[1]
 	for i in range(0, amount):
-		var t = positioning_logic.get_next_transform(item)
+		var t = scatter_logic.get_next_transform(item)
 		mm.multimesh.set_instance_transform(i, t)
 
 func _setup_multi_mesh(item, count):

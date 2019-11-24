@@ -9,7 +9,7 @@ extends PolygonPath
 # affect all the items.
 # Add it as a direct child of a ScatterItem to affect this item only.
 # --
-# 
+#
 # --
 
 class_name ScatterExclude
