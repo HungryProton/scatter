@@ -65,11 +65,11 @@ func set_scale_profile(val):
 func init(node : PolygonPath) -> void:
 	.init(node)
 	if not position_profile:
-		position_profile = ProfilePositionSimple.new()
+		self.position_profile = ProfilePositionSimple.new()
 	if not rotation_profile:
-		rotation_profile = ProfileRotationSimple.new()
+		self.rotation_profile = ProfileRotationSimple.new()
 	if not scale_profile:
-		scale_profile = ProfileScaleSimple.new()
+		self.scale_profile = ProfileScaleSimple.new()
 	position_profile.reset()
 	rotation_profile.reset()
 	scale_profile.reset()

@@ -24,4 +24,3 @@ func set_parameter(variant1, variant2) -> void:
 
 func get_result(variant):
 	return null
-

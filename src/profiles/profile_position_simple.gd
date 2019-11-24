@@ -42,6 +42,7 @@ func set_parameter(name, value):
 	match name:
 		"path":
 			_path = value
+			distribution.set_bounding_box(_path.size, _path.center)
 		"exclusion_areas":
 			_exclusion_areas = value
 
@@ -69,10 +70,9 @@ func set_ray_up_length(val) -> void:
 
 func reset() -> void:
 	if not distribution:
-		distribution = DistributionUniform.new()
+		self.distribution = DistributionUniform.new()
 	distribution.reset()
 	distribution.set_range(Vector2(-1.0, 1.0))
-	distribution.set_bounding_box(_path.size, _path.center)
 
 func get_result(item : ScatterItem) -> Vector3:
 	var pos = _get_next_valid_pos()

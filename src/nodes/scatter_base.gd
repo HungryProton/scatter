@@ -51,7 +51,6 @@ func set_scatter_logic (val : Resource) -> void:
 func update() -> void:
 	if not _is_ready():
 		return
-	scatter_logic.init(self)
 	_discover_items_info()
 	_scatter_instances()
 
@@ -69,6 +68,7 @@ func _on_curve_update() -> void:
 	update()
 
 func _scatter_instances() -> void:
+	scatter_logic.init(self)
 	var count = 0
 	for i in _items:
 		i.translation = Vector3.ZERO
