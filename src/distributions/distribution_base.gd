@@ -60,6 +60,12 @@ func get_float() -> float:
 func get_float_range(rand_min = 0.0, rand_max = 1.0) -> float:
 	return 0.0
 
+func get_int() -> int:
+	return int(get_float())
+
+func get_int_range(rand_min = 0.0, rand_max = 1.0) -> int:
+	return int(get_float_range(rand_min, rand_max))
+
 # Returns a random Vector2
 func get_vector2() -> Vector2:
 	return Vector2(get_float(), get_float())

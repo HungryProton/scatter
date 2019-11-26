@@ -21,6 +21,7 @@ signal parameter_updated
 ## Exported variables
 ## --
 
+export(bool) var continuous_update
 export(Resource) var scatter_logic setget set_scatter_logic
 
 ## --
@@ -116,4 +117,5 @@ func _is_ready():
 	return get_tree()
 
 func _process(_delta) -> void:
-	pass
+	if continuous_update:
+		update()
