@@ -64,12 +64,7 @@ func set_scale_profile(val):
 
 func init(node : PolygonPath) -> void:
 	.init(node)
-	if not position_profile:
-		self.position_profile = ProfilePositionSimple.new()
-	if not rotation_profile:
-		self.rotation_profile = ProfileRotationSimple.new()
-	if not scale_profile:
-		self.scale_profile = ProfileScaleSimple.new()
+	_ensure_profiles_exists()
 	position_profile.reset()
 	rotation_profile.reset()
 	scale_profile.reset()
@@ -108,6 +103,14 @@ func get_next_transform(item : ScatterItem, index = -1) -> Transform:
 
 func _listen_to_updates(val) -> void:
 	ScatterCommon.safe_connect(val, "parameter_updated", self, "notify_update")
+
+func _ensure_profiles_exists() -> void:
+	if not position_profile:
+		self.position_profile = ProfilePositionSimple.new()
+	if not rotation_profile:
+		self.rotation_profile = ProfileRotationSimple.new()
+	if not scale_profile:
+		self.scale_profile = ProfileScaleSimple.new()
 
 ## --
 ## Callbacks

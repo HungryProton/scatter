@@ -18,7 +18,7 @@ class_name ProfileRotationSimple
 ## Exported variables
 ## --
 
-export(Vector3) var offset : Vector3 = Vector3.ONE setget _set_offset
+export(Vector3) var offset : Vector3 = Vector3.ZERO setget _set_offset
 export(Vector3) var randomness : Vector3 = Vector3(0.0, 90.0, 0.0) setget _set_randomness
 export(Resource) var distribution setget _set_distribution
 

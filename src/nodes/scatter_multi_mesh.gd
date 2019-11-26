@@ -36,7 +36,7 @@ func _scatter_instances_from_item(item, amount):
 	var mm = result[0]
 	var src_node = result[1]
 	for i in range(0, amount):
-		var t = scatter_logic.get_next_transform(item, i)
+		var t = scatter_logic.get_next_transform(item, i + _offset)
 		mm.multimesh.set_instance_transform(i, t)
 
 func _setup_multi_mesh(item, count):

@@ -23,6 +23,9 @@ class_name ScatterLogic
 # The Scatter nodes will use this value so remember to update it
 var amount : int = 0
 
+# The total amount of scatter items used
+var scatter_items_count : int = 0
+
 ## --
 ## Internal variables
 ## --

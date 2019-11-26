@@ -29,7 +29,8 @@ export(Resource) var scatter_logic setget set_scatter_logic
 
 var _items : Array = Array()
 var _exclusion_areas : Array = Array()
-var _total_proportion : int
+var _total_proportion : int = 0
+var _offset : int = 0
 
 ## --
 ## Getters and Setters
@@ -68,14 +69,20 @@ func _on_curve_update() -> void:
 	update()
 
 func _scatter_instances() -> void:
-	scatter_logic.init(self)
+	_init_scatter_logic()
+	_offset = 0
 	var count = 0
-	for i in _items:
-		i.translation = Vector3.ZERO
-		scatter_logic.scatter_pre_hook(i)
-		count = int(float(i.proportion) / _total_proportion * scatter_logic.amount)
-		_scatter_instances_from_item(i, count)
-		scatter_logic.scatter_post_hook(i)
+	for i in range(_items.size()):
+		var item = _items[i]
+		item.translation = Vector3.ZERO
+		scatter_logic.scatter_pre_hook(item)
+		if i == _items.size() - 1:
+			count = scatter_logic.amount - _offset
+		else:
+			count = int(round(float(item.proportion) / _total_proportion * scatter_logic.amount))
+		_scatter_instances_from_item(item, count)
+		scatter_logic.scatter_post_hook(item)
+		_offset += count
 
 func _scatter_instances_from_item(_scatter_item, _instances_count) -> void:
 	pass
@@ -92,6 +99,10 @@ func _discover_items_info() -> void:
 			_total_proportion += c.proportion
 		elif c.get_class() == "ScatterExclude":
 			_exclusion_areas.append(c)
+
+func _init_scatter_logic() -> void:
+	scatter_logic.init(self)
+	scatter_logic.scatter_items_count = _items.size()
 
 # Avoid some errors during tool developpement
 func _is_ready():

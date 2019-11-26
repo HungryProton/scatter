@@ -57,7 +57,7 @@ func reset() -> void:
 	distribution.reset()
 
 func get_result(pos : Vector3) -> Vector3:
-	return Vector3.ONE + abs(distribution.get_float()) * randomness * global_scale
+	return (Vector3.ONE + abs(distribution.get_float()) * randomness) * global_scale
 
 ## --
 ## Internal methods

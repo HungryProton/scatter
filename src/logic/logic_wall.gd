@@ -20,6 +20,7 @@ export(Vector2) var resolution : Vector2 = Vector2.ONE setget set_resolution
 export(Resource) var rotation_profile : Resource setget set_rotation_profile
 export(Resource) var scale_profile : Resource setget set_scale_profile
 
+
 ## --
 ## Public variables
 ## --
@@ -27,6 +28,9 @@ export(Resource) var scale_profile : Resource setget set_scale_profile
 ## --
 ## Internal variables
 ## --
+
+var _coords : Array
+var _item_offset : int = -1
 
 ## --
 ## Getters and Setters
@@ -68,14 +72,15 @@ func init(node : PolygonPath) -> void:
 		self.scale_profile = ProfileScaleSimple.new()
 	rotation_profile.reset()
 	scale_profile.reset()
-	_defineTotalInstancesAmount()
+	_define_total_instances_amount()
+	_item_offset = -1
 
 func scatter_pre_hook(item : ScatterItem) -> void:
-	pass
+	_item_offset += 1
 
 func get_next_transform(item : ScatterItem, index = -1) -> Transform:
 	var t : Transform = Transform()
-	var pos : Vector3 = _get_next_pos(index)
+	var pos : Vector3 = _get_random_pos(index)
 
 	# Update item scaling
 	var s : Vector3 = scale_profile.get_result(pos) * item.scale_modifier
@@ -104,10 +109,12 @@ func get_next_transform(item : ScatterItem, index = -1) -> Transform:
 func _listen_to_updates(val) -> void:
 	ScatterCommon.safe_connect(val, "parameter_updated", self, "notify_update")
 
-func _defineTotalInstancesAmount() -> void:
+func _define_total_instances_amount() -> void:
 	var curve_length = _path.curve.get_baked_length()
-	amount = (curve_length / resolution.x) * (height / resolution.y)
-	amount = int(amount * 1.10)
+	var x_count = int(round(curve_length / resolution.x))
+	var y_count = int(round(height / resolution.y))
+	amount = x_count * y_count
+	print("Total amount ", x_count, " x ", y_count, " = ", amount )
 
 func _get_next_pos(index) -> Vector3:
 	var instances_in_column = int(round(height / resolution.y))
@@ -116,8 +123,12 @@ func _get_next_pos(index) -> Vector3:
 	var index2 = (index / instances_in_column)
 	var offset = index2 * (_path.curve.get_baked_length() / (amount / instances_in_column))
 	var pos = _path.curve.interpolate_baked(offset)
-	pos.y += (index % instances_in_column) * (height / resolution.y)
+	pos.y += (index % instances_in_column) * (height / instances_in_column) * resolution.y
 	return pos
+
+func _get_random_pos(index) -> Vector3:
+	var i = index
+	return _get_next_pos(i)
 
 ## --
 ## Callbacks
