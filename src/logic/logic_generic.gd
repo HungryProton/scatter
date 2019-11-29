@@ -36,9 +36,10 @@ export(Resource) var scale_profile : Resource setget set_scale_profile
 ## --
 
 func set_items_amount(val) -> void:
-	items_amount = val
-	amount = val
-	notify_update()
+	if val > 0:
+		items_amount = val
+		amount = val
+		notify_update()
 
 func set_position_profile(val):
 	if val is ScatterProfile:
@@ -64,6 +65,7 @@ func set_scale_profile(val):
 
 func init(node : PolygonPath) -> void:
 	.init(node)
+	amount = items_amount
 	_ensure_profiles_exists()
 	position_profile.reset()
 	rotation_profile.reset()

@@ -1,8 +1,8 @@
 # --
 # DistributionUnique
 # --
-# Mostly useful for its get_int method. Returns a sequence of non repeating
-# numbers in the given range.
+# Only useful for its get_int method. Returns a sequence of non repeating
+# numbers in the given range. This is useful if you want non repeating
 # --
 
 tool
@@ -31,6 +31,7 @@ var _offset : int = 0
 ## Getters and Setters
 ## --
 
+
 ## --
 ## Public methods
 ## --
@@ -38,13 +39,11 @@ var _offset : int = 0
 func reset() -> void:
 	_rand.set_seed(random_seed)
 	_shuffle()
+	_offset = -1
 
 func get_int() -> int:
-	var i = _numbers[_offset]
 	_offset += 1
-	if _offset >= range_1d.y:
-		_offset = 0
-	return i
+	return _numbers[_offset]
 
 ## --
 ## Protected methods
@@ -57,6 +56,7 @@ func get_int() -> int:
 func _shuffle() -> void:
 	_numbers = Array()
 	_numbers.resize(range_1d.y)
+
 	for i in range(range_1d.y):
 		_numbers[i] = i
 		var j = _rand.randi_range(0, i)
@@ -65,7 +65,3 @@ func _shuffle() -> void:
 			var nj = _numbers[j]
 			_numbers[i] = nj
 			_numbers[j] = ni
-
-## --
-## Callbacks
-## --

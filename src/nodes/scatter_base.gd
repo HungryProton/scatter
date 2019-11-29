@@ -21,7 +21,8 @@ signal parameter_updated
 ## Exported variables
 ## --
 
-export(bool) var continuous_update
+export(bool) var copy_parent_curve = false setget set_copy_parent_curve
+export(bool) var continuous_update = false
 export(Resource) var scatter_logic setget set_scatter_logic
 
 ## --
@@ -39,6 +40,16 @@ var _offset : int = 0
 
 func get_exclusion_areas () -> Array:
 	return _exclusion_areas
+
+func set_copy_parent_curve(val: bool) -> void:
+	copy_parent_curve = false
+	var parent = get_parent()
+	if not val or not parent is PolygonPath:
+		return
+	copy_parent_curve = true
+	_align_scatter_node_with_parent()
+	ScatterCommon.safe_connect(parent, "curve_updated", self, "update")
+	update()
 
 func set_scatter_logic (val : Resource) -> void:
 	if val is ScatterLogic:
@@ -68,6 +79,12 @@ func _ready() -> void:
 
 func _on_curve_update() -> void:
 	update()
+
+func _align_scatter_node_with_parent() -> void:
+	var origin = Vector3.ZERO
+	origin.y = transform.origin.y
+	transform.origin = origin
+	rotation = Vector3.ZERO
 
 func _scatter_instances() -> void:
 	_init_scatter_logic()
@@ -102,7 +119,10 @@ func _discover_items_info() -> void:
 			_exclusion_areas.append(c)
 
 func _init_scatter_logic() -> void:
-	scatter_logic.init(self)
+	if copy_parent_curve:
+		scatter_logic.init(get_parent())
+	else:
+		scatter_logic.init(self)
 	scatter_logic.scatter_items_count = _items.size()
 
 # Avoid some errors during tool developpement
