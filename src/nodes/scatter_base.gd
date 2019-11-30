@@ -1,72 +1,117 @@
-tool
-extends PolygonPath
-
 # --
 # Scatter Base
 # --
-# The common parameters shared by ScatterMultimesh and ScatterDuplicate
+# The common variables shared by ScatterMultimesh and ScatterDuplicate
 # are defined here.
 # --
-#
-# --
+
+tool
+
+extends PolygonPath
 
 class_name ScatterBase
 
 ## --
-## Imported libraries
+## Signals
 ## --
 
-# TODO : Implement these, but check if this approach couldn't be replaced by a better one first
-var UniformDistribution = load("res://addons/scatter/src/distributions/uniform.gd")
-var NormalDistribution = load("res://addons/scatter/src/distributions/normal.gd")
-var SimplexNoiseDistribution = load("res://addons/scatter/src/distributions/simplex_noise.gd")
+signal parameter_updated
 
-## -- 
+## --
 ## Exported variables
 ## --
-export(int) var amount : int = 10 setget _set_amount
-export(int, "Uniform", "Normal", "Simplex noise") var distribution : int = 0 setget _set_distribution
-export(int) var custom_seed : int = 0 setget _set_seed
-export(bool) var project_on_floor : bool = false
-export(float) var ray_down_length : float = 10.0
-export(float) var ray_up_length : float = 0.0
-export(Vector3) var rotation_randomness : Vector3 = Vector3(0.0, 1.0, 0.0) setget _set_rotation_randomness
-export(Vector3) var scale_randomness : Vector3 = Vector3.ONE setget _set_scale
-export(Vector3) var global_scale : Vector3 = Vector3.ONE setget _set_global_scale
+
+export(bool) var copy_parent_curve = false setget set_copy_parent_curve
+export(bool) var continuous_update = false
+export(Resource) var scatter_logic setget set_scatter_logic
 
 ## --
 ## Internal variables
 ## --
+
 var _items : Array = Array()
 var _exclusion_areas : Array = Array()
-var _total_proportion : int
-var _distribution : Distribution
+var _total_proportion : int = 0
+var _offset : int = 0
+
+## --
+## Getters and Setters
+## --
+
+func get_exclusion_areas () -> Array:
+	return _exclusion_areas
+
+func set_copy_parent_curve(val: bool) -> void:
+	var parent = get_parent()
+	if not val or not parent is PolygonPath:
+		copy_parent_curve = false
+		update()
+		return
+	copy_parent_curve = true
+	_align_scatter_node_with_parent()
+	ScatterCommon.safe_connect(parent, "curve_updated", self, "update")
+	update()
+
+func set_scatter_logic (val : Resource) -> void:
+	if val is ScatterLogic:
+		scatter_logic = val
+		ScatterCommon.safe_connect(scatter_logic, "parameter_updated", self, "update")
+		update()
 
 ## --
 ## Public methods
 ## --
 
-# Called from any children when their exported parameters changes
-func update():
-	pass
+func update() -> void:
+	if not _is_ready():
+		return
+	_discover_items_info()
+	_scatter_instances()
 
 ## --
 ## Internal methods
 ## --
 
-func _ready():
-	self.connect("curve_updated", self, "_on_curve_update")
+func _ready() -> void:
+	if not scatter_logic:
+		scatter_logic = ScatterLogicGeneric.new()
+	ScatterCommon.safe_connect(self, "curve_updated", self, "_on_curve_update")
 	update()
 
-func _on_curve_update():
+func _on_curve_update() -> void:
 	update()
+
+func _align_scatter_node_with_parent() -> void:
+	var origin = Vector3.ZERO
+	origin.y = transform.origin.y
+	transform.origin = origin
+	rotation = Vector3.ZERO
+
+func _scatter_instances() -> void:
+	_init_scatter_logic()
+	_offset = 0
+	var count = 0
+	for i in range(_items.size()):
+		var item = _items[i]
+		item.translation = Vector3.ZERO
+		scatter_logic.scatter_pre_hook(item)
+		if i == _items.size() - 1:
+			count = scatter_logic.amount - _offset
+		else:
+			count = int(round(float(item.proportion) / _total_proportion * scatter_logic.amount))
+		_scatter_instances_from_item(item, count)
+		scatter_logic.scatter_post_hook(item)
+		_offset += count
+
+func _scatter_instances_from_item(_scatter_item, _instances_count) -> void:
+	pass
 
 # Loop through children to find all the ScatterItem and ScatterExclude nodes within
-func _discover_items_info():
+func _discover_items_info() -> void:
 	_items.clear()
 	_exclusion_areas.clear()
 	_total_proportion = 0
-	
+
 	for c in get_children():
 		if c.get_class() == "ScatterItem":
 			_items.append(c)
@@ -74,86 +119,27 @@ func _discover_items_info():
 		elif c.get_class() == "ScatterExclude":
 			_exclusion_areas.append(c)
 
-func _setup_distribution():
-	match distribution:
-		0:
-			_distribution = UniformDistribution.new()
-		1:
-			_distribution = NormalDistribution.new()
-		2:
-			_distribution = SimplexNoiseDistribution.new()
-	_distribution.init(custom_seed)
-
-func _get_ground_position(pos):
-	var space_state = get_world().get_direct_space_state()
-	var top = pos
-	var bottom = pos
-	top.y = ray_up_length
-	bottom.y = -ray_down_length
-	
-	top = to_global(top)
-	bottom = to_global(bottom)
-	
-	var hit = space_state.intersect_ray(top, bottom)
-	if hit:
-		return to_local(hit.position).y
+func _init_scatter_logic() -> void:
+	if copy_parent_curve:
+		scatter_logic.init(get_parent())
 	else:
-		return 0.0
+		scatter_logic.init(self)
+	scatter_logic.scatter_items_count = _items.size()
 
-func _get_next_valid_pos(item_excludes):
-	var pos = _distribution.get_vector3() * size * 0.5 + center
-	var attempts = 0
-	var max_attempts = 200
-	while not _is_point_valid(pos, item_excludes) and (attempts < max_attempts):
-		pos = _distribution.get_vector3() * size * 0.5 + center
-		attempts += 1
-	return pos
-
-func _is_point_valid(pos, item_excludes):
-	if not is_point_inside(pos):
-		return false
-	if _is_point_in_exclusion_area(pos, _exclusion_areas):
-		return false
-	if _is_point_in_exclusion_area(pos, item_excludes):
-		return false
-	return true
-
-func _is_point_in_exclusion_area(pos, exclusion_areas):
-	var inside = false
-	for i in range(0, exclusion_areas.size()):
-		var a = exclusion_areas[i]
-		if a.is_point_inside(a.to_local(to_global(pos))):
-			inside = true
-	return inside
-
-func _set_amount(val):
-	amount = val
-	update()
-
-func _set_distribution(val):
-	distribution = val
-	update()
-
-func _set_seed(val):
-	custom_seed = val
-	update()
-
-func _set_rotation_randomness(val):
-	rotation_randomness = val
-	update()
-
-func _set_scale(val):
-	scale_randomness = val
-	update()
-
-func _set_global_scale(val):
-	global_scale = val
-	update()
-
-# Avoid certain errors during tool developpement
+# Avoid some errors during tool developpement
 func _is_ready():
+	var c = curve
+	if copy_parent_curve:
+		c = get_parent().curve
+	if not c:
+		return false
+	if c.get_point_count() < 2:
+		return false
+	if not scatter_logic:
+		return false
 	set_process(true)
 	return get_tree()
 
-func _process(_delta):
-	pass
+func _process(_delta) -> void:
+	if continuous_update:
+		update()
