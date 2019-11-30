@@ -80,10 +80,6 @@ func _set_path(val):
 	initial_rotation = instance.rotation
 	initial_scale = instance.scale
 	instance.queue_free()
-	var root = get_node("Duplicates")
-	if root:
-		for c in root.get_children():
-			c.queue_free()
 	update()
 
 func _set_scale_modifier(val):
