@@ -42,9 +42,10 @@ func get_exclusion_areas () -> Array:
 	return _exclusion_areas
 
 func set_copy_parent_curve(val: bool) -> void:
-	copy_parent_curve = false
 	var parent = get_parent()
 	if not val or not parent is PolygonPath:
+		copy_parent_curve = false
+		update()
 		return
 	copy_parent_curve = true
 	_align_scatter_node_with_parent()
