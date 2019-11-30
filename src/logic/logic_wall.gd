@@ -18,7 +18,7 @@ export(Resource) var distribution : Resource setget set_distribution
 export(float) var min_resolution : float = 0.2 setget set_min_resolution
 export(Vector2) var resolution : Vector2 = Vector2.ONE setget set_resolution
 export(float) var height : float = 2.0 setget set_height
-export(Curve) var height_profile : Curve = Curve.new() setget set_height_profile
+export(Curve) var height_curve : Curve = Curve.new() setget set_height_curve
 export(Resource) var jitter_profile : Resource setget set_jitter_profile
 export(Resource) var rotation_profile : Resource setget set_rotation_profile
 export(Resource) var scale_profile : Resource setget set_scale_profile
@@ -75,8 +75,8 @@ func set_scale_profile(val) -> void:
 		_listen_to_updates(scale_profile)
 		notify_update()
 
-func set_height_profile(val) -> void:
-	height_profile = val
+func set_height_curve(val) -> void:
+	height_curve = val
 	notify_update()
 
 ## --
@@ -175,6 +175,6 @@ func _get_next_pos(index) -> Vector3:
 	normal.y = 0.0
 	normal = normal.normalized().rotated(Vector3.UP, PI / 2.0)
 	var ratio = relative_pos / height
-	var mod = height_profile.interpolate_baked(ratio)
+	var mod = height_curve.interpolate_baked(ratio)
 	normal *= mod
 	return pos + normal

@@ -127,9 +127,12 @@ func _init_scatter_logic() -> void:
 
 # Avoid some errors during tool developpement
 func _is_ready():
-	if not curve:
+	var c = curve
+	if copy_parent_curve:
+		c = get_parent().curve
+	if not c:
 		return false
-	if curve.get_point_count() < 2:
+	if c.get_point_count() < 2:
 		return false
 	if not scatter_logic:
 		return false
