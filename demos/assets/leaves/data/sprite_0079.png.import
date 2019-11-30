@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/item.svg-f9c90a093f58a922d83f513824f3eb99.stex"
+path="res://.import/sprite_0079.png-db689999a5c10e2ac84dba8f77a9ee33.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/scatter/icons/item.svg"
-dest_files=[ "res://.import/item.svg-f9c90a093f58a922d83f513824f3eb99.stex" ]
+source_file="res://addons/scatter/demos/assets/leaves/data/sprite_0079.png"
+dest_files=[ "res://.import/sprite_0079.png-db689999a5c10e2ac84dba8f77a9ee33.stex" ]
 
 [params]
 

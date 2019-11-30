@@ -1,0 +1,168 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/modifier_panel.gd" type="Script" id=1]
+[ext_resource path="res://addons/scatter/icons/right.svg" type="Texture" id=2]
+[ext_resource path="res://addons/scatter/icons/up.svg" type="Texture" id=3]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/toggle_button.gd" type="Script" id=4]
+[ext_resource path="res://addons/scatter/icons/close.svg" type="Texture" id=5]
+[ext_resource path="res://addons/scatter/icons/down.svg" type="Texture" id=6]
+[ext_resource path="res://addons/scatter/icons/enabled.svg" type="Texture" id=7]
+[ext_resource path="res://addons/scatter/icons/disabled.svg" type="Texture" id=8]
+[ext_resource path="res://addons/scatter/icons/warning.svg" type="Texture" id=9]
+
+[node name="ModifierPanel" type="Control"]
+anchor_right = 1.0
+margin_bottom = 34.0
+rect_min_size = Vector2( 0, 34 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_right = 1.0
+margin_bottom = 34.0
+mouse_filter = 2
+size_flags_vertical = 4
+custom_constants/margin_right = 6
+custom_constants/margin_top = 6
+custom_constants/margin_left = 6
+custom_constants/margin_bottom = 6
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+margin_left = 6.0
+margin_top = 6.0
+margin_right = 1018.0
+margin_bottom = 28.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+margin_right = 1012.0
+margin_bottom = 22.0
+size_flags_vertical = 0
+
+[node name="Expand" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+margin_right = 28.0
+margin_bottom = 22.0
+focus_mode = 0
+mouse_filter = 1
+toggle_mode = true
+icon = ExtResource( 2 )
+flat = true
+script = ExtResource( 4 )
+default_icon = ExtResource( 2 )
+pressed_icon = ExtResource( 6 )
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+margin_left = 32.0
+margin_top = 4.0
+margin_right = 980.0
+margin_bottom = 18.0
+rect_min_size = Vector2( 80, 0 )
+size_flags_horizontal = 3
+text = "Modifier Name"
+clip_text = true
+
+[node name="Buttons" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+margin_left = 984.0
+margin_right = 1012.0
+margin_bottom = 22.0
+custom_constants/separation = 0
+
+[node name="EditButtons" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
+visible = false
+margin_right = 84.0
+margin_bottom = 22.0
+custom_constants/separation = 0
+
+[node name="MoveUp" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons/EditButtons"]
+margin_right = 28.0
+margin_bottom = 22.0
+focus_mode = 0
+mouse_filter = 1
+size_flags_vertical = 4
+icon = ExtResource( 3 )
+
+[node name="MoveDown" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons/EditButtons"]
+margin_left = 28.0
+margin_right = 56.0
+margin_bottom = 22.0
+focus_mode = 0
+mouse_filter = 1
+size_flags_vertical = 4
+icon = ExtResource( 6 )
+
+[node name="Remove" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons/EditButtons"]
+margin_left = 56.0
+margin_right = 84.0
+margin_bottom = 22.0
+focus_mode = 0
+mouse_filter = 1
+size_flags_vertical = 4
+icon = ExtResource( 5 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
+margin_right = 28.0
+margin_bottom = 22.0
+custom_constants/separation = 0
+
+[node name="Warning" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer"]
+visible = false
+margin_right = 28.0
+margin_bottom = 22.0
+hint_tooltip = "There are issues with this modifier configuration, click this warning icon for more details."
+mouse_filter = 1
+size_flags_horizontal = 0
+icon = ExtResource( 9 )
+flat = true
+
+[node name="Enable" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer"]
+margin_right = 28.0
+margin_bottom = 22.0
+hint_tooltip = "Enable or Disable the modifier.
+If a modifier is disabled, it will stay in the stack but wont contribute to the final result."
+mouse_filter = 1
+size_flags_vertical = 4
+toggle_mode = true
+pressed = true
+icon = ExtResource( 7 )
+flat = true
+script = ExtResource( 4 )
+default_icon = ExtResource( 8 )
+pressed_icon = ExtResource( 7 )
+
+[node name="Parameters" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+visible = false
+margin_top = 26.0
+margin_right = 1012.0
+margin_bottom = 26.0
+
+[node name="AcceptDialog" type="AcceptDialog" parent="."]
+margin_right = 83.0
+margin_bottom = 58.0
+window_title = "Warning"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="." method="_on_expand_toggled"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="MarginContainer/VBoxContainer/HBoxContainer/Expand" method="_on_toggled"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/EditButtons/MoveUp" to="." method="_on_move_up_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/EditButtons/MoveDown" to="." method="_on_move_down_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/EditButtons/Remove" to="." method="_on_remove_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Warning" to="." method="_on_warning_icon_pressed"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable" to="." method="_on_enable_toggled"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable" to="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable" method="_on_toggled"]

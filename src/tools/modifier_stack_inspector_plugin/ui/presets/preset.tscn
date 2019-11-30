@@ -1,0 +1,53 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/scatter/icons/close.svg" type="Texture" id=1]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/presets/preset.gd" type="Script" id=2]
+
+[node name="Preset" type="Button"]
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_top = -10.0
+margin_bottom = 29.0
+rect_min_size = Vector2( 0, 40 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+custom_constants/margin_right = 6
+custom_constants/margin_top = 6
+custom_constants/margin_left = 6
+custom_constants/margin_bottom = 6
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+margin_left = 6.0
+margin_top = 6.0
+margin_right = 1018.0
+margin_bottom = 34.0
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer"]
+margin_top = 7.0
+margin_right = 980.0
+margin_bottom = 21.0
+size_flags_horizontal = 3
+text = "Preset name"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Delete" type="Button" parent="MarginContainer/HBoxContainer"]
+margin_left = 984.0
+margin_right = 1012.0
+margin_bottom = 28.0
+icon = ExtResource( 1 )
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/Delete" to="." method="_on_delete"]

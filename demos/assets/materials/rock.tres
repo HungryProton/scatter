@@ -1,0 +1,9 @@
+[gd_resource type="SpatialMaterial" load_steps=2 format=2]
+
+[ext_resource path="res://addons/scatter/demos/assets/materials/t_rock_2.png" type="Texture" id=1]
+
+[resource]
+albedo_color = Color( 0.709804, 0.709804, 0.709804, 1 )
+albedo_texture = ExtResource( 1 )
+uv1_scale = Vector3( 0.15, 0.15, 0.15 )
+uv1_triplanar = true

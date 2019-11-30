@@ -1,0 +1,60 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_scalar.gd" type="Script" id=1]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0, 0, 0, 0.392157 )
+
+[node name="ParameterScalar" type="HBoxContainer"]
+anchor_right = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_top = 7.0
+margin_right = 942.0
+margin_bottom = 21.0
+size_flags_horizontal = 3
+text = "Parameter name"
+valign = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+margin_left = 946.0
+margin_right = 1024.0
+margin_bottom = 28.0
+mouse_filter = 2
+
+[node name="Panel" type="Panel" parent="MarginContainer"]
+margin_right = 78.0
+margin_bottom = 28.0
+mouse_filter = 2
+custom_styles/panel = SubResource( 1 )
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer"]
+margin_right = 78.0
+margin_bottom = 28.0
+mouse_filter = 2
+custom_constants/margin_right = 2
+custom_constants/margin_top = 2
+custom_constants/margin_left = 2
+custom_constants/margin_bottom = 2
+
+[node name="SpinBox" type="SpinBox" parent="MarginContainer/MarginContainer"]
+margin_left = 2.0
+margin_top = 2.0
+margin_right = 76.0
+margin_bottom = 26.0
+mouse_filter = 1
+min_value = -100.0
+step = 0.001
+allow_greater = true
+allow_lesser = true
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/MarginContainer"]
+visible = false
+margin_left = 2.0
+margin_top = 2.0
+margin_right = 76.0
+margin_bottom = 26.0

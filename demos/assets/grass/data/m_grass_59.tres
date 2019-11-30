@@ -1,0 +1,26 @@
+[gd_resource type="ShaderMaterial" load_steps=6 format=2]
+
+[ext_resource path="res://addons/scatter/demos/assets/grass/data/s_grass.shader" type="Shader" id=1]
+[ext_resource path="res://addons/scatter/demos/assets/grass/data/t_grass_4.png" type="Texture" id=2]
+[ext_resource path="res://addons/scatter/demos/assets/grass/data/t_noise.png" type="Texture" id=3]
+
+[sub_resource type="Gradient" id=1]
+colors = PoolColorArray( 0.546875, 0.33659, 0.00854492, 1, 0.945312, 0.931061, 0.0332336, 1 )
+
+[sub_resource type="GradientTexture" id=2]
+gradient = SubResource( 1 )
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/alpha_scissor_threshold = 0.8
+shader_param/transmission = Color( 0.823529, 0.654902, 0, 1 )
+shader_param/secondary_color = Color( 0.960784, 0.0431373, 0.0431373, 1 )
+shader_param/secondary_attenuation = 0.5
+shader_param/grass_height = 0.5
+shader_param/wind_direction = Vector2( 1, -0.5 )
+shader_param/wind_speed = 0.25
+shader_param/wind_strength = 1.0
+shader_param/noise_scale = 20.0
+shader_param/texture_albedo = ExtResource( 2 )
+shader_param/texture_gradient = SubResource( 2 )
+shader_param/texture_noise = ExtResource( 3 )

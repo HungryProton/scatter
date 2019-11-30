@@ -1,0 +1,24 @@
+[gd_resource type="ShaderMaterial" load_steps=6 format=2]
+
+[ext_resource path="res://addons/scatter/demos/assets/leaves/data/s_leaves.shader" type="Shader" id=1]
+[ext_resource path="res://addons/scatter/demos/assets/leaves/data/sprite_0081.png" type="Texture" id=2]
+[ext_resource path="res://addons/scatter/demos/assets/grass/data/t_noise.png" type="Texture" id=3]
+
+[sub_resource type="Gradient" id=1]
+offsets = PoolRealArray( 0, 0.996016 )
+colors = PoolColorArray( 0.571198, 0.796875, 0.34552, 1, 0.645856, 0.765625, 0.0687866, 1 )
+
+[sub_resource type="GradientTexture" id=2]
+gradient = SubResource( 1 )
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/alpha_scissor_threshold = 0.8
+shader_param/transmission = Color( 0.494118, 0.541176, 0.0666667, 1 )
+shader_param/wind_direction = Vector2( 1, -0.5 )
+shader_param/wind_speed = 0.25
+shader_param/wind_strength = 0.5
+shader_param/noise_scale = 20.0
+shader_param/texture_albedo = ExtResource( 2 )
+shader_param/texture_gradient = SubResource( 2 )
+shader_param/texture_noise = ExtResource( 3 )

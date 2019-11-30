@@ -1,0 +1,84 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/stack_panel.gd" type="Script" id=1]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/add_modifier_button.gd" type="Script" id=2]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/modifiers_popup.tscn" type="PackedScene" id=3]
+[ext_resource path="res://addons/scatter/icons/add.svg" type="Texture" id=4]
+[ext_resource path="res://addons/scatter/icons/menu.svg" type="Texture" id=5]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/presets_button.gd" type="Script" id=6]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/presets/load_preset.tscn" type="PackedScene" id=7]
+[ext_resource path="res://addons/scatter/icons/save.svg" type="Texture" id=8]
+[ext_resource path="res://addons/scatter/icons/load.svg" type="Texture" id=9]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/presets/save_preset.tscn" type="PackedScene" id=10]
+
+[node name="MarginContainer" type="MarginContainer"]
+margin_right = 227.0
+margin_bottom = 116.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+modifiers_popup = NodePath("PanelContainer/VBoxContainer/HBoxContainer/Add/ModifiersPopup")
+root = NodePath("PanelContainer/VBoxContainer/VBoxContainer2")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+margin_right = 227.0
+margin_bottom = 116.0
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 220.0
+margin_bottom = 109.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+margin_right = 213.0
+margin_bottom = 22.0
+
+[node name="Add" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+margin_right = 116.0
+margin_bottom = 22.0
+size_flags_horizontal = 2
+toggle_mode = true
+action_mode = 0
+text = " Add Modifier"
+icon = ExtResource( 4 )
+flat = true
+script = ExtResource( 2 )
+
+[node name="ModifiersPopup" parent="PanelContainer/VBoxContainer/HBoxContainer/Add" instance=ExtResource( 3 )]
+
+[node name="Presets" type="MenuButton" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+margin_left = 185.0
+margin_right = 213.0
+margin_bottom = 22.0
+hint_tooltip = "Presets"
+icon = ExtResource( 5 )
+items = [ "Save Preset", ExtResource( 8 ), 0, false, false, 0, 0, null, "", false, "Load Preset", ExtResource( 9 ), 0, false, false, 1, 0, null, "", false ]
+script = ExtResource( 6 )
+
+[node name="LoadPresetPopup" parent="PanelContainer/VBoxContainer/HBoxContainer/Presets" instance=ExtResource( 7 )]
+visible = false
+
+[node name="SavePresetPopup" parent="PanelContainer/VBoxContainer/HBoxContainer/Presets" instance=ExtResource( 10 )]
+visible = false
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainer/VBoxContainer"]
+margin_top = 26.0
+margin_right = 213.0
+margin_bottom = 26.0
+
+[node name="RebuildButton" type="Button" parent="PanelContainer/VBoxContainer"]
+margin_left = 76.0
+margin_top = 30.0
+margin_right = 136.0
+margin_bottom = 50.0
+size_flags_horizontal = 4
+text = "Rebuild"
+
+[connection signal="load_preset" from="PanelContainer/VBoxContainer/HBoxContainer/Presets/LoadPresetPopup" to="." method="_on_load_preset"]
+[connection signal="save_preset" from="PanelContainer/VBoxContainer/HBoxContainer/Presets/SavePresetPopup" to="." method="_on_save_preset"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/RebuildButton" to="." method="_on_rebuild_pressed"]

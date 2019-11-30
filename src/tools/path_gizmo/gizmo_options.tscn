@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/scatter/src/tools/path_gizmo/gizmo_options.gd" type="Script" id=1]
+
+[node name="Control" type="Control"]
+margin_bottom = 40.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Colliders" type="CheckButton" parent="HBoxContainer"]
+margin_right = 186.0
+margin_bottom = 40.0
+text = "Snap to colliders"
+
+[node name="Plane" type="CheckButton" parent="HBoxContainer"]
+margin_left = 190.0
+margin_right = 355.0
+margin_bottom = 40.0
+pressed = true
+text = "Lock to plane"
+
+[connection signal="toggled" from="HBoxContainer/Colliders" to="." method="_on_button_toggled"]
+[connection signal="toggled" from="HBoxContainer/Colliders" to="." method="_on_snap_button_toggled"]
+[connection signal="toggled" from="HBoxContainer/Plane" to="." method="_on_button_toggled"]
