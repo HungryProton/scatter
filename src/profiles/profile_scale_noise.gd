@@ -40,7 +40,8 @@ func _set_noise(val):
 ## --
 
 func reset() -> void:
-	pass
+	if not noise:
+		self.noise = OpenSimplexNoise.new()
 
 func get_result(pos : Vector3) -> Vector3:
 	return (Vector3.ONE + abs(noise.get_noise_3dv(pos)) * randomness) * global_scale

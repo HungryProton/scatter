@@ -78,6 +78,7 @@ func set_scale_profile(val) -> void:
 func set_height_curve(val) -> void:
 	height_curve = val
 	notify_update()
+	ScatterCommon.safe_connect(height_curve, "changed", self, "notify_update")
 
 ## --
 ## Public methods
