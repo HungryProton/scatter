@@ -38,7 +38,6 @@ var initial_scale
 ## --
 
 var _parent
-var _exclusion_areas : Array
 
 ## --
 ## Public methods

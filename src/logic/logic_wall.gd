@@ -20,6 +20,7 @@ export(Vector2) var resolution : Vector2 = Vector2.ONE setget set_resolution
 export(float) var height : float = 2.0 setget set_height
 export(Curve) var height_curve : Curve = Curve.new() setget set_height_curve
 export(Resource) var jitter_profile : Resource setget set_jitter_profile
+export(bool) var align_rotation_with_path : bool = false setget set_rotation_bool
 export(Resource) var rotation_profile : Resource setget set_rotation_profile
 export(Resource) var scale_profile : Resource setget set_scale_profile
 
@@ -80,6 +81,10 @@ func set_height_curve(val) -> void:
 	notify_update()
 	ScatterCommon.safe_connect(height_curve, "changed", self, "notify_update")
 
+func set_rotation_bool(val) -> void:
+	align_rotation_with_path = val
+	notify_update()
+
 ## --
 ## Public methods
 ## --
@@ -98,7 +103,10 @@ func scatter_pre_hook(item : ScatterItem) -> void:
 
 func get_next_transform(item : ScatterItem, index = -1) -> Transform:
 	var t : Transform = Transform()
-	var pos : Vector3 = _get_random_pos()
+	var info = _get_random_info()
+	var pos = info[0]
+	var normal = info[1]
+
 	pos += jitter_profile.get_result(pos)
 
 	# Update item scaling
@@ -111,6 +119,8 @@ func get_next_transform(item : ScatterItem, index = -1) -> Transform:
 	var rotation = rotation_profile.get_result(pos)
 	if not item.ignore_initial_rotation:
 		rotation += item.initial_rotation
+	if align_rotation_with_path:
+		rotation.y = atan2(normal.x, normal.z)
 	t = t.rotated(Vector3.RIGHT, rotation.x)
 	t = t.rotated(Vector3.UP, rotation.y)
 	t = t.rotated(Vector3.BACK, rotation.z)
@@ -151,10 +161,10 @@ func _define_total_instances_amount() -> void:
 	y_count = clamp(y_count, 1, y_count)
 	amount = x_count * y_count
 
-func _get_random_pos() -> Vector3:
+func _get_random_info() -> Array:
 	return _get_next_pos(distribution.get_int())
 
-func _get_next_pos(index) -> Vector3:
+func _get_next_pos(index) -> Array:
 	var instances_in_column = int(round(height / resolution.y))
 	clamp(instances_in_column, 1, instances_in_column)
 	var index2 = (index / instances_in_column)
@@ -166,16 +176,16 @@ func _get_next_pos(index) -> Vector3:
 
 	var pos1
 	var normal
-	if offset + 0.15 < path_length:
-		pos1 = _path.curve.interpolate_baked(offset + 0.15)
+	if offset + 1.0 < path_length:
+		pos1 = _path.curve.interpolate_baked(offset + 1.0)
 		normal = (pos1 - pos)
 	else:
-		pos1 = _path.curve.interpolate_baked(offset - 0.15)
+		pos1 = _path.curve.interpolate_baked(offset - 1.0)
 		normal = (pos - pos1)
 
 	normal.y = 0.0
 	normal = normal.normalized().rotated(Vector3.UP, PI / 2.0)
 	var ratio = relative_pos / height
 	var mod = height_curve.interpolate_baked(ratio)
-	normal *= mod
-	return pos + normal
+	pos += normal * mod
+	return [pos, normal]

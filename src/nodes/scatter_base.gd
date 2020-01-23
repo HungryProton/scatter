@@ -21,7 +21,7 @@ signal parameter_updated
 ## Exported variables
 ## --
 
-export(bool) var copy_parent_curve = false setget set_copy_parent_curve
+export(bool) var copy_parent_curve setget set_copy_parent_curve
 export(bool) var continuous_update = false
 export(Resource) var scatter_logic setget set_scatter_logic
 

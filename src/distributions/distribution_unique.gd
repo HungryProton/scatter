@@ -43,6 +43,8 @@ func reset() -> void:
 
 func get_int() -> int:
 	_offset += 1
+	if _offset >= range_1d.y:
+		_offset = 0
 	return _numbers[_offset]
 
 ## --

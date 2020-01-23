@@ -19,6 +19,7 @@ class_name ProfilePositionSimple
 ## --
 
 export(bool) var project_on_floor : bool = false setget set_project_on_floor
+export(bool) var invert_ray_direction : bool = false setget set_invert_ray_direction
 export(float) var ray_down_length : float = 10.0 setget set_ray_down_length
 export(float) var ray_up_length : float = 0.0 setget set_ray_up_length
 export(Resource) var distribution setget set_distribution
@@ -54,6 +55,10 @@ func set_distribution(val):
 
 func set_project_on_floor(val) -> void:
 	project_on_floor = val
+	notify_update()
+
+func set_invert_ray_direction(val) -> void:
+	invert_ray_direction = val
 	notify_update()
 
 func set_ray_down_length(val) -> void:
@@ -111,7 +116,11 @@ func _get_ground_position(pos):
 	top = _path.to_global(top)
 	bottom = _path.to_global(bottom)
 
-	var hit = space_state.intersect_ray(top, bottom)
+	var hit
+	if invert_ray_direction:
+		space_state.intersect_ray(bottom, top)
+	else:
+		space_state.intersect_ray(top, bottom)
 	if hit:
 		return _path.to_local(hit.position).y
 	else:
