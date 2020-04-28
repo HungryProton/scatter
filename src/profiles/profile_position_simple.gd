@@ -118,9 +118,9 @@ func _get_ground_position(pos):
 
 	var hit
 	if invert_ray_direction:
-		space_state.intersect_ray(bottom, top)
+		hit = space_state.intersect_ray(bottom, top)
 	else:
-		space_state.intersect_ray(top, bottom)
+		hit = space_state.intersect_ray(top, bottom)
 	if hit:
 		return _path.to_local(hit.position).y
 	else:
