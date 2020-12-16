@@ -12,8 +12,6 @@ tool
 
 extends Spatial
 
-class_name ScatterItem
-
 ## --
 ## Exported variables
 ## --
@@ -43,8 +41,6 @@ var _parent
 ## Public methods
 ## --
 
-func get_class():
-	return "ScatterItem"
 
 func get_exclusion_areas():
 	var result = _parent.get_exclusion_areas()
@@ -52,6 +48,7 @@ func get_exclusion_areas():
 		if c.get_class() == "ScatterExclude":
 			result.append(c)
 	return result
+
 
 func update():
 	_parent = get_parent()
