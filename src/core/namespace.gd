@@ -7,7 +7,7 @@ var _root = _get_root_folder()
 var Scatter = load(_root + "/src/core/scatter.gd")
 var ScatterItem = load(_root + "/src/core/scatter_item.gd")
 var Transforms = load(_root + "/src/core/transforms.gd")
-var ModifierStack = load(_root + "/src/core/modifier_stack/modifier_stack.gd")
+var ModifierStack = load(_root + "/src/core/modifier_stack.gd")
 
 
 func _get_root_folder() -> String:

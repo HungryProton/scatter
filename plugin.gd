@@ -4,7 +4,7 @@ extends EditorPlugin
 
 var modifier_stack_plugin: EditorInspectorPlugin = load(
 	_get_current_folder() + 
-	"/src/core/modifier_stack/modifier_stack_plugin.gd").new()
+	"/src/tools/modifier_stack_inspector_plugin/modifier_stack_plugin.gd").new()
 
 
 func get_name():

@@ -7,7 +7,7 @@ extends EditorInspectorPlugin
 
 var _root := _get_root_folder()
 var _namespace = load(_root + "/src/core/namespace.gd").new()
-var _editor = load(_root + "/src/core/modifier_stack/plugin_ui/editor_property.gd")
+var _editor = load(_root + "/src/tools/modifier_stack_inspector_plugin/editor_property.gd")
 
 
 func can_handle(object):
@@ -17,7 +17,7 @@ func can_handle(object):
 func parse_property(object, type, path, hint, hint_text, usage):
 	if type == TYPE_OBJECT and hint_text == "ScatterModifierStack":
 		var editor_property = _editor.new()
-		editor_property.set_node(object._modifier_stack)
+		editor_property.set_node(object)
 		add_property_editor(path, editor_property)
 		return true
 	return false

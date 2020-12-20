@@ -1,17 +1,20 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://addons/scatter/src/core/modifier_stack/plugin_ui/modifier_panel.gd" type="Script" id=1]
-[ext_resource path="res://addons/scatter/icons/item.svg" type="Texture" id=2]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/modifier_panel.gd" type="Script" id=1]
+[ext_resource path="res://addons/scatter/icons/right.svg" type="Texture" id=2]
+[ext_resource path="res://addons/scatter/icons/up.svg" type="Texture" id=3]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/expand_button.gd" type="Script" id=4]
+[ext_resource path="res://addons/scatter/icons/close.svg" type="Texture" id=5]
+[ext_resource path="res://addons/scatter/icons/down.svg" type="Texture" id=6]
 
 [node name="ModifierPanel" type="Control"]
 anchor_right = 1.0
-rect_min_size = Vector2( 0, 38 )
+margin_bottom = 106.0
+rect_min_size = Vector2( 0, 106 )
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-parameters = NodePath("../ModifierPanel/MarginContainer/VBoxContainer/Parameters")
-display_name = NodePath("MarginContainer/VBoxContainer/HBoxContainer/Label")
 
 [node name="Panel" type="Panel" parent="."]
 anchor_right = 1.0
@@ -25,6 +28,7 @@ __meta__ = {
 [node name="MarginContainer" type="MarginContainer" parent="."]
 anchor_right = 1.0
 margin_bottom = 38.0
+size_flags_vertical = 4
 custom_constants/margin_right = 6
 custom_constants/margin_top = 6
 custom_constants/margin_left = 6
@@ -37,7 +41,7 @@ __meta__ = {
 margin_left = 6.0
 margin_top = 6.0
 margin_right = 1018.0
-margin_bottom = 32.0
+margin_bottom = 37.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 margin_right = 1012.0
@@ -49,52 +53,59 @@ margin_right = 28.0
 margin_bottom = 22.0
 toggle_mode = true
 icon = ExtResource( 2 )
+flat = true
+script = ExtResource( 4 )
+collapsed_icon = ExtResource( 2 )
+expanded_icon = ExtResource( 6 )
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 margin_left = 32.0
 margin_top = 4.0
-margin_right = 937.0
+margin_right = 912.0
 margin_bottom = 18.0
 rect_min_size = Vector2( 80, 0 )
 size_flags_horizontal = 3
-text = "Modifier Name longer"
+text = "Modifier Name"
 autowrap = true
 
 [node name="Buttons" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-margin_left = 941.0
+margin_left = 916.0
 margin_right = 1012.0
 margin_bottom = 22.0
 custom_constants/separation = 12
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
-margin_right = 40.0
+margin_right = 56.0
 margin_bottom = 22.0
 custom_constants/separation = 0
 
 [node name="MoveUp" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer"]
-margin_right = 20.0
+margin_right = 28.0
 margin_bottom = 22.0
 size_flags_horizontal = 0
-text = "u"
+icon = ExtResource( 3 )
 
 [node name="MoveDown" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer"]
-margin_left = 20.0
-margin_right = 40.0
+margin_left = 28.0
+margin_right = 56.0
 margin_bottom = 22.0
-text = "d"
+icon = ExtResource( 6 )
 
 [node name="Remove" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
-margin_left = 52.0
-margin_right = 71.0
+margin_left = 68.0
+margin_right = 96.0
 margin_bottom = 22.0
-text = "x"
+icon = ExtResource( 5 )
 
 [node name="Parameters" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
 visible = false
+margin_left = 6.0
 margin_top = 26.0
-margin_right = 1012.0
+margin_right = 1006.0
 margin_bottom = 26.0
+
 [connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="." method="_on_expand_toggled"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="MarginContainer/VBoxContainer/HBoxContainer/Expand" method="_on_toggled"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/MoveUp" to="." method="_on_move_up_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/MoveDown" to="." method="_on_move_down_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/Remove" to="." method="_on_remove_pressed"]

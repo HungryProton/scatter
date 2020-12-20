@@ -7,6 +7,7 @@ export var root: NodePath
 
 var _add: MenuButton
 var _root: Control
+var _scatter
 var _modifier_stack
 var _modifier_panel = load(_get_current_folder() + "/modifier_panel.tscn")
 
@@ -25,7 +26,8 @@ func set_node(node) -> void:
 	if _modifier_stack:
 		_modifier_stack.disconnect("stack_changed", self, "_on_stack_changed")
 	
-	_modifier_stack = node
+	_scatter = node
+	_modifier_stack = node._modifier_stack
 	_modifier_stack.connect("stack_changed", self, "_on_stack_changed")
 
 
@@ -34,10 +36,11 @@ func rebuild_ui() -> void:
 	for m in _modifier_stack.stack:
 		var ui = _modifier_panel.instance()
 		_root.add_child(ui)
-		ui.set_modifier_name(m.display_name)
+		ui.create_ui_for(m)
 		ui.connect("move_up", self, "_on_move_up", [m])
 		ui.connect("move_down", self, "_on_move_down", [m])
 		ui.connect("remove_modifier", self, "_on_remove", [m])
+		ui.connect("value_changed", self, "_on_value_changed")
 
 
 func _clear() -> void:
@@ -70,3 +73,8 @@ func _on_move_down(m) -> void:
 
 func _on_remove(m) -> void:
 	_modifier_stack.remove(m)
+
+
+func _on_value_changed() -> void:
+	if _scatter:
+		_scatter.update()

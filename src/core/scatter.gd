@@ -1,5 +1,5 @@
 tool
-extends Path
+extends "scatter_path.gd"
 
 
 export var instances_count := 10 setget _set_instances_count
@@ -17,6 +17,9 @@ var _total_proportion: int
 func _ready() -> void:
 	if not _modifier_stack:
 		_modifier_stack = _namespace.ModifierStack.new()
+	
+	_modifier_stack.connect("stack_changed", self, "update")
+	self.connect("curve_updated", self, "update")
 
 
 func _get_property_list() -> Array:
@@ -55,6 +58,7 @@ func update() -> void:
 	
 	_transforms = _namespace.Transforms.new()
 	_transforms.set_count(instances_count)
+	_transforms.set_path(self)
 	_modifier_stack.update(_transforms, random_seed)
 	
 	if use_instancing:
@@ -83,12 +87,12 @@ func _create_multimesh() -> void:
 	var transforms_count: int = _transforms.list.size()
 	
 	for item in _items:
-		var count = int(round(float(item.proportion) / _total_proportion * instances_count))
+		var count = int(round(float(item.proportion) / _total_proportion * transforms_count))
 		var mmi = _setup_multi_mesh(item, count)
 
 		for i in count:
 			if (offset + i) >= transforms_count:
-				break
+				return
 			mmi.multimesh.set_instance_transform(i, _transforms.list[offset + i])
 		offset += count
 

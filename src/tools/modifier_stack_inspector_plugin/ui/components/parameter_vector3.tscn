@@ -1,0 +1,108 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_vector3.gd" type="Script" id=1]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0, 0, 0, 0.392157 )
+
+[node name="ParameterVector3" type="VBoxContainer"]
+anchor_right = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_right = 1024.0
+margin_bottom = 14.0
+size_flags_horizontal = 3
+text = "Parameter name"
+valign = 1
+autowrap = true
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+margin_top = 18.0
+margin_right = 1024.0
+margin_bottom = 50.0
+
+[node name="Panel" type="Panel" parent="MarginContainer"]
+margin_right = 1024.0
+margin_bottom = 32.0
+custom_styles/panel = SubResource( 1 )
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer"]
+margin_left = 374.0
+margin_right = 649.0
+margin_bottom = 32.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+custom_constants/margin_right = 4
+custom_constants/margin_top = 4
+custom_constants/margin_left = 4
+custom_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/MarginContainer"]
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 271.0
+margin_bottom = 28.0
+custom_constants/separation = 6
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/MarginContainer/HBoxContainer"]
+margin_right = 85.0
+margin_bottom = 24.0
+
+[node name="Label" type="Label" parent="MarginContainer/MarginContainer/HBoxContainer/HBoxContainer"]
+modulate = Color( 1, 0.447059, 0.368627, 1 )
+margin_top = 5.0
+margin_right = 7.0
+margin_bottom = 19.0
+text = "x"
+
+[node name="X" type="SpinBox" parent="MarginContainer/MarginContainer/HBoxContainer/HBoxContainer"]
+margin_left = 11.0
+margin_right = 85.0
+margin_bottom = 24.0
+step = 0.001
+allow_greater = true
+allow_lesser = true
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/MarginContainer/HBoxContainer"]
+margin_left = 91.0
+margin_right = 176.0
+margin_bottom = 24.0
+
+[node name="Label" type="Label" parent="MarginContainer/MarginContainer/HBoxContainer/HBoxContainer2"]
+modulate = Color( 0.564706, 0.992157, 0.298039, 1 )
+margin_top = 5.0
+margin_right = 7.0
+margin_bottom = 19.0
+text = "y"
+
+[node name="Y" type="SpinBox" parent="MarginContainer/MarginContainer/HBoxContainer/HBoxContainer2"]
+margin_left = 11.0
+margin_right = 85.0
+margin_bottom = 24.0
+step = 0.001
+allow_greater = true
+allow_lesser = true
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/MarginContainer/HBoxContainer"]
+margin_left = 182.0
+margin_right = 267.0
+margin_bottom = 24.0
+
+[node name="Label" type="Label" parent="MarginContainer/MarginContainer/HBoxContainer/HBoxContainer3"]
+modulate = Color( 0.14902, 0.8, 1, 1 )
+margin_top = 5.0
+margin_right = 7.0
+margin_bottom = 19.0
+text = "z"
+
+[node name="Z" type="SpinBox" parent="MarginContainer/MarginContainer/HBoxContainer/HBoxContainer3"]
+margin_left = 11.0
+margin_right = 85.0
+margin_bottom = 24.0
+step = 0.001
+allow_greater = true
+allow_lesser = true
