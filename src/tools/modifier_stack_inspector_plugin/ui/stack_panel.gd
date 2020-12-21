@@ -2,10 +2,10 @@ tool
 extends Control
 
 
-export var add_button: NodePath
+export var modifiers_popup: NodePath
 export var root: NodePath
 
-var _add: MenuButton
+var _modifiers_popup: PopupPanel
 var _root: Control
 var _scatter
 var _modifier_stack
@@ -13,9 +13,9 @@ var _modifier_panel = load(_get_current_folder() + "/modifier_panel.tscn")
 
 
 func _ready():
-	_add = get_node(add_button)
+	_modifiers_popup = get_node(modifiers_popup)
 	_root = get_node(root)
-	_add.connect("add_modifier", self, "_on_add_modifier")
+	_modifiers_popup.connect("add_modifier", self, "_on_add_modifier")
 	rebuild_ui()
 
 

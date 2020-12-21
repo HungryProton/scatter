@@ -36,9 +36,11 @@ func create_ui_for(modifier) -> void:
 			TYPE_INT:
 				parameter_ui = load(_get_current_folder() + "/components/parameter_scalar.tscn").instance()
 				parameter_ui.mark_as_int(true)
+			TYPE_STRING:
+				parameter_ui = load(_get_current_folder() + "/components/parameter_string.tscn").instance()
 			TYPE_VECTOR3:
 				parameter_ui = load(_get_current_folder() + "/components/parameter_vector3.tscn").instance()
-		
+			
 		if parameter_ui:
 			_parameters.add_child(parameter_ui)
 			parameter_ui.set_parameter_name(property.name.capitalize())
@@ -52,12 +54,10 @@ func _get_current_folder() -> String:
 	return path.get_base_dir()
 
 
-
 func _on_expand_toggled(toggled: bool) -> void:
 	_parameters.visible = toggled
 	if _margin_container:
 		_margin_container.rect_size.y = 0.0
-
 
 func _on_move_up_pressed() -> void:
 	emit_signal("move_up")

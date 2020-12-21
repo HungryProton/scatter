@@ -2,12 +2,11 @@ tool
 extends "scatter_path.gd"
 
 
-export var instances_count := 10 setget _set_instances_count
-export var random_seed := 0 setget _set_random_seed
+export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
 
 
-var _namespace = load(_get_root_path() + "/namespace.gd").new()
+var _namespace = load(_get_current_folder() + "/namespace.gd").new()
 var _modifier_stack
 var _transforms
 var _items := []
@@ -45,7 +44,7 @@ func _set(property, value):
 	if property == "modifier_stack":
 		# TODO: This duplicate is there because I couldn't find a way to detect
 		# when a node is duplicated from the editor and I don't want multiple
-		# scatter nodes to share the same stack
+		# scatter nodes to share the same stack.
 		_modifier_stack = value.duplicate(7)
 		return true
 	return false
@@ -57,9 +56,8 @@ func update() -> void:
 		return
 	
 	_transforms = _namespace.Transforms.new()
-	_transforms.set_count(instances_count)
 	_transforms.set_path(self)
-	_modifier_stack.update(_transforms, random_seed)
+	_modifier_stack.update(_transforms, global_seed)
 	
 	if use_instancing:
 		_create_multimesh()
@@ -131,19 +129,14 @@ func _get_mesh_from_scene(node_path):
 				return res
 
 
-func _get_root_path() -> String:
+func _get_current_folder() -> String:
 	var script: Script = get_script()
 	var path: String = script.get_path()
 	return path.get_base_dir()
 
 
-func _set_instances_count(val: int) -> void:
-	instances_count = val
-	update()
-
-
-func _set_random_seed(val: int) -> void:
-	random_seed = val
+func _set_global_seed(val: int) -> void:
+	global_seed = val
 	update()
 
 

@@ -1,14 +1,14 @@
 tool
-extends VBoxContainer
+extends Control
 
 
 signal value_changed
 
 
 onready var _label: Label = $Label
-onready var _x: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/HBoxContainer/X
-onready var _y: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/HBoxContainer2/Y
-onready var _z: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/HBoxContainer3/Z
+onready var _x: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer/X
+onready var _y: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer2/Y
+onready var _z: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer3/Z
 
 
 func _ready() -> void:
@@ -37,3 +37,8 @@ func get_value() -> Vector3:
 
 func _on_value_changed(_val) -> void:
 	emit_signal("value_changed", get_value())
+
+
+func _on_clear_pressed():
+	set_value(Vector3.ZERO)
+	_on_value_changed(Vector3.ZERO)

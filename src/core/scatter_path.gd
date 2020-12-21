@@ -51,7 +51,25 @@ func remove_point(index):
 		return
 	curve.remove_point(index)
 	_update_from_curve()
- 
+
+
+func get_pos_and_normal(offset) -> Array:
+	var pos: Vector3 = curve.interpolate_baked(offset)
+	var normal := Vector3.ZERO
+	
+	var pos1
+	if offset + 0.1 < curve.get_baked_length():
+		pos1 = curve.interpolate_baked(offset + 0.1)
+		normal = (pos1 - pos)
+	else:
+		pos1 = curve.interpolate_baked(offset - 0.1)
+		normal = (pos - pos1)
+
+	normal.y = 0.0
+	normal = normal.normalized().rotated(Vector3.UP, PI / 2.0)
+	
+	return [pos, normal]
+
 
 func set_closed_curve(value):
 	closed_curve = value

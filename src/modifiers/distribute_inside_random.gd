@@ -2,21 +2,23 @@ tool
 extends Node
 
 
-export(bool) var override_random_seed = false
+export(bool) var override_global_seed = false
 export(int) var custom_seed = 0
+export(int) var instance_count = 10
 
-var display_name := "Distribute Random"
+var display_name := "Distribute Inside (Random)"
 
 var _rng: RandomNumberGenerator
 
 
-func process_transforms(transforms, random_seed) -> void:
+func process_transforms(transforms, global_seed) -> void:
+	transforms.resize(instance_count)
 	_rng = RandomNumberGenerator.new()
 
-	if override_random_seed:
+	if override_global_seed:
 		_rng.set_seed(custom_seed)
 	else:
-		_rng.set_seed(random_seed)
+		_rng.set_seed(global_seed)
 	
 	var center = transforms.path.center
 	var half_size = transforms.path.size * 0.5

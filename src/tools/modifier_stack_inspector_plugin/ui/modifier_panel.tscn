@@ -9,8 +9,8 @@
 
 [node name="ModifierPanel" type="Control"]
 anchor_right = 1.0
-margin_bottom = 106.0
-rect_min_size = Vector2( 0, 106 )
+margin_bottom = 34.0
+rect_min_size = Vector2( 0, 34 )
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -27,7 +27,7 @@ __meta__ = {
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 anchor_right = 1.0
-margin_bottom = 38.0
+margin_bottom = 34.0
 size_flags_vertical = 4
 custom_constants/margin_right = 6
 custom_constants/margin_top = 6
@@ -41,7 +41,7 @@ __meta__ = {
 margin_left = 6.0
 margin_top = 6.0
 margin_right = 1018.0
-margin_bottom = 37.0
+margin_bottom = 28.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 margin_right = 1012.0
@@ -51,6 +51,7 @@ size_flags_vertical = 0
 [node name="Expand" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 margin_right = 28.0
 margin_bottom = 22.0
+focus_mode = 0
 toggle_mode = true
 icon = ExtResource( 2 )
 flat = true
@@ -82,6 +83,7 @@ custom_constants/separation = 0
 [node name="MoveUp" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer"]
 margin_right = 28.0
 margin_bottom = 22.0
+focus_mode = 0
 size_flags_horizontal = 0
 icon = ExtResource( 3 )
 
@@ -89,19 +91,20 @@ icon = ExtResource( 3 )
 margin_left = 28.0
 margin_right = 56.0
 margin_bottom = 22.0
+focus_mode = 0
 icon = ExtResource( 6 )
 
 [node name="Remove" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 margin_left = 68.0
 margin_right = 96.0
 margin_bottom = 22.0
+focus_mode = 0
 icon = ExtResource( 5 )
 
 [node name="Parameters" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
 visible = false
-margin_left = 6.0
 margin_top = 26.0
-margin_right = 1006.0
+margin_right = 325.0
 margin_bottom = 26.0
 
 [connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="." method="_on_expand_toggled"]
