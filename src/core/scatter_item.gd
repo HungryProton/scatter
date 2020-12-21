@@ -1,20 +1,7 @@
-# --
-# ScatterItem
-# --
-# This node must be a child of either a ScatterDuplicates or a ScatterMultimesh node.
-# Gives information about the scene we want to duplicate and spread accross
-# the given area.
-# Multiple ScatterItems nodes can be attached to the same Scatter*, just like
-# multiple CollisionShape can be attached to a CollisionObject.
-# --
-
 tool
 
 extends Spatial
 
-## --
-## Exported variables
-## --
 
 export(int) var proportion : int = 100 setget _set_proportion
 export(String, FILE) var item_path : String setget _set_path

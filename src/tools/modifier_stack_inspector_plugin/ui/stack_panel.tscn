@@ -43,6 +43,7 @@ margin_right = 116.0
 margin_bottom = 22.0
 size_flags_horizontal = 2
 toggle_mode = true
+action_mode = 0
 text = " Add Modifier"
 icon = ExtResource( 4 )
 flat = true

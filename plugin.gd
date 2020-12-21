@@ -21,6 +21,12 @@ func _enter_tree():
 		load(root + "/icons/scatter.svg")
 	)
 	add_custom_type(
+		"ScatterExclude",
+		"Path",
+		load(root + "/src/core/scatter_exclude.gd"),
+		load(root + "/icons/exclude.svg")
+	)
+	add_custom_type(
 		"ScatterItem",
 		"Spatial",
 		load(root + "/src/core/scatter_item.gd"),
@@ -32,6 +38,7 @@ func _exit_tree():
 	remove_inspector_plugin(modifier_stack_plugin)
 	remove_custom_type("Scatter")
 	remove_custom_type("ScatterItem")
+	remove_custom_type("ScatterExclude")
 
 
 func _get_current_folder() -> String:
