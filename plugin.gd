@@ -21,16 +21,22 @@ func _enter_tree():
 		load(root + "/icons/scatter.svg")
 	)
 	add_custom_type(
-		"ScatterExclude",
-		"Path",
-		load(root + "/src/core/scatter_exclude.gd"),
-		load(root + "/icons/exclude.svg")
-	)
-	add_custom_type(
 		"ScatterItem",
 		"Spatial",
 		load(root + "/src/core/scatter_item.gd"),
 		load(root + "/icons/item.svg")
+	)
+	add_custom_type(
+		"ScatterExcludePath",
+		"Path",
+		load(root + "/src/core/scatter_exclude_path.gd"),
+		load(root + "/icons/exclude.svg")
+	)
+	add_custom_type(
+		"ScatterExcludePoint",
+		"Spatial",
+		load(root + "/src/core/scatter_exclude_point.gd"),
+		load(root + "/icons/exclude.svg")
 	)
 
 
@@ -38,7 +44,8 @@ func _exit_tree():
 	remove_inspector_plugin(modifier_stack_plugin)
 	remove_custom_type("Scatter")
 	remove_custom_type("ScatterItem")
-	remove_custom_type("ScatterExclude")
+	remove_custom_type("ScatterExcludePath")
+	remove_custom_type("ScatterExcludePoint")
 
 
 func _get_current_folder() -> String:

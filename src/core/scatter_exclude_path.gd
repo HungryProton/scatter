@@ -7,6 +7,6 @@ func _ready():
 
 
 func update():
-	var _parent = get_parent()
-	if _parent:
-		_parent.update()
+	var parent = get_parent()
+	if parent and parent.has_method("update"):
+		parent.update()

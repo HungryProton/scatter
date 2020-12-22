@@ -14,14 +14,31 @@ var closed_curve : bool = false
 
 
 func _ready():
+	set_notify_transform(true)
 	self.connect("curve_changed", self, "_on_curve_changed")
 	_update_from_curve()
+
+
+func _notification(what):
+	match what:
+		NOTIFICATION_TRANSFORM_CHANGED:
+			emit_signal("curve_updated")
 
 
 func is_point_inside(point : Vector3):
 	if not polygon:
 		_update_from_curve()
 	return polygon.is_point_inside(_get_projected_coords(point))
+
+
+func distance_from_point(point: Vector3, ignore_height := false) -> float:
+	var offset: float = curve.get_closest_offset(point)
+	var point_on_curve: Vector3 = curve.interpolate_baked(offset)
+	if ignore_height:
+		point.y = 0.0
+		point_on_curve.y = 0.0
+	
+	return point.distance_to(point_on_curve)
 
 
 func add_point(position):

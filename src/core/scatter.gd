@@ -52,17 +52,21 @@ func _set(property, value):
 
 func update() -> void:
 	_discover_items()
-	if _items.empty():
-		return
+	if not _items.empty():
+		_transforms = _namespace.Transforms.new()
+		_transforms.set_path(self)
+		_modifier_stack.update(_transforms, global_seed)
+		
+		if use_instancing:
+			_delete_duplicates()
+			_create_multimesh()
+		else:
+			_delete_multimeshes()
+			_create_duplicates()
 	
-	_transforms = _namespace.Transforms.new()
-	_transforms.set_path(self)
-	_modifier_stack.update(_transforms, global_seed)
-	
-	if use_instancing:
-		_create_multimesh()
-	else:
-		_create_duplicates()
+	var parent = get_parent()
+	if parent and parent.has_method("update"):
+		parent.update()
 
 
 # Loop through children to find all the ScatterItem nodes
@@ -77,7 +81,61 @@ func _discover_items() -> void:
 
 
 func _create_duplicates() -> void:
-	pass
+	var offset := 0
+	var transforms_count: int = _transforms.list.size()
+
+	for item in _items:
+		var count = int(round(float(item.proportion) / _total_proportion * transforms_count))
+		var root = _get_or_create_instances_root(item)
+		var instances = root.get_children()
+		var child_count = instances.size()
+		
+		for i in count:
+			if (offset + i) >= transforms_count:
+				return
+			var instance
+			if i < child_count:
+				# Grab an instance from the pool if there's one available
+				instance = instances[i]
+			else:
+				# If not, create one
+				instance = _create_instance(item, root)
+			
+			instance.transform = _transforms.list[offset + i]
+		
+		# Delete the unused instances left in the pool if any
+		if count < child_count:
+			for i in (child_count - count):
+				instances[count + i].queue_free()
+		
+		offset += count
+
+
+func _get_or_create_instances_root(item):
+	var root: Spatial
+	if item.has_node("Duplicates"):
+		root = item.get_node("Duplicates")
+	else:
+		root = Spatial.new()
+		root.set_name("Duplicates")
+		item.add_child(root)
+		root.set_owner(get_tree().get_edited_scene_root())
+	root.translation = Vector3.ZERO
+	return root
+
+
+func _create_instance(item, root):
+	# Create item and add it to the scene
+	var instance = load(item.item_path).instance()
+	root.add_child(instance)
+	instance.set_owner(get_tree().get_edited_scene_root())
+	return instance
+
+
+func _delete_duplicates():
+	for item in _items:
+		if item.has_node("Duplicates"):
+			item.get_node("Duplicates").queue_free()
 
 
 func _create_multimesh() -> void:
@@ -127,6 +185,12 @@ func _get_mesh_from_scene(node_path):
 			var res = _get_mesh_from_scene(c2)
 			if res:
 				return res
+
+
+func _delete_multimeshes() -> void:
+	for item in _items:
+		if item.has_node("MultiMeshInstance"):
+			item.get_node("MultiMeshInstance").queue_free()
 
 
 func _get_current_folder() -> String:

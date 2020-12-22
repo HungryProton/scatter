@@ -36,7 +36,7 @@ __meta__ = {
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 margin_left = 6.0
 margin_top = 6.0
-margin_right = 473.0
+margin_right = 491.0
 margin_bottom = 124.0
 custom_constants/separation = 12
 __meta__ = {
@@ -147,4 +147,18 @@ margin_top = 26.0
 margin_right = 130.0
 margin_bottom = 46.0
 text = "Exclude From Path"
+align = 0
+
+[node name="ExcludeAlongPath" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer3"]
+margin_top = 26.0
+margin_right = 130.0
+margin_bottom = 46.0
+text = "Exclude Along Path"
+align = 0
+
+[node name="ExcludeAroundPoint" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer3"]
+margin_top = 26.0
+margin_right = 130.0
+margin_bottom = 46.0
+text = "Exclude Around Point"
 align = 0

@@ -15,6 +15,8 @@ onready var _scale_noise = $MarginContainer/HBoxContainer/VBoxContainer2/ScaleNo
 onready var _project = $MarginContainer/HBoxContainer/VBoxContainer2/Project
 
 onready var _exclude_from_path = $MarginContainer/HBoxContainer/VBoxContainer3/ExcludeFromPath
+onready var _exclude_along_path = $MarginContainer/HBoxContainer/VBoxContainer3/ExcludeAlongPath
+onready var _exclude_around_point = $MarginContainer/HBoxContainer/VBoxContainer3/ExcludeAroundPoint
 
 onready var _root = _get_root_folder() + "/src/modifiers/"
 
@@ -28,6 +30,8 @@ func _ready():
 	_connect(_scale_noise, "randomize_scale_noise.gd")
 	_connect(_project, "project_on_floor.gd")
 	_connect(_exclude_from_path, "exclude_from_path.gd")
+	_connect(_exclude_along_path, "exclude_along_path.gd")
+	_connect(_exclude_around_point, "exclude_around_point.gd")
 
 
 func _connect(button, script_path) -> void:
