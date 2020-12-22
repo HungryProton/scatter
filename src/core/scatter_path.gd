@@ -150,6 +150,9 @@ func _update_from_curve():
 	if not curve:
 		curve = Curve3D.new()
 	
+	if not polygon:
+		polygon = PolygonPathFinder.new()
+	
 	var length = curve.get_baked_length()
 	var steps = round(length / bake_interval)
 	
@@ -183,8 +186,6 @@ func _update_from_curve():
 			if coords.y < _min.y:
 				_min.y = coords.y
 	
-	if not polygon:
-		polygon = PolygonPathFinder.new()
 	polygon.setup(polygon_points, connections)
 	size = Vector3(_max.x - _min.x, 0.0, _max.y - _min.y)
 	center = Vector3((_min.x + _max.x) / 2, 0.0, (_min.y + _max.y) / 2)

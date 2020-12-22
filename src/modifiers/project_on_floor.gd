@@ -2,10 +2,11 @@ tool
 extends Node
 
 
-export(bool) var invert_ray_direction = false
 export(float) var ray_length : float = 10.0
 export(float) var ray_offset : float = 1.0
-export(bool) var remove_points_on_miss := true
+export(bool) var remove_points_on_miss = true
+export(bool) var invert_ray_direction = false
+export(Vector3) var floor_direction = Vector3.DOWN
 
 var display_name := "Project On Floor"
 
@@ -14,12 +15,12 @@ func process_transforms(transforms, _seed) -> void:
 	var path = transforms.path
 	var space_state = path.get_world().get_direct_space_state()
 	
-	var height
+	var pos
 	var i := 0
 	while i < transforms.list.size():
-		height = _project_on_floor(transforms.list[i].origin, path, space_state)
-		if height != null:
-			transforms.list[i].origin.y = height
+		pos = _project_on_floor(transforms.list[i].origin, path, space_state)
+		if pos != null:
+			transforms.list[i].origin = pos
 		elif remove_points_on_miss:
 			transforms.list.remove(i)
 			continue
@@ -31,17 +32,17 @@ func _project_on_floor(pos, path, space_state):
 	var end = pos
 	
 	if invert_ray_direction:
-		start.y -= ray_offset
-		end.y += ray_length
+		start += ray_offset * floor_direction
+		end -= ray_length * floor_direction
 	else:
-		start.y += ray_offset
-		end.y -= ray_length
+		start -= ray_offset * floor_direction
+		end += ray_length * floor_direction
 
 	start = path.to_global(start)
 	end = path.to_global(end)
 
 	var hit = space_state.intersect_ray(start, end)
 	if hit:
-		return path.to_local(hit.position).y
+		return path.to_local(hit.position)
 	else:
 		return null

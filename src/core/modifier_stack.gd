@@ -6,6 +6,7 @@ signal stack_changed
 
 
 export var stack := []
+var just_created := false
 
 
 func update(transforms, random_seed) -> void:

@@ -10,12 +10,14 @@ var _root: Control
 var _scatter
 var _modifier_stack
 var _modifier_panel = load(_get_current_folder() + "/modifier_panel.tscn")
+var _ready := false
 
 
 func _ready():
 	_modifiers_popup = get_node(modifiers_popup)
 	_root = get_node(root)
 	_modifiers_popup.connect("add_modifier", self, "_on_add_modifier")
+	_ready = true
 	rebuild_ui()
 
 
@@ -27,11 +29,16 @@ func set_node(node) -> void:
 		_modifier_stack.disconnect("stack_changed", self, "_on_stack_changed")
 	
 	_scatter = node
-	_modifier_stack = node._modifier_stack
+	_modifier_stack = node.modifier_stack
 	_modifier_stack.connect("stack_changed", self, "_on_stack_changed")
+	if _modifier_stack.just_created:
+		_on_load_preset("default")
 
 
 func rebuild_ui() -> void:
+	if not _ready:
+		return
+	
 	_clear()
 	for m in _modifier_stack.stack:
 		var ui = _modifier_panel.instance()
@@ -44,9 +51,31 @@ func rebuild_ui() -> void:
 
 
 func _clear() -> void:
+	if not _root:
+		_root = get_node(root)
 	for c in _root.get_children():
 		_root.remove_child(c)
 		c.queue_free()
+
+
+func _set_children_owner(root: Node, node: Node):
+	for child in node.get_children():
+		child.set_owner(root)
+		if child.get_children().size() > 0:
+			_set_children_owner(root, child)
+
+
+func _get_current_folder() -> String:
+	var script: Script = get_script()
+	var path: String = script.get_path()
+	return path.get_base_dir()
+
+
+func _get_root_folder() -> String:
+	var path: String = _get_current_folder()
+	var folders = path.right(6) # Remove the res://
+	var tokens = folders.split('/')
+	return "res://" + tokens[0] + "/" + tokens[1]
 
 
 func _on_add_modifier(modifier) -> void:
@@ -55,12 +84,6 @@ func _on_add_modifier(modifier) -> void:
 
 func _on_stack_changed() -> void:
 	rebuild_ui()
-
-
-func _get_current_folder() -> String:
-	var script: Script = get_script()
-	var path: String = script.get_path()
-	return path.get_base_dir()
 
 
 func _on_move_up(m) -> void:
@@ -78,3 +101,38 @@ func _on_remove(m) -> void:
 func _on_value_changed() -> void:
 	if _scatter:
 		_scatter.update()
+
+
+func _on_save_preset(preset_name) -> void:
+	if not _scatter:
+		return
+	
+	var preset = _scatter.duplicate(7)
+	preset.clear()
+	_set_children_owner(preset, preset)
+	
+	var packed_scene = PackedScene.new()
+	if packed_scene.pack(preset) != OK:
+		print("Failed to save preset")
+		return
+	
+	var preset_path = _get_root_folder() + "/presets/" + preset_name + ".tscn"
+	ResourceSaver.save(preset_path, packed_scene)
+
+
+func _on_load_preset(preset_name) -> void:
+	var preset_path = _get_root_folder() + "/presets/" + preset_name + ".tscn"
+	var preset = load(preset_path).instance()
+	if not preset:
+		return
+	
+	_modifier_stack = preset.modifier_stack.duplicate(7)
+	_modifier_stack.connect("stack_changed", self, "_on_stack_changed")
+	_scatter.modifier_stack = _modifier_stack
+	rebuild_ui()
+	_scatter.update()
+
+
+func _on_delete_preset(preset_name) -> void:
+	var dir = Directory.new()
+	dir.remove(_get_root_folder() + "/presets/" + preset_name + ".tscn")

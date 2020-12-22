@@ -49,3 +49,4 @@ margin_right = 506.0
 margin_bottom = 16.0
 custom_styles/focus = SubResource( 2 )
 custom_styles/normal = SubResource( 2 )
+clear_button_enabled = true

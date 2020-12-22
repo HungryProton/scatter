@@ -3,14 +3,15 @@
 [ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/presets/load_preset.gd" type="Script" id=1]
 
 [node name="LoadPresetPopup" type="WindowDialog"]
+visible = true
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -160.5
-margin_top = -121.0
-margin_right = 160.5
-margin_bottom = 121.0
+margin_left = -147.5
+margin_top = -156.5
+margin_right = 147.5
+margin_bottom = 156.5
 size_flags_horizontal = 5
 size_flags_vertical = 5
 window_title = "Load Presets"
@@ -34,13 +35,13 @@ __meta__ = {
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
 margin_left = 24.0
 margin_top = 24.0
-margin_right = 297.0
-margin_bottom = 218.0
+margin_right = 271.0
+margin_bottom = 289.0
 size_flags_vertical = 3
 
 [node name="NoPresets" type="Label" parent="MarginContainer/ScrollContainer"]
-margin_right = 273.0
-margin_bottom = 194.0
+margin_right = 247.0
+margin_bottom = 265.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "No presets found.
@@ -51,8 +52,8 @@ autowrap = true
 
 [node name="PresetsRoot" type="VBoxContainer" parent="MarginContainer/ScrollContainer"]
 visible = false
-margin_right = 273.0
-margin_bottom = 194.0
+margin_right = 247.0
+margin_bottom = 265.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 

@@ -18,6 +18,7 @@ func _ready() -> void:
 	_popup.add_icon_item(_load_icon, "Load Preset", 1)
 	
 	_load_popup = get_node("LoadPresetPopup")
+	_save_popup = get_node("SavePresetPopup")
 
 
 func _get_root_folder() -> String:

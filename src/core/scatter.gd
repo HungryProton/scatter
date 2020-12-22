@@ -4,20 +4,21 @@ extends "scatter_path.gd"
 
 export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
+export var disable_updates_in_game := true
 
+var modifier_stack setget _set_modifier_stack
 
 var _namespace = load(_get_current_folder() + "/namespace.gd").new()
-var _modifier_stack
 var _transforms
 var _items := []
 var _total_proportion: int
 
 
 func _ready() -> void:
-	if not _modifier_stack:
-		_modifier_stack = _namespace.ModifierStack.new()
-	
-	_modifier_stack.connect("stack_changed", self, "update")
+	if not modifier_stack:
+		modifier_stack = _namespace.ModifierStack.new()
+		modifier_stack.just_created = true
+
 	self.connect("curve_updated", self, "update")
 
 
@@ -36,7 +37,7 @@ func _get_property_list() -> Array:
 
 func _get(property):
 	if property == "modifier_stack":
-		return _modifier_stack
+		return modifier_stack
 	return null
 
 
@@ -45,17 +46,26 @@ func _set(property, value):
 		# TODO: This duplicate is there because I couldn't find a way to detect
 		# when a node is duplicated from the editor and I don't want multiple
 		# scatter nodes to share the same stack.
-		_modifier_stack = value.duplicate(7)
+		modifier_stack = value.duplicate(7)
 		return true
 	return false
 
 
+func clear() -> void:
+	_discover_items()
+	_delete_duplicates()
+	_delete_multimeshes()
+
+
 func update() -> void:
+	if disable_updates_in_game and not Engine.is_editor_hint():
+		return
+
 	_discover_items()
 	if not _items.empty():
 		_transforms = _namespace.Transforms.new()
 		_transforms.set_path(self)
-		_modifier_stack.update(_transforms, global_seed)
+		modifier_stack.update(_transforms, global_seed)
 		
 		if use_instancing:
 			_delete_duplicates()
@@ -207,3 +217,9 @@ func _set_global_seed(val: int) -> void:
 func _set_instancing(val: bool) -> void:
 	use_instancing = val
 	update()
+
+
+func _set_modifier_stack(val) -> void:
+	modifier_stack = val
+	if not modifier_stack.is_connected("stack_changed", self, "update"):
+		modifier_stack.connect("stack_changed", self, "update")

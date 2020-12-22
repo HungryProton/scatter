@@ -1,16 +1,21 @@
+tool
 extends Button
 
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
+signal load_preset
+signal delete_preset
 
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
+onready var _label: Label = $MarginContainer/HBoxContainer/Label
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func set_preset_name(text) -> void:
+	_label.text = text
+
+
+func _on_pressed() -> void:
+	emit_signal("load_preset")
+
+
+func _on_delete() -> void:
+	emit_signal("delete_preset")
