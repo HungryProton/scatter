@@ -12,6 +12,7 @@ var _namespace = preload("./namespace.gd").new()
 var _transforms
 var _items := []
 var _total_proportion: int
+var _was_duplicated := false
 
 
 func _ready() -> void:
@@ -20,6 +21,24 @@ func _ready() -> void:
 		modifier_stack.just_created = true
 
 	self.connect("curve_updated", self, "update")
+	_discover_items()
+
+
+func add_child(node, legible_name := false) -> void:
+	.add_child(node, legible_name)
+	_discover_items()
+
+
+func remove_child(node) -> void:
+	.remove_child(node)
+	_discover_items()
+
+
+func _get_configuration_warning() -> String:
+	#_discover_items()
+	if _items.empty():
+		return "Scatter requires at least one ScatterItem node as a child to work."
+	return ""
 
 
 func _get_property_list() -> Array:
@@ -31,7 +50,6 @@ func _get_property_list() -> Array:
 		type = TYPE_OBJECT,
 		hint_string =  "ScatterModifierStack",
 	})
-	
 	return list
 
 
@@ -47,7 +65,19 @@ func _set(property, value):
 		# when a node is duplicated from the editor and I don't want multiple
 		# scatter nodes to share the same stack.
 		modifier_stack = value.duplicate(7)
+		clear()
 		return true
+	
+	# For some reason, set_modifier_stack is not always called when duplicating
+	# a node, but other parameters like transforms are so we check that as well
+	if property == "transform":
+		if modifier_stack:
+			modifier_stack = modifier_stack.duplicate(7)
+		else:
+			modifier_stack = _namespace.ModifierStack.new()
+			modifier_stack.just_created = true
+		call_deferred("clear")
+	
 	return false
 
 
@@ -68,10 +98,8 @@ func update() -> void:
 		modifier_stack.update(_transforms, global_seed)
 		
 		if use_instancing:
-			_delete_duplicates()
 			_create_multimesh()
 		else:
-			_delete_multimeshes()
 			_create_duplicates()
 	
 	var parent = get_parent()
@@ -88,6 +116,9 @@ func _discover_items() -> void:
 		if c is _namespace.ScatterItem:
 			_items.append(c)
 			_total_proportion += c.proportion
+	
+	if is_inside_tree():
+		get_tree().emit_signal("node_configuration_warning_changed", self)
 
 
 func _create_duplicates() -> void:
@@ -155,6 +186,8 @@ func _create_multimesh() -> void:
 	for item in _items:
 		var count = int(round(float(item.proportion) / _total_proportion * transforms_count))
 		var mmi = _setup_multi_mesh(item, count)
+		if not mmi:
+			return
 
 		for i in count:
 			if (offset + i) >= transforms_count:
@@ -174,7 +207,16 @@ func _setup_multi_mesh(item, count):
 		instance.multimesh = MultiMesh.new()
 	instance.translation = Vector3.ZERO
 
-	var mesh_instance = _get_mesh_from_scene(item.item_path)
+	var node = load(item.item_path)
+	if not node:
+		printerr("Warning: ", item.item_path, " is not a valid scene file")
+		return
+	
+	var mesh_instance = _get_mesh_from_scene(node.instance())
+	if not mesh_instance:
+		printerr("Warning: No MeshInstance found in ", item.item_path)
+		return
+	
 	instance.material_override = mesh_instance.get_surface_material(0)
 	instance.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
 	instance.multimesh.mesh = mesh_instance.mesh
@@ -184,21 +226,23 @@ func _setup_multi_mesh(item, count):
 	return instance
 
 
-func _get_mesh_from_scene(node_path):
-	var target = load(node_path).instance()
-	for c in target.get_children():
-		if c is MeshInstance:
-			target.queue_free()
-			return c
-		
-		for c2 in c.get_children():
-			var res = _get_mesh_from_scene(c2)
-			if res:
-				return res
+func _get_mesh_from_scene(node):
+	if node is MeshInstance:
+		return node
+	
+	for c in node.get_children():
+		var res = _get_mesh_from_scene(c)
+		if res:
+			node.remove_child(res)
+			return res
+	
 	return null
 
 
 func _delete_multimeshes() -> void:
+	if _items.empty():
+		_discover_items()
+
 	for item in _items:
 		if item.has_node("MultiMeshInstance"):
 			item.get_node("MultiMeshInstance").queue_free()
@@ -211,10 +255,17 @@ func _set_global_seed(val: int) -> void:
 
 func _set_instancing(val: bool) -> void:
 	use_instancing = val
+	if use_instancing:
+		_delete_duplicates()
+	else:
+		_delete_multimeshes()
+	
 	update()
 
 
 func _set_modifier_stack(val) -> void:
-	modifier_stack = val
+	modifier_stack = _namespace.ModifierStack.new()
+	modifier_stack.stack = val.stack.duplicate(true)
+	
 	if not modifier_stack.is_connected("stack_changed", self, "update"):
 		modifier_stack.connect("stack_changed", self, "update")

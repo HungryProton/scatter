@@ -1,5 +1,4 @@
 tool
-
 extends Spatial
 
 
@@ -10,31 +9,21 @@ export(bool) var ignore_initial_position : bool = false setget _set_position_fla
 export(bool) var ignore_initial_rotation : bool = false setget _set_rotation_flag
 export(bool) var ignore_initial_scale : bool = false setget _set_scale_flag
 
-## --
-## Public variables
-## --
-
 var initial_position
 var initial_rotation
 var initial_scale
 
-## --
-## Internal variables
-## --
-
 var _parent
 
-## --
-## Public methods
-## --
+
+func _ready():
+	_parent = get_parent()
 
 
-func get_exclusion_areas():
-	var result = _parent.get_exclusion_areas()
-	for c in get_children():
-		if c.get_class() == "ScatterExclude":
-			result.append(c)
-	return result
+func _get_configuration_warning() -> String:
+	if item_path.empty():
+		return "The 'Item Path' variable must points to a valid scene containing the mesh you want to scatter"
+	return ""
 
 
 func update():
@@ -42,19 +31,18 @@ func update():
 	if _parent:
 		_parent.update()
 
-## --
-## Internal methods
-## --
-
-func _ready():
-	_parent = get_parent()
 
 func _set_proportion(val):
 	proportion = val
 	update()
 
+
 func _set_path(val):
 	item_path = val
+
+	if is_inside_tree():
+		get_tree().emit_signal("node_configuration_warning_changed", self)
+	
 	if not val:
 		return
 
@@ -65,17 +53,21 @@ func _set_path(val):
 	instance.queue_free()
 	update()
 
+
 func _set_scale_modifier(val):
 	scale_modifier = val
 	update()
+
 
 func _set_position_flag(val):
 	ignore_initial_position = val
 	update()
 
+
 func _set_rotation_flag(val):
 	ignore_initial_rotation = val
 	update()
+
 
 func _set_scale_flag(val):
 	ignore_initial_scale = val

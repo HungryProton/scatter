@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[ext_resource path="res://addons/scatter/demos/assets/grass/data/s_grass.shader" type="Shader" id=1]
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/alpha_scissor_threshold = null
+shader_param/transmission = null
+shader_param/secondary_color = null
+shader_param/secondary_attenuation = 0.2
+shader_param/grass_height = 1.0
+shader_param/wind_direction = Vector2( 1, -0.5 )
+shader_param/wind_speed = 1.0
+shader_param/wind_strength = 2.0
+shader_param/noise_scale = 20.0

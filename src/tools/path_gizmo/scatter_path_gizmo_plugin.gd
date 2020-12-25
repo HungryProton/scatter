@@ -160,7 +160,7 @@ func _draw_handles(gizmo):
 	if count == 0:
 		return
 	
-	for i in range(count):
+	for i in count:
 		var point_pos = curve.get_point_position(i)
 		var point_in = curve.get_point_in(i) + point_pos
 		var point_out = curve.get_point_out(i) + point_pos
@@ -196,17 +196,18 @@ func _draw_grid(gizmo):
 	var grid = PoolVector3Array()
 	var size = path.size
 	var center = path.center
-	var resolution = 2.0 # Define how large each square is
+	var resolution = 1.5 # Define how large each square is
 	var steps_x = int(size.x / resolution) + 1
 	var steps_y = int(size.z / resolution) + 1
 	var half_size = size/2
 	
-	for i in range(steps_x):
-		grid.append(Vector3(i*resolution, 0.0, 0.0) - half_size + center)
-		grid.append(Vector3(i*resolution, 0.0, size.z) - half_size + center)
-	for j in range(steps_y):
-		grid.append(Vector3(0.0, 0.0, j*resolution) - half_size + center)
-		grid.append(Vector3(size.x, 0.0, j*resolution) - half_size + center)
+	for i in steps_x:
+		grid.append(Vector3(i * resolution, 0.0, 0.0) - half_size + center)
+		grid.append(Vector3(i * resolution, 0.0, size.z) - half_size + center)
+		
+	for j in steps_y:
+		grid.append(Vector3(0.0, 0.0, j * resolution) - half_size + center)
+		grid.append(Vector3(size.x, 0.0, j * resolution) - half_size + center)
 	
 	gizmo.add_lines(grid, get_material("grid", gizmo))
 

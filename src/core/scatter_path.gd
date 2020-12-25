@@ -4,7 +4,7 @@ extends Path
 
 signal curve_updated
 
-export var bake_interval := 2.0
+export var bake_interval := 1.0
 
 var polygon : PolygonPathFinder
 var baked_points : PoolVector3Array
@@ -115,7 +115,7 @@ func get_closest_to(pos):
 	var closest = -1
 	var dist_squared = -1
 	
-	for i in range(0, curve.get_point_count()):
+	for i in curve.get_point_count():
 		var point_pos = curve.get_point_position(i)
 		var point_dist = point_pos.distance_squared_to(pos)
 		
@@ -150,26 +150,27 @@ func _update_from_curve():
 	
 	if not curve:
 		curve = Curve3D.new()
+		return
+	
+	if curve.get_point_count() == 0:
+		return
 	
 	if not polygon:
 		polygon = PolygonPathFinder.new()
 	
 	var length = curve.get_baked_length()
-	var steps = round(length / bake_interval)
+	var steps := int(max(3, round(length / bake_interval)))
 	
-	if steps == 0:
-		return
-
-	for i in range(steps):
+	for i in steps:
 		# Get a point on the curve
-		var coords_3d = curve.interpolate_baked((i / (steps - 2)) * length)
+		var coords_3d = curve.interpolate_baked((float(i) / (steps - 2)) * length)
 		var coords = _get_projected_coords(coords_3d)
-		
+
 		# Store polygon data
 		baked_points.append(coords_3d)
 		polygon_points.append(coords)
 		connections.append(i)
-		if(i == steps - 1):
+		if i == steps - 1:
 			connections.append(0)
 		else:
 			connections.append(i + 1)
