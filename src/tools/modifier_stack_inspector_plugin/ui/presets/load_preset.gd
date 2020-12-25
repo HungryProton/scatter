@@ -28,7 +28,7 @@ func _rebuild_ui():
 	_no_presets.visible = false
 	_root.visible = true
 	for p in presets:
-		var ui = load(_get_current_folder() + "/preset.tscn").instance()
+		var ui = preload("./preset.tscn").instance()
 		_root.add_child(ui)
 		ui.set_preset_name(p)
 		ui.connect("load_preset", self, "_on_load_preset", [p])
@@ -55,12 +55,8 @@ func _find_all_presets() -> Array:
 	return res
 
 
-func _get_current_folder() -> String:
-	return get_script().get_path().get_base_dir()
-
-
 func _get_root_folder() -> String:
-	var path: String = _get_current_folder()
+	var path: String = get_script().get_path().get_base_dir()
 	var folders = path.right(6) # Remove the res://
 	var tokens = folders.split('/')
 	return "res://" + tokens[0] + "/" + tokens[1]

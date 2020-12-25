@@ -8,7 +8,7 @@ export var disable_updates_in_game := true
 
 var modifier_stack setget _set_modifier_stack
 
-var _namespace = load(_get_current_folder() + "/namespace.gd").new()
+var _namespace = preload("./namespace.gd").new()
 var _transforms
 var _items := []
 var _total_proportion: int
@@ -190,23 +190,18 @@ func _get_mesh_from_scene(node_path):
 		if c is MeshInstance:
 			target.queue_free()
 			return c
-	for c in target.get_children():
+		
 		for c2 in c.get_children():
 			var res = _get_mesh_from_scene(c2)
 			if res:
 				return res
+	return null
 
 
 func _delete_multimeshes() -> void:
 	for item in _items:
 		if item.has_node("MultiMeshInstance"):
 			item.get_node("MultiMeshInstance").queue_free()
-
-
-func _get_current_folder() -> String:
-	var script: Script = get_script()
-	var path: String = script.get_path()
-	return path.get_base_dir()
 
 
 func _set_global_seed(val: int) -> void:

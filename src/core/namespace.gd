@@ -4,6 +4,7 @@ extends Node
 
 var _root = _get_root_folder()
 
+var ScatterPath = load(_root + "/src/core/scatter_path.gd")
 var Scatter = load(_root + "/src/core/scatter.gd")
 var ScatterItem = load(_root + "/src/core/scatter_item.gd")
 var Transforms = load(_root + "/src/core/transforms.gd")

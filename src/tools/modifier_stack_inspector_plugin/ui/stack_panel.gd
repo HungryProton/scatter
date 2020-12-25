@@ -9,7 +9,7 @@ var _modifiers_popup: PopupPanel
 var _root: Control
 var _scatter
 var _modifier_stack
-var _modifier_panel = load(_get_current_folder() + "/modifier_panel.tscn")
+var _modifier_panel = preload("./modifier_panel.tscn")
 var _ready := false
 
 
@@ -65,14 +65,8 @@ func _set_children_owner(root: Node, node: Node):
 			_set_children_owner(root, child)
 
 
-func _get_current_folder() -> String:
-	var script: Script = get_script()
-	var path: String = script.get_path()
-	return path.get_base_dir()
-
-
 func _get_root_folder() -> String:
-	var path: String = _get_current_folder()
+	var path: String = get_script().get_path().get_base_dir()
 	var folders = path.right(6) # Remove the res://
 	var tokens = folders.split('/')
 	return "res://" + tokens[0] + "/" + tokens[1]

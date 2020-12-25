@@ -30,28 +30,22 @@ func create_ui_for(modifier) -> void:
 		var parameter_ui
 		match property.type:
 			TYPE_BOOL:
-				parameter_ui = load(_get_current_folder() + "/components/parameter_bool.tscn").instance()
+				parameter_ui = preload("./components/parameter_bool.tscn").instance()
 			TYPE_REAL:
-				parameter_ui = load(_get_current_folder() + "/components/parameter_scalar.tscn").instance()
+				parameter_ui = preload("./components/parameter_scalar.tscn").instance()
 			TYPE_INT:
-				parameter_ui = load(_get_current_folder() + "/components/parameter_scalar.tscn").instance()
+				parameter_ui = preload("./components/parameter_scalar.tscn").instance()
 				parameter_ui.mark_as_int(true)
 			TYPE_STRING:
-				parameter_ui = load(_get_current_folder() + "/components/parameter_string.tscn").instance()
+				parameter_ui = preload("./components/parameter_string.tscn").instance()
 			TYPE_VECTOR3:
-				parameter_ui = load(_get_current_folder() + "/components/parameter_vector3.tscn").instance()
+				parameter_ui = preload("./components/parameter_vector3.tscn").instance()
 			
 		if parameter_ui:
 			_parameters.add_child(parameter_ui)
 			parameter_ui.set_parameter_name(property.name.capitalize())
 			parameter_ui.set_value(modifier.get(property.name))
 			parameter_ui.connect("value_changed", self, "_on_parameter_value_changed", [property.name])
-
-
-func _get_current_folder() -> String:
-	var script: Script = get_script()
-	var path: String = script.get_path()
-	return path.get_base_dir()
 
 
 func _on_expand_toggled(toggled: bool) -> void:

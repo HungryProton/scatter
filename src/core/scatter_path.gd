@@ -7,7 +7,7 @@ signal curve_updated
 export var bake_interval := 2.0
 
 var polygon : PolygonPathFinder
-var polygon_points : PoolVector2Array
+var baked_points : PoolVector3Array
 var size : Vector3
 var center : Vector3
 var closed_curve : bool = false
@@ -145,7 +145,8 @@ func _update_from_curve():
 	var _min = null
 	var _max = null
 	var connections = PoolIntArray()
-	polygon_points = PoolVector2Array()
+	var polygon_points = PoolVector2Array()
+	baked_points = PoolVector3Array()
 	
 	if not curve:
 		curve = Curve3D.new()
@@ -165,6 +166,7 @@ func _update_from_curve():
 		var coords = _get_projected_coords(coords_3d)
 		
 		# Store polygon data
+		baked_points.append(coords_3d)
 		polygon_points.append(coords)
 		connections.append(i)
 		if(i == steps - 1):
