@@ -1,35 +1,24 @@
 # Scatter
-
 ![scatter](https://user-images.githubusercontent.com/52043844/68284290-7ca01780-007d-11ea-979b-128ca7038787.png)
 
 Custom node that takes care to randomly place props or any other scene inside a 3D curve
 [See it in action here](https://streamable.com/sms1m)
 
-## Documentation 
+**Scatter V2 is not backward compatible with the first version**.  
+Use the tag selector to go back to older versions if needed.
 
-These links are also available from [the wiki](https://github.com/HungryProton/scatter/wiki)
+## Installation
++ Clone this repository in your addons folder
++ Navigate to **Project -> Project Settings -> Plugin** and enable the **Scatter** plugin
 
-### Important considerations
-+ [Duplicating Godot nodes](https://github.com/HungryProton/scatter/wiki/Warning-about-duplicating-nodes)
-+ [Multimesh and Duplicates](https://github.com/HungryProton/scatter/wiki/Multimesh-and-Duplicates)
+## Getting started
+Check the two scenes under **addons/scatter/demo** to get an idea of how this addon can be used.
 
-### Quick setup guide
-+ [Installation](https://github.com/HungryProton/scatter/wiki/Installation)
-+ [Getting started](https://github.com/HungryProton/scatter/wiki/Getting-started)
-
-### Advanced usage
-+ [ScatterItem node](https://github.com/HungryProton/scatter/wiki/Scatter-Items)
-+ [Common parameters](https://github.com/HungryProton/scatter/wiki/Common-parameters)
-+ [Generic scatter logic](https://github.com/HungryProton/scatter/wiki/The-generic-scatter-logic)
-+ [Wall scatter logic](https://github.com/HungryProton/scatter/wiki/The-Wall-scatter-logic)
-+ [Exclusion areas](https://github.com/HungryProton/scatter/wiki/Exclusion-areas)
-
-### Creating your own logic
-+ [Introduction](https://github.com/HungryProton/scatter/wiki/Introduction-to-custom-logic-resources)
-+ [Understanding the add-on](https://github.com/HungryProton/scatter/wiki/Understanding-the-add-on)
-+ [Creating a new Distribution resource](https://github.com/HungryProton/scatter/wiki/Creating-a-new-distribution)
-+ [Creating a new Profile resource](https://github.com/HungryProton/scatter/wiki/Creating-a-new-profile)
-+ [Creating a new ScatterLogic resource](https://github.com/HungryProton/scatter/wiki/Creating-a-new-scatter-logic)
++ Add a **Scatter** node to you scene tree
++ Add a **ScatterItem** node as a child
++ ScatterItem has a **Path Item** parameter. It expect a path to the scene containing the mesh you want to scatter.
++ Use these buttons on top of the viewport to draw a path on your scene. By default, objects will be placed inside the path.
+![path_controls](https://user-images.githubusercontent.com/52043844/69886910-b19e3380-12e4-11ea-87ea-39e8d00e2701.png)
 
 
 ## Licence
