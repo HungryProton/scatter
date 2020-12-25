@@ -14,6 +14,13 @@ func update(transforms, random_seed) -> void:
 		modifier.process_transforms(transforms, random_seed)
 
 
+func duplicate_stack() -> Array:
+	var res = []
+	for m in stack:
+		res.push_back(m.duplicate(7))
+	return res
+
+
 func add_modifier(modifier) -> void:
 	stack.push_back(modifier)
 	emit_signal("stack_changed")

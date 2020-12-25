@@ -192,7 +192,16 @@ func _create_multimesh() -> void:
 		for i in count:
 			if (offset + i) >= transforms_count:
 				return
-			mmi.multimesh.set_instance_transform(i, _transforms.list[offset + i])
+			
+			# Apply local scale multiplier to each transform
+			var t = _transforms.list[offset + i]
+			var origin = t.origin
+			t.origin = Vector3.ZERO
+			t = t.scaled(Vector3.ONE * item.scale_modifier)
+			t.origin = origin
+			
+			mmi.multimesh.set_instance_transform(i, t)
+			
 		offset += count
 
 
@@ -203,8 +212,10 @@ func _setup_multi_mesh(item, count):
 		instance.set_name("MultiMeshInstance")
 		item.add_child(instance)
 		instance.set_owner(get_tree().get_edited_scene_root())
+	
 	if not instance.multimesh:
 		instance.multimesh = MultiMesh.new()
+	
 	instance.translation = Vector3.ZERO
 
 	var node = load(item.item_path)
@@ -265,7 +276,7 @@ func _set_instancing(val: bool) -> void:
 
 func _set_modifier_stack(val) -> void:
 	modifier_stack = _namespace.ModifierStack.new()
-	modifier_stack.stack = val.stack.duplicate(true)
+	modifier_stack.stack = val.duplicate_stack()
 	
 	if not modifier_stack.is_connected("stack_changed", self, "update"):
 		modifier_stack.connect("stack_changed", self, "update")

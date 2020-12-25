@@ -115,7 +115,6 @@ func _on_save_preset(preset_name) -> void:
 
 
 func _on_load_preset(preset_name) -> void:
-	print("On load preset")
 	var preset_path = _get_root_folder() + "/presets/" + preset_name + ".tscn"
 	var preset = load(preset_path).instance()
 	if not preset:

@@ -28,6 +28,10 @@ func _notification(what):
 func is_point_inside(point : Vector3):
 	if not polygon:
 		_update_from_curve()
+	
+	if not polygon:
+		return false
+	
 	return polygon.is_point_inside(_get_projected_coords(point))
 
 

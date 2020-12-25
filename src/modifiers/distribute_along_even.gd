@@ -10,9 +10,13 @@ var display_name := "Distribute Along Path (Even)"
 
 func process_transforms(transforms, _seed) -> void:
 	var path = transforms.path
+	if path.curve.get_point_count() == 0:
+		return
+	
 	var length: float = path.curve.get_baked_length()
 	var total_count: int = round(length / interval)
 	transforms.resize(total_count)
+
 	for i in transforms.list.size():
 		var data = path.get_pos_and_normal(i * interval)
 		var pos: Vector3 = data[0]

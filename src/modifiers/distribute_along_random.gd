@@ -13,6 +13,10 @@ var _rng: RandomNumberGenerator
 
 
 func process_transforms(transforms, global_seed) -> void:
+	var path = transforms.path
+	if path.curve.get_point_count() == 0:
+		return
+
 	transforms.resize(instance_count)
 	_rng = RandomNumberGenerator.new()
 
@@ -20,8 +24,7 @@ func process_transforms(transforms, global_seed) -> void:
 		_rng.set_seed(custom_seed)
 	else:
 		_rng.set_seed(global_seed)
-	
-	var path = transforms.path
+
 	var length: float = path.curve.get_baked_length()
 	for i in transforms.list.size():
 		var data = path.get_pos_and_normal(_rng.randf() * length)
