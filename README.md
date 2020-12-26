@@ -180,6 +180,21 @@ If you're often using a specific setup of modifiers and don't want to manually a
   ![image](https://user-images.githubusercontent.com/52043844/103152775-71c9aa00-478b-11eb-91e0-08815ae9ce9d.png)
 
 
+## Troubleshooting
+
+### The addon is slow when editing a curve
+When updating a Scatter Path object, a 2D polygon projected on the XZ plane is also generated internally.
+This polygon is used to know if a point is inside the curve or not. If this polygon resolution is too high, regenerating
+it will take time. To fix fix, increase the `Bake Interval` on the Scatter node itself. (Not on the curve resource, this one
+is not used). Values around 1 or 2 are usually enough, but if your path is really large, you don't need that much precision and
+you can increase this value. On the other end, if your path is really small, you can decrease this value.
+
+### The 3D curves are modified at different places at once
+[Please read this page](https://github.com/HungryProton/scatter/wiki/Warning-about-duplicating-nodes).
+When you duplicate a `Scatter` node, the curve resource is duplicated automatically so this shoudn't happen.
+If it does, click on the `Curve3D` resource and click on `Make Unique`. 
+
+
 ## Licence
 - This addon is published under the MIT licence.
 - Most 2D and 3D assets in the demos folder are MIT, with a few exceptions. 
