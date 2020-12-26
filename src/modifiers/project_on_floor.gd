@@ -5,6 +5,7 @@ extends Node
 export(float) var ray_length : float = 10.0
 export(float) var ray_offset : float = 1.0
 export(bool) var remove_points_on_miss = true
+export(bool) var align_with_floor_normal = false
 export(bool) var invert_ray_direction = false
 export(Vector3) var floor_direction = Vector3.DOWN
 
@@ -15,15 +16,22 @@ func process_transforms(transforms, _seed) -> void:
 	var path = transforms.path
 	var space_state = path.get_world().get_direct_space_state()
 	
-	var pos
+	var hit
+	var t: Transform
 	var i := 0
 	while i < transforms.list.size():
-		pos = _project_on_floor(transforms.list[i].origin, path, space_state)
-		if pos != null:
-			transforms.list[i].origin = pos
+		t = transforms.list[i]
+		hit = _project_on_floor(t.origin, path, space_state)
+		if hit != null:
+			if align_with_floor_normal:
+				t = _align_with(t, hit.normal)
+			t.origin = path.to_local(hit.position)
+			transforms.list[i] = t
+		
 		elif remove_points_on_miss:
 			transforms.list.remove(i)
 			continue
+		
 		i += 1
 
 
@@ -41,8 +49,16 @@ func _project_on_floor(pos, path, space_state):
 	start = path.to_global(start)
 	end = path.to_global(end)
 
-	var hit = space_state.intersect_ray(start, end)
-	if hit:
-		return path.to_local(hit.position)
-	else:
-		return null
+	return space_state.intersect_ray(start, end)
+
+
+func _align_with(t: Transform, normal: Vector3) -> Transform:
+	var n1 = t.basis.y.normalized()
+	var n2 = normal.normalized()
+	
+	var cosa = n1.dot(n2)
+	var alpha = acos(cosa)
+	var axis = n1.cross(n2)
+	axis = axis.normalized()
+	
+	return t.rotated(axis, alpha)

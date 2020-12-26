@@ -65,7 +65,7 @@ func _set(property, value):
 		# when a node is duplicated from the editor and I don't want multiple
 		# scatter nodes to share the same stack.
 		modifier_stack = value.duplicate(7)
-		clear()
+		call_deferred("clear")
 		return true
 	
 	# For some reason, set_modifier_stack is not always called when duplicating
@@ -76,6 +76,10 @@ func _set(property, value):
 		else:
 			modifier_stack = _namespace.ModifierStack.new()
 			modifier_stack.just_created = true
+		# Duplicate the curve item too. If someone want to share data, it has
+		# to be explicitely done by the user
+
+		call_deferred("_make_curve_unique")
 		call_deferred("clear")
 	
 	return false
@@ -280,3 +284,8 @@ func _set_modifier_stack(val) -> void:
 	
 	if not modifier_stack.is_connected("stack_changed", self, "update"):
 		modifier_stack.connect("stack_changed", self, "update")
+
+
+func _make_curve_unique() -> void:
+	curve = curve.duplicate(true)
+	_update_from_curve()
