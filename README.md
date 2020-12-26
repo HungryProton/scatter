@@ -31,13 +31,13 @@ Check the two scenes under **addons/scatter/demos** to get an idea of how this a
 
 The biggest change with V2 is the new `Modifier stack`. You can find it in the inspector when a Scatter node is selected.
 Scatter uses a pool of transforms to know where to create new items in your scene. The modifiers runs from top to
-bottom, each of them affect these transforms in a specificway. Depending on which transforms you use in which order, 
+bottom, each of them affect these transforms in a specific way. Depending on which modifiers you use in which order, 
 you can end up with very different results.
 
-Each modifiers also have their own parameters you can tweak by expanding their ui using the arrow on the left
+Each modifiers also have their own parameters you can tweak by expanding their UI using the arrow on the left.  
 ![image](https://user-images.githubusercontent.com/52043844/103151387-04fbe300-477e-11eb-9440-13d1628a806c.png)
 
-To add a new modifier to the stack, simply press the `Add Modifier` button to bring up this popup:
+To add a new modifier to the stack, simply press the `Add Modifier` button to bring up this popup:  
 ![image](https://user-images.githubusercontent.com/52043844/103151426-586e3100-477e-11eb-940a-820dd406a45d.png)
 
 There are 3 types of modifiers:
