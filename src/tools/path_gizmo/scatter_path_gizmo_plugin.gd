@@ -16,14 +16,9 @@ func _init():
 	create_custom_material("grid", Color(1, 0.7, 0))
 	create_custom_material("handle_lines", Color(0.1, 0.1, 0.1))
 	create_handle_material("handles")
-	
-	var in_out_icon = ImageTexture.new()
-	in_out_icon.load(_get_root_folder() + "/icons/square_handle.svg")
-	create_custom_handle_material("square_handle", in_out_icon)
 
-	var axis_icon = ImageTexture.new()
-	axis_icon.load(_get_root_folder() + "/icons/axis_handle.svg")
-	create_custom_handle_material("axis_handle", axis_icon)
+	var in_out_icon = load(_get_root_folder() + "/icons/square_handle.svg")
+	create_custom_handle_material("square_handle", in_out_icon)
 
 
 func get_name() -> String:
@@ -45,21 +40,24 @@ func get_handle_value(gizmo: EditorSpatialGizmo, index: int):
 		return null
 	
 	var count = curve.get_point_count()
-	if index < count:
-		_old_position = curve.get_point_position(index);
-		return _old_position
-
-	var i = (index - count)
-	var p_index = int(i / 2)
-	var value: Vector3
+	var p_in := false
+	var p_out := false
 	
-	if i % 2 == 0:
-		value = curve.get_point_in(p_index)
-	else:
-		value = curve.get_point_out(p_index)
+	if index > count:
+		var i = index - count
+		index = int(i / 2)
+		p_in = (i % 2 == 0)
+		p_out = !p_in
 
-	_old_position = value + curve.get_point_position(p_index)
-	return value
+	var data: Dictionary = _get_point_data(path.curve, index)
+	
+	_old_position = data.pos
+	if p_in:
+		_old_position += data.pos_in
+	elif p_out:
+		_old_position += data.pos_out
+	
+	return data
 
 
 # Automatically called when a handle is moved around.
@@ -106,7 +104,12 @@ func set_handle(gizmo: EditorSpatialGizmo, index: int, camera: Camera, point: Ve
 func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, cancel: bool = false) -> void:
 	var path = gizmo.get_spatial_node()
 	var ur = editor_plugin.get_undo_redo()
-	# TODO
+	var undo: UndoRedo = editor_plugin.get_undo_redo()
+	
+	undo.create_action("Moved Scatter Path Point")
+	undo.add_undo_method(self, "_set_point", path, restore)
+	undo.add_do_method(self, "_set_point", path, _get_point_data(path.curve, index))
+	undo.commit_action()
 
 
 func redraw(gizmo: EditorSpatialGizmo):
@@ -154,7 +157,6 @@ func _draw_handles(gizmo):
 	var curve = gizmo.get_spatial_node().curve
 	var handles = PoolVector3Array()
 	var square_handles = PoolVector3Array()
-	var axis_handles = PoolVector3Array()
 	var lines = PoolVector3Array()
 	var count = curve.get_point_count()
 	if count == 0:
@@ -254,6 +256,28 @@ func _get_path_plane(path) -> Plane:
 	var c = a + b
 	var o = t.origin
 	return Plane(a + o, b + o, c + o)
+
+
+func _get_point_data(curve: Curve3D, index: int) -> Dictionary:
+	var pos: Vector3 = curve.get_point_position(index)
+	var pos_in: Vector3 = curve.get_point_in(index)
+	var pos_out: Vector3 = curve.get_point_out(index)
+	var tilt: float = curve.get_point_tilt(index)
+
+	return {
+		"index": index,
+		"pos": pos,
+		"in": pos_in,
+		"out": pos_out,
+		"tilt": tilt
+	}
+
+func _set_point(path, data: Dictionary) -> void:
+	var index = data.index
+	path.curve.set_point_position(index, data.pos)
+	path.curve.set_point_in(index, data.in)
+	path.curve.set_point_out(index, data.out)
+	path.curve.set_point_tilt(index, data.tilt)
 
 
 func _set_options(val) -> void:
