@@ -8,6 +8,7 @@ signal remove_modifier
 signal value_changed
 
 
+var _scatter
 var _modifier
 
 onready var _parameters: Control = $MarginContainer/VBoxContainer/Parameters
@@ -18,6 +19,10 @@ onready var _enabled: Button = $MarginContainer/VBoxContainer/HBoxContainer/Butt
 
 func _ready() -> void:
 	_margin_container.connect("resized", self, "_on_child_resized")
+
+
+func set_root(val) -> void:
+	_scatter = val
 
 
 func create_ui_for(modifier) -> void:
@@ -50,7 +55,13 @@ func create_ui_for(modifier) -> void:
 			_parameters.add_child(parameter_ui)
 			parameter_ui.set_parameter_name(property.name.capitalize())
 			parameter_ui.set_value(modifier.get(property.name))
-			parameter_ui.connect("value_changed", self, "_on_parameter_value_changed", [property.name])
+			parameter_ui.connect("value_changed", self, "_on_parameter_value_changed", [property.name, parameter_ui])
+
+
+func _restore_value(name, val, ui) -> void:
+	_modifier.set(name, val)
+	ui.set_value(val)
+	emit_signal("value_changed")
 
 
 func _on_expand_toggled(toggled: bool) -> void:
@@ -76,7 +87,13 @@ func _on_child_resized() -> void:
 		rect_min_size.y = _margin_container.rect_size.y
 
 
-func _on_parameter_value_changed(value, name) -> void:
+func _on_parameter_value_changed(value, previous, name, ui) -> void:
+	if _scatter.undo_redo:
+		_scatter.undo_redo.create_action("Changed Value " + name.capitalize())
+		_scatter.undo_redo.add_undo_method(self, "_restore_value", name, previous, ui)
+		_scatter.undo_redo.add_do_method(self, "_restore_value", name, value, ui)
+		_scatter.undo_redo.commit_action()
+
 	_modifier.set(name, value)
 	emit_signal("value_changed")
 

@@ -43,6 +43,7 @@ func rebuild_ui() -> void:
 	for m in _modifier_stack.stack:
 		var ui = _modifier_panel.instance()
 		_root.add_child(ui)
+		ui.set_root(_scatter)
 		ui.create_ui_for(m)
 		ui.connect("move_up", self, "_on_move_up", [m])
 		ui.connect("move_down", self, "_on_move_down", [m])

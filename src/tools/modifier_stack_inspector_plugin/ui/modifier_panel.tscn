@@ -122,10 +122,10 @@ visible = false
 margin_top = 26.0
 margin_right = 325.0
 margin_bottom = 26.0
-[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="MarginContainer/VBoxContainer/HBoxContainer/Expand" method="_on_toggled"]
 [connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="." method="_on_expand_toggled"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="MarginContainer/VBoxContainer/HBoxContainer/Expand" method="_on_toggled"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/MoveUp" to="." method="_on_move_up_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/MoveDown" to="." method="_on_move_down_pressed"]
-[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable" to="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable" method="_on_toggled"]
 [connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable" to="." method="_on_enable_toggled"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable" to="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable" method="_on_toggled"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/Remove" to="." method="_on_remove_pressed"]

@@ -27,8 +27,6 @@ func process_transforms(transforms, random_seed) -> void:
 		pos.x = (i % width) * x_spacing
 		pos.y = 0.0
 		pos.z = (i / width) * z_spacing
-		#print(pos)
-		
 		pos += (center - half_size)
 
 		if transforms.path.is_point_inside(pos):

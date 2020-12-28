@@ -4,6 +4,8 @@ extends Control
 
 signal value_changed
 
+var _locked := false
+var _previous
 
 onready var _label: Label = $Label
 onready var _x: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer/X
@@ -22,9 +24,12 @@ func set_parameter_name(text: String) -> void:
 
 
 func set_value(val: Vector3) -> void:
+	_locked = true
 	_x.set_value(val.x)
 	_y.set_value(val.y)
 	_z.set_value(val.z)
+	_previous = get_value()
+	_locked = false
 
 
 func get_value() -> Vector3:
@@ -36,9 +41,12 @@ func get_value() -> Vector3:
 
 
 func _on_value_changed(_val) -> void:
-	emit_signal("value_changed", get_value())
+	if not _locked:
+		emit_signal("value_changed", get_value(), _previous)
 
 
 func _on_clear_pressed():
+	var old = get_value()
 	set_value(Vector3.ZERO)
+	_previous = old
 	_on_value_changed(Vector3.ZERO)

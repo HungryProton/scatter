@@ -6,6 +6,8 @@ signal value_changed
 
 
 var _is_int := false
+var _locked := false
+var _previous
 
 onready var _label: Label = $Label
 onready var _spinbox: SpinBox = $MarginContainer/MarginContainer/SpinBox
@@ -27,9 +29,12 @@ func set_parameter_name(text: String) -> void:
 
 
 func set_value(val) -> void:
+	_locked = true
 	if _is_int:
 		val = int(val)
 	_spinbox.set_value(val)
+	_previous = get_value()
+	_locked = false
 
 
 func get_value():
@@ -39,4 +44,5 @@ func get_value():
 
 
 func _on_value_changed(value) -> void:
-	emit_signal("value_changed", value)
+	if not _locked:
+		emit_signal("value_changed", value, _previous)

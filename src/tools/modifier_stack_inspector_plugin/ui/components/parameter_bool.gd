@@ -5,7 +5,8 @@ extends HBoxContainer
 signal value_changed
 
 
-var _is_int := false
+var _previous: bool
+var _locked := false
 
 onready var _label: Label = $Label
 onready var _check_box: CheckBox = $CheckBox
@@ -20,7 +21,10 @@ func set_parameter_name(text: String) -> void:
 
 
 func set_value(val: bool) -> void:
+	_locked = true
 	_check_box.pressed = val
+	_previous = get_value()
+	_locked = false
 
 
 func get_value() -> bool:
@@ -28,4 +32,5 @@ func get_value() -> bool:
 
 
 func _on_value_changed(value) -> void:
-	emit_signal("value_changed", value)
+	if not _locked:
+		emit_signal("value_changed", value, _previous)
