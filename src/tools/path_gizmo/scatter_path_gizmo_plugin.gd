@@ -176,9 +176,9 @@ func _draw_handles(gizmo):
 		square_handles.push_back(point_out)
 		handles.push_back(point_pos)
 		
-	gizmo.add_handles(handles, get_material("handles"))
-	gizmo.add_handles(square_handles, get_material("square_handle"))
-	gizmo.add_lines(lines, get_material("handle_lines"))
+	gizmo.add_handles(handles, get_material("handles", gizmo))
+	gizmo.add_handles(square_handles, get_material("square_handle", gizmo))
+	gizmo.add_lines(lines, get_material("handle_lines", gizmo))
 
 
 func _draw_path(gizmo):
