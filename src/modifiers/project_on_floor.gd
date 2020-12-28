@@ -22,7 +22,8 @@ func process_transforms(transforms, _seed) -> void:
 	while i < transforms.list.size():
 		t = transforms.list[i]
 		hit = _project_on_floor(t.origin, path, space_state)
-		if hit != null:
+		
+		if hit != null and not hit.empty():
 			if align_with_floor_normal:
 				t = _align_with(t, hit.normal)
 			t.origin = path.to_local(hit.position)

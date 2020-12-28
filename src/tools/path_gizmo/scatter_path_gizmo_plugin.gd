@@ -43,7 +43,7 @@ func get_handle_value(gizmo: EditorSpatialGizmo, index: int):
 	var p_in := false
 	var p_out := false
 	
-	if index > count:
+	if index >= count:
 		var i = index - count
 		index = int(i / 2)
 		p_in = (i % 2 == 0)
@@ -53,9 +53,9 @@ func get_handle_value(gizmo: EditorSpatialGizmo, index: int):
 	
 	_old_position = data.pos
 	if p_in:
-		_old_position += data.pos_in
+		_old_position += data.in
 	elif p_out:
-		_old_position += data.pos_out
+		_old_position += data.out
 	
 	return data
 
@@ -103,10 +103,14 @@ func set_handle(gizmo: EditorSpatialGizmo, index: int, camera: Camera, point: Ve
 # Handle Undo / Redo after a handle was moved.
 func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, cancel: bool = false) -> void:
 	var path = gizmo.get_spatial_node()
+	var count = path.curve.get_point_count()
 	var ur = editor_plugin.get_undo_redo()
 	var undo: UndoRedo = editor_plugin.get_undo_redo()
 	
-	undo.create_action("Moved Scatter Path Point")
+	if index >= count:
+		index = int((index - count) / 2)
+	
+	undo.create_action("Moved Path Point")
 	undo.add_undo_method(self, "_set_point", path, restore)
 	undo.add_do_method(self, "_set_point", path, _get_point_data(path.curve, index))
 	undo.commit_action()
