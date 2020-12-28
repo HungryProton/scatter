@@ -7,6 +7,7 @@ export var use_instancing := true setget _set_instancing
 export var disable_updates_in_game := true
 
 var modifier_stack setget _set_modifier_stack
+var undo_redo setget _set_undo_redo
 
 var _namespace = preload("./namespace.gd").new()
 var _transforms
@@ -278,6 +279,11 @@ func _set_instancing(val: bool) -> void:
 		_delete_multimeshes()
 	
 	update()
+
+
+func _set_undo_redo(val) -> void:
+	undo_redo = val
+	modifier_stack.undo_redo = val
 
 
 func _set_modifier_stack(val) -> void:

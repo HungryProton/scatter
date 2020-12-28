@@ -69,6 +69,7 @@ func _on_selection_changed() -> void:
 	if selected[0] is _scatter_path:
 		_show_options_panel()
 		_scatter_path_gizmo_plugin.set_selection(selected[0])
+		selected[0].undo_redo = get_undo_redo()
 	else:
 		_hide_options_panel()
 		_scatter_path_gizmo_plugin.set_selection(null)
