@@ -1,5 +1,5 @@
 tool
-extends Node
+extends "base_modifier.gd"
 
 
 export(String) var node_name

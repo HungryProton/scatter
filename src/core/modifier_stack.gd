@@ -11,7 +11,8 @@ var just_created := false
 
 func update(transforms, random_seed) -> void:
 	for modifier in stack:
-		modifier.process_transforms(transforms, random_seed)
+		if modifier.enabled:
+			modifier.process_transforms(transforms, random_seed)
 
 
 func duplicate_stack() -> Array:

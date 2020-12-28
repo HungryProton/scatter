@@ -1,11 +1,13 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/modifier_panel.gd" type="Script" id=1]
 [ext_resource path="res://addons/scatter/icons/right.svg" type="Texture" id=2]
 [ext_resource path="res://addons/scatter/icons/up.svg" type="Texture" id=3]
-[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/expand_button.gd" type="Script" id=4]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/toggle_button.gd" type="Script" id=4]
 [ext_resource path="res://addons/scatter/icons/close.svg" type="Texture" id=5]
 [ext_resource path="res://addons/scatter/icons/down.svg" type="Texture" id=6]
+[ext_resource path="res://addons/scatter/icons/enabled.svg" type="Texture" id=7]
+[ext_resource path="res://addons/scatter/icons/disabled.svg" type="Texture" id=8]
 
 [node name="ModifierPanel" type="Control"]
 anchor_right = 1.0
@@ -56,13 +58,13 @@ toggle_mode = true
 icon = ExtResource( 2 )
 flat = true
 script = ExtResource( 4 )
-collapsed_icon = ExtResource( 2 )
-expanded_icon = ExtResource( 6 )
+default_icon = ExtResource( 2 )
+pressed_icon = ExtResource( 6 )
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 margin_left = 32.0
 margin_top = 4.0
-margin_right = 912.0
+margin_right = 890.0
 margin_bottom = 18.0
 rect_min_size = Vector2( 80, 0 )
 size_flags_horizontal = 3
@@ -70,13 +72,13 @@ text = "Modifier Name"
 autowrap = true
 
 [node name="Buttons" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-margin_left = 916.0
+margin_left = 894.0
 margin_right = 1012.0
 margin_bottom = 22.0
-custom_constants/separation = 12
+custom_constants/separation = 6
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
-margin_right = 56.0
+margin_right = 84.0
 margin_bottom = 22.0
 custom_constants/separation = 0
 
@@ -94,9 +96,23 @@ margin_bottom = 22.0
 focus_mode = 0
 icon = ExtResource( 6 )
 
+[node name="Enable" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer"]
+margin_left = 56.0
+margin_right = 84.0
+margin_bottom = 22.0
+hint_tooltip = "Enable or Disable the modifier.
+If a modifier is disabled, it will stay in the stack but wont contribute to the final result."
+toggle_mode = true
+pressed = true
+icon = ExtResource( 7 )
+flat = true
+script = ExtResource( 4 )
+default_icon = ExtResource( 8 )
+pressed_icon = ExtResource( 7 )
+
 [node name="Remove" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
-margin_left = 68.0
-margin_right = 96.0
+margin_left = 90.0
+margin_right = 118.0
 margin_bottom = 22.0
 focus_mode = 0
 icon = ExtResource( 5 )
@@ -106,9 +122,10 @@ visible = false
 margin_top = 26.0
 margin_right = 325.0
 margin_bottom = 26.0
-
-[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="." method="_on_expand_toggled"]
 [connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="MarginContainer/VBoxContainer/HBoxContainer/Expand" method="_on_toggled"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="." method="_on_expand_toggled"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/MoveUp" to="." method="_on_move_up_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/MoveDown" to="." method="_on_move_down_pressed"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable" to="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable" method="_on_toggled"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable" to="." method="_on_enable_toggled"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/Remove" to="." method="_on_remove_pressed"]

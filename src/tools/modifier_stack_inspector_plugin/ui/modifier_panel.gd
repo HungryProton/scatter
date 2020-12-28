@@ -13,6 +13,7 @@ var _modifier
 onready var _parameters: Control = $MarginContainer/VBoxContainer/Parameters
 onready var _name: Label = $MarginContainer/VBoxContainer/HBoxContainer/Label
 onready var _margin_container: MarginContainer = $MarginContainer
+onready var _enabled: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable
 
 
 func _ready() -> void:
@@ -22,9 +23,13 @@ func _ready() -> void:
 func create_ui_for(modifier) -> void:
 	_modifier = modifier
 	_name.text = modifier.display_name
+	_enabled.pressed = modifier.enabled
 	
 	for property in modifier.get_property_list():
 		if property.usage != PROPERTY_USAGE_DEFAULT + PROPERTY_USAGE_SCRIPT_VARIABLE:
+			continue
+		
+		if property.name == "enabled":
 			continue
 
 		var parameter_ui
@@ -53,6 +58,7 @@ func _on_expand_toggled(toggled: bool) -> void:
 	if _margin_container:
 		_margin_container.rect_size.y = 0.0
 
+
 func _on_move_up_pressed() -> void:
 	emit_signal("move_up")
 
@@ -72,4 +78,9 @@ func _on_child_resized() -> void:
 
 func _on_parameter_value_changed(value, name) -> void:
 	_modifier.set(name, value)
+	emit_signal("value_changed")
+
+
+func _on_enable_toggled(pressed: bool):
+	_modifier.enabled = pressed
 	emit_signal("value_changed")

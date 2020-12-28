@@ -1,5 +1,5 @@
 tool
-extends Node
+extends "base_modifier.gd"
 
 
 export(float) var ray_length : float = 10.0

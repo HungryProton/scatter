@@ -1,5 +1,5 @@
 tool
-extends Node
+extends "base_modifier.gd"
 
 
 export(bool) var override_global_seed = false
