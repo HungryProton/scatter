@@ -24,24 +24,35 @@ func process_transforms(transforms, global_seed) -> void:
 		_rng.set_seed(global_seed)
 	
 	var t: Transform
-	var origin: Vector3
 	var s: Vector3
+	var origin: Vector3
+	
+	var gt: Transform = transforms.path.get_global_transform()
+	origin = gt.origin
+	gt.origin = Vector3.ZERO
+	var global_x: Vector3 = gt.xform_inv(Vector3.RIGHT).normalized()
+	var global_y: Vector3 = gt.xform_inv(Vector3.UP).normalized()
+	var global_z: Vector3 = gt.xform_inv(Vector3.DOWN).normalized()
+	gt.origin = origin
+
 	for i in transforms.list.size():
 		t = transforms.list[i]
 		origin = t.origin
 		t.origin = Vector3.ZERO
 		
 		s = Vector3.ONE + (_rng.randf() * scale)
-		# scale = _clamp_vector(scale, Vector3.ZERO, scale)
 		t = t.scaled(s)
 		
-		t = t.rotated(Vector3.RIGHT, deg2rad(_random_float() * rotation.x))
-		t = t.rotated(Vector3.UP, deg2rad(_random_float() * rotation.y))
-		t = t.rotated(Vector3.BACK, deg2rad(_random_float() * rotation.z))
-		
 		if local_space:
+			t = t.rotated(t.basis.x.normalized(), deg2rad(_random_float() * rotation.x))
+			t = t.rotated(t.basis.y.normalized(), deg2rad(_random_float() * rotation.y))
+			t = t.rotated(t.basis.z.normalized(), deg2rad(_random_float() * rotation.z))
 			t.origin = origin + t.xform(_random_vec3() * position)
+
 		else:
+			t = t.rotated(global_x, deg2rad(_random_float() * rotation.x))
+			t = t.rotated(global_y, deg2rad(_random_float() * rotation.y))
+			t = t.rotated(global_z, deg2rad(_random_float() * rotation.z))
 			t.origin = origin + _random_vec3() * position
 		
 		transforms.list[i] = t

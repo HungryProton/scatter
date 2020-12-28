@@ -4,6 +4,7 @@ extends Path
 
 signal curve_updated
 
+
 export var bake_interval := 1.0 setget _set_bake_interval
 
 var polygon : PolygonPathFinder

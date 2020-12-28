@@ -122,18 +122,13 @@ func redraw(gizmo: EditorSpatialGizmo):
 	if not gizmo:
 		return
 	
-	if _cached_gizmo and _cached_gizmo != gizmo:
-		# Different path was selected, clear the previous gizmo
-		_cached_gizmo.clear()
-		_draw_path(_cached_gizmo)
-	
-	_cached_gizmo = gizmo
 	gizmo.clear()
-
-	if not _selection:
+	var path = gizmo.get_spatial_node()
+	if not _selection or path != _selection:
 		_draw_path(gizmo)
 		return
 	
+	_cached_gizmo = gizmo
 	_draw_handles(gizmo)
 	_draw_path(gizmo)
 	if options.lock_to_plane():
@@ -172,10 +167,6 @@ func create_custom_material(name, color := Color.white):
 
 
 func set_selection(path) -> void:
-	#if _cached_gizmo:
-	#	_selection = null
-	#	redraw(_cached_gizmo)
-	
 	_selection = path
 	if not path:
 		return
