@@ -1,3 +1,4 @@
+tool
 extends EditorSpatialGizmoPlugin
 
 
@@ -7,6 +8,7 @@ var options setget _set_options
 var _previous_size
 var _namespace = load(_get_root_folder() + "/src/core/namespace.gd").new()
 var _axis_mesh: ArrayMesh
+var _selection
 var _cached_gizmo
 var _old_position
 
@@ -117,8 +119,20 @@ func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, cancel: bool 
 
 
 func redraw(gizmo: EditorSpatialGizmo):
+	if not gizmo:
+		return
+	
+	if _cached_gizmo and _cached_gizmo != gizmo:
+		# Different path was selected, clear the previous gizmo
+		_cached_gizmo.clear()
+		_draw_path(_cached_gizmo)
+	
 	_cached_gizmo = gizmo
 	gizmo.clear()
+
+	if not _selection:
+		_draw_path(gizmo)
+		return
 	
 	_draw_handles(gizmo)
 	_draw_path(gizmo)
@@ -157,7 +171,15 @@ func create_custom_material(name, color := Color.white):
 	add_material(name, material)
 
 
-func new_path_selected(path) -> void:
+func set_selection(path) -> void:
+	#if _cached_gizmo:
+	#	_selection = null
+	#	redraw(_cached_gizmo)
+	
+	_selection = path
+	if not path:
+		return
+	
 	if not path.is_connected("curve_updated", self, "_on_option_changed"):
 		path.connect("curve_updated", self, "_on_option_changed")
 
@@ -280,6 +302,7 @@ func _get_point_data(curve: Curve3D, index: int) -> Dictionary:
 		"out": pos_out,
 		"tilt": tilt
 	}
+
 
 func _set_point(path, data: Dictionary) -> void:
 	var index = data.index

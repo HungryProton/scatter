@@ -68,15 +68,17 @@ func _on_selection_changed() -> void:
 
 	if selected[0] is _scatter_path:
 		_show_options_panel()
-		_scatter_path_gizmo_plugin.new_path_selected(selected[0])
+		_scatter_path_gizmo_plugin.set_selection(selected[0])
 	else:
 		_hide_options_panel()
+		_scatter_path_gizmo_plugin.set_selection(null)
 
 
 func _on_scene_changed(_root) -> void:
 	var selected = _editor_selection.get_selected_nodes()
 	if selected.empty():
 		_hide_options_panel()
+		_scatter_path_gizmo_plugin.set_selection(null)
 
 
 func _show_options_panel():
