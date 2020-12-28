@@ -60,6 +60,8 @@ func _align_with(t: Transform, normal: Vector3) -> Transform:
 	var cosa = n1.dot(n2)
 	var alpha = acos(cosa)
 	var axis = n1.cross(n2)
-	axis = axis.normalized()
 	
-	return t.rotated(axis, alpha)
+	if axis == Vector3.ZERO:
+		return t
+
+	return t.rotated(axis.normalized(), alpha)
