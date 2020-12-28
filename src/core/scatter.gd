@@ -210,8 +210,10 @@ func _create_multimesh() -> void:
 
 
 func _setup_multi_mesh(item, count):
-	var instance = item.get_node("MultiMeshInstance")
-	if not instance:
+	var instance
+	if item.has_node("MultiMeshInstance"):
+		instance = item.get_node("MultiMeshInstance")
+	else:
 		instance = MultiMeshInstance.new()
 		instance.set_name("MultiMeshInstance")
 		item.add_child(instance)

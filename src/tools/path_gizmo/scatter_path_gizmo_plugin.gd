@@ -157,6 +157,11 @@ func create_custom_material(name, color := Color.white):
 	add_material(name, material)
 
 
+func new_path_selected(path) -> void:
+	if not path.is_connected("curve_updated", self, "_on_option_changed"):
+		path.connect("curve_updated", self, "_on_option_changed")
+
+
 func _draw_handles(gizmo):
 	var curve = gizmo.get_spatial_node().curve
 	var handles = PoolVector3Array()

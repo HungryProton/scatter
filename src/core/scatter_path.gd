@@ -4,7 +4,7 @@ extends Path
 
 signal curve_updated
 
-export var bake_interval := 1.0
+export var bake_interval := 1.0 setget _set_bake_interval
 
 var polygon : PolygonPathFinder
 var baked_points : PoolVector3Array
@@ -198,6 +198,11 @@ func _update_from_curve():
 	center = Vector3((_min.x + _max.x) / 2, 0.0, (_min.y + _max.y) / 2)
 	
 	emit_signal("curve_updated")
+
+
+func _set_bake_interval(val) -> void:
+	bake_interval = val
+	_update_from_curve()
 
 
 func _on_curve_changed() -> void:

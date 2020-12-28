@@ -6,7 +6,7 @@ var _modifier_stack_plugin: EditorInspectorPlugin = preload("./src/tools/modifie
 var _scatter_path_gizmo_plugin: EditorSpatialGizmoPlugin = preload("./src/tools/path_gizmo/scatter_path_gizmo_plugin.gd").new()
 var _editor_selection
 var _gizmo_options: Control = preload("./src/tools/path_gizmo/gizmo_options.tscn").instance()
-
+var _scatter_path = preload("./src/core/scatter_path.gd")
 
 func get_name():
 	return "Scatter"
@@ -45,6 +45,7 @@ func _enter_tree():
 	
 	_editor_selection = get_editor_interface().get_selection()
 	_editor_selection.connect("selection_changed", self, "_on_selection_changed")
+	connect("scene_changed", self, "_on_scene_changed")
 
 
 func _exit_tree():
@@ -58,11 +59,23 @@ func _exit_tree():
 
 
 func _on_selection_changed() -> void:
-	var scatter_path = preload("./src/core/scatter_path.gd")
 	var selected = _editor_selection.get_selected_nodes()
-	if not selected.empty() and selected[0] is scatter_path:
+	
+	if selected.empty():
+		# Node was deselected but nothing else was selected. By default, Godot
+		# will keep the path editor panel on top so we do the same.
+		return 
+
+	if selected[0] is _scatter_path:
 		_show_options_panel()
+		_scatter_path_gizmo_plugin.new_path_selected(selected[0])
 	else:
+		_hide_options_panel()
+
+
+func _on_scene_changed(_root) -> void:
+	var selected = _editor_selection.get_selected_nodes()
+	if selected.empty():
 		_hide_options_panel()
 
 

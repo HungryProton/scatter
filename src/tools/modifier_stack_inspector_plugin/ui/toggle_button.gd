@@ -2,8 +2,8 @@ tool
 extends Button
 
 
-export var collapsed_icon: Texture
-export var expanded_icon: Texture
+export var default_icon: Texture
+export var pressed_icon: Texture
 
 
 func _on_ready() -> void:
@@ -12,6 +12,6 @@ func _on_ready() -> void:
 
 func _on_toggled(pressed: bool) -> void:
 	if pressed:
-		icon = expanded_icon
+		icon = pressed_icon
 	else:
-		icon = collapsed_icon
+		icon = default_icon
