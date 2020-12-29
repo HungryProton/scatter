@@ -4,6 +4,7 @@ extends HBoxContainer
 
 signal value_changed
 
+
 var _locked := false
 var _previous: String
 
@@ -13,6 +14,7 @@ onready var _line_edit: LineEdit = $MarginContainer/MarginContainer/LineEdit
 
 func _ready() -> void:
 	_line_edit.connect("text_entered", self, "_on_value_changed")
+	_line_edit.connect("focus_exited", self, "_on_focus_exited")
 
 
 func set_parameter_name(text: String) -> void:
@@ -32,4 +34,9 @@ func get_value() -> String:
 
 func _on_value_changed(value) -> void:
 	if not _locked:
-		emit_signal("value_changed", value, _previous)
+		if value != _previous:
+			emit_signal("value_changed", value, _previous)
+
+
+func _on_focus_exited() -> void:
+	_on_value_changed(get_value())

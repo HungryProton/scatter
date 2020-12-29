@@ -9,13 +9,14 @@ export(Vector3) var position = Vector3.ONE
 export(Vector3) var rotation = Vector3(360.0, 360.0, 360.0)
 export(Vector3) var scale = Vector3.ONE
 
-
-var display_name := "Randomize Transforms"
-
 var _rng: RandomNumberGenerator
 
 
-func process_transforms(transforms, global_seed) -> void:
+func _init() -> void:
+	display_name = "Randomize Transforms"
+
+
+func _process_transforms(transforms, global_seed) -> void:
 	_rng = RandomNumberGenerator.new()
 
 	if override_global_seed:

@@ -6,11 +6,15 @@ export(String) var path_name
 export(float) var width = 4.0
 export(bool) var ignore_height = true
 
-var display_name := "Exclude Along Path"
+
+func _init() -> void:
+	display_name = "Exclude Along Path"
 
 
-func process_transforms(transforms, _seed) -> void:
+func _process_transforms(transforms, _seed) -> void:
 	if not transforms.path.has_node(path_name):
+		warning += "Could not find " + path_name
+		warning += "\n Make sure the curve exists as a child of the Scatter node"
 		return
 	
 	var exclude_root = transforms.path.get_node(path_name)

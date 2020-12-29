@@ -5,10 +5,13 @@ extends "base_modifier.gd"
 export(float) var x_spacing = 1.0
 export(float) var z_spacing = 1.0
 
-var display_name := "Distribute Inside (Grid)"
+
+func _init() -> void:
+	display_name = "Distribute Inside (Grid)"
+	warning_ignore_no_transforms = true
 
 
-func process_transforms(transforms, random_seed) -> void:
+func _process_transforms(transforms, random_seed) -> void:
 	x_spacing = max(0.05, x_spacing)
 	z_spacing = max(0.05, z_spacing)
 	

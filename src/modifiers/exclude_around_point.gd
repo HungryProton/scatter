@@ -6,11 +6,16 @@ export(String) var node_name
 export(float) var radius = 4.0
 export(bool) var ignore_height = true
 
-var display_name := "Exclude Around Point"
+
+func _init() -> void:
+	display_name = "Exclude Around Point"
 
 
-func process_transforms(transforms, _seed) -> void:
+func _process_transforms(transforms, _seed) -> void:
 	if not transforms.path.has_node(node_name):
+		warning += "Could not find " + node_name
+		warning += "\n Make sure the node exists as a child of the Scatter node"
+		_notify_warning_changed()
 		return
 	
 	var exclude_root = transforms.path.get_node(node_name)

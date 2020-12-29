@@ -9,12 +9,14 @@ export(float) var period = 20.0
 export(float) var persistence = 0.8
 export(Vector3) var scale = Vector3.ONE
 
-var display_name := "Randomize Scale (Noise)"
-
 var _noise: OpenSimplexNoise
 
 
-func process_transforms(transforms, global_seed) -> void:
+func _init() -> void:
+	display_name = "Randomize Scale (Noise)"
+
+
+func _process_transforms(transforms, global_seed) -> void:
 	_noise = OpenSimplexNoise.new()
 	_noise.period = period
 	_noise.octaves = octaves
@@ -34,7 +36,6 @@ func process_transforms(transforms, global_seed) -> void:
 		t.origin = Vector3.ZERO
 		
 		s = _randf(origin) * scale
-		#s = _clamp_vector(s, Vector3(-0.9, -0.9, -0.9), s)
 		t = t.scaled(Vector3.ONE + s)
 
 		t.origin = origin
@@ -42,7 +43,6 @@ func process_transforms(transforms, global_seed) -> void:
 
 
 func _randf(pos) -> float:
-	#return _noise.get_noise_3dv(pos)
 	return (_noise.get_noise_3dv(pos) + 1.0) * 0.5
 
 

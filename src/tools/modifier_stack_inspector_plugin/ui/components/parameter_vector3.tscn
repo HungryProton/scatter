@@ -26,11 +26,13 @@ autowrap = true
 margin_left = 899.0
 margin_right = 1024.0
 margin_bottom = 88.0
+mouse_filter = 2
 size_flags_horizontal = 0
 
 [node name="Panel" type="Panel" parent="MarginContainer"]
 margin_right = 125.0
 margin_bottom = 88.0
+mouse_filter = 2
 custom_styles/panel = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -39,6 +41,7 @@ __meta__ = {
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer"]
 margin_right = 125.0
 margin_bottom = 88.0
+mouse_filter = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
 custom_constants/margin_right = 4
@@ -71,6 +74,7 @@ text = "x"
 margin_left = 11.0
 margin_right = 85.0
 margin_bottom = 24.0
+mouse_filter = 1
 min_value = -100.0
 step = 0.001
 allow_greater = true
@@ -92,6 +96,7 @@ text = "y"
 margin_left = 11.0
 margin_right = 85.0
 margin_bottom = 24.0
+mouse_filter = 1
 min_value = -100.0
 step = 0.001
 allow_greater = true
@@ -113,6 +118,7 @@ text = "z"
 margin_left = 11.0
 margin_right = 85.0
 margin_bottom = 24.0
+mouse_filter = 1
 min_value = -100.0
 step = 0.001
 allow_greater = true
@@ -120,10 +126,12 @@ allow_lesser = true
 
 [node name="ClearButton" type="Button" parent="MarginContainer/MarginContainer/HBoxContainer"]
 margin_left = 89.0
+margin_top = 29.0
 margin_right = 117.0
-margin_bottom = 80.0
+margin_bottom = 51.0
 focus_mode = 0
+mouse_filter = 1
+size_flags_vertical = 4
 icon = ExtResource( 2 )
 flat = true
-
 [connection signal="pressed" from="MarginContainer/MarginContainer/HBoxContainer/ClearButton" to="." method="_on_clear_pressed"]

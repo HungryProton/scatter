@@ -21,3 +21,4 @@ valign = 1
 margin_left = 1000.0
 margin_right = 1024.0
 margin_bottom = 24.0
+mouse_filter = 1

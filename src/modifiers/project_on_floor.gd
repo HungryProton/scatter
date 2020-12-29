@@ -9,10 +9,15 @@ export(bool) var align_with_floor_normal = false
 export(bool) var invert_ray_direction = false
 export(Vector3) var floor_direction = Vector3.DOWN
 
-var display_name := "Project On Floor"
+
+func _init() -> void:
+	display_name = "Project On Floor"
 
 
-func process_transforms(transforms, _seed) -> void:
+func _process_transforms(transforms, _seed) -> void:
+	if transforms.list.empty():
+		return
+	
 	var path = transforms.path
 	var space_state = path.get_world().get_direct_space_state()
 	
@@ -34,6 +39,13 @@ func process_transforms(transforms, _seed) -> void:
 			continue
 		
 		i += 1
+
+	if transforms.list.empty():
+		warning += """All the transforms have been removed. Possible reasons: \n
+		+ There is no collider close enough to the path.
+		+ The Ray length is not long enough.
+		+ The floor direction is incorrect.
+		"""
 
 
 func _project_on_floor(pos, path, space_state):

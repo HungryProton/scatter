@@ -7,17 +7,18 @@ export(int) var custom_seed = 0
 export(int) var instance_count = 10
 export(bool) var align_to_path = false
 
-var display_name := "Distribute Along Path (Random)"
-
 var _rng: RandomNumberGenerator
 
 
-func process_transforms(transforms, global_seed) -> void:
-	var path = transforms.path
-	if path.curve.get_point_count() == 0:
-		return
+func _init() -> void:
+	display_name = "Distribute Along Path (Random)"
+	warning_ignore_no_transforms = true
 
+
+func _process_transforms(transforms, global_seed) -> void:
+	var path = transforms.path
 	transforms.resize(instance_count)
+	
 	_rng = RandomNumberGenerator.new()
 
 	if override_global_seed:
@@ -33,7 +34,8 @@ func process_transforms(transforms, global_seed) -> void:
 		var t : Transform = transforms.list[i]
 		
 		if align_to_path:
-			t = t.rotated(Vector3.UP, atan2(normal.x, normal.z))
+			t = t.rotated(t.basis.y.normalized(), atan2(normal.x, normal.z))
+			t = t.rotated(t.basis.x.normalized(), atan2(normal.y, normal.z))
 		
 		t.origin = pos
 		transforms.list[i] = t

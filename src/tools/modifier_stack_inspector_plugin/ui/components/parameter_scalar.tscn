@@ -24,15 +24,18 @@ valign = 1
 margin_left = 946.0
 margin_right = 1024.0
 margin_bottom = 28.0
+mouse_filter = 2
 
 [node name="Panel" type="Panel" parent="MarginContainer"]
 margin_right = 78.0
 margin_bottom = 28.0
+mouse_filter = 2
 custom_styles/panel = SubResource( 1 )
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer"]
 margin_right = 78.0
 margin_bottom = 28.0
+mouse_filter = 2
 custom_constants/margin_right = 2
 custom_constants/margin_top = 2
 custom_constants/margin_left = 2
@@ -43,6 +46,7 @@ margin_left = 2.0
 margin_top = 2.0
 margin_right = 76.0
 margin_bottom = 26.0
+mouse_filter = 1
 min_value = -100.0
 step = 0.001
 allow_greater = true

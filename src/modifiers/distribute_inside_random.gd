@@ -6,12 +6,15 @@ export(bool) var override_global_seed = false
 export(int) var custom_seed = 0
 export(int) var instance_count = 10
 
-var display_name := "Distribute Inside (Random)"
-
 var _rng: RandomNumberGenerator
 
 
-func process_transforms(transforms, global_seed) -> void:
+func _init() -> void:
+	display_name = "Distribute Inside (Random)"
+	warning_ignore_no_transforms = true
+
+
+func _process_transforms(transforms, global_seed) -> void:
 	transforms.resize(instance_count)
 	_rng = RandomNumberGenerator.new()
 

@@ -14,7 +14,10 @@ var _modifier
 onready var _parameters: Control = $MarginContainer/VBoxContainer/Parameters
 onready var _name: Label = $MarginContainer/VBoxContainer/HBoxContainer/Label
 onready var _margin_container: MarginContainer = $MarginContainer
+onready var _edit_buttons: Control = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/EditButtons
 onready var _enabled: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable
+onready var _warning: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Warning
+onready var _warning_popup: AcceptDialog = $AcceptDialog
 
 
 func _ready() -> void:
@@ -27,6 +30,9 @@ func set_root(val) -> void:
 
 func create_ui_for(modifier) -> void:
 	_modifier = modifier
+	_modifier.connect("warning_changed", self, "_on_warning_changed")
+	_on_warning_changed()
+	
 	_name.text = modifier.display_name
 	_enabled.pressed = modifier.enabled
 	
@@ -101,3 +107,21 @@ func _on_parameter_value_changed(value, previous, name, ui) -> void:
 func _on_enable_toggled(pressed: bool):
 	_modifier.enabled = pressed
 	emit_signal("value_changed")
+
+
+func _on_warning_changed() -> void:
+	var warning = _modifier.get_warning()
+	_warning.visible = (warning != "")
+	_warning_popup.dialog_text = warning
+
+
+func _on_warning_icon_pressed() -> void:
+	_warning_popup.popup_centered()
+
+
+func _on_mouse_entered():
+	_edit_buttons.visible = true
+
+
+func _on_mouse_exited():
+	_edit_buttons.visible = false

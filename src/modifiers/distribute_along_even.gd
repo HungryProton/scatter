@@ -5,16 +5,23 @@ extends "base_modifier.gd"
 export(float) var interval = 1.0
 export(bool) var align_to_path = false
 
-var display_name := "Distribute Along Path (Even)"
+
+func _init() -> void:
+	display_name = "Distribute Along Path (Even)"
+	warning_ignore_no_transforms = true
 
 
-func process_transforms(transforms, _seed) -> void:
+func _process_transforms(transforms, _seed) -> void:
 	var path = transforms.path
-	if path.curve.get_point_count() == 0:
-		return
-	
 	var length: float = path.curve.get_baked_length()
 	var total_count: int = round(length / interval)
+	
+	if total_count == 0:
+		warning += """
+		The interval is larger than the curve length.
+		No transforms could be placed."""
+		return
+	
 	transforms.resize(total_count)
 
 	for i in transforms.list.size():

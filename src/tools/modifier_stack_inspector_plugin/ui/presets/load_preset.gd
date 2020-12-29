@@ -6,8 +6,8 @@ signal load_preset
 signal delete_preset
 
 
-onready var _no_presets: Label = $MarginContainer/ScrollContainer/NoPresets
-onready var _root: VBoxContainer = $MarginContainer/ScrollContainer/PresetsRoot
+onready var _no_presets: Label = $MarginContainer/ScrollContainer/VBoxContainer/NoPresets
+onready var _root: VBoxContainer = $MarginContainer/ScrollContainer/VBoxContainer/PresetsRoot
 
 
 func _ready():
@@ -70,3 +70,7 @@ func _on_load_preset(preset_name) -> void:
 func _on_delete_preset(preset_name, ui) -> void:
 	emit_signal("delete_preset", preset_name)
 	ui.queue_free()
+
+
+func _on_cancel_pressed():
+	visible = false
