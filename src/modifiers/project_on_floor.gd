@@ -20,10 +20,10 @@ func _process_transforms(transforms, _seed) -> void:
 	
 	var path = transforms.path
 	var space_state = path.get_world().get_direct_space_state()
-	
 	var hit
 	var t: Transform
 	var i := 0
+	
 	while i < transforms.list.size():
 		t = transforms.list[i]
 		hit = _project_on_floor(t.origin, path, space_state)

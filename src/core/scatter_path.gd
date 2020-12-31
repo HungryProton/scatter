@@ -46,35 +46,6 @@ func distance_from_point(point: Vector3, ignore_height := false) -> float:
 	return point.distance_to(point_on_curve)
 
 
-func add_point(position):
-	if not curve:
-		curve = Curve3D.new()
-	
-	curve.add_point(position)
-	var current_index = curve.get_point_count() - 1
-	var previous_index = current_index - 1
-	if previous_index < 0:
-		curve.set_point_in(current_index, Vector3(-1.0, 0.0, 0.0))
-		curve.set_point_out(current_index, Vector3(1.0, 0.0, 0.0))
-		return
-	
-	var dir = position - curve.get_point_position(previous_index)
-	var dir_out = dir.normalized()
-	var dir_in = -dir.normalized()
-	
-	curve.set_point_in(current_index, dir_in)
-	curve.set_point_out(current_index, dir_out)
-	
-	_update_from_curve()
-
-
-func remove_point(index):
-	if index > curve.get_point_count() - 1:
-		return
-	curve.remove_point(index)
-	_update_from_curve()
-
-
 func get_pos_and_normal(offset) -> Array:
 	var pos: Vector3 = curve.interpolate_baked(offset)
 	var normal := Vector3.ZERO
@@ -91,29 +62,6 @@ func get_pos_and_normal(offset) -> Array:
 	normal = normal.normalized().rotated(Vector3.UP, PI / 2.0)
 	
 	return [pos, normal]
-
-
-func set_closed_curve(value):
-	closed_curve = value
-	if closed_curve:
-		# Create a new point, duplicate the first point data
-		pass
-	_update_from_curve()
-
-
-func set_point_position(index, pos):
-	curve.set_point_position(index, pos)
-	_update_from_curve()
-
-
-func set_point_in(index, pos):
-	curve.set_point_in(index, pos)
-	_update_from_curve()
-
-
-func set_point_out(index, pos):
-	curve.set_point_out(index, pos)
-	_update_from_curve()
 
 
 func get_closest_to(pos):
@@ -133,12 +81,6 @@ func get_closest_to(pos):
 		return -1
 	
 	return closest
-
-
-func remove_closest_to(pos):
-	if curve.get_point_count() > 0:
-		var closest = get_closest_to(pos)
-		remove_point(closest)
 
 
 func _get_projected_coords(coords : Vector3):

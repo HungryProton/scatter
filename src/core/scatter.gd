@@ -112,6 +112,14 @@ func update() -> void:
 		parent.update()
 
 
+# Same thing as update except we force all the physic objects in the entire
+# scene to refresh their colliders. We have to do this because of reasons
+# explained here: https://github.com/godotengine/godot/issues/43744
+func full_update() -> void:
+	_reset_all_colliders(get_tree().root)
+	update()
+
+
 # Loop through children to find all the ScatterItem nodes
 func _discover_items() -> void:
 	_items.clear()
@@ -297,3 +305,12 @@ func _set_modifier_stack(val) -> void:
 func _make_curve_unique() -> void:
 	curve = curve.duplicate(true)
 	_update_from_curve()
+
+
+func _reset_all_colliders(node) -> void:
+	if node is CollisionShape and not node.disabled:
+		node.disabled = true
+		node.disabled = false
+	
+	for c in node.get_children():
+		_reset_all_colliders(c)

@@ -1,12 +1,13 @@
 tool
-extends HBoxContainer
+extends Control
 
 
 signal option_changed
+signal snap_to_colliders_enabled
 
 
-onready var colliders: Button = $Colliders
-onready var plane: Button = $Plane
+onready var colliders: Button = $HBoxContainer/Colliders
+onready var plane: Button = $HBoxContainer/Plane
 
 var path
 
@@ -36,3 +37,8 @@ func _get_nodes() -> void:
 func _on_button_toggled(val: bool) -> void:
 	emit_signal("option_changed")
 	plane.disabled = snap_to_colliders()
+
+
+func _on_snap_button_toggled(val: bool) -> void:
+	if val:
+		emit_signal("snap_to_colliders_enabled")

@@ -42,6 +42,7 @@ func _enter_tree():
 	_scatter_path_gizmo_plugin.editor_plugin = self
 	_scatter_path_gizmo_plugin.options = _gizmo_options
 	add_spatial_gizmo_plugin(_scatter_path_gizmo_plugin)
+	_gizmo_options.connect("snap_to_colliders_enabled", self, "_on_snap_to_colliders_enabled")
 	
 	_editor_selection = get_editor_interface().get_selection()
 	_editor_selection.connect("selection_changed", self, "_on_selection_changed")
@@ -70,6 +71,8 @@ func _on_selection_changed() -> void:
 		_show_options_panel()
 		_scatter_path_gizmo_plugin.set_selection(selected[0])
 		selected[0].undo_redo = get_undo_redo()
+		if _gizmo_options.snap_to_colliders():
+			_on_snap_to_colliders_enabled()
 	else:
 		_hide_options_panel()
 		_scatter_path_gizmo_plugin.set_selection(null)
@@ -90,3 +93,19 @@ func _show_options_panel():
 func _hide_options_panel():
 	if _gizmo_options.get_parent():
 		remove_control_from_container(CONTAINER_SPATIAL_EDITOR_MENU, _gizmo_options)
+
+
+func _on_snap_to_colliders_enabled():
+	var selected = _editor_selection.get_selected_nodes()
+	if not selected.empty():
+		var root = selected[0].get_tree().root
+		_reset_all_colliders(root)
+
+
+func _reset_all_colliders(node) -> void:
+	if node is CollisionShape and not node.disabled:
+		node.disabled = true
+		node.disabled = false
+	
+	for c in node.get_children():
+		_reset_all_colliders(c)

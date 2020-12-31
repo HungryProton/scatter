@@ -31,7 +31,7 @@ func _process_transforms(transforms, _seed) -> void:
 		var t : Transform = transforms.list[i]
 		
 		if align_to_path:
-			t = t.rotated(Vector3.UP, atan2(normal.x, normal.z))
-		
+			t = t.rotated(t.basis.y.normalized(), atan2(normal.x, normal.z))
+			
 		t.origin = pos
 		transforms.list[i] = t

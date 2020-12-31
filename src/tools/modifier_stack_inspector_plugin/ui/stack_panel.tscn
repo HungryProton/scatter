@@ -61,8 +61,10 @@ items = [ "Save Preset", ExtResource( 8 ), 0, false, false, 0, 0, null, "", fals
 script = ExtResource( 6 )
 
 [node name="LoadPresetPopup" parent="PanelContainer/VBoxContainer/HBoxContainer/Presets" instance=ExtResource( 7 )]
+visible = false
 
 [node name="SavePresetPopup" parent="PanelContainer/VBoxContainer/HBoxContainer/Presets" instance=ExtResource( 10 )]
+visible = false
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainer/VBoxContainer"]
 margin_top = 26.0
@@ -79,4 +81,4 @@ text = "Rebuild"
 
 [connection signal="load_preset" from="PanelContainer/VBoxContainer/HBoxContainer/Presets/LoadPresetPopup" to="." method="_on_load_preset"]
 [connection signal="save_preset" from="PanelContainer/VBoxContainer/HBoxContainer/Presets/SavePresetPopup" to="." method="_on_save_preset"]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/RebuildButton" to="." method="_on_value_changed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/RebuildButton" to="." method="_on_rebuild_pressed"]

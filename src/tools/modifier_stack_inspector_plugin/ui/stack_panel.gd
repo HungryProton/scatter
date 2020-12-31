@@ -98,6 +98,11 @@ func _on_value_changed() -> void:
 		_scatter.update()
 
 
+func _on_rebuild_pressed() -> void:
+	if _scatter:
+		_scatter.full_update()
+
+
 func _on_save_preset(preset_name) -> void:
 	if not _scatter:
 		return

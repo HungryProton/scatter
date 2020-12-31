@@ -17,7 +17,9 @@ Check the two scenes under **addons/scatter/demos** to get an idea of how this a
 ### Scatter nodes
 + Add a **Scatter** node to you scene tree
 + Add a **ScatterItem** node as a child
-+ ScatterItem has a `Item Path` parameter. It expects a path to the scene containing the mesh you want to scatter.
+  - ScatterItem has a `Item Path` parameter. It expects a path to the scene containing the mesh you want to scatter.
+  - You can add multiple ScatterItem under a single Scatter node to use
+    different meshes in the same area
 
 + Use these buttons on top of the viewport to draw a path on your scene. By default, objects will be placed inside the path.
 ![path_controls](https://user-images.githubusercontent.com/52043844/69886910-b19e3380-12e4-11ea-87ea-39e8d00e2701.png)
@@ -131,7 +133,7 @@ to your own needs), open a proposal in the issues tracker.
     + How far the ray cast should go to find a collider
   - `Ray Offset`
     + Sometimes, the 3D curve may pass through (or below) a collider. This parameter makes the raycast start before it's starting
-    point to account for this. 
+    point to account for this.
   - `Remove Points on Miss`
     + If the raycast didn't hit anything, the transform will be completely removed. If disabled, the transforms stays where it is.
   - `Align with Floor Normal`
@@ -187,7 +189,7 @@ When updating a Scatter Path object, a 2D polygon projected on the XZ plane is a
 This polygon is used to know if a point is inside the curve or not. If this polygon resolution is too high, regenerating
 it will take time. To fix fix, increase the `Bake Interval` on the Scatter node itself. (Not on the curve resource, this one
 is not used). Values around 1 or 2 are usually enough, but if your path is really large, you don't need that much precision and
-you can increase this value. On the other end, if your path is really small, you can decrease this value.
+you can increase this value. However, if your path is really small, you can decrease this value.
 
 ### The 3D curves are modified at different places at once
 [Please read this page](https://github.com/HungryProton/scatter/wiki/Warning-about-duplicating-nodes).
