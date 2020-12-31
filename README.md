@@ -196,6 +196,12 @@ you can increase this value. However, if your path is really small, you can decr
 When you duplicate a `Scatter` node, the curve resource is duplicated automatically so this shoudn't happen.
 If it does, click on the `Curve3D` resource and click on `Make Unique`. 
 
+### Project on floor ignores my colliders
+There is [a known bug in Godot](https://github.com/godotengine/godot/issues/43744) when raycasting from a tool script.
+After moving the colliders of you scene, the physic world is not synced with their new position, so you have to hit
+the `Rebuild` button in the inspector, under the modifier stack. Hit it once after you made modifications to your
+scene.
+
 
 ## Licence
 - This addon is published under the MIT licence.
