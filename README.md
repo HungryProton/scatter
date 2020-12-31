@@ -29,7 +29,7 @@ Check the two scenes under **addons/scatter/demos** to get an idea of how this a
 
 ### Modifier stack
 
-![modifier_stack](https://user-images.githubusercontent.com/52043844/103151370-d251ea80-477d-11eb-971b-36dad4ded7bb.png)
+![modifier_stack](https://user-images.githubusercontent.com/52043844/103406914-b1620e80-4b5c-11eb-8989-d868fcae00c7.png)
 
 The biggest change with V2 is the new `Modifier stack`. You can find it in the inspector when a Scatter node is selected.
 Scatter uses a pool of transforms to know where to create new items in your scene. The modifiers runs from top to
@@ -37,7 +37,7 @@ bottom, each of them affect these transforms in a specific way. Depending on whi
 you can end up with very different results.
 
 Each modifiers also have their own parameters you can tweak by expanding their UI using the arrow on the left.  
-![image](https://user-images.githubusercontent.com/52043844/103151387-04fbe300-477e-11eb-9440-13d1628a806c.png)
+![parameters](https://user-images.githubusercontent.com/52043844/103406951-da829f00-4b5c-11eb-8297-cd333969199e.png)
 
 To add a new modifier to the stack, simply press the `Add Modifier` button to bring up this popup:  
 ![image](https://user-images.githubusercontent.com/52043844/103151426-586e3100-477e-11eb-940a-820dd406a45d.png)
@@ -167,8 +167,8 @@ to your own needs), open a proposal in the issues tracker.
     + How far away transforms are removed.
 
 ### Presets
-If you're often using a specific setup of modifiers and don't want to manually add them all the time, you can create a **preset**.
-![image](https://user-images.githubusercontent.com/52043844/103152717-f2d47180-478a-11eb-8ca1-9a076e85c6db.png)
+If you're often using a specific setup of modifiers and don't want to manually add them all the time, you can create a **preset**.  
+![image](https://user-images.githubusercontent.com/52043844/103406981-043bc600-4b5d-11eb-8e5b-2a85dc0b360d.png)
 
 + Pressing the `Save Preset` option will open a popup asking you for a name.
   - Presets are store on your filesystem so they must be a valid file name.
