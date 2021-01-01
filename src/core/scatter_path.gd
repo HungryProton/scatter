@@ -11,6 +11,8 @@ var polygon : PolygonPathFinder
 var baked_points : PoolVector3Array
 var size : Vector3
 var center : Vector3
+var bounds_max
+var bounds_min
 var closed_curve : bool = false
 
 
@@ -89,8 +91,8 @@ func _get_projected_coords(coords : Vector3):
 
 # Travel the whole path to update the polygon and bounds
 func _update_from_curve():
-	var _min = null
-	var _max = null
+	bounds_max = null
+	bounds_min = null
 	var connections = PoolIntArray()
 	var polygon_points = PoolVector2Array()
 	baked_points = PoolVector3Array()
@@ -124,21 +126,25 @@ func _update_from_curve():
 		
 		# Check for bounds
 		if i == 0:
-			_min = coords
-			_max = coords
+			bounds_min = coords_3d
+			bounds_max = coords_3d
 		else:
-			if coords.x > _max.x:
-				_max.x = coords.x
-			if coords.x < _min.x:
-				_min.x = coords.x
-			if coords.y > _max.y:
-				_max.y = coords.y
-			if coords.y < _min.y:
-				_min.y = coords.y
-	
+			if coords_3d.x > bounds_max.x:
+				bounds_max.x = coords_3d.x
+			if coords_3d.x < bounds_min.x:
+				bounds_min.x = coords_3d.x
+			if coords_3d.y > bounds_max.y:
+				bounds_max.y = coords_3d.y
+			if coords_3d.y < bounds_min.y:
+				bounds_min.y = coords_3d.y
+			if coords_3d.z > bounds_max.z:
+				bounds_max.z = coords_3d.z
+			if coords_3d.z < bounds_min.z:
+				bounds_min.z = coords_3d.z
+			
 	polygon.setup(polygon_points, connections)
-	size = Vector3(_max.x - _min.x, 0.0, _max.y - _min.y)
-	center = Vector3((_min.x + _max.x) / 2, 0.0, (_min.y + _max.y) / 2)
+	size = Vector3(bounds_max.x - bounds_min.x, bounds_max.z - bounds_min.z, bounds_max.z - bounds_min.z)
+	center = Vector3((bounds_min.x + bounds_max.x) / 2, (bounds_min.y + bounds_max.y) / 2, (bounds_min.z + bounds_max.z) / 2)
 	
 	emit_signal("curve_updated")
 

@@ -30,6 +30,6 @@ margin_bottom = 40.0
 pressed = true
 text = "Lock to plane"
 
-[connection signal="toggled" from="HBoxContainer/Colliders" to="HBoxContainer" method="_on_snap_button_toggled"]
-[connection signal="toggled" from="HBoxContainer/Colliders" to="HBoxContainer" method="_on_button_toggled"]
-[connection signal="toggled" from="HBoxContainer/Plane" to="HBoxContainer" method="_on_button_toggled"]
+[connection signal="toggled" from="HBoxContainer/Colliders" to="." method="_on_button_toggled"]
+[connection signal="toggled" from="HBoxContainer/Colliders" to="." method="_on_snap_button_toggled"]
+[connection signal="toggled" from="HBoxContainer/Plane" to="." method="_on_button_toggled"]

@@ -23,8 +23,9 @@ func _process_transforms(transforms, global_seed) -> void:
 	else:
 		_rng.set_seed(global_seed)
 	
-	var center = transforms.path.center
-	var half_size = transforms.path.size * 0.5
+	var center: Vector3 = transforms.path.center
+	var half_size: Vector3 = transforms.path.size * 0.5
+	var height: float = transforms.path.bounds_max.y
 	
 	for i in transforms.list.size():
 		# Don't use a while just in case the user-provided path is invalid 
@@ -32,6 +33,7 @@ func _process_transforms(transforms, global_seed) -> void:
 		for j in 100:
 			var pos = _random_vec3() * half_size + center
 			if transforms.path.is_point_inside(pos):
+				pos.y = height
 				transforms.list[i].origin = pos
 				break
 
