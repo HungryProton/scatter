@@ -9,6 +9,7 @@ Use the tag selector to go back to older versions if needed.
 
 ## Installation
 + Clone this repository in your addons folder
++ If you downloaded the GitHub archive, make sure to **rename the folder**, it must be called `scatter`, not scatter-master.
 + Navigate to **Project -> Project Settings -> Plugin** and enable the **Scatter** plugin
 
 ## Getting started
