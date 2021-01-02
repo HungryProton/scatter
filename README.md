@@ -22,9 +22,9 @@ in order to use this plugin.
 ## Troubleshooting
 
 ### The addon is slow when editing a curve
-When updating a Scatter Path object, a 2D polygon projected on the XZ plane is also generated internally.
+When updating a `Scatter Path` object, a 2D polygon projected on the XZ plane is also generated internally.
 This polygon is used to know if a point is inside the curve or not. If this polygon resolution is too high, regenerating
-it will take time. To fix fix, increase the `Bake Interval` on the Scatter node itself. (Not on the curve resource, this one
+it will take time. To fix this, increase the `Bake Interval` on the Scatter node itself. (Not on the curve resource, this one
 is not used). Values around 1 or 2 are usually enough, but if your path is really large, you don't need that much precision and
 you can increase this value. However, if your path is really small, you can decrease this value.
 
@@ -35,7 +35,7 @@ If it does, click on the `Curve3D` resource and click on `Make Unique`.
 
 ### Project on floor ignores my colliders
 There is [a known bug in Godot](https://github.com/godotengine/godot/issues/43744) when raycasting from a tool script.
-After moving the colliders of you scene, the physic world is not synced with their new position, so you have to hit
+After moving your colliders, the physic world is not synced with their new position, so you have to hit
 the `Rebuild` button in the inspector, under the modifier stack. Hit it once after you made modifications to your
 scene.
 
