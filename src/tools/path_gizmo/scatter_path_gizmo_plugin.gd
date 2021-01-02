@@ -220,11 +220,14 @@ func _draw_grid(gizmo):
 	var grid = PoolVector3Array()
 	var size = path.size
 	var center = path.center
+	center.y = 0.0
+	size.y = 0.0
+	
 	var resolution = 1.5 # Define how large each square is
 	var steps_x = int(size.x / resolution) + 1
 	var steps_y = int(size.z / resolution) + 1
-	var half_size = size/2
-	
+	var half_size = size / 2
+
 	for i in steps_x:
 		grid.append(Vector3(i * resolution, 0.0, 0.0) - half_size + center)
 		grid.append(Vector3(i * resolution, 0.0, size.z) - half_size + center)
