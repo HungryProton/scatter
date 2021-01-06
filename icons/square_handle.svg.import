@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/square_handle.svg-2194a5504d5bc93759471bda1d2d5881.s3tc.stex"
-path.etc2="res://.import/square_handle.svg-2194a5504d5bc93759471bda1d2d5881.etc2.stex"
+path.s3tc="res://.import/square_handle.svg-780e8c81aeda264cfc779a9c41e595d2.s3tc.stex"
+path.etc2="res://.import/square_handle.svg-780e8c81aeda264cfc779a9c41e595d2.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://addons/scatter/icons/square_handle.svg"
-dest_files=[ "res://.import/square_handle.svg-2194a5504d5bc93759471bda1d2d5881.s3tc.stex", "res://.import/square_handle.svg-2194a5504d5bc93759471bda1d2d5881.etc2.stex" ]
+source_file="res://scatter/icons/square_handle.svg"
+dest_files=[ "res://.import/square_handle.svg-780e8c81aeda264cfc779a9c41e595d2.s3tc.stex", "res://.import/square_handle.svg-780e8c81aeda264cfc779a9c41e595d2.etc2.stex" ]
 
 [params]
 

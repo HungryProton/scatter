@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/fence_planks.glb-8264901bdd0a8448e1c6d14acb15ebd4.scn"
+path="res://.import/fence_planks.glb-19af78d0ea047bc4ea5b79994fe29f4e.scn"
 
 [deps]
 
-source_file="res://addons/scatter/demos/assets/fences/models/fence_planks.glb"
-dest_files=[ "res://.import/fence_planks.glb-8264901bdd0a8448e1c6d14acb15ebd4.scn" ]
+source_file="res://scatter/demos/assets/fences/models/fence_planks.glb"
+dest_files=[ "res://.import/fence_planks.glb-19af78d0ea047bc4ea5b79994fe29f4e.scn" ]
 
 [params]
 

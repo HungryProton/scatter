@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/t_grass_4.png-8c4ce0ae1e4976cff282b513cd460d46.s3tc.stex"
-path.etc2="res://.import/t_grass_4.png-8c4ce0ae1e4976cff282b513cd460d46.etc2.stex"
+path.s3tc="res://.import/t_grass_4.png-792e97f40420c06bd9e9b3fa69e7ab99.s3tc.stex"
+path.etc2="res://.import/t_grass_4.png-792e97f40420c06bd9e9b3fa69e7ab99.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://addons/scatter/demos/assets/grass/data/t_grass_4.png"
-dest_files=[ "res://.import/t_grass_4.png-8c4ce0ae1e4976cff282b513cd460d46.s3tc.stex", "res://.import/t_grass_4.png-8c4ce0ae1e4976cff282b513cd460d46.etc2.stex" ]
+source_file="res://scatter/demos/assets/grass/data/t_grass_4.png"
+dest_files=[ "res://.import/t_grass_4.png-792e97f40420c06bd9e9b3fa69e7ab99.s3tc.stex", "res://.import/t_grass_4.png-792e97f40420c06bd9e9b3fa69e7ab99.etc2.stex" ]
 
 [params]
 

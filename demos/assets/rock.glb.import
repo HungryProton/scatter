@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/rock.glb-f283afef7d1a80f07fdeac5e32c8ec34.scn"
+path="res://.import/rock.glb-6de599d45bbe7505d6cf3e60bd180629.scn"
 
 [deps]
 
-source_file="res://addons/scatter/demos/assets/rock.glb"
-dest_files=[ "res://.import/rock.glb-f283afef7d1a80f07fdeac5e32c8ec34.scn" ]
+source_file="res://scatter/demos/assets/rock.glb"
+dest_files=[ "res://.import/rock.glb-6de599d45bbe7505d6cf3e60bd180629.scn" ]
 
 [params]
 
