@@ -37,6 +37,9 @@ func get_handle_name(gizmo: EditorSpatialGizmo, index: int) -> String:
 
 func get_handle_value(gizmo: EditorSpatialGizmo, index: int):
 	var path = gizmo.get_spatial_node()
+	if not path:
+		return null
+	
 	var curve: Curve3D = path.get_curve()
 	if not curve:
 		return null
@@ -65,12 +68,15 @@ func get_handle_value(gizmo: EditorSpatialGizmo, index: int):
 # Automatically called when a handle is moved around.
 func set_handle(gizmo: EditorSpatialGizmo, index: int, camera: Camera, point: Vector2) -> void:
 	var path = gizmo.get_spatial_node()
+	if not path:
+		return
+	
 	var local_pos
 	
-	if options.snap_to_colliders():
+	if options and options.snap_to_colliders():
 		local_pos = _intersect_with_colliders(path, camera, point)
 	
-	elif options.lock_to_plane():
+	elif options and options.lock_to_plane():
 		local_pos = _intersect_with_plane(path, camera, point)
 	
 	else:
@@ -105,6 +111,9 @@ func set_handle(gizmo: EditorSpatialGizmo, index: int, camera: Camera, point: Ve
 # Handle Undo / Redo after a handle was moved.
 func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, cancel: bool = false) -> void:
 	var path = gizmo.get_spatial_node()
+	if not path:
+		return
+	
 	var count = path.curve.get_point_count()
 	var ur = editor_plugin.get_undo_redo()
 	var undo: UndoRedo = editor_plugin.get_undo_redo()
@@ -124,6 +133,9 @@ func redraw(gizmo: EditorSpatialGizmo):
 	
 	gizmo.clear()
 	var path = gizmo.get_spatial_node()
+	if not path:
+		return
+	
 	if not _selection or path != _selection:
 		_draw_path(gizmo)
 		return
@@ -131,7 +143,7 @@ func redraw(gizmo: EditorSpatialGizmo):
 	_cached_gizmo = gizmo
 	_draw_handles(gizmo)
 	_draw_path(gizmo)
-	if options.lock_to_plane():
+	if options and options.lock_to_plane():
 		_draw_grid(gizmo)
 
 
@@ -168,15 +180,24 @@ func create_custom_material(name, color := Color.white):
 
 func set_selection(path) -> void:
 	_selection = path
+	return
 	if not path:
 		return
 	
 	if not path.is_connected("curve_updated", self, "_on_option_changed"):
 		path.connect("curve_updated", self, "_on_option_changed")
+		#path.call_deferred("connect", "curve_updated", self, "_on_option_changed")
 
 
 func _draw_handles(gizmo):
-	var curve = gizmo.get_spatial_node().curve
+	var path = gizmo.get_spatial_node()
+	if not path:
+		return
+	
+	var curve = path.curve
+	if not curve:
+		return
+	
 	var handles = PoolVector3Array()
 	var square_handles = PoolVector3Array()
 	var lines = PoolVector3Array()
@@ -197,7 +218,7 @@ func _draw_handles(gizmo):
 		square_handles.push_back(point_in)
 		square_handles.push_back(point_out)
 		handles.push_back(point_pos)
-		
+	
 	gizmo.add_handles(handles, get_material("handles", gizmo))
 	gizmo.add_handles(square_handles, get_material("square_handle", gizmo))
 	gizmo.add_lines(lines, get_material("handle_lines", gizmo))

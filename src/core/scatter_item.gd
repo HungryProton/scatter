@@ -3,6 +3,7 @@ extends Spatial
 
 
 export(int) var proportion : int = 100 setget _set_proportion
+export(NodePath) var local_item_path setget _set_local_path
 export(String, FILE) var item_path : String setget _set_path
 export(float) var scale_modifier : float = 1.0 setget _set_scale_modifier
 
@@ -14,15 +15,20 @@ func _ready():
 
 
 func _get_configuration_warning() -> String:
-	if item_path.empty():
-		return "The 'Item Path' variable must points to a valid scene containing the mesh you want to scatter"
+	if local_item_path.is_empty() and item_path.empty():
+		return """ No source Node found! You need either ONE of the following:
+			
+			- If the Node you want to scatter is in this scene, fill the 'Local Item Path' variable.
+			- If your Node is in another scene, fill the 'Item Path' variable.
+		"""
 	return ""
 
 
-func _set(property, value):
+func _set(property, _value):
 	# Hack to detect if the node was just duplicated from the editor
 	if property == "transform":
 		call_deferred("_delete_multimesh")
+	return false
 
 
 func update():
@@ -31,9 +37,73 @@ func update():
 		_parent.update()
 
 
+func get_mesh_instance() -> MeshInstance:
+	# Check the supplied local path.
+	if local_item_path:
+		if has_node(local_item_path):
+			var mesh = _get_mesh_from_scene(get_node(local_item_path))
+			if mesh:
+				return mesh
+
+	# Check the remote scene.
+	if item_path:
+		var node = load(item_path)
+		if node:
+			var mesh = _get_mesh_from_scene(node.instance())
+			if mesh:
+				return mesh
+
+	# Nothing found, print the relevant warning in the console.
+	if local_item_path:
+		printerr("Warning: ", name, "/local_item_path - ", local_item_path, " is not a valid MeshInstance")
+	if item_path:
+		printerr("Warning: ", item_path, " is not a valid scene file")
+	
+	return null
+
+
+func get_item_node():
+	# Check the supplied local path.
+	if local_item_path:
+		if has_node(local_item_path):
+			return get_node(local_item_path)
+
+	# Check the remote scene.
+	if item_path:
+		var node = load(item_path)
+		if node:
+			return node.instance()
+	
+	# Nothing found, print the relevant warning in the console.
+	if local_item_path:
+		printerr("Warning: ", name, "/local_item_path - ", local_item_path, " is not a valid node path")
+	if item_path:
+		printerr("Warning: ", item_path, " is not a valid scene file")
+
+	return null
+
+
+func update_warning() -> void:
+	if is_inside_tree():
+		get_tree().emit_signal("node_configuration_warning_changed", self)
+
+
 func _delete_multimesh() -> void:
 	if has_node("MultiMeshInstance"):
 		get_node("MultiMeshInstance").queue_free()
+
+
+func _get_mesh_from_scene(node):
+	if node is MeshInstance:
+		return node
+	
+	for c in node.get_children():
+		var res = _get_mesh_from_scene(c)
+		if res:
+			node.remove_child(res)
+			return res
+	
+	return null
 
 
 func _set_proportion(val):
@@ -43,16 +113,14 @@ func _set_proportion(val):
 
 func _set_path(val):
 	item_path = val
-
-	if is_inside_tree():
-		get_tree().emit_signal("node_configuration_warning_changed", self)
-	
-	if not val:
-		return
-
 	update()
 
 
 func _set_scale_modifier(val):
 	scale_modifier = val
+	update()
+
+
+func _set_local_path(val):
+	local_item_path = val
 	update()

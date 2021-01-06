@@ -55,8 +55,8 @@ func _exit_tree():
 	remove_custom_type("ScatterItem")
 	remove_custom_type("ScatterExcludePath")
 	remove_custom_type("ScatterExcludePoint")
-	remove_spatial_gizmo_plugin(_scatter_path_gizmo_plugin)
 	_hide_options_panel()
+	remove_spatial_gizmo_plugin(_scatter_path_gizmo_plugin)
 
 
 func _on_selection_changed() -> void:
@@ -66,11 +66,12 @@ func _on_selection_changed() -> void:
 		# Node was deselected but nothing else was selected. By default, Godot
 		# will keep the path editor panel on top so we do the same.
 		return 
-
+	
 	if selected[0] is _scatter_path:
 		_show_options_panel()
 		_scatter_path_gizmo_plugin.set_selection(selected[0])
 		selected[0].undo_redo = get_undo_redo()
+		
 		if _gizmo_options.snap_to_colliders():
 			_on_snap_to_colliders_enabled()
 	else:

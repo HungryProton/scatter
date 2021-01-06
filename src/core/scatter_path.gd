@@ -15,6 +15,8 @@ var bounds_max
 var bounds_min
 var closed_curve : bool = false
 
+var _previous_transform: Transform
+
 
 func _ready():
 	set_notify_transform(true)
@@ -25,7 +27,9 @@ func _ready():
 func _notification(what):
 	match what:
 		NOTIFICATION_TRANSFORM_CHANGED:
-			emit_signal("curve_updated")
+			if _previous_transform != transform:
+				_previous_transform = transform
+				emit_signal("curve_updated")
 
 
 func is_point_inside(point : Vector3):

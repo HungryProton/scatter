@@ -117,6 +117,8 @@ func update() -> void:
 # explained here: https://github.com/godotengine/godot/issues/43744
 func full_update() -> void:
 	_reset_all_colliders(get_tree().root)
+	_delete_duplicates()
+	_delete_multimeshes()
 	update()
 
 
@@ -180,7 +182,7 @@ func _get_or_create_instances_root(item):
 
 func _create_instance(item, root):
 	# Create item and add it to the scene
-	var instance = load(item.item_path).instance()
+	var instance = item.get_item_node()
 	root.add_child(instance)
 	instance.set_owner(get_tree().get_edited_scene_root())
 	return instance
@@ -232,15 +234,10 @@ func _setup_multi_mesh(item, count):
 		instance.multimesh = MultiMesh.new()
 	
 	instance.translation = Vector3.ZERO
-
-	var node = load(item.item_path)
-	if not node:
-		printerr("Warning: ", item.item_path, " is not a valid scene file")
-		return
 	
-	var mesh_instance = _get_mesh_from_scene(node.instance())
+	var mesh_instance = item.get_mesh_instance()
 	if not mesh_instance:
-		printerr("Warning: No MeshInstance found in ", item.item_path)
+		_delete_multimeshes()
 		return
 	
 	instance.material_override = mesh_instance.get_surface_material(0)
@@ -250,19 +247,6 @@ func _setup_multi_mesh(item, count):
 	instance.multimesh.instance_count = count
 
 	return instance
-
-
-func _get_mesh_from_scene(node):
-	if node is MeshInstance:
-		return node
-	
-	for c in node.get_children():
-		var res = _get_mesh_from_scene(c)
-		if res:
-			node.remove_child(res)
-			return res
-	
-	return null
 
 
 func _delete_multimeshes() -> void:
