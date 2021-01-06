@@ -13,6 +13,7 @@ onready var _along_even = $MarginContainer/HBoxContainer/VBoxContainer/AlongEven
 onready var _randomize_all = $MarginContainer/HBoxContainer/VBoxContainer2/RandomizeAll
 onready var _scale_noise = $MarginContainer/HBoxContainer/VBoxContainer2/ScaleNoise
 onready var _project = $MarginContainer/HBoxContainer/VBoxContainer2/Project
+onready var _offset = $MarginContainer/HBoxContainer/VBoxContainer2/ApplyOffset
 
 onready var _exclude_from_path = $MarginContainer/HBoxContainer/VBoxContainer3/ExcludeFromPath
 onready var _exclude_along_path = $MarginContainer/HBoxContainer/VBoxContainer3/ExcludeAlongPath
@@ -29,6 +30,7 @@ func _ready():
 	_connect(_randomize_all, "randomize_transforms.gd")
 	_connect(_scale_noise, "randomize_scale_noise.gd")
 	_connect(_project, "project_on_floor.gd")
+	_connect(_offset, "apply_offset.gd")
 	_connect(_exclude_from_path, "exclude_from_path.gd")
 	_connect(_exclude_along_path, "exclude_along_path.gd")
 	_connect(_exclude_around_point, "exclude_around_point.gd")

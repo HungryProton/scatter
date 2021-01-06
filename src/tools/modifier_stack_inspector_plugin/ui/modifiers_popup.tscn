@@ -125,40 +125,47 @@ margin_bottom = 94.0
 text = "Project On Floor"
 align = 0
 
+[node name="ApplyOffset" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 98.0
+margin_right = 169.0
+margin_bottom = 118.0
+text = "Apply Offset"
+align = 0
+
 [node name="VBoxContainer3" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 margin_left = 337.0
-margin_right = 467.0
+margin_right = 485.0
 margin_bottom = 118.0
 size_flags_horizontal = 3
 
 [node name="Remove" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer3"]
 modulate = Color( 1, 1, 1, 0.784314 )
-margin_right = 130.0
+margin_right = 148.0
 margin_bottom = 14.0
 text = "Remove"
 
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/HBoxContainer/VBoxContainer3"]
 margin_top = 18.0
-margin_right = 130.0
+margin_right = 148.0
 margin_bottom = 22.0
 
 [node name="ExcludeFromPath" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer3"]
 margin_top = 26.0
-margin_right = 130.0
+margin_right = 148.0
 margin_bottom = 46.0
 text = "Exclude From Path"
 align = 0
 
 [node name="ExcludeAlongPath" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer3"]
-margin_top = 26.0
-margin_right = 130.0
-margin_bottom = 46.0
+margin_top = 50.0
+margin_right = 148.0
+margin_bottom = 70.0
 text = "Exclude Along Path"
 align = 0
 
 [node name="ExcludeAroundPoint" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer3"]
-margin_top = 26.0
-margin_right = 130.0
-margin_bottom = 46.0
+margin_top = 74.0
+margin_right = 148.0
+margin_bottom = 94.0
 text = "Exclude Around Point"
 align = 0

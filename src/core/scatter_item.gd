@@ -6,6 +6,13 @@ export(int) var proportion : int = 100 setget _set_proportion
 export(NodePath) var local_item_path setget _set_local_path
 export(String, FILE) var item_path : String setget _set_path
 export(float) var scale_modifier : float = 1.0 setget _set_scale_modifier
+export(bool) var ignore_initial_position := true setget _set_ignore_pos
+export(bool) var ignore_initial_rotation := true setget _set_ignore_rot
+export(bool) var ignore_initial_scale := true setget _set_ignore_scale
+
+var initial_position: Vector3
+var initial_rotation: Vector3
+var initial_scale: Vector3
 
 var _parent
 
@@ -43,6 +50,7 @@ func get_mesh_instance() -> MeshInstance:
 		if has_node(local_item_path):
 			var mesh = _get_mesh_from_scene(get_node(local_item_path))
 			if mesh:
+				_save_initial_data(mesh)
 				return mesh
 
 	# Check the remote scene.
@@ -51,6 +59,7 @@ func get_mesh_instance() -> MeshInstance:
 		if node:
 			var mesh = _get_mesh_from_scene(node.instance())
 			if mesh:
+				_save_initial_data(mesh)
 				return mesh
 
 	# Nothing found, print the relevant warning in the console.
@@ -66,13 +75,20 @@ func get_item_node():
 	# Check the supplied local path.
 	if local_item_path:
 		if has_node(local_item_path):
-			return get_node(local_item_path)
+			var node = get_node(local_item_path).duplicate()
+			_save_initial_data(node)
+			var parent = node.get_parent()
+			if parent:
+				parent.remove_child(node)
+			return node
 
 	# Check the remote scene.
 	if item_path:
-		var node = load(item_path)
-		if node:
-			return node.instance()
+		var scene = load(item_path)
+		if scene:
+			var node = scene.instance()
+			_save_initial_data(node)
+			return node
 	
 	# Nothing found, print the relevant warning in the console.
 	if local_item_path:
@@ -100,10 +116,15 @@ func _get_mesh_from_scene(node):
 	for c in node.get_children():
 		var res = _get_mesh_from_scene(c)
 		if res:
-			node.remove_child(res)
-			return res
+			return res.duplicate()
 	
 	return null
+
+
+func _save_initial_data(node) -> void:
+	initial_position = node.translation
+	initial_rotation = node.rotation
+	initial_scale = node.scale
 
 
 func _set_proportion(val):
@@ -123,4 +144,19 @@ func _set_scale_modifier(val):
 
 func _set_local_path(val):
 	local_item_path = val
+	update()
+
+
+func _set_ignore_pos(val):
+	ignore_initial_position = val
+	update()
+
+
+func _set_ignore_rot(val):
+	ignore_initial_rotation = val
+	update()
+
+
+func _set_ignore_scale(val):
+	ignore_initial_scale = val
 	update()

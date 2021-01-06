@@ -157,7 +157,7 @@ func _create_duplicates() -> void:
 				# If not, create one
 				instance = _create_instance(item, root)
 			
-			instance.transform = _transforms.list[offset + i]
+			instance.transform = _process_transform(item, _transforms.list[offset + i])
 		
 		# Delete the unused instances left in the pool if any
 		if count < child_count:
@@ -207,15 +207,8 @@ func _create_multimesh() -> void:
 		for i in count:
 			if (offset + i) >= transforms_count:
 				return
-			
-			# Apply local scale multiplier to each transform
-			var t = _transforms.list[offset + i]
-			var origin = t.origin
-			t.origin = Vector3.ZERO
-			t = t.scaled(Vector3.ONE * item.scale_modifier)
-			t.origin = origin
-			
-			mmi.multimesh.set_instance_transform(i, t)
+
+			mmi.multimesh.set_instance_transform(i, _process_transform(item, _transforms.list[offset + i]))
 			
 		offset += count
 
@@ -256,6 +249,28 @@ func _delete_multimeshes() -> void:
 	for item in _items:
 		if item.has_node("MultiMeshInstance"):
 			item.get_node("MultiMeshInstance").queue_free()
+
+
+func _process_transform(item, t: Transform) -> Transform:
+	var origin = t.origin
+	t.origin = Vector3.ZERO
+	
+	t = t.scaled(Vector3.ONE * item.scale_modifier)
+	
+	if not item.ignore_initial_scale:
+		t = t.scaled(item.initial_scale)
+	
+	if not item.ignore_initial_rotation:
+		t = t.rotated(t.basis.x.normalized(), item.initial_rotation.x)
+		t = t.rotated(t.basis.y.normalized(), item.initial_rotation.y)
+		t = t.rotated(t.basis.z.normalized(), item.initial_rotation.z)
+	
+	t.origin = origin
+	
+	if not item.ignore_initial_position:
+		t.origin += item.initial_position
+	
+	return t
 
 
 func _set_global_seed(val: int) -> void:
