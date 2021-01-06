@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/scatter.svg-c666e1da505235f796e87a5fb08afc85.stex"
+path="res://.import/scatter.svg-acee3f4d6f8ddf1b21e205247a8c8a0e.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://scatter/icons/scatter.svg"
-dest_files=[ "res://.import/scatter.svg-c666e1da505235f796e87a5fb08afc85.stex" ]
+source_file="res://addons/scatter/icons/scatter.svg"
+dest_files=[ "res://.import/scatter.svg-acee3f4d6f8ddf1b21e205247a8c8a0e.stex" ]
 
 [params]
 

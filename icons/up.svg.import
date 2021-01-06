@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/up.svg-937ac49ea67276c3d0638834def9d511.stex"
+path="res://.import/up.svg-0bd6722fd3738363a27c89e604b47d80.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://scatter/icons/up.svg"
-dest_files=[ "res://.import/up.svg-937ac49ea67276c3d0638834def9d511.stex" ]
+source_file="res://addons/scatter/icons/up.svg"
+dest_files=[ "res://.import/up.svg-0bd6722fd3738363a27c89e604b47d80.stex" ]
 
 [params]
 

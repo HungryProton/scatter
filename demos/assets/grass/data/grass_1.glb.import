@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/grass_1.glb-3faa3fccfd63d86fe393a103ff495063.scn"
+path="res://.import/grass_1.glb-2e27cec4ce079d0bf78ccb7835ae9b6c.scn"
 
 [deps]
 
-source_file="res://scatter/demos/assets/grass/data/grass_1.glb"
-dest_files=[ "res://.import/grass_1.glb-3faa3fccfd63d86fe393a103ff495063.scn" ]
+source_file="res://addons/scatter/demos/assets/grass/data/grass_1.glb"
+dest_files=[ "res://.import/grass_1.glb-2e27cec4ce079d0bf78ccb7835ae9b6c.scn" ]
 
 [params]
 

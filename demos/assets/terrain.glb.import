@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/terrain.glb-96e1c700950c4105d94a03fae4cf12ad.scn"
+path="res://.import/terrain.glb-fad8cec9792136e1ce649f71f1f9f6ca.scn"
 
 [deps]
 
-source_file="res://scatter/demos/assets/terrain.glb"
-dest_files=[ "res://.import/terrain.glb-96e1c700950c4105d94a03fae4cf12ad.scn" ]
+source_file="res://addons/scatter/demos/assets/terrain.glb"
+dest_files=[ "res://.import/terrain.glb-fad8cec9792136e1ce649f71f1f9f6ca.scn" ]
 
 [params]
 
