@@ -24,9 +24,14 @@ func _process_transforms(transforms, _seed) -> void:
 		return
 
 	transforms.resize(total_count)
+	var result := []
 
 	for i in transforms.list.size():
-		var data = path.get_pos_and_normal(i * interval + offset)
+		var path_offset: float = i * interval + offset
+		if path_offset < 0 or path_offset > length:
+			continue
+
+		var data = path.get_pos_and_normal(path_offset)
 		var pos: Vector3 = data[0]
 		var normal: Vector3 = data[1]
 		var t : Transform = transforms.list[i]
@@ -35,4 +40,6 @@ func _process_transforms(transforms, _seed) -> void:
 			t = t.rotated(t.basis.y.normalized(), atan2(normal.x, normal.z))
 
 		t.origin = pos
-		transforms.list[i] = t
+		result.push_back(t)
+
+	transforms.list = result
