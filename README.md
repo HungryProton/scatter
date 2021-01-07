@@ -21,6 +21,15 @@ in order to use this plugin.
 
 ## Troubleshooting
 
+### I can't open the demo scenes
+Make sure the folder is named `scatter` exactly, nothing else. If you downloaded the archive from GitHub,
+if probably renamed that into *scatter-master* or something else, this will break the import / scene paths.
++ Disable the plugin first.
++ Rename the folder into `scatter`.
++ Close the editor and open it again.
+  - If you don't Godot will probably complain about cyclic dependencies or something else.
++ Enable the plugin and it should work.
+
 ### The addon is slow when editing a curve
 When updating a `Scatter Path` object, a 2D polygon projected on the XZ plane is also generated internally.
 This polygon is used to know if a point is inside the curve or not. If this polygon resolution is too high, regenerating
