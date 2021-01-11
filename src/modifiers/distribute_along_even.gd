@@ -18,7 +18,7 @@ func _init() -> void:
 func _process_transforms(transforms, _seed) -> void:
 	var path = transforms.path
 	var length: float = path.curve.get_baked_length()
-	var total_count: int = round(length / interval) + int(fmod(length, interval) <= interval / 2)
+	var total_count: int = round(length / interval)# + int(fmod(length, interval) <= interval / 2)
 	
 	
 	if total_count == 0:
@@ -30,7 +30,7 @@ func _process_transforms(transforms, _seed) -> void:
 	
 	transforms.resize(total_count)
 	for i in transforms.list.size():
-		var data : Array = path.get_pos_and_normal(fmod(i * interval + abs(offset), length + fmod(length, interval)))
+		var data : Array = path.get_pos_and_normal(fmod(i * interval + abs(offset), length - fmod(length, interval)))
 		var pos: Vector3 = data[0]
 		var normal: Vector3 = data[1]
 		var t : Transform = transforms.list[i]
