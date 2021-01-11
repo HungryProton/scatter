@@ -3,7 +3,7 @@ extends "base_modifier.gd"
 
 
 export(float) var interval = 1.0
-export(float) var offset = 0.0
+export(float, 0, 100) var offset = 0.0
 export(bool) var align_to_path = false
 
 
@@ -22,11 +22,10 @@ func _process_transforms(transforms, _seed) -> void:
 		The interval is larger than the curve length.
 		No transforms could be placed."""
 		return
-
+	
 	transforms.resize(total_count)
-
 	for i in transforms.list.size():
-		var data = path.get_pos_and_normal(i * interval + offset)
+		var data : Array = path.get_pos_and_normal(fmod(i * interval + abs(offset), length - fmod(length, interval)))
 		var pos: Vector3 = data[0]
 		var normal: Vector3 = data[1]
 		var t : Transform = transforms.list[i]
