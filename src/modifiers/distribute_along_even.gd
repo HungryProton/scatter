@@ -38,13 +38,13 @@ func _process_transforms(transforms, _seed) -> void:
 		t.origin = pos
 		
 		if align_to_path:
+			#axis restrictions
 			normal.x *= int(!restrict_x)
 			normal.y *= int(!restrict_y)
 			normal.z *= int(!restrict_z)
+			#this does not like restricting both x and z simulatneously
 			
 			t = t.looking_at(normal + pos, get_align_up_vector(align_up_axis))
-			
-			
 		
 		transforms.list[i] = t
 
@@ -53,19 +53,15 @@ static func get_align_up_vector(align : int) -> Vector3:
 	match align:
 		#x
 		0:
-			print(1)
 			axis = Vector3.RIGHT
 		#y
 		1:
-			print(2)
 			axis = Vector3.UP
 		#z
 		2:
-			print(3)
 			axis = Vector3.BACK
 		_:
 			#default return y axis
-			print(4)
 			axis = Vector3.UP
 	
 	return axis
