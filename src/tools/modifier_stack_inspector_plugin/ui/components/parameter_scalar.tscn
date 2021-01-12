@@ -51,3 +51,10 @@ min_value = -100.0
 step = 0.001
 allow_greater = true
 allow_lesser = true
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/MarginContainer"]
+visible = false
+margin_left = 2.0
+margin_top = 2.0
+margin_right = 76.0
+margin_bottom = 26.0

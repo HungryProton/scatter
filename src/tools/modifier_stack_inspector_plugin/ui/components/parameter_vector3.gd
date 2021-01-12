@@ -1,11 +1,6 @@
 tool
-extends Control
+extends "base_parameter.gd"
 
-
-signal value_changed
-
-var _locked := false
-var _previous
 
 onready var _label: Label = $Label
 onready var _x: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer/X
@@ -23,15 +18,6 @@ func set_parameter_name(text: String) -> void:
 	_label.text = text
 
 
-func set_value(val: Vector3) -> void:
-	_locked = true
-	_x.set_value(val.x)
-	_y.set_value(val.y)
-	_z.set_value(val.z)
-	_previous = get_value()
-	_locked = false
-
-
 func get_value() -> Vector3:
 	var vec3 = Vector3.ZERO
 	vec3.x = _x.get_value()
@@ -40,9 +26,10 @@ func get_value() -> Vector3:
 	return vec3
 
 
-func _on_value_changed(_val) -> void:
-	if not _locked:
-		emit_signal("value_changed", get_value(), _previous)
+func _set_value(val: Vector3) -> void:
+	_x.set_value(val.x)
+	_y.set_value(val.y)
+	_z.set_value(val.z)
 
 
 func _on_clear_pressed():

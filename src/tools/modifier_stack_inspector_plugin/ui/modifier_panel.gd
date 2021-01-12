@@ -32,14 +32,14 @@ func create_ui_for(modifier) -> void:
 	_modifier = modifier
 	_modifier.connect("warning_changed", self, "_on_warning_changed")
 	_on_warning_changed()
-	
+
 	_name.text = modifier.display_name
 	_enabled.pressed = modifier.enabled
-	
+
 	for property in modifier.get_property_list():
 		if property.usage != PROPERTY_USAGE_DEFAULT + PROPERTY_USAGE_SCRIPT_VARIABLE:
 			continue
-		
+
 		if property.name == "enabled":
 			continue
 
@@ -56,11 +56,12 @@ func create_ui_for(modifier) -> void:
 				parameter_ui = preload("./components/parameter_string.tscn").instance()
 			TYPE_VECTOR3:
 				parameter_ui = preload("./components/parameter_vector3.tscn").instance()
-			
+
 		if parameter_ui:
 			_parameters.add_child(parameter_ui)
 			parameter_ui.set_parameter_name(property.name.capitalize())
 			parameter_ui.set_value(modifier.get(property.name))
+			parameter_ui.set_hint_string(property.hint_string)
 			parameter_ui.connect("value_changed", self, "_on_parameter_value_changed", [property.name, parameter_ui])
 
 
