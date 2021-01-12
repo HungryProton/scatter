@@ -10,6 +10,7 @@ export(bool) var restrict_x = false
 export(bool) var restrict_y = false
 export(bool) var restrict_z = false
 
+
 func _init() -> void:
 	display_name = "Distribute Along Path (Even)"
 	warning_ignore_no_transforms = true
@@ -20,13 +21,11 @@ func _process_transforms(transforms, _seed) -> void:
 	var length: float = path.curve.get_baked_length()
 	var total_count: int = round(length / interval)
 
-
 	if total_count == 0:
 		warning += """
 		The interval is larger than the curve length.
 		No transforms could be placed."""
 		return
-
 
 	transforms.resize(total_count)
 	for i in transforms.list.size():
@@ -47,6 +46,7 @@ func _process_transforms(transforms, _seed) -> void:
 			t = t.looking_at(normal + pos, get_align_up_vector(align_up_axis))
 
 		transforms.list[i] = t
+
 
 static func get_align_up_vector(align : int) -> Vector3:
 	var axis : Vector3

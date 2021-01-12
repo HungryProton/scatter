@@ -68,6 +68,7 @@ func set_hint_string(hint: String) -> void:
 
 	for i in tokens.size():
 		_option.add_item(tokens[i], i)
+	set_value(int(_spinbox.get_value()))
 
 
 func get_value():
