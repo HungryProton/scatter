@@ -3,9 +3,9 @@ extends "base_modifier.gd"
 
 
 export(float) var interval = 1.0
-export(float, 0, 100) var offset = 0.0
+export(float) var offset = 0.0
 export(bool) var align_to_path = false
-export(int) var align_up_axis = 0
+export(int) var align_up_axis = 1
 export(bool) var restrict_x = false
 export(bool) var restrict_y = false
 export(bool) var restrict_z = false
@@ -18,7 +18,7 @@ func _init() -> void:
 func _process_transforms(transforms, _seed) -> void:
 	var path = transforms.path
 	var length: float = path.curve.get_baked_length()
-	var total_count: int = round(length / interval)# + int(fmod(length, interval) <= interval / 2)
+	var total_count: int = round(length / interval)
 	
 	
 	if total_count == 0:

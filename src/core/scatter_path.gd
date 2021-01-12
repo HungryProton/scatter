@@ -52,7 +52,7 @@ func distance_from_point(point: Vector3, ignore_height := false) -> float:
 	return point.distance_to(point_on_curve)
 
 
-func get_pos_and_normal(offset) -> Array:
+func get_pos_and_normal(offset : float) -> Array:
 	var pos: Vector3 = curve.interpolate_baked(offset)
 	var normal := Vector3.ZERO
 	
@@ -63,11 +63,6 @@ func get_pos_and_normal(offset) -> Array:
 	else:
 		pos1 = curve.interpolate_baked(offset - curve.get_bake_interval())
 		normal = (pos - pos1)
-	
-	#not sure what these lines are intended to do, but they break utility
-	#ommitting the normals y axis is silly, probably the root cause of why alignment wasn't working
-#	normal.y = 0.0
-#	normal = normal.normalized().rotated(Vector3.UP, PI / 2.0)
 	
 	return [pos, normal]
 
