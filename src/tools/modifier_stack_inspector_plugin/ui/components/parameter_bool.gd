@@ -18,5 +18,5 @@ func get_value() -> bool:
 	return _check_box.pressed
 
 
-func _set_value(val: bool) -> void:
+func _set_value(val) -> void:
 	_check_box.pressed = val

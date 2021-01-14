@@ -3,6 +3,7 @@
 [ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/modifiers_popup.gd" type="Script" id=1]
 
 [node name="ModifiersPopup" type="PopupPanel"]
+visible = true
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -37,7 +38,7 @@ __meta__ = {
 margin_left = 6.0
 margin_top = 6.0
 margin_right = 491.0
-margin_bottom = 124.0
+margin_bottom = 148.0
 custom_constants/separation = 12
 __meta__ = {
 "_edit_use_anchors_": false
@@ -45,7 +46,7 @@ __meta__ = {
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 margin_right = 144.0
-margin_bottom = 118.0
+margin_bottom = 142.0
 size_flags_horizontal = 3
 
 [node name="Distribute" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer"]
@@ -87,10 +88,17 @@ margin_bottom = 118.0
 text = "Along Path (Even)"
 align = 0
 
+[node name="Array" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+margin_top = 122.0
+margin_right = 144.0
+margin_bottom = 142.0
+text = "Array"
+align = 0
+
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 margin_left = 156.0
 margin_right = 325.0
-margin_bottom = 118.0
+margin_bottom = 142.0
 size_flags_horizontal = 3
 
 [node name="Edit" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
@@ -135,7 +143,7 @@ align = 0
 [node name="VBoxContainer3" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 margin_left = 337.0
 margin_right = 485.0
-margin_bottom = 118.0
+margin_bottom = 142.0
 size_flags_horizontal = 3
 
 [node name="Remove" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer3"]
