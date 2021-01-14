@@ -11,7 +11,7 @@ func _init() -> void:
 	display_name = "Exclude Along Path"
 
 
-func _process_transforms(transforms, _seed) -> void:
+func _process_transforms(transforms, _seed : int) -> void:
 	if not transforms.path.has_node(path_name):
 		warning += "Could not find " + path_name
 		warning += "\n Make sure the curve exists as a child of the Scatter node"
@@ -20,7 +20,7 @@ func _process_transforms(transforms, _seed) -> void:
 	var exclude_root = transforms.path.get_node(path_name)
 	var paths := _get_paths_recursive(exclude_root)
 	
-	var global_transform = transforms.path.global_transform
+	var global_transform : Transform = transforms.path.global_transform
 	var pos: Vector3
 	var i := 0
 	while i < transforms.list.size():
@@ -34,7 +34,7 @@ func _process_transforms(transforms, _seed) -> void:
 
 
 func _get_paths_recursive(root) -> Array:
-	var res = []
+	var res := []
 	if root is Path:
 		res.push_back(root)
 		

@@ -24,7 +24,7 @@ func _notify_warning_changed() -> void:
 	emit_signal("warning_changed")
 
 
-func process_transforms(transforms, global_seed) -> void:
+func process_transforms(transforms, global_seed : int) -> void:
 	_clear_warning()
 	
 	var path = transforms.path

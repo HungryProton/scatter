@@ -66,10 +66,10 @@ func get_pos_and_normal(offset : float) -> Array:
 	
 	return [pos, normal]
 
-
-func get_closest_to(pos):
-	var closest = -1
-	var dist_squared = -1
+#This function is very easy to make run branchless, especially in it's current cocnfiguration
+func get_closest_to(pos : Vector3) -> int:
+	var closest := -1
+	var dist_squared : float = -1
 	
 	for i in curve.get_point_count():
 		var point_pos = curve.get_point_position(i)
@@ -86,16 +86,16 @@ func get_closest_to(pos):
 	return closest
 
 
-func _get_projected_coords(coords : Vector3):
+func _get_projected_coords(coords : Vector3) -> Vector2:
 	return Vector2(coords.x, coords.z)
 
 
 # Travel the whole path to update the polygon and bounds
-func _update_from_curve():
+func _update_from_curve() -> void:
 	bounds_max = null
 	bounds_min = null
-	var connections = PoolIntArray()
-	var polygon_points = PoolVector2Array()
+	var connections := PoolIntArray()
+	var polygon_points := PoolVector2Array()
 	baked_points = PoolVector3Array()
 	
 	if not curve:
@@ -108,13 +108,13 @@ func _update_from_curve():
 	if not polygon:
 		polygon = PolygonPathFinder.new()
 	
-	var length = curve.get_baked_length()
+	var length : float = curve.get_baked_length()
 	var steps := int(max(3, round(length / bake_interval)))
 	
 	for i in steps:
 		# Get a point on the curve
-		var coords_3d = curve.interpolate_baked((float(i) / (steps - 2)) * length)
-		var coords = _get_projected_coords(coords_3d)
+		var coords_3d := curve.interpolate_baked((float(i) / (steps - 2)) * length)
+		var coords := _get_projected_coords(coords_3d)
 
 		# Store polygon data
 		baked_points.append(coords_3d)

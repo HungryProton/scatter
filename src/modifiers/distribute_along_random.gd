@@ -19,7 +19,7 @@ func _init() -> void:
 	warning_ignore_no_transforms = true
 
 
-func _process_transforms(transforms, global_seed) -> void:
+func _process_transforms(transforms, global_seed : int) -> void:
 	var path = transforms.path
 	transforms.resize(instance_count)
 	
