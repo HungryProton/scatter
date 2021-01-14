@@ -11,13 +11,13 @@ func _init() -> void:
 	warning_ignore_no_transforms = true
 
 
-func _process_transforms(transforms, global_seed : int) -> void:
+func _process_transforms(transforms, global_seed) -> void:
 	x_spacing = max(0.05, x_spacing)
 	z_spacing = max(0.05, z_spacing)
 	
-	var center : Vector3 = transforms.path.center
-	var size : Vector3 = transforms.path.size
-	var half_size : Vector3 = size * 0.5
+	var center = transforms.path.center
+	var size = transforms.path.size
+	var half_size = size * 0.5
 	var height: float = transforms.path.bounds_max.y
 	
 	var width: int = ceil(size.x / x_spacing)
@@ -27,12 +27,12 @@ func _process_transforms(transforms, global_seed : int) -> void:
 	
 	var t_index := 0
 	for i in max_count:
-		var pos := Vector3.ZERO
+		var pos = Vector3.ZERO
 		pos.x = (i % width) * x_spacing
 		pos.z = (i / width) * z_spacing
 		pos += (center - half_size)
 		pos.y = height
-		
+
 		if transforms.path.is_point_inside(pos):
 			transforms.list[t_index].origin = pos
 			t_index += 1
@@ -43,17 +43,17 @@ func _process_transforms(transforms, global_seed : int) -> void:
 	_shuffle(transforms.list, global_seed)
 
 
-func _shuffle(array : Array, random_seed := 0) -> void:
-	var n : int = array.size()
+func _shuffle(array, random_seed := 0) -> void:
+	var n = array.size()
 	if n < 2:
 		return
-	
+
 	var rng = RandomNumberGenerator.new()
 	rng.set_seed(random_seed)
-	
-	var i : int = n - 1
-	var j : int
-	var tmp : Array
+
+	var i = n - 1
+	var j
+	var tmp
 	while i >= 1:
 		j = rng.randi() % (i + 1)
 		tmp = array[j]
