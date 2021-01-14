@@ -9,7 +9,7 @@ signal snap_to_colliders_enabled
 onready var colliders: Button = $HBoxContainer/Colliders
 onready var plane: Button = $HBoxContainer/Plane
 
-var path
+var path : Path
 
 
 func snap_to_colliders() -> bool:
