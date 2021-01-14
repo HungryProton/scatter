@@ -12,8 +12,8 @@ func _init() -> void:
 	display_name = "Apply Offset"
 
 
-func _process_transforms(transforms, _global_seed : int) -> void:
-	
+func _process_transforms(transforms, _global_seed) -> void:
+
 	var t: Transform
 	var origin: Vector3
 	
@@ -24,7 +24,7 @@ func _process_transforms(transforms, _global_seed : int) -> void:
 	var global_y: Vector3 = gt.xform_inv(Vector3.UP).normalized()
 	var global_z: Vector3 = gt.xform_inv(Vector3.DOWN).normalized()
 	gt.origin = origin
-	
+
 	for i in transforms.list.size():
 		t = transforms.list[i]
 		origin = t.origin
@@ -37,7 +37,7 @@ func _process_transforms(transforms, _global_seed : int) -> void:
 			t = t.rotated(t.basis.y.normalized(), deg2rad(rotation.y))
 			t = t.rotated(t.basis.z.normalized(), deg2rad(rotation.z))
 			t.origin = origin + t.xform(position)
-		
+
 		else:
 			t = t.rotated(global_x, deg2rad(rotation.x))
 			t = t.rotated(global_y, deg2rad(rotation.y))

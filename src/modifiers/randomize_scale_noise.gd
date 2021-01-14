@@ -16,7 +16,7 @@ func _init() -> void:
 	display_name = "Randomize Scale (Noise)"
 
 
-func _process_transforms(transforms, global_seed : int) -> void:
+func _process_transforms(transforms, global_seed) -> void:
 	_noise = OpenSimplexNoise.new()
 	_noise.period = period
 	_noise.octaves = octaves
@@ -37,16 +37,16 @@ func _process_transforms(transforms, global_seed : int) -> void:
 		
 		s = _randf(origin) * scale
 		t = t.scaled(Vector3.ONE + s)
-		
+
 		t.origin = origin
 		transforms.list[i] = t
 
 
-func _randf(pos : Vector3) -> float:
+func _randf(pos) -> float:
 	return (_noise.get_noise_3dv(pos) + 1.0) * 0.5
 
 
-func _clamp_vector(vec3 : Vector3, vmin : Vector3, vmax : Vector3) -> Vector3:
+func _clamp_vector(vec3, vmin, vmax) -> Vector3:
 	vec3.x = clamp(vec3.x, vmin.x, vmax.x)
 	vec3.y = clamp(vec3.y, vmin.y, vmax.y)
 	vec3.z = clamp(vec3.z, vmin.z, vmax.z)
