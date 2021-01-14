@@ -32,17 +32,17 @@ func create_ui_for(modifier) -> void:
 	_modifier = modifier
 	_modifier.connect("warning_changed", self, "_on_warning_changed")
 	_on_warning_changed()
-	
+
 	_name.text = modifier.display_name
 	_enabled.pressed = modifier.enabled
-	
+
 	for property in modifier.get_property_list():
 		if property.usage != PROPERTY_USAGE_DEFAULT + PROPERTY_USAGE_SCRIPT_VARIABLE:
 			continue
-		
+
 		if property.name == "enabled":
 			continue
-		
+
 		var parameter_ui
 		match property.type:
 			TYPE_BOOL:
@@ -56,7 +56,7 @@ func create_ui_for(modifier) -> void:
 				parameter_ui = preload("./components/parameter_string.tscn").instance()
 			TYPE_VECTOR3:
 				parameter_ui = preload("./components/parameter_vector3.tscn").instance()
-		
+
 		if parameter_ui:
 			_parameters.add_child(parameter_ui)
 			parameter_ui.set_parameter_name(property.name.capitalize())
@@ -65,7 +65,7 @@ func create_ui_for(modifier) -> void:
 			parameter_ui.connect("value_changed", self, "_on_parameter_value_changed", [property.name, parameter_ui])
 
 
-func _restore_value(name : String, val : Variant, ui) -> void:
+func _restore_value(name, val, ui) -> void:
 	_modifier.set(name, val)
 	ui.set_value(val)
 	emit_signal("value_changed")
@@ -94,7 +94,7 @@ func _on_child_resized() -> void:
 		rect_min_size.y = _margin_container.rect_size.y
 
 
-func _on_parameter_value_changed(value : Variant, previous : Variant, name : String, ui : Object) -> void:
+func _on_parameter_value_changed(value, previous, name, ui) -> void:
 	if _scatter.undo_redo:
 		_scatter.undo_redo.create_action("Changed Value " + name.capitalize())
 		_scatter.undo_redo.add_undo_method(self, "_restore_value", name, previous, ui)

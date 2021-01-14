@@ -20,7 +20,7 @@ func _ready() -> void:
 	if not modifier_stack:
 		modifier_stack = _namespace.ModifierStack.new()
 		modifier_stack.just_created = true
-	
+
 	self.connect("curve_updated", self, "update")
 	_discover_items()
 
@@ -54,13 +54,13 @@ func _get_property_list() -> Array:
 	return list
 
 
-func _get(property : String):
+func _get(property):
 	if property == "modifier_stack":
 		return modifier_stack
 	return null
 
 
-func _set(property : String, value : Variant) -> bool:
+func _set(property, value):
 	if property == "modifier_stack":
 		# TODO: This duplicate is there because I couldn't find a way to detect
 		# when a node is duplicated from the editor and I don't want multiple
@@ -79,7 +79,7 @@ func _set(property : String, value : Variant) -> bool:
 			modifier_stack.just_created = true
 		# Duplicate the curve item too. If someone want to share data, it has
 		# to be explicitely done by the user
-	
+
 		call_deferred("_make_curve_unique")
 		call_deferred("clear")
 	
@@ -95,7 +95,7 @@ func clear() -> void:
 func update() -> void:
 	if disable_updates_in_game and not Engine.is_editor_hint():
 		return
-	
+
 	_discover_items()
 	if not _items.empty():
 		_transforms = _namespace.Transforms.new()
@@ -126,7 +126,7 @@ func full_update() -> void:
 func _discover_items() -> void:
 	_items.clear()
 	_total_proportion = 0
-	
+
 	for c in get_children():
 		if c is _namespace.ScatterItem:
 			_items.append(c)
@@ -139,7 +139,7 @@ func _discover_items() -> void:
 func _create_duplicates() -> void:
 	var offset := 0
 	var transforms_count: int = _transforms.list.size()
-	
+
 	for item in _items:
 		var count = int(round(float(item.proportion) / _total_proportion * transforms_count))
 		var root = _get_or_create_instances_root(item)
@@ -213,7 +213,7 @@ func _create_multimesh() -> void:
 		offset += count
 
 
-func _setup_multi_mesh(item, count : int):
+func _setup_multi_mesh(item, count):
 	var instance
 	if item.has_node("MultiMeshInstance"):
 		instance = item.get_node("MultiMeshInstance")

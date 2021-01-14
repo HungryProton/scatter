@@ -16,9 +16,9 @@ func _init() -> void:
 	display_name = "Randomize Transforms"
 
 
-func _process_transforms(transforms, global_seed : int) -> void:
+func _process_transforms(transforms, global_seed) -> void:
 	_rng = RandomNumberGenerator.new()
-	
+
 	if override_global_seed:
 		_rng.set_seed(custom_seed)
 	else:
@@ -35,7 +35,7 @@ func _process_transforms(transforms, global_seed : int) -> void:
 	var global_y: Vector3 = gt.xform_inv(Vector3.UP).normalized()
 	var global_z: Vector3 = gt.xform_inv(Vector3.DOWN).normalized()
 	gt.origin = origin
-	
+
 	for i in transforms.list.size():
 		t = transforms.list[i]
 		origin = t.origin
@@ -60,7 +60,7 @@ func _process_transforms(transforms, global_seed : int) -> void:
 
 
 func _random_vec3() -> Vector3:
-	var vec3 := Vector3.ZERO
+	var vec3 = Vector3.ZERO
 	vec3.x = _rng.randf_range(-1.0, 1.0)
 	vec3.y = _rng.randf_range(-1.0, 1.0)
 	vec3.z = _rng.randf_range(-1.0, 1.0)
@@ -71,7 +71,7 @@ func _random_float() -> float:
 	return _rng.randf_range(-1.0, 1.0)
 
 
-func _clamp_vector(vec3 : Vector3, vmin : Vector3, vmax : Vector3) -> Vector3:
+func _clamp_vector(vec3, vmin, vmax) -> Vector3:
 	vec3.x = clamp(vec3.x, vmin.x, vmax.x)
 	vec3.y = clamp(vec3.y, vmin.y, vmax.y)
 	vec3.z = clamp(vec3.z, vmin.z, vmax.z)
