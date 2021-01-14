@@ -17,7 +17,7 @@ var initial_scale: Vector3
 var _parent
 
 
-func _ready() -> void:
+func _ready():
 	_parent = get_parent()
 
 
@@ -31,14 +31,14 @@ func _get_configuration_warning() -> String:
 	return ""
 
 
-func _set(property, _value) -> bool:
+func _set(property, _value):
 	# Hack to detect if the node was just duplicated from the editor
 	if property == "transform":
 		call_deferred("_delete_multimesh")
 	return false
 
 
-func update() -> void:
+func update():
 	_parent = get_parent()
 	if _parent:
 		_parent.update()
@@ -52,7 +52,7 @@ func get_mesh_instance() -> MeshInstance:
 			if mesh:
 				_save_initial_data(mesh)
 				return mesh
-	
+
 	# Check the remote scene.
 	if item_path:
 		var node = load(item_path)
@@ -61,7 +61,7 @@ func get_mesh_instance() -> MeshInstance:
 			if mesh:
 				_save_initial_data(mesh)
 				return mesh
-	
+
 	# Nothing found, print the relevant warning in the console.
 	if local_item_path:
 		printerr("Warning: ", name, "/local_item_path - ", local_item_path, " is not a valid MeshInstance")
@@ -75,13 +75,13 @@ func get_item_node():
 	# Check the supplied local path.
 	if local_item_path:
 		if has_node(local_item_path):
-			var node := get_node(local_item_path).duplicate()
+			var node = get_node(local_item_path).duplicate()
 			_save_initial_data(node)
-			var parent := node.get_parent()
+			var parent = node.get_parent()
 			if parent:
 				parent.remove_child(node)
 			return node
-	
+
 	# Check the remote scene.
 	if item_path:
 		var scene = load(item_path)
@@ -95,7 +95,7 @@ func get_item_node():
 		printerr("Warning: ", name, "/local_item_path - ", local_item_path, " is not a valid node path")
 	if item_path:
 		printerr("Warning: ", item_path, " is not a valid scene file")
-	
+
 	return null
 
 
@@ -127,7 +127,7 @@ func _save_initial_data(node) -> void:
 	initial_scale = node.scale
 
 
-func _set_proportion(val : int) -> void:
+func _set_proportion(val):
 	proportion = val
 	update()
 

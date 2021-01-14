@@ -13,7 +13,7 @@ var _modifier_panel = preload("./modifier_panel.tscn")
 var _ready := false
 
 
-func _ready() -> void:
+func _ready():
 	_modifiers_popup = get_node(modifiers_popup)
 	_root = get_node(root)
 	_modifiers_popup.connect("add_modifier", self, "_on_add_modifier")
@@ -59,7 +59,7 @@ func _clear() -> void:
 		c.queue_free()
 
 
-func _set_children_owner(root: Node, node: Node) -> void:
+func _set_children_owner(root: Node, node: Node):
 	for child in node.get_children():
 		child.set_owner(root)
 		if child.get_children().size() > 0:
@@ -116,12 +116,12 @@ func _on_save_preset(preset_name) -> void:
 		print("Failed to save preset")
 		return
 	
-	var preset_path : String = _get_root_folder() + "/presets/" + preset_name + ".tscn"
+	var preset_path = _get_root_folder() + "/presets/" + preset_name + ".tscn"
 	ResourceSaver.save(preset_path, packed_scene)
 
 
-func _on_load_preset(preset_name : String) -> void:
-	var preset_path : String = _get_root_folder() + "/presets/" + preset_name + ".tscn"
+func _on_load_preset(preset_name) -> void:
+	var preset_path = _get_root_folder() + "/presets/" + preset_name + ".tscn"
 	var preset = load(preset_path).instance()
 	if not preset:
 		return
@@ -134,6 +134,6 @@ func _on_load_preset(preset_name : String) -> void:
 	preset.queue_free()
 
 
-func _on_delete_preset(preset_name : String) -> void:
+func _on_delete_preset(preset_name) -> void:
 	var dir = Directory.new()
 	dir.remove(_get_root_folder() + "/presets/" + preset_name + ".tscn")

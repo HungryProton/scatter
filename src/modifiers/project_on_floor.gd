@@ -14,12 +14,12 @@ func _init() -> void:
 	display_name = "Project On Floor"
 
 
-func _process_transforms(transforms, _seed : int) -> void:
+func _process_transforms(transforms, _seed) -> void:
 	if transforms.list.empty():
 		return
 	
-	var path : Path = transforms.path
-	var space_state : PhysicsDirectSpaceState = path.get_world().get_direct_space_state()
+	var path = transforms.path
+	var space_state = path.get_world().get_direct_space_state()
 	var hit
 	var t: Transform
 	var i := 0
@@ -48,9 +48,9 @@ func _process_transforms(transforms, _seed : int) -> void:
 		"""
 
 
-func _project_on_floor(pos : Vector3, path : Path, space_state : PhysicsDirectSpaceState):
-	var start := pos
-	var end := pos
+func _project_on_floor(pos, path, space_state):
+	var start = pos
+	var end = pos
 	
 	if invert_ray_direction:
 		start += ray_offset * floor_direction
@@ -58,22 +58,22 @@ func _project_on_floor(pos : Vector3, path : Path, space_state : PhysicsDirectSp
 	else:
 		start -= ray_offset * floor_direction
 		end += ray_length * floor_direction
-	
+
 	start = path.to_global(start)
 	end = path.to_global(end)
-	
+
 	return space_state.intersect_ray(start, end)
 
 
 func _align_with(t: Transform, normal: Vector3) -> Transform:
-	var n1 := t.basis.y.normalized()
-	var n2 := normal.normalized()
+	var n1 = t.basis.y.normalized()
+	var n2 = normal.normalized()
 	
-	var cosa := n1.dot(n2)
-	var alpha := acos(cosa)
-	var axis : Vector3 = n1.cross(n2)
+	var cosa = n1.dot(n2)
+	var alpha = acos(cosa)
+	var axis = n1.cross(n2)
 	
 	if axis == Vector3.ZERO:
 		return t
-	
+
 	return t.rotated(axis.normalized(), alpha)

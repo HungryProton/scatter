@@ -29,7 +29,7 @@ func _get_root_folder() -> String:
 	return "res://" + tokens[0] + "/" + tokens[1]
 
 
-func _on_id_pressed(id : int) -> void:
+func _on_id_pressed(id) -> void:
 	match id:
 		0:
 			_save_popup.popup_centered()
