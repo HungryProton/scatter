@@ -2,11 +2,11 @@ tool
 extends "base_modifier.gd"
 
 export(int) var amount = 1
-var local_offset := false
+export(bool) var local_offset = false
 export(Vector3) var offset = Vector3.ZERO
-var local_rotation := false
+export(bool) var local_rotation = false
 export(Vector3) var rotation = Vector3.ZERO
-var local_rotation_offset := false
+export(bool) var local_rotation_offset = false
 export(Vector3) var rotation_offset = Vector3.ZERO
 
 func _init() -> void:
