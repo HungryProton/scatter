@@ -30,28 +30,28 @@ func set_hint_string(hint: String) -> void:
 	# No hint provided, ignore.
 	if hint.empty():
 		return
-	
+
 	# One integer provided
 	if hint.is_valid_integer():
 		_set_range(0, int(hint))
 		return
-	
+
 	# Multiple items provided, check their types
 	var tokens = hint.split(",")
 	var all_int = true
 	var all_float = true
-	
+
 	for t in tokens:
 		if not t.is_valid_integer():
 			all_int = false
 		if not t.is_valid_float():
 			all_float = false
-	
+
 	# All items are integer
 	if all_int and tokens.size() >= 2:
 		_set_range(int(tokens[0]), int(tokens[1]))
 		return
-	
+
 	# All items are float
 	if all_float:
 		if tokens.size() >= 2:
@@ -59,13 +59,13 @@ func set_hint_string(hint: String) -> void:
 		if tokens.size() >= 3:
 			_spinbox.step = float(tokens[2])
 		return
-	
+
 	# All items are strings, make it a dropdown
 	_spinbox.visible = false
 	_option.visible = true
 	_is_enum = true
 	_is_int = true
-	
+
 	for i in tokens.size():
 		_option.add_item(tokens[i], i)
 	set_value(int(_spinbox.get_value()))

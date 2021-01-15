@@ -3,7 +3,7 @@ extends "base_modifier.gd"
 
 
 export(float) var interval = 1.0
-export(float, 0, 100) var offset = 0.0
+export(float) var offset = 0.0
 export(bool) var align_to_path = false
 export(int, "X", "Y", "Z") var align_up_axis = 1
 export(bool) var restrict_x = false
@@ -21,13 +21,12 @@ func _process_transforms(transforms, _seed) -> void:
 	var length: float = path.curve.get_baked_length()
 	var total_count: int = round(length / interval)
 
-
 	if total_count == 0:
 		warning += """
 		The interval is larger than the curve length.
 		No transforms could be placed."""
 		return
-	
+
 	transforms.resize(total_count)
 	for i in transforms.list.size():
 		var data : Array = path.get_pos_and_normal(fmod(i * interval + abs(offset), length - fmod(length, interval)))
@@ -48,7 +47,6 @@ func _process_transforms(transforms, _seed) -> void:
 
 		transforms.list[i] = t
 
-		transforms.list[i] = t
 
 static func get_align_up_vector(align : int) -> Vector3:
 	var axis : Vector3

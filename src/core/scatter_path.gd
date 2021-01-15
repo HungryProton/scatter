@@ -147,6 +147,7 @@ func _update_from_curve():
 	size = Vector3(bounds_max.x - bounds_min.x, bounds_max.z - bounds_min.z, bounds_max.z - bounds_min.z)
 	center = Vector3((bounds_min.x + bounds_max.x) / 2, (bounds_min.y + bounds_max.y) / 2, (bounds_min.z + bounds_max.z) / 2)
 
+
 	emit_signal("curve_updated")
 
 
