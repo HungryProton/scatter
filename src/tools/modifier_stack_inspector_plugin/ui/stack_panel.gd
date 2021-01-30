@@ -24,10 +24,10 @@ func _ready():
 func set_node(node) -> void:
 	if not node:
 		return
-	
+
 	if _modifier_stack:
 		_modifier_stack.disconnect("stack_changed", self, "_on_stack_changed")
-	
+
 	_scatter = node
 	_modifier_stack = node.modifier_stack
 	_modifier_stack.connect("stack_changed", self, "_on_stack_changed")
@@ -38,7 +38,7 @@ func set_node(node) -> void:
 func rebuild_ui() -> void:
 	if not _ready:
 		return
-	
+
 	_clear()
 	for m in _modifier_stack.stack:
 		var ui = _modifier_panel.instance()
@@ -106,16 +106,16 @@ func _on_rebuild_pressed() -> void:
 func _on_save_preset(preset_name) -> void:
 	if not _scatter:
 		return
-	
+
 	var preset = _scatter.duplicate(7)
 	preset.clear()
 	_set_children_owner(preset, preset)
-	
+
 	var packed_scene = PackedScene.new()
 	if packed_scene.pack(preset) != OK:
 		print("Failed to save preset")
 		return
-	
+
 	var preset_path = _get_root_folder() + "/presets/" + preset_name + ".tscn"
 	ResourceSaver.save(preset_path, packed_scene)
 
@@ -125,7 +125,7 @@ func _on_load_preset(preset_name) -> void:
 	var preset = load(preset_path).instance()
 	if not preset:
 		return
-	
+
 	_modifier_stack = preset.modifier_stack.duplicate(7)
 	_modifier_stack.connect("stack_changed", self, "_on_stack_changed")
 	_scatter.modifier_stack = _modifier_stack

@@ -16,13 +16,14 @@ var _rng: RandomNumberGenerator
 
 func _init() -> void:
 	display_name = "Distribute Along Path (Random)"
+	category = "Distribute"
 	warning_ignore_no_transforms = true
 
 
 func _process_transforms(transforms, global_seed) -> void:
 	var path = transforms.path
 	transforms.resize(instance_count)
-	
+
 	_rng = RandomNumberGenerator.new()
 
 	if override_global_seed:
@@ -36,16 +37,16 @@ func _process_transforms(transforms, global_seed) -> void:
 		var pos: Vector3 = data[0]
 		var normal: Vector3 = data[1]
 		var t : Transform = transforms.list[i]
-		
+
 		if align_to_path:
 			#axis restrictions
 			normal.x *= int(!restrict_x)
 			normal.y *= int(!restrict_y)
 			normal.z *= int(!restrict_z)
 			#this does not like restricting both x and z simulatneously
-			
+
 			t = t.looking_at(normal + pos, get_align_up_vector(align_up_axis))
-		
+
 		t.origin = pos
 		transforms.list[i] = t
 
@@ -64,5 +65,5 @@ static func get_align_up_vector(align : int) -> Vector3:
 		_:
 			#default return y axis
 			axis = Vector3.UP
-	
+
 	return axis

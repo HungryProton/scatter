@@ -9,14 +9,15 @@ export(Vector3) var scale = Vector3.ONE
 
 
 func _init() -> void:
-	display_name = "Apply Offset"
+	display_name = "Offset Transform"
+	category = "Offset"
 
 
 func _process_transforms(transforms, _global_seed) -> void:
 
 	var t: Transform
 	var origin: Vector3
-	
+
 	var gt: Transform = transforms.path.get_global_transform()
 	origin = gt.origin
 	gt.origin = Vector3.ZERO
@@ -29,9 +30,9 @@ func _process_transforms(transforms, _global_seed) -> void:
 		t = transforms.list[i]
 		origin = t.origin
 		t.origin = Vector3.ZERO
-		
+
 		t = t.scaled(scale)
-		
+
 		if local_space:
 			t = t.rotated(t.basis.x.normalized(), deg2rad(rotation.x))
 			t = t.rotated(t.basis.y.normalized(), deg2rad(rotation.y))
@@ -43,5 +44,5 @@ func _process_transforms(transforms, _global_seed) -> void:
 			t = t.rotated(global_y, deg2rad(rotation.y))
 			t = t.rotated(global_z, deg2rad(rotation.z))
 			t.origin = origin + position
-		
+
 		transforms.list[i] = t

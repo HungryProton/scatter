@@ -14,6 +14,7 @@ var _rng: RandomNumberGenerator
 
 func _init() -> void:
 	display_name = "Randomize Transforms"
+	category = "Edit"
 
 
 func _process_transforms(transforms, global_seed) -> void:
@@ -23,11 +24,11 @@ func _process_transforms(transforms, global_seed) -> void:
 		_rng.set_seed(custom_seed)
 	else:
 		_rng.set_seed(global_seed)
-	
+
 	var t: Transform
 	var s: Vector3
 	var origin: Vector3
-	
+
 	var gt: Transform = transforms.path.get_global_transform()
 	origin = gt.origin
 	gt.origin = Vector3.ZERO
@@ -40,10 +41,10 @@ func _process_transforms(transforms, global_seed) -> void:
 		t = transforms.list[i]
 		origin = t.origin
 		t.origin = Vector3.ZERO
-		
+
 		s = Vector3.ONE + (_rng.randf() * scale)
 		t = t.scaled(s)
-		
+
 		if local_space:
 			t = t.rotated(t.basis.x.normalized(), deg2rad(_random_float() * rotation.x))
 			t = t.rotated(t.basis.y.normalized(), deg2rad(_random_float() * rotation.y))
@@ -55,7 +56,7 @@ func _process_transforms(transforms, global_seed) -> void:
 			t = t.rotated(global_y, deg2rad(_random_float() * rotation.y))
 			t = t.rotated(global_z, deg2rad(_random_float() * rotation.z))
 			t.origin = origin + _random_vec3() * position
-		
+
 		transforms.list[i] = t
 
 

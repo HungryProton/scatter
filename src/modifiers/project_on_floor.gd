@@ -12,32 +12,33 @@ export(Vector3) var floor_direction = Vector3.DOWN
 
 func _init() -> void:
 	display_name = "Project On Floor"
+	category = "Edit"
 
 
 func _process_transforms(transforms, _seed) -> void:
 	if transforms.list.empty():
 		return
-	
+
 	var path = transforms.path
 	var space_state = path.get_world().get_direct_space_state()
 	var hit
 	var t: Transform
 	var i := 0
-	
+
 	while i < transforms.list.size():
 		t = transforms.list[i]
 		hit = _project_on_floor(t.origin, path, space_state)
-		
+
 		if hit != null and not hit.empty():
 			if align_with_floor_normal:
 				t = _align_with(t, hit.normal)
 			t.origin = path.to_local(hit.position)
 			transforms.list[i] = t
-		
+
 		elif remove_points_on_miss:
 			transforms.list.remove(i)
 			continue
-		
+
 		i += 1
 
 	if transforms.list.empty():
@@ -51,7 +52,7 @@ func _process_transforms(transforms, _seed) -> void:
 func _project_on_floor(pos, path, space_state):
 	var start = pos
 	var end = pos
-	
+
 	if invert_ray_direction:
 		start += ray_offset * floor_direction
 		end -= ray_length * floor_direction
@@ -68,11 +69,11 @@ func _project_on_floor(pos, path, space_state):
 func _align_with(t: Transform, normal: Vector3) -> Transform:
 	var n1 = t.basis.y.normalized()
 	var n2 = normal.normalized()
-	
+
 	var cosa = n1.dot(n2)
 	var alpha = acos(cosa)
 	var axis = n1.cross(n2)
-	
+
 	if axis == Vector3.ZERO:
 		return t
 

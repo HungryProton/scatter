@@ -9,6 +9,7 @@ export(bool) var ignore_height = true
 
 func _init() -> void:
 	display_name = "Exclude Around Point"
+	category = "Remove"
 
 
 func _process_transforms(transforms, _seed) -> void:
@@ -17,10 +18,10 @@ func _process_transforms(transforms, _seed) -> void:
 		warning += "\n Make sure the node exists as a child of the Scatter node"
 		_notify_warning_changed()
 		return
-	
+
 	var exclude_root = transforms.path.get_node(node_name)
 	var points := _get_children_recursive(exclude_root)
-	
+
 	var global_transform = transforms.path.global_transform
 	var pos: Vector3
 	var i := 0
@@ -42,9 +43,9 @@ func _get_children_recursive(root) -> Array:
 	var res = []
 	if root is Spatial:
 		res.push_back(root)
-		
+
 	for c in root.get_children():
 		if c is Spatial:
 			res += _get_children_recursive(c)
-	
+
 	return res

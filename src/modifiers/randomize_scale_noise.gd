@@ -14,6 +14,7 @@ var _noise: OpenSimplexNoise
 
 func _init() -> void:
 	display_name = "Randomize Scale (Noise)"
+	category = "Edit"
 
 
 func _process_transforms(transforms, global_seed) -> void:
@@ -21,12 +22,12 @@ func _process_transforms(transforms, global_seed) -> void:
 	_noise.period = period
 	_noise.octaves = octaves
 	_noise.persistence = persistence
-	
+
 	if override_global_seed:
 		_noise.set_seed(custom_seed)
 	else:
 		_noise.set_seed(global_seed)
-	
+
 	var t: Transform
 	var origin: Vector3
 	var s: Vector3
@@ -34,7 +35,7 @@ func _process_transforms(transforms, global_seed) -> void:
 		t = transforms.list[i]
 		origin = t.origin
 		t.origin = Vector3.ZERO
-		
+
 		s = _randf(origin) * scale
 		t = t.scaled(Vector3.ONE + s)
 

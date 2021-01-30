@@ -44,7 +44,7 @@ func _get_configuration_warning() -> String:
 
 func _get_property_list() -> Array:
 	var list := []
-	
+
 	# Used to display the modifier stack in an inspector plugin.
 	list.push_back({
 		name = "modifier_stack",
@@ -68,7 +68,7 @@ func _set(property, value):
 		modifier_stack = value.duplicate(7)
 		call_deferred("clear")
 		return true
-	
+
 	# For some reason, set_modifier_stack is not always called when duplicating
 	# a node, but other parameters like transforms are so we check that as well
 	if property == "transform":
@@ -82,7 +82,7 @@ func _set(property, value):
 
 		call_deferred("_make_curve_unique")
 		call_deferred("clear")
-	
+
 	return false
 
 
@@ -101,12 +101,12 @@ func update() -> void:
 		_transforms = _namespace.Transforms.new()
 		_transforms.set_path(self)
 		modifier_stack.update(_transforms, global_seed)
-		
+
 		if use_instancing:
 			_create_multimesh()
 		else:
 			_create_duplicates()
-	
+
 	var parent = get_parent()
 	if parent and parent.has_method("update"):
 		parent.update()
@@ -131,7 +131,7 @@ func _discover_items() -> void:
 		if c is _namespace.ScatterItem:
 			_items.append(c)
 			_total_proportion += c.proportion
-	
+
 	if is_inside_tree():
 		get_tree().emit_signal("node_configuration_warning_changed", self)
 
@@ -145,7 +145,7 @@ func _create_duplicates() -> void:
 		var root = _get_or_create_instances_root(item)
 		var instances = root.get_children()
 		var child_count = instances.size()
-		
+
 		for i in count:
 			if (offset + i) >= transforms_count:
 				return
@@ -156,14 +156,14 @@ func _create_duplicates() -> void:
 			else:
 				# If not, create one
 				instance = _create_instance(item, root)
-			
+
 			instance.transform = _process_transform(item, _transforms.list[offset + i])
-		
+
 		# Delete the unused instances left in the pool if any
 		if count < child_count:
 			for i in (child_count - count):
 				instances[count + i].queue_free()
-		
+
 		offset += count
 
 
@@ -197,7 +197,7 @@ func _delete_duplicates():
 func _create_multimesh() -> void:
 	var offset := 0
 	var transforms_count: int = _transforms.list.size()
-	
+
 	for item in _items:
 		var count = int(round(float(item.proportion) / _total_proportion * transforms_count))
 		var mmi = _setup_multi_mesh(item, count)
@@ -209,7 +209,7 @@ func _create_multimesh() -> void:
 				return
 
 			mmi.multimesh.set_instance_transform(i, _process_transform(item, _transforms.list[offset + i]))
-			
+
 		offset += count
 
 
@@ -222,17 +222,17 @@ func _setup_multi_mesh(item, count):
 		instance.set_name("MultiMeshInstance")
 		item.add_child(instance)
 		instance.set_owner(get_tree().get_edited_scene_root())
-	
+
 	if not instance.multimesh:
 		instance.multimesh = MultiMesh.new()
-	
+
 	instance.translation = Vector3.ZERO
-	
+
 	var mesh_instance = item.get_mesh_instance()
 	if not mesh_instance:
 		_delete_multimeshes()
 		return
-	
+
 	instance.material_override = mesh_instance.get_surface_material(0)
 	instance.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
 	instance.multimesh.mesh = mesh_instance.mesh
@@ -254,22 +254,22 @@ func _delete_multimeshes() -> void:
 func _process_transform(item, t: Transform) -> Transform:
 	var origin = t.origin
 	t.origin = Vector3.ZERO
-	
+
 	t = t.scaled(Vector3.ONE * item.scale_modifier)
-	
+
 	if not item.ignore_initial_scale:
 		t = t.scaled(item.initial_scale)
-	
+
 	if not item.ignore_initial_rotation:
 		t = t.rotated(t.basis.x.normalized(), item.initial_rotation.x)
 		t = t.rotated(t.basis.y.normalized(), item.initial_rotation.y)
 		t = t.rotated(t.basis.z.normalized(), item.initial_rotation.z)
-	
+
 	t.origin = origin
-	
+
 	if not item.ignore_initial_position:
 		t.origin += item.initial_position
-	
+
 	return t
 
 
@@ -284,7 +284,7 @@ func _set_instancing(val: bool) -> void:
 		_delete_duplicates()
 	else:
 		_delete_multimeshes()
-	
+
 	update()
 
 
@@ -296,7 +296,7 @@ func _set_undo_redo(val) -> void:
 func _set_modifier_stack(val) -> void:
 	modifier_stack = _namespace.ModifierStack.new()
 	modifier_stack.stack = val.duplicate_stack()
-	
+
 	if not modifier_stack.is_connected("stack_changed", self, "update"):
 		modifier_stack.connect("stack_changed", self, "update")
 
@@ -310,6 +310,6 @@ func _reset_all_colliders(node) -> void:
 	if node is CollisionShape and not node.disabled:
 		node.disabled = true
 		node.disabled = false
-	
+
 	for c in node.get_children():
 		_reset_all_colliders(c)
