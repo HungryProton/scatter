@@ -67,25 +67,6 @@ func get_pos_and_normal(offset : float) -> Array:
 	return [pos, normal]
 
 
-func get_closest_to(pos):
-	var closest = -1
-	var dist_squared = -1
-
-	for i in curve.get_point_count():
-		var point_pos = curve.get_point_position(i)
-		var point_dist = point_pos.distance_squared_to(pos)
-
-		if (closest == -1) or (dist_squared > point_dist):
-			closest = i
-			dist_squared = point_dist
-
-	var threshold = 16 # Ignore if the closest point is farther than this
-	if dist_squared >= threshold:
-		return -1
-
-	return closest
-
-
 func _get_projected_coords(coords : Vector3):
 	return Vector2(coords.x, coords.z)
 
@@ -108,7 +89,7 @@ func _update_from_curve():
 	if not polygon:
 		polygon = PolygonPathFinder.new()
 
-	var length = curve.get_baked_length()
+	var length: float = curve.get_baked_length()
 	var steps := int(max(3, round(length / bake_interval)))
 
 	for i in steps:
