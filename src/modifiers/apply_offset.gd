@@ -14,7 +14,6 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, _global_seed) -> void:
-
 	var t: Transform
 	var origin: Vector3
 
@@ -31,18 +30,20 @@ func _process_transforms(transforms, _global_seed) -> void:
 		origin = t.origin
 		t.origin = Vector3.ZERO
 
-		t = t.scaled(scale)
-
 		if local_space:
 			t = t.rotated(t.basis.x.normalized(), deg2rad(rotation.x))
 			t = t.rotated(t.basis.y.normalized(), deg2rad(rotation.y))
 			t = t.rotated(t.basis.z.normalized(), deg2rad(rotation.z))
+			t.basis.x *= scale.x
+			t.basis.y *= scale.y
+			t.basis.z *= scale.z
 			t.origin = origin + t.xform(position)
 
 		else:
 			t = t.rotated(global_x, deg2rad(rotation.x))
 			t = t.rotated(global_y, deg2rad(rotation.y))
 			t = t.rotated(global_z, deg2rad(rotation.z))
+			t.basis = t.basis.scaled(scale)
 			t.origin = origin + position
 
 		transforms.list[i] = t
