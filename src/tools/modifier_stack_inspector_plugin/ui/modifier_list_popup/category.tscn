@@ -12,11 +12,15 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="."]
+[node name="Header" type="VBoxContainer" parent="."]
+margin_right = 40.0
+margin_bottom = 22.0
+
+[node name="Label" type="Label" parent="Header"]
 margin_right = 40.0
 margin_bottom = 14.0
 
-[node name="HSeparator" type="HSeparator" parent="."]
+[node name="HSeparator" type="HSeparator" parent="Header"]
 margin_top = 18.0
 margin_right = 40.0
 margin_bottom = 22.0

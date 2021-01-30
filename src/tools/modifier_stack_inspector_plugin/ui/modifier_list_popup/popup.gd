@@ -26,12 +26,29 @@ func _rebuild_ui():
 		category.add_child(button)
 		button.connect("pressed", self, "_on_pressed", [modifier])
 
+	for category in _category_root.get_children():
+		var header = category.get_child(0)
+		_sort_children_by_name(category)
+		category.move_child(header, 0)
+
 
 func _create_button(display_name) -> Button:
 	var button = Button.new()
+	button.name = display_name
 	button.text = display_name
 	button.align = Button.ALIGN_LEFT
 	return button
+
+
+func _sort_children_by_name(node: Node) -> void:
+	var children = node.get_children()
+	var total_passes = len(children) - 1
+	for i in range(total_passes):
+		for j in range(total_passes - i):
+			var k = j + 1
+			if children[j].name > children[k].name:
+				node.move_child(children[j], k)
+				children = node.get_children()
 
 
 func _get_or_create_category(text: String) -> Control:

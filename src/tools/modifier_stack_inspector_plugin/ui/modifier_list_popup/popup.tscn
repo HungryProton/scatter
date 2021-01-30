@@ -23,8 +23,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 4.0
 margin_top = 4.0
-margin_right = -4.0
-margin_bottom = -4.0
+margin_right = 628.0
+margin_bottom = 20.0
 custom_constants/margin_right = 6
 custom_constants/margin_top = 6
 custom_constants/margin_left = 6
@@ -36,8 +36,8 @@ __meta__ = {
 [node name="CategoryRoot" type="HBoxContainer" parent="MarginContainer"]
 margin_left = 6.0
 margin_top = 6.0
-margin_right = 58.0
-margin_bottom = 124.0
+margin_right = 690.0
+margin_bottom = 148.0
 custom_constants/separation = 12
 __meta__ = {
 "_edit_use_anchors_": false
