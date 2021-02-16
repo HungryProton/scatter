@@ -1,7 +1,6 @@
 tool
 extends "scatter_path.gd"
 
-
 export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
 export var disable_updates_in_game := true

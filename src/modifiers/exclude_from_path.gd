@@ -4,6 +4,7 @@ extends "base_modifier.gd"
 
 export(String) var path_name
 
+export(float, 0.0, 1.0) var strength = 1.0
 
 func _init() -> void:
 	display_name = "Exclude From Path"
@@ -21,13 +22,19 @@ func _process_transforms(transforms, _seed) -> void:
 	var global_transform = transforms.path.global_transform
 	var pos: Vector3
 	var i := 0
+	
+	var rng := RandomNumberGenerator.new()
+	
 	while i < transforms.list.size():
 		pos = global_transform.xform(transforms.list[i].origin)
 		for p in paths:
 			if p.is_point_inside(p.global_transform.xform_inv(pos)):
-				transforms.list.remove(i)
-				i -= 1
-				break
+				
+				var random_value := rng.randf()
+				if random_value < strength:
+					transforms.list.remove(i)
+					i -= 1
+					break
 		i += 1
 
 
