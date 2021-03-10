@@ -32,7 +32,7 @@ if probably renamed that into *scatter-master* or something else, this will brea
 
 ### My collisions are ignored
 By default, instancing or batching is enabled (through a MultimeshInstance node) and doesn't support collisions. However
-you can turn off instancing in the Scatter node and it will copy the entire source, including colliders, scripts and others.
+you can turn off instancing in the Scatter node and it will copy the entire source, including colliders, scripts and others.  
 ![image](https://user-images.githubusercontent.com/52043844/110603386-3eda6400-8187-11eb-84d7-e8ec3fc15e4c.png)
 
 ### The addon is slow when editing a curve
