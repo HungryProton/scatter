@@ -327,7 +327,6 @@ func _reset_all_colliders(node) -> void:
 func _set_colliders_state(node, enabled: bool) -> void:
 	if node is CollisionShape:
 		node.disabled = not enabled
-		print("dsiabled: ", node.disabled)
 
 	for c in node.get_children():
 		_set_colliders_state(c, enabled)
