@@ -24,7 +24,7 @@ func _ready():
 func _get_configuration_warning() -> String:
 	if local_item_path.is_empty() and item_path.empty():
 		return """ No source Node found! You need either ONE of the following:
-			
+
 			- If the Node you want to scatter is in this scene, fill the 'Local Item Path' variable.
 			- If your Node is in another scene, fill the 'Item Path' variable.
 		"""
@@ -67,7 +67,7 @@ func get_mesh_instance() -> MeshInstance:
 		printerr("Warning: ", name, "/local_item_path - ", local_item_path, " is not a valid MeshInstance")
 	if item_path:
 		printerr("Warning: ", item_path, " is not a valid scene file")
-	
+
 	return null
 
 
@@ -89,7 +89,7 @@ func get_item_node():
 			var node = scene.instance()
 			_save_initial_data(node)
 			return node
-	
+
 	# Nothing found, print the relevant warning in the console.
 	if local_item_path:
 		printerr("Warning: ", name, "/local_item_path - ", local_item_path, " is not a valid node path")
@@ -112,12 +112,12 @@ func _delete_multimesh() -> void:
 func _get_mesh_from_scene(node):
 	if node is MeshInstance:
 		return node
-	
+
 	for c in node.get_children():
 		var res = _get_mesh_from_scene(c)
 		if res:
 			return res.duplicate()
-	
+
 	return null
 
 

@@ -184,7 +184,7 @@ func _create_instance(item, root):
 	# Create item and add it to the scene
 	var instance = item.get_item_node()
 	root.add_child(instance)
-	instance.set_owner(get_tree().get_edited_scene_root())
+	_set_owner_recursive(instance, get_tree().get_edited_scene_root())
 	return instance
 
 
@@ -271,6 +271,12 @@ func _process_transform(item, t: Transform) -> Transform:
 		t.origin += item.initial_position
 
 	return t
+
+
+func _set_owner_recursive(node: Node, owner: Node) -> void:
+	node.set_owner(owner)
+	for c in node.get_children():
+		_set_owner_recursive(c, owner)
 
 
 func _set_global_seed(val: int) -> void:
