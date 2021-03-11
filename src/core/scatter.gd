@@ -100,11 +100,14 @@ func update() -> void:
 	if not _items.empty():
 		_transforms = _namespace.Transforms.new()
 		_transforms.set_path(self)
-		modifier_stack.update(_transforms, global_seed)
 
 		if use_instancing:
+			modifier_stack.update(_transforms, global_seed)
 			_create_multimesh()
 		else:
+			_set_colliders_state(self, false)
+			modifier_stack.update(_transforms, global_seed)
+			_set_colliders_state(self, true)
 			_create_duplicates()
 
 	var parent = get_parent()
@@ -319,3 +322,12 @@ func _reset_all_colliders(node) -> void:
 
 	for c in node.get_children():
 		_reset_all_colliders(c)
+
+
+func _set_colliders_state(node, enabled: bool) -> void:
+	if node is CollisionShape:
+		node.disabled = not enabled
+		print("dsiabled: ", node.disabled)
+
+	for c in node.get_children():
+		_set_colliders_state(c, enabled)
