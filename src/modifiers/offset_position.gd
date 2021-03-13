@@ -18,7 +18,7 @@ func _process_transforms(transforms, _global_seed) -> void:
 		t = transforms.list[i]
 
 		if local_space:
-			t.origin += t.xform(position)
+			t.origin += t.basis.xform(position)
 		else:
 			t.origin += position
 
