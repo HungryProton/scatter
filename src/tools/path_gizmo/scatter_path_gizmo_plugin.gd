@@ -39,15 +39,15 @@ func get_handle_value(gizmo: EditorSpatialGizmo, index: int):
 	var path = gizmo.get_spatial_node()
 	if not path:
 		return null
-	
+
 	var curve: Curve3D = path.get_curve()
 	if not curve:
 		return null
-	
+
 	var count = curve.get_point_count()
 	var p_in := false
 	var p_out := false
-	
+
 	if index >= count:
 		var i = index - count
 		index = int(i / 2)
@@ -55,13 +55,13 @@ func get_handle_value(gizmo: EditorSpatialGizmo, index: int):
 		p_out = !p_in
 
 	var data: Dictionary = _get_point_data(path.curve, index)
-	
+
 	_old_position = data.pos
 	if p_in:
 		_old_position += data.in
 	elif p_out:
 		_old_position += data.out
-	
+
 	return data
 
 
@@ -70,28 +70,28 @@ func set_handle(gizmo: EditorSpatialGizmo, index: int, camera: Camera, point: Ve
 	var path = gizmo.get_spatial_node()
 	if not path:
 		return
-	
+
 	var local_pos
-	
+
 	if options and options.snap_to_colliders():
 		local_pos = _intersect_with_colliders(path, camera, point)
-	
+
 	elif options and options.lock_to_plane():
 		local_pos = _intersect_with_plane(path, camera, point)
-	
+
 	else:
 		local_pos = _intersect_screen_space(path, camera, point)
-	
+
 	if not local_pos:
 		return
-	
+
 	local_pos = path.to_local(local_pos)
 	var count = path.curve.get_point_count()
 	var shift_pressed = Input.is_key_pressed(KEY_SHIFT)
-	
+
 	if shift_pressed and index < count:
 		index = (index * 2) + count + 1  # Force select the out handle
-	
+
 	if index < count:
 		path.curve.set_point_position(index, local_pos)
 	else:
@@ -113,14 +113,14 @@ func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, cancel: bool 
 	var path = gizmo.get_spatial_node()
 	if not path:
 		return
-	
+
 	var count = path.curve.get_point_count()
 	var ur = editor_plugin.get_undo_redo()
 	var undo: UndoRedo = editor_plugin.get_undo_redo()
-	
+
 	if index >= count:
 		index = int((index - count) / 2)
-	
+
 	undo.create_action("Moved Path Point")
 	undo.add_undo_method(self, "_set_point", path, restore)
 	undo.add_do_method(self, "_set_point", path, _get_point_data(path.curve, index))
@@ -130,16 +130,16 @@ func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, cancel: bool 
 func redraw(gizmo: EditorSpatialGizmo):
 	if not gizmo:
 		return
-	
+
 	gizmo.clear()
 	var path = gizmo.get_spatial_node()
 	if not path:
 		return
-	
+
 	if not _selection or path != _selection:
 		_draw_path(gizmo)
 		return
-	
+
 	_cached_gizmo = gizmo
 	_draw_handles(gizmo)
 	_draw_path(gizmo)
@@ -150,7 +150,7 @@ func redraw(gizmo: EditorSpatialGizmo):
 func create_custom_handle_material(name, icon: Texture, color := Color.white):
 	var handle_material = SpatialMaterial.new()
 	handle_material.render_priority = 1
-	
+
 	handle_material.set_feature(SpatialMaterial.FEATURE_TRANSPARENT, true)
 	handle_material.set_flag(SpatialMaterial.FLAG_UNSHADED, true)
 	handle_material.set_flag(SpatialMaterial.FLAG_USE_POINT_SIZE, true)
@@ -160,21 +160,21 @@ func create_custom_handle_material(name, icon: Texture, color := Color.white):
 	handle_material.set_point_size(icon.get_width())
 	handle_material.set_texture(SpatialMaterial.TEXTURE_ALBEDO, icon)
 	handle_material.set_albedo(color)
-	
+
 	add_material(name, handle_material)
 
 
 func create_custom_material(name, color := Color.white):
 	var material = SpatialMaterial.new()
 	material.render_priority = 1
-	
+
 	material.set_feature(SpatialMaterial.FEATURE_TRANSPARENT, true)
 	material.set_flag(SpatialMaterial.FLAG_UNSHADED, true)
 	material.set_flag(SpatialMaterial.FLAG_ALBEDO_FROM_VERTEX_COLOR, true)
 	material.set_flag(SpatialMaterial.FLAG_SRGB_VERTEX_COLOR, true)
 	material.set_flag(SpatialMaterial.FLAG_DISABLE_DEPTH_TEST, true)
 	material.set_albedo(color)
-	
+
 	add_material(name, material)
 
 
@@ -183,7 +183,7 @@ func set_selection(path) -> void:
 	return
 	if not path:
 		return
-	
+
 	if not path.is_connected("curve_updated", self, "_on_option_changed"):
 		path.connect("curve_updated", self, "_on_option_changed")
 		#path.call_deferred("connect", "curve_updated", self, "_on_option_changed")
@@ -193,18 +193,18 @@ func _draw_handles(gizmo):
 	var path = gizmo.get_spatial_node()
 	if not path:
 		return
-	
+
 	var curve = path.curve
 	if not curve:
 		return
-	
+
 	var handles = PoolVector3Array()
 	var square_handles = PoolVector3Array()
 	var lines = PoolVector3Array()
 	var count = curve.get_point_count()
 	if count == 0:
 		return
-	
+
 	for i in count:
 		var point_pos = curve.get_point_position(i)
 		var point_in = curve.get_point_in(i) + point_pos
@@ -214,11 +214,11 @@ func _draw_handles(gizmo):
 		lines.push_back(point_in)
 		lines.push_back(point_pos)
 		lines.push_back(point_out)
-		
+
 		square_handles.push_back(point_in)
 		square_handles.push_back(point_out)
 		handles.push_back(point_pos)
-	
+
 	gizmo.add_handles(handles, get_material("handles", gizmo))
 	gizmo.add_handles(square_handles, get_material("square_handle", gizmo))
 	gizmo.add_lines(lines, get_material("handle_lines", gizmo))
@@ -227,11 +227,11 @@ func _draw_handles(gizmo):
 func _draw_path(gizmo):
 	var path = gizmo.get_spatial_node()
 	var polygon = PoolVector3Array()
-	
+
 	for i in path.baked_points.size() - 1:
 		polygon.append(path.baked_points[i])
 		polygon.append(path.baked_points[i + 1])
-	
+
 	gizmo.add_lines(polygon, get_material("path", gizmo))
 	gizmo.add_collision_segments(polygon)
 
@@ -243,7 +243,7 @@ func _draw_grid(gizmo):
 	var center = path.center
 	center.y = 0.0
 	size.y = 0.0
-	
+
 	var resolution = 1.5 # Define how large each square is
 	var steps_x = int(size.x / resolution) + 1
 	var steps_y = int(size.z / resolution) + 1
@@ -252,11 +252,11 @@ func _draw_grid(gizmo):
 	for i in steps_x:
 		grid.append(Vector3(i * resolution, 0.0, 0.0) - half_size + center)
 		grid.append(Vector3(i * resolution, 0.0, size.z) - half_size + center)
-		
+
 	for j in steps_y:
 		grid.append(Vector3(0.0, 0.0, j * resolution) - half_size + center)
 		grid.append(Vector3(size.x, 0.0, j * resolution) - half_size + center)
-	
+
 	gizmo.add_lines(grid, get_material("grid", gizmo))
 
 

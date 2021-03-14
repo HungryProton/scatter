@@ -29,13 +29,13 @@ func _on_save_pressed() -> void:
 	if preset_name.empty():
 		_warning.text = "Preset name can't be empty"
 		return
-	
+
 	if not preset_name.is_valid_filename():
 		_warning.text = """Preset name must be a valid file name.
 			It cannot contain the following characters:
 			: / \\ ? * " | % < >"""
 		return
-	
+
 	_warning.text = ""
 	if _exists(preset_name):
 		_confirm_overwrite.dialog_text = "Preset \"" + preset_name + "\" already exists. Overwrite?"
