@@ -1,35 +1,107 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://addons/scatter/src/tools/path_gizmo/gizmo_options.gd" type="Script" id=1]
 
-[node name="Control" type="Control"]
-margin_bottom = 40.0
+[sub_resource type="StyleBoxFlat" id=1]
+content_margin_left = 4.0
+content_margin_right = 4.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+bg_color = Color( 0.192157, 0.2, 0.219608, 0.501961 )
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+anti_aliasing = false
+
+[node name="PanelContainer" type="PanelContainer"]
+margin_right = 175.0
+margin_bottom = 84.0
+rect_min_size = Vector2( 220, 0 )
+custom_styles/panel = SubResource( 1 )
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-anchor_right = 1.0
-anchor_bottom = 1.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 216.0
+margin_bottom = 228.0
 
-[node name="Colliders" type="CheckButton" parent="HBoxContainer"]
-margin_right = 186.0
+[node name="Colliders" type="CheckButton" parent="VBoxContainer"]
+margin_right = 212.0
 margin_bottom = 40.0
+focus_mode = 0
 text = "Snap to colliders"
 
-[node name="Plane" type="CheckButton" parent="HBoxContainer"]
-margin_left = 190.0
-margin_right = 355.0
-margin_bottom = 40.0
-pressed = true
-text = "Lock to plane"
+[node name="Plane" type="CheckButton" parent="VBoxContainer"]
+margin_top = 44.0
+margin_right = 212.0
+margin_bottom = 84.0
+focus_mode = 0
+text = "Lock to Plane"
 
-[connection signal="toggled" from="HBoxContainer/Colliders" to="." method="_on_button_toggled"]
-[connection signal="toggled" from="HBoxContainer/Colliders" to="." method="_on_snap_button_toggled"]
-[connection signal="toggled" from="HBoxContainer/Plane" to="." method="_on_button_toggled"]
+[node name="Options" type="Button" parent="VBoxContainer"]
+margin_top = 88.0
+margin_right = 212.0
+margin_bottom = 108.0
+focus_mode = 0
+toggle_mode = true
+text = "Show extra options"
+flat = true
+align = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+margin_top = 112.0
+margin_right = 212.0
+margin_bottom = 224.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/MarginContainer"]
+margin_right = 212.0
+margin_bottom = 112.0
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+margin_right = 212.0
+margin_bottom = 24.0
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2"]
+margin_right = 134.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+custom_constants/margin_left = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/MarginContainer"]
+margin_left = 2.0
+margin_top = 5.0
+margin_right = 134.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+text = "Grid density"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2"]
+modulate = Color( 1, 1, 1, 0.686275 )
+margin_left = 138.0
+margin_right = 212.0
+margin_bottom = 24.0
+step = 0.001
+align = 2
+
+[node name="CheckButton" type="CheckButton" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+margin_top = 28.0
+margin_right = 212.0
+margin_bottom = 68.0
+focus_mode = 0
+text = "Relative grid density"
+
+[node name="CheckButton2" type="CheckButton" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+margin_top = 72.0
+margin_right = 212.0
+margin_bottom = 112.0
+focus_mode = 0
+text = "Always hide the grid"
+
+[connection signal="toggled" from="VBoxContainer/Colliders" to="." method="_on_button_toggled"]
+[connection signal="toggled" from="VBoxContainer/Plane" to="." method="_on_button_toggled"]
+[connection signal="toggled" from="VBoxContainer/Options" to="." method="_on_option_button_toggled"]

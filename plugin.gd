@@ -2,11 +2,15 @@ tool
 extends EditorPlugin
 
 
+const Util = preload("src/util.gd")
+const ScatterPath = preload("./src/core/scatter_path.gd")
+
 var _modifier_stack_plugin: EditorInspectorPlugin = preload("./src/tools/modifier_stack_inspector_plugin/modifier_stack_plugin.gd").new()
 var _scatter_path_gizmo_plugin: EditorSpatialGizmoPlugin = preload("./src/tools/path_gizmo/scatter_path_gizmo_plugin.gd").new()
 var _editor_selection
-var _gizmo_options: Control = preload("./src/tools/path_gizmo/gizmo_options.tscn").instance()
-var _scatter_path = preload("./src/core/scatter_path.gd")
+var _gizmo_options: Control
+var _options_root: Control
+
 
 func get_name():
 	return "Scatter"
@@ -39,14 +43,16 @@ func _enter_tree():
 		preload("./icons/exclude.svg")
 	)
 
+	_setup_options_panel()
+
 	_scatter_path_gizmo_plugin.editor_plugin = self
 	_scatter_path_gizmo_plugin.options = _gizmo_options
 	add_spatial_gizmo_plugin(_scatter_path_gizmo_plugin)
-	_gizmo_options.connect("snap_to_colliders_enabled", self, "_on_snap_to_colliders_enabled")
 
 	_editor_selection = get_editor_interface().get_selection()
 	_editor_selection.connect("selection_changed", self, "_on_selection_changed")
 	connect("scene_changed", self, "_on_scene_changed")
+
 
 
 func _exit_tree():
@@ -55,28 +61,23 @@ func _exit_tree():
 	remove_custom_type("ScatterItem")
 	remove_custom_type("ScatterExcludePath")
 	remove_custom_type("ScatterExcludePoint")
-	_hide_options_panel()
 	remove_spatial_gizmo_plugin(_scatter_path_gizmo_plugin)
+	_gizmo_options.queue_free()
 
 
 func _on_selection_changed() -> void:
 	var selected = _editor_selection.get_selected_nodes()
 
-	if selected.empty():
-		# Node was deselected but nothing else was selected. By default, Godot
-		# will keep the path editor panel on top so we do the same.
-		return
-
-	if selected[0] is _scatter_path:
+	if selected.empty() or not selected[0] is ScatterPath:
+		_hide_options_panel()
+		_scatter_path_gizmo_plugin.set_selection(null)
+	else:
 		_show_options_panel()
 		_scatter_path_gizmo_plugin.set_selection(selected[0])
 		selected[0].undo_redo = get_undo_redo()
 
 		if _gizmo_options.snap_to_colliders():
 			_on_snap_to_colliders_enabled()
-	else:
-		_hide_options_panel()
-		_scatter_path_gizmo_plugin.set_selection(null)
 
 
 func _on_scene_changed(_root) -> void:
@@ -87,20 +88,11 @@ func _on_scene_changed(_root) -> void:
 
 
 func _show_options_panel():
-	if not _gizmo_options.get_parent():
-		add_control_to_container(CONTAINER_SPATIAL_EDITOR_MENU, _gizmo_options)
+	_gizmo_options.visible = true
 
 
 func _hide_options_panel():
-	if _gizmo_options.get_parent():
-		remove_control_from_container(CONTAINER_SPATIAL_EDITOR_MENU, _gizmo_options)
-
-
-func _on_snap_to_colliders_enabled():
-	var selected = _editor_selection.get_selected_nodes()
-	if not selected.empty():
-		var root = selected[0].get_tree().root
-		_reset_all_colliders(root)
+	_gizmo_options.visible = false
 
 
 func _reset_all_colliders(node) -> void:
@@ -110,3 +102,27 @@ func _reset_all_colliders(node) -> void:
 
 	for c in node.get_children():
 		_reset_all_colliders(c)
+
+
+func _setup_options_panel() -> void:
+	var editor_viewport:VBoxContainer = get_editor_interface().get_editor_viewport()
+	_options_root = Util.get_node_by_class_path(editor_viewport, [
+		'SpatialEditor',
+		'HSplitContainer',
+		'VSplitContainer',
+		'SpatialEditorViewportContainer',
+		'SpatialEditorViewport',
+		'Control',
+		'VBoxContainer',
+		])
+	_gizmo_options = preload("./src/tools/path_gizmo/gizmo_options.tscn").instance()
+	_options_root.add_child(_gizmo_options)
+	_gizmo_options.connect("snap_to_colliders_enabled", self, "_on_snap_to_colliders_enabled")
+	_gizmo_options.visible = false
+
+
+func _on_snap_to_colliders_enabled():
+	var selected = _editor_selection.get_selected_nodes()
+	if not selected.empty():
+		var root = selected[0].get_tree().root
+		_reset_all_colliders(root)

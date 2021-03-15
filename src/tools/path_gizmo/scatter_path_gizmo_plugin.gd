@@ -5,7 +5,6 @@ extends EditorSpatialGizmoPlugin
 var editor_plugin: EditorPlugin
 var options setget _set_options
 
-var _previous_size
 var _namespace = load(_get_root_folder() + "/src/core/namespace.gd").new()
 var _axis_mesh: ArrayMesh
 var _selection
@@ -180,12 +179,12 @@ func create_custom_material(name, color := Color.white):
 
 func set_selection(path) -> void:
 	_selection = path
-	return
+
 	if not path:
 		return
 
-	if not path.is_connected("curve_updated", self, "_on_option_changed"):
-		path.connect("curve_updated", self, "_on_option_changed")
+	if not path.is_connected("curve_updated", self, "_on_curve_updated"):
+		path.connect("curve_updated", self, "_on_curve_updated")
 		#path.call_deferred("connect", "curve_updated", self, "_on_option_changed")
 
 
@@ -333,4 +332,8 @@ func _set_options(val) -> void:
 
 
 func _on_option_changed() -> void:
+	redraw(_cached_gizmo)
+
+
+func _on_curve_updated() -> void:
 	redraw(_cached_gizmo)
