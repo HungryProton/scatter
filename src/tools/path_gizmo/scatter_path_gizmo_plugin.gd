@@ -249,15 +249,21 @@ func _draw_grid(gizmo):
 	var resolution = 10.0 / options.get_grid_density() # Define how large each square is
 	var steps_x = int(size.x / resolution) + 1
 	var steps_y = int(size.z / resolution) + 1
-	var half_size = size / 2
+	var offset = -size / 2 + center
 
 	for i in steps_x:
-		grid.append(Vector3(i * resolution, 0.0, 0.0) - half_size + center)
-		grid.append(Vector3(i * resolution, 0.0, size.z) - half_size + center)
+		grid.append(Vector3(i * resolution, 0.0, 0.0) + offset)
+		grid.append(Vector3(i * resolution, 0.0, size.z) + offset)
 
 	for j in steps_y:
-		grid.append(Vector3(0.0, 0.0, j * resolution) - half_size + center)
-		grid.append(Vector3(size.x, 0.0, j * resolution) - half_size + center)
+		grid.append(Vector3(0.0, 0.0, j * resolution) + offset)
+		grid.append(Vector3(size.x, 0.0, j * resolution) + offset)
+
+
+	grid.append(Vector3(0.0, 0.0, size.z) + offset)
+	grid.append(Vector3(size.x, 0.0, size.z) + offset)
+	grid.append(Vector3(size.x, 0.0, 0.0) + offset)
+	grid.append(Vector3(size.x, 0.0, size.z) + offset)
 
 	gizmo.add_lines(grid, get_material("grid", gizmo))
 
