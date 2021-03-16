@@ -8,6 +8,7 @@ export(bool) var remove_points_on_miss = true
 export(bool) var align_with_floor_normal = false
 export(bool) var invert_ray_direction = false
 export(Vector3) var floor_direction = Vector3.DOWN
+export(float, 0.0, 1.0) var max_slope = 1.0
 
 
 func _init() -> void:
@@ -22,6 +23,7 @@ func _process_transforms(transforms, _seed) -> void:
 	var path = transforms.path
 	var space_state = path.get_world().get_direct_space_state()
 	var hit
+	var d: float
 	var t: Transform
 	var i := 0
 
@@ -30,8 +32,14 @@ func _process_transforms(transforms, _seed) -> void:
 		hit = _project_on_floor(t.origin, path, space_state)
 
 		if hit != null and not hit.empty():
+			d = Vector3.UP.dot(hit.normal)
+			if d < (1.0 - max_slope):
+				transforms.list.remove(i)
+				continue
+
 			if align_with_floor_normal:
 				t = _align_with(t, hit.normal)
+
 			t.origin = path.to_local(hit.position)
 			transforms.list[i] = t
 
