@@ -236,6 +236,9 @@ func _draw_path(gizmo):
 
 
 func _draw_grid(gizmo):
+	if options.hide_grid():
+		return
+
 	var path = gizmo.get_spatial_node()
 	var grid = PoolVector3Array()
 	var size = path.size
@@ -243,7 +246,7 @@ func _draw_grid(gizmo):
 	center.y = 0.0
 	size.y = 0.0
 
-	var resolution = 1.5 # Define how large each square is
+	var resolution = 10.0 / options.get_grid_density() # Define how large each square is
 	var steps_x = int(size.x / resolution) + 1
 	var steps_y = int(size.z / resolution) + 1
 	var half_size = size / 2
@@ -329,6 +332,9 @@ func _set_point(path, data: Dictionary) -> void:
 func _set_options(val) -> void:
 	options = val
 	options.connect("option_changed", self, "_on_option_changed")
+	options.connect("color_changed", self, "_on_color_changed")
+	create_custom_material("grid", options.get_grid_color())
+	create_custom_material("path", options.get_path_color())
 
 
 func _on_option_changed() -> void:
@@ -336,4 +342,10 @@ func _on_option_changed() -> void:
 
 
 func _on_curve_updated() -> void:
+	redraw(_cached_gizmo)
+
+
+func _on_color_changed() -> void:
+	create_custom_material("grid", options.get_grid_color())
+	create_custom_material("path", options.get_path_color())
 	redraw(_cached_gizmo)
