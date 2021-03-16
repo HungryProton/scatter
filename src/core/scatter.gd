@@ -217,7 +217,7 @@ func _create_multimesh() -> void:
 
 
 func _setup_multi_mesh(item, count):
-	var instance
+	var instance: MultiMeshInstance
 	if item.has_node("MultiMeshInstance"):
 		instance = item.get_node("MultiMeshInstance")
 	else:
@@ -231,16 +231,22 @@ func _setup_multi_mesh(item, count):
 
 	instance.translation = Vector3.ZERO
 
-	var mesh_instance = item.get_mesh_instance()
+	var mesh_instance: MeshInstance = item.get_mesh_instance()
 	if not mesh_instance:
 		_delete_multimeshes()
 		return
 
-	instance.material_override = mesh_instance.get_surface_material(0)
+	for i in mesh_instance.get_surface_material_count():
+		var mat = mesh_instance.get_surface_material(i)
+		if not mat:
+			continue
+		mesh_instance.mesh.surface_set_material(i, mat)
+
 	instance.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
 	instance.multimesh.mesh = mesh_instance.mesh
 	instance.multimesh.transform_format = 1
 	instance.multimesh.instance_count = count
+	instance.material_override = mesh_instance.material_override
 
 	return instance
 
