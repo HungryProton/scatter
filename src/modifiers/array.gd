@@ -19,7 +19,7 @@ func _init() -> void:
 	category = "Edit"
 
 
-func _process_transforms(transforms, _global_seed : int) -> void:
+func _process_transforms(transforms, global_seed: int) -> void:
 	var new_transforms := []
 	var rotation_rad := Vector3.ZERO
 
@@ -74,4 +74,5 @@ func _process_transforms(transforms, _global_seed : int) -> void:
 			# store the final result
 			new_transforms.push_back(transform)
 
+	shuffle(new_transforms, global_seed)
 	transforms.list = new_transforms

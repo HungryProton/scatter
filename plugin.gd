@@ -42,6 +42,12 @@ func _enter_tree():
 		preload("./src/core/scatter_exclude_point.gd"),
 		preload("./icons/exclude.svg")
 	)
+	add_custom_type(
+		"ScatterUpdateGroup",
+		"Spatial",
+		preload("./src/core/update_group.gd"),
+		preload("./icons/scatter.svg")
+	)
 
 	_setup_options_panel()
 
@@ -61,6 +67,7 @@ func _exit_tree():
 	remove_custom_type("ScatterItem")
 	remove_custom_type("ScatterExcludePath")
 	remove_custom_type("ScatterExcludePoint")
+	remove_custom_type("ScatterUpdateGroup")
 	remove_spatial_gizmo_plugin(_scatter_path_gizmo_plugin)
 	_gizmo_options.queue_free()
 

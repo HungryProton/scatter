@@ -41,23 +41,4 @@ func _process_transforms(transforms, global_seed) -> void:
 	if t_index < max_count:
 		transforms.remove(max_count - t_index)
 
-	_shuffle(transforms.list, global_seed)
-
-
-func _shuffle(array, random_seed := 0) -> void:
-	var n = array.size()
-	if n < 2:
-		return
-
-	var rng = RandomNumberGenerator.new()
-	rng.set_seed(random_seed)
-
-	var i = n - 1
-	var j
-	var tmp
-	while i >= 1:
-		j = rng.randi() % (i + 1)
-		tmp = array[j]
-		array[j] = array[i]
-		array[i] = tmp
-		i -= 1
+	shuffle(transforms.list, global_seed)

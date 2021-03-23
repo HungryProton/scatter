@@ -32,7 +32,7 @@ func _process_transforms(transforms, _seed) -> void:
 		hit = _project_on_floor(t.origin, path, space_state)
 
 		if hit != null and not hit.empty():
-			d = Vector3.UP.dot(hit.normal)
+			d = abs(Vector3.UP.dot(hit.normal))
 			if d < (1.0 - max_slope):
 				transforms.list.remove(i)
 				continue

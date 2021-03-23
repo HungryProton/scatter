@@ -185,7 +185,6 @@ func set_selection(path) -> void:
 
 	if not path.is_connected("curve_updated", self, "_on_curve_updated"):
 		path.connect("curve_updated", self, "_on_curve_updated")
-		#path.call_deferred("connect", "curve_updated", self, "_on_option_changed")
 
 
 func _draw_handles(gizmo):

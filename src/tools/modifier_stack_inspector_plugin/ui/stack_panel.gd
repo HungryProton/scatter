@@ -25,20 +25,15 @@ func set_node(node) -> void:
 	if not node:
 		return
 
-	if _modifier_stack:
-		_modifier_stack.disconnect("stack_changed", self, "_on_stack_changed")
-
 	_scatter = node
-	_modifier_stack = node.modifier_stack
-	_modifier_stack.connect("stack_changed", self, "_on_stack_changed")
-	if _modifier_stack.just_created:
-		_on_load_preset("default")
+	rebuild_ui()
 
 
 func rebuild_ui() -> void:
 	if not _ready:
 		return
 
+	_validate_stack_connections()
 	_clear()
 	for m in _modifier_stack.stack:
 		var ui = _modifier_panel.instance()
@@ -57,6 +52,17 @@ func _clear() -> void:
 	for c in _root.get_children():
 		_root.remove_child(c)
 		c.queue_free()
+
+
+func _validate_stack_connections() -> void:
+	if _modifier_stack:
+		_modifier_stack.disconnect("stack_changed", self, "_on_stack_changed")
+
+	_modifier_stack = _scatter.modifier_stack
+	_modifier_stack.connect("stack_changed", self, "_on_stack_changed")
+
+	if _modifier_stack.just_created:
+		_on_load_preset("default")
 
 
 func _set_children_owner(root: Node, node: Node):

@@ -2,6 +2,8 @@ tool
 extends "scatter_path.gd"
 
 
+var Scatter = preload("namespace.gd").new()
+
 export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
 export var disable_updates_in_game := true
@@ -9,7 +11,6 @@ export var disable_updates_in_game := true
 var modifier_stack setget _set_modifier_stack
 var undo_redo setget _set_undo_redo
 
-var _namespace = preload("./namespace.gd").new()
 var _transforms
 var _items := []
 var _total_proportion: int
@@ -18,7 +19,7 @@ var _was_duplicated := false
 
 func _ready() -> void:
 	if not modifier_stack:
-		modifier_stack = _namespace.ModifierStack.new()
+		modifier_stack = Scatter.ModifierStack.new()
 		modifier_stack.just_created = true
 
 	self.connect("curve_updated", self, "update")
@@ -37,7 +38,7 @@ func remove_child(node) -> void:
 
 func _get_configuration_warning() -> String:
 	#_discover_items()
-	if _items.empty():
+	if _items and _items.empty():
 		return "Scatter requires at least one ScatterItem node as a child to work."
 	return ""
 
@@ -75,7 +76,7 @@ func _set(property, value):
 		if modifier_stack:
 			modifier_stack = modifier_stack.duplicate(7)
 		else:
-			modifier_stack = _namespace.ModifierStack.new()
+			modifier_stack = Scatter.ModifierStack.new()
 			modifier_stack.just_created = true
 		# Duplicate the curve item too. If someone want to share data, it has
 		# to be explicitely done by the user
@@ -98,7 +99,7 @@ func update() -> void:
 
 	_discover_items()
 	if not _items.empty():
-		_transforms = _namespace.Transforms.new()
+		_transforms = Scatter.Transforms.new()
 		_transforms.set_path(self)
 
 		if use_instancing:
@@ -110,9 +111,16 @@ func update() -> void:
 			_set_colliders_state(self, true)
 			_create_duplicates()
 
+	notify_update()
+
+
+func notify_update() -> void:
 	var parent = get_parent()
-	if parent and parent.has_method("update"):
-		parent.update()
+	if not parent:
+		return
+
+	if parent is Scatter.Scatter or parent is Scatter.UpdateGroup:
+		parent.notify_update()
 
 
 # Same thing as update except we force all the physic objects in the entire
@@ -131,7 +139,7 @@ func _discover_items() -> void:
 	_total_proportion = 0
 
 	for c in get_children():
-		if c is _namespace.ScatterItem:
+		if c is Scatter.ScatterItem:
 			_items.append(c)
 			_total_proportion += c.proportion
 
@@ -202,6 +210,9 @@ func _create_multimesh() -> void:
 	var transforms_count: int = _transforms.list.size()
 
 	for item in _items:
+		item.translation = Vector3.ZERO
+		item.rotation = Vector3.ZERO
+		item.scale = Vector3.ONE
 		var count = int(round(float(item.proportion) / _total_proportion * transforms_count))
 		var mmi = _setup_multi_mesh(item, count)
 		if not mmi:
@@ -212,6 +223,7 @@ func _create_multimesh() -> void:
 				return
 
 			mmi.multimesh.set_instance_transform(i, _process_transform(item, _transforms.list[offset + i]))
+			mmi.multimesh.visible_instance_count = i + 1
 
 		offset += count
 
@@ -309,7 +321,7 @@ func _set_undo_redo(val) -> void:
 
 
 func _set_modifier_stack(val) -> void:
-	modifier_stack = _namespace.ModifierStack.new()
+	modifier_stack = Scatter.ModifierStack.new()
 	modifier_stack.stack = val.duplicate_stack()
 
 	if not modifier_stack.is_connected("stack_changed", self, "update"):

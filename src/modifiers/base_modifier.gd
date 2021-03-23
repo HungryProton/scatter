@@ -46,3 +46,22 @@ func process_transforms(transforms, global_seed) -> void:
 # Override in inherited class
 func _process_transforms(transforms, global_seed) -> void:
 	pass
+
+
+func shuffle(array, random_seed := 0) -> void:
+	var n = array.size()
+	if n < 2:
+		return
+
+	var rng = RandomNumberGenerator.new()
+	rng.set_seed(random_seed)
+
+	var i = n - 1
+	var j
+	var tmp
+	while i >= 1:
+		j = rng.randi() % (i + 1)
+		tmp = array[j]
+		array[j] = array[i]
+		array[i] = tmp
+		i -= 1
