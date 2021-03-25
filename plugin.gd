@@ -7,6 +7,7 @@ const ScatterPath = preload("./src/core/scatter_path.gd")
 
 var _modifier_stack_plugin: EditorInspectorPlugin = preload("./src/tools/modifier_stack_inspector_plugin/modifier_stack_plugin.gd").new()
 var _scatter_path_gizmo_plugin: EditorSpatialGizmoPlugin = preload("./src/tools/path_gizmo/scatter_path_gizmo_plugin.gd").new()
+var _exclude_point_gizmo_plugin: EditorSpatialGizmoPlugin = preload("./src/tools/point_gizmo/exclude_point_gizmo_plugin.gd").new()
 var _editor_selection
 var _gizmo_options: Control
 var _options_root: Control
@@ -46,7 +47,7 @@ func _enter_tree():
 		"ScatterUpdateGroup",
 		"Spatial",
 		preload("./src/core/update_group.gd"),
-		preload("./icons/scatter.svg")
+		preload("./icons/group.svg")
 	)
 
 	_setup_options_panel()
@@ -54,6 +55,7 @@ func _enter_tree():
 	_scatter_path_gizmo_plugin.editor_plugin = self
 	_scatter_path_gizmo_plugin.options = _gizmo_options
 	add_spatial_gizmo_plugin(_scatter_path_gizmo_plugin)
+	add_spatial_gizmo_plugin(_exclude_point_gizmo_plugin)
 
 	_editor_selection = get_editor_interface().get_selection()
 	_editor_selection.connect("selection_changed", self, "_on_selection_changed")
@@ -69,6 +71,7 @@ func _exit_tree():
 	remove_custom_type("ScatterExcludePoint")
 	remove_custom_type("ScatterUpdateGroup")
 	remove_spatial_gizmo_plugin(_scatter_path_gizmo_plugin)
+	remove_spatial_gizmo_plugin(_exclude_point_gizmo_plugin)
 	_gizmo_options.queue_free()
 
 

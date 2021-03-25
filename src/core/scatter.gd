@@ -111,16 +111,16 @@ func update() -> void:
 			_set_colliders_state(self, true)
 			_create_duplicates()
 
-	notify_update()
+	_notify_parent()
 
 
-func notify_update() -> void:
+func _notify_parent() -> void:
 	var parent = get_parent()
 	if not parent:
 		return
 
 	if parent is Scatter.Scatter or parent is Scatter.UpdateGroup:
-		parent.notify_update()
+		parent.update()
 
 
 # Same thing as update except we force all the physic objects in the entire
