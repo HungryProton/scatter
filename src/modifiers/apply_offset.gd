@@ -2,10 +2,10 @@ tool
 extends "base_modifier.gd"
 
 
-export(bool) var local_space = false
-export(Vector3) var position = Vector3.ZERO
-export(Vector3) var rotation = Vector3(0.0, 0.0, 0.0)
-export(Vector3) var scale = Vector3.ONE
+export var local_space := false
+export var position := Vector3.ZERO
+export var rotation := Vector3(0.0, 0.0, 0.0)
+export var scale := Vector3.ONE
 
 
 func _init() -> void:

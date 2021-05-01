@@ -56,6 +56,8 @@ func create_ui_for(modifier) -> void:
 				if property.hint_string == "Node":
 					parameter_ui = preload("./components/parameter_node_selector.tscn").instance()
 					parameter_ui.set_root(_scatter)
+				elif property.hint_string == "Curve":
+					parameter_ui = preload("./components/parameter_curve.tscn").instance()
 				else:
 					parameter_ui = preload("./components/parameter_string.tscn").instance()
 			TYPE_VECTOR3:

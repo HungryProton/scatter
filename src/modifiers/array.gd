@@ -3,15 +3,15 @@ extends "base_modifier.gd"
 
 # Takes existing objects and duplicates them recursively with given transforms
 
-export(int) var amount = 1
-export(bool) var local_offset = false
-export(Vector3) var offset = Vector3.ZERO
-export(bool) var local_rotation = false
-export(Vector3) var rotation = Vector3.ZERO
-export(bool) var individual_rotation_pivots = true
-export(Vector3) var rotation_pivot = Vector3.ZERO
-export(bool) var local_scale = true
-export(Vector3) var scale = Vector3.ONE
+export var amount := 1
+export var local_offset := false
+export var offset := Vector3.ZERO
+export var local_rotation := false
+export var rotation := Vector3.ZERO
+export var individual_rotation_pivots := true
+export var rotation_pivot := Vector3.ZERO
+export var local_scale := true
+export var scale := Vector3.ONE
 
 
 func _init() -> void:

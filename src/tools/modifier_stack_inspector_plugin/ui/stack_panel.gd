@@ -55,6 +55,9 @@ func _clear() -> void:
 
 
 func _validate_stack_connections() -> void:
+	if not _scatter:
+		return
+
 	if _modifier_stack:
 		_modifier_stack.disconnect("stack_changed", self, "_on_stack_changed")
 

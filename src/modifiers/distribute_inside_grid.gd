@@ -2,8 +2,8 @@ tool
 extends "base_modifier.gd"
 
 
-export(float) var x_spacing = 1.0
-export(float) var z_spacing = 1.0
+export var x_spacing := 2.0
+export var z_spacing := 2.0
 
 
 func _init() -> void:

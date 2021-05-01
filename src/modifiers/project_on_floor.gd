@@ -2,12 +2,12 @@ tool
 extends "base_modifier.gd"
 
 
-export(float) var ray_length : float = 10.0
-export(float) var ray_offset : float = 1.0
-export(bool) var remove_points_on_miss = true
-export(bool) var align_with_floor_normal = false
-export(bool) var invert_ray_direction = false
-export(Vector3) var floor_direction = Vector3.DOWN
+export var ray_length := 10.0
+export var ray_offset := 1.0
+export var remove_points_on_miss := true
+export var align_with_floor_normal := false
+export var invert_ray_direction := false
+export var floor_direction := Vector3.DOWN
 export(float, 0.0, 1.0) var max_slope = 1.0
 
 

@@ -2,12 +2,12 @@ tool
 extends "base_modifier.gd"
 
 
-export(bool) var override_global_seed = false
-export(int) var custom_seed = 0
-export(bool) var local_space = false
-export(Vector3) var position = Vector3.ONE
-export(Vector3) var rotation = Vector3(360.0, 360.0, 360.0)
-export(Vector3) var scale = Vector3.ONE
+export var override_global_seed := false
+export var custom_seed := 0
+export var local_space := false
+export var position := Vector3.ONE
+export var rotation := Vector3(360.0, 360.0, 360.0)
+export var scale := Vector3.ONE
 
 var _rng: RandomNumberGenerator
 

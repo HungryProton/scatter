@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_curve.gd" type="Script" id=1]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/curve_panel.gd" type="Script" id=2]
+
+[node name="ParameterCurve" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_right = 1280.0
+margin_bottom = 14.0
+text = "Curve name"
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+margin_top = 18.0
+margin_right = 1280.0
+margin_bottom = 168.0
+
+[node name="CurvePanel" type="PanelContainer" parent="MarginContainer"]
+margin_right = 1280.0
+margin_bottom = 150.0
+rect_min_size = Vector2( 0, 150 )
+rect_clip_content = true
+script = ExtResource( 2 )
+selected_point_color = Color( 0.878431, 0.47451, 0, 1 )
+
+[connection signal="curve_updated" from="MarginContainer/CurvePanel" to="." method="_on_curve_updated"]

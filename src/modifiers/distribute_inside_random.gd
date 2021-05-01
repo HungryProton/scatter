@@ -2,9 +2,9 @@ tool
 extends "base_modifier.gd"
 
 
-export(bool) var override_global_seed = false
-export(int) var custom_seed = 0
-export(int) var instance_count = 10
+export var override_global_seed := false
+export var custom_seed := 0
+export var instance_count := 10
 
 var _rng: RandomNumberGenerator
 

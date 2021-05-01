@@ -2,26 +2,31 @@ tool
 extends "base_modifier.gd"
 
 
-export(String, "Node") var path_name
-export(float) var width = 4.0
-export(bool) var ignore_height = true
+var Scatter = preload("../core/namespace.gd").new()
 
-export(float, 0.0, 1.0) var strength = 1.0
-export(Curve) var curve : Curve = Curve.new() #as of now there is no default curve editor, so this value cannot be changed
-export(int) var random_seed = -283376
+export(String, "Node") var path_name
+export var width := 4.0
+export var ignore_height := true
+export(String, "Curve") var falloff
+export var override_global_seed := false
+export var custom_seed := 0
+
+var _rng: RandomNumberGenerator
 
 
 func _init() -> void:
 	display_name = "Exclude Along Path"
-  category = "Remove"
+	category = "Remove"
 
-	#prepares initial curve values
-	curve.add_point(Vector2(0, 0))
-	curve.add_point(Vector2(1, 1))
-	curve.bake()
-	
+	if falloff.empty():
+		var curve = Curve.new()
+		curve.add_point(Vector2(0, 0))
+		curve.add_point(Vector2(1, 0))
+		curve.bake()
+		falloff = Scatter.Util.curve_to_string(curve)
 
-func _process_transforms(transforms, _seed) -> void:
+
+func _process_transforms(transforms, global_seed) -> void:
 	if not transforms.path.has_node(path_name):
 		warning += "Could not find " + path_name
 		warning += "\n Make sure the curve exists as a child of the Scatter node"
@@ -33,23 +38,26 @@ func _process_transforms(transforms, _seed) -> void:
 	var global_transform = transforms.path.global_transform
 	var pos: Vector3
 	var i := 0
-	
-	var rng := RandomNumberGenerator.new()
-	rng.seed = random_seed
-	
+
+	_rng = RandomNumberGenerator.new()
+	if override_global_seed:
+		_rng.set_seed(custom_seed)
+	else:
+		_rng.set_seed(global_seed)
+
+	var curve: Curve = Scatter.Util.string_to_curve(falloff)
+
 	while i < transforms.list.size():
 		pos = global_transform.xform(transforms.list[i].origin)
 		for p in paths:
-			#saves us from computing this value multiple times
-			var distance_to_point : float = p.distance_from_point(p.global_transform.xform_inv(pos), ignore_height)
-			
-			#if this point is within the exclude distance
-			if distance_to_point < width:
-				#we can apply gradients that are linked to the distance from the path
-				var curve_value := curve.interpolate_baked(distance_to_point)
-				var random_value := rng.randf()
-				
-				if curve_value * strength < random_value:
+			var distance_to_point: float = p.distance_from_point(p.global_transform.xform_inv(pos), ignore_height)
+			var max_distance: float = width / 2.0
+
+			if distance_to_point < max_distance:
+				var falloff_value := curve.interpolate_baked(distance_to_point / max_distance)
+				var random_value := _rng.randf()
+
+				if random_value > falloff_value:
 					transforms.list.remove(i)
 					i -= 1
 					break

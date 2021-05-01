@@ -130,6 +130,7 @@ func full_update() -> void:
 	_reset_all_colliders(get_tree().root)
 	_delete_duplicates()
 	_delete_multimeshes()
+	yield(get_tree(), "idle_frame")
 	update()
 
 
@@ -311,7 +312,6 @@ func _set_instancing(val: bool) -> void:
 		_delete_duplicates()
 	else:
 		_delete_multimeshes()
-
 	update()
 
 

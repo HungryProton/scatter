@@ -2,12 +2,12 @@ tool
 extends "base_modifier.gd"
 
 
-export(bool) var override_global_seed = false
-export(int) var custom_seed = 0
-export(int) var octaves = 4
-export(float) var period = 20.0
-export(float) var persistence = 0.8
-export(Vector3) var scale = Vector3.ONE
+export var override_global_seed := false
+export var custom_seed := 0
+export var octaves := 4
+export var period := 20.0
+export var persistence := 0.8
+export var scale := Vector3.ONE
 
 var _noise: OpenSimplexNoise
 

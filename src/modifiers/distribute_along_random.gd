@@ -2,14 +2,14 @@ tool
 extends "base_modifier.gd"
 
 
-export(bool) var override_global_seed = false
-export(int) var custom_seed = 0
-export(int) var instance_count = 10
-export(bool) var align_to_path = false
-export(int) var align_up_axis = 1
-export(bool) var restrict_x = false
-export(bool) var restrict_y = false
-export(bool) var restrict_z = false
+export var override_global_seed := false
+export var custom_seed := 0
+export var instance_count := 10
+export var align_to_path := false
+export var align_up_axis := 1
+export var restrict_x := false
+export var restrict_y := false
+export var restrict_z := false
 
 var _rng: RandomNumberGenerator
 
@@ -25,7 +25,6 @@ func _process_transforms(transforms, global_seed) -> void:
 	transforms.resize(instance_count)
 
 	_rng = RandomNumberGenerator.new()
-
 	if override_global_seed:
 		_rng.set_seed(custom_seed)
 	else:
@@ -49,6 +48,7 @@ func _process_transforms(transforms, global_seed) -> void:
 
 		t.origin = pos
 		transforms.list[i] = t
+
 
 static func get_align_up_vector(align : int) -> Vector3:
 	var axis : Vector3

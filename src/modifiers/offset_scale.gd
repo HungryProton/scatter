@@ -1,10 +1,9 @@
 tool
 extends "base_modifier.gd"
 
-#changes scale of objects
 
-export(bool) var local_space = false
-export(Vector3) var scale = Vector3(1, 1, 1)
+export var local_space := false
+export var scale := Vector3(1, 1, 1)
 
 
 func _init() -> void:
@@ -12,7 +11,7 @@ func _init() -> void:
 	category = "Offset"
 
 
-func _process_transforms(transforms, _global_seed : int) -> void:
+func _process_transforms(transforms, _seed) -> void:
 	var basis: Basis
 	for t in transforms.list.size():
 		basis = transforms.list[t].basis

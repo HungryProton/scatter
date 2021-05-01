@@ -2,13 +2,13 @@ tool
 extends "base_modifier.gd"
 
 
-export(float) var interval = 1.0
-export(float) var offset = 0.0
-export(bool) var align_to_path = false
+export var interval := 1.0
+export var offset := 0.0
+export var align_to_path := false
 export(int, "X", "Y", "Z") var align_up_axis = 1
-export(bool) var restrict_x = false
-export(bool) var restrict_y = false
-export(bool) var restrict_z = false
+export var restrict_x := false
+export var restrict_y := false
+export var restrict_z := false
 
 
 func _init() -> void:
