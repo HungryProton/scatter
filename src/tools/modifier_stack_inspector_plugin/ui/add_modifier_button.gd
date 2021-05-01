@@ -18,6 +18,5 @@ func _toggled(button_pressed):
 		_popup.popup()
 
 
-
 func _on_popup_closed() -> void:
 	pressed = false

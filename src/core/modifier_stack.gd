@@ -34,12 +34,12 @@ func move_up(modifier) -> void:
 	var index = stack.find(modifier)
 	if index == 0 or index == -1:
 		return
-	
+
 	var restore = duplicate_stack()
 	stack.remove(index)
 	stack.insert(index - 1, modifier)
 	_create_undo_action("Moved Modifier Up", restore)
-		
+
 	emit_signal("stack_changed")
 
 
@@ -48,7 +48,7 @@ func move_down(modifier) -> void:
 	var last_index = stack.size() - 1
 	if index == last_index or index == -1:
 		return
-	
+
 	var restore = duplicate_stack()
 	stack.remove(index)
 	stack.insert(index + 1, modifier)

@@ -6,8 +6,12 @@ signal load_preset
 signal delete_preset
 
 
-onready var _no_presets: Label = $MarginContainer/ScrollContainer/VBoxContainer/NoPresets
-onready var _root: VBoxContainer = $MarginContainer/ScrollContainer/VBoxContainer/PresetsRoot
+onready var _no_presets: Label = $MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/NoPresets
+onready var _root: VBoxContainer = $MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PresetsRoot
+onready var _confirmation_dialog: ConfirmationDialog = $ConfirmationDialog
+
+var _selected: String
+var _selected_ui: Node
 
 
 func _ready():
@@ -19,12 +23,12 @@ func _rebuild_ui():
 	for c in _root.get_children():
 		c.queue_free()
 	_root.visible = false
-	
+
 	var presets = _find_all_presets()
 	if presets.empty():
 		_no_presets.visible = true
 		return
-	
+
 	_no_presets.visible = false
 	_root.visible = true
 	for p in presets:
@@ -68,8 +72,15 @@ func _on_load_preset(preset_name) -> void:
 
 
 func _on_delete_preset(preset_name, ui) -> void:
-	emit_signal("delete_preset", preset_name)
-	ui.queue_free()
+	_selected = preset_name
+	_selected_ui = ui
+	_confirmation_dialog.popup_centered()
+
+
+func _on_delete_preset_confirmed():
+	var dir = Directory.new()
+	dir.remove(_get_root_folder() + "/presets/" + _selected + ".tscn")
+	_selected_ui.queue_free()
 
 
 func _on_cancel_pressed():

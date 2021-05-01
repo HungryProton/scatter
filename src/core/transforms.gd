@@ -3,8 +3,7 @@ extends Node
 
 
 var list := []
-var size: Vector3
-var path #ScatterPath object
+var path # ScatterPath object
 
 
 func add(count: int) -> void:
@@ -14,7 +13,7 @@ func add(count: int) -> void:
 
 
 func remove(count: int) -> void:
-	count = max(count, 0) # Prevent using a negative number
+	count = int(max(count, 0)) # Prevent using a negative number
 	var new_size = max(list.size() - count, 0)
 	list.resize(new_size)
 

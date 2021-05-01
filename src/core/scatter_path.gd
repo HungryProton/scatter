@@ -35,10 +35,10 @@ func _notification(what):
 func is_point_inside(point : Vector3):
 	if not polygon:
 		_update_from_curve()
-	
+
 	if not polygon:
 		return false
-	
+
 	return polygon.is_point_inside(_get_projected_coords(point))
 
 
@@ -48,14 +48,14 @@ func distance_from_point(point: Vector3, ignore_height := false) -> float:
 	if ignore_height:
 		point.y = 0.0
 		point_on_curve.y = 0.0
-	
+
 	return point.distance_to(point_on_curve)
 
 
 func get_pos_and_normal(offset : float) -> Array:
 	var pos: Vector3 = curve.interpolate_baked(offset)
 	var normal := Vector3.ZERO
-	
+
 	var pos1
 	if offset + curve.get_bake_interval() < curve.get_baked_length():
 		pos1 = curve.interpolate_baked(offset + curve.get_bake_interval())
@@ -63,27 +63,8 @@ func get_pos_and_normal(offset : float) -> Array:
 	else:
 		pos1 = curve.interpolate_baked(offset - curve.get_bake_interval())
 		normal = (pos - pos1)
-	
+
 	return [pos, normal]
-
-
-func get_closest_to(pos):
-	var closest = -1
-	var dist_squared = -1
-	
-	for i in curve.get_point_count():
-		var point_pos = curve.get_point_position(i)
-		var point_dist = point_pos.distance_squared_to(pos)
-		
-		if (closest == -1) or (dist_squared > point_dist):
-			closest = i
-			dist_squared = point_dist
-	
-	var threshold = 16 # Ignore if the closest point is farther than this
-	if dist_squared >= threshold:
-		return -1
-	
-	return closest
 
 
 func _get_projected_coords(coords : Vector3):
@@ -97,20 +78,20 @@ func _update_from_curve():
 	var connections = PoolIntArray()
 	var polygon_points = PoolVector2Array()
 	baked_points = PoolVector3Array()
-	
+
 	if not curve:
 		curve = Curve3D.new()
 		return
-	
+
 	if curve.get_point_count() == 0:
 		return
-	
+
 	if not polygon:
 		polygon = PolygonPathFinder.new()
-	
-	var length = curve.get_baked_length()
+
+	var length: float = curve.get_baked_length()
 	var steps := int(max(3, round(length / bake_interval)))
-	
+
 	for i in steps:
 		# Get a point on the curve
 		var coords_3d = curve.interpolate_baked((float(i) / (steps - 2)) * length)
@@ -124,7 +105,7 @@ func _update_from_curve():
 			connections.append(0)
 		else:
 			connections.append(i + 1)
-		
+
 		# Check for bounds
 		if i == 0:
 			bounds_min = coords_3d
@@ -142,11 +123,11 @@ func _update_from_curve():
 				bounds_max.z = coords_3d.z
 			if coords_3d.z < bounds_min.z:
 				bounds_min.z = coords_3d.z
-			
+
 	polygon.setup(polygon_points, connections)
 	size = Vector3(bounds_max.x - bounds_min.x, bounds_max.z - bounds_min.z, bounds_max.z - bounds_min.z)
 	center = Vector3((bounds_min.x + bounds_max.x) / 2, (bounds_min.y + bounds_max.y) / 2, (bounds_min.z + bounds_max.z) / 2)
-	
+
 	emit_signal("curve_updated")
 
 

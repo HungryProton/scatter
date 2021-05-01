@@ -1,6 +1,9 @@
 tool
 extends "scatter_path.gd"
 
+
+var Scatter = preload("namespace.gd").new()
+
 export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
 export var disable_updates_in_game := true
@@ -8,7 +11,6 @@ export var disable_updates_in_game := true
 var modifier_stack setget _set_modifier_stack
 var undo_redo setget _set_undo_redo
 
-var _namespace = preload("./namespace.gd").new()
 var _transforms
 var _items := []
 var _total_proportion: int
@@ -17,7 +19,7 @@ var _was_duplicated := false
 
 func _ready() -> void:
 	if not modifier_stack:
-		modifier_stack = _namespace.ModifierStack.new()
+		modifier_stack = Scatter.ModifierStack.new()
 		modifier_stack.just_created = true
 
 	self.connect("curve_updated", self, "update")
@@ -36,14 +38,14 @@ func remove_child(node) -> void:
 
 func _get_configuration_warning() -> String:
 	#_discover_items()
-	if _items.empty():
+	if _items and _items.empty():
 		return "Scatter requires at least one ScatterItem node as a child to work."
 	return ""
 
 
 func _get_property_list() -> Array:
 	var list := []
-	
+
 	# Used to display the modifier stack in an inspector plugin.
 	list.push_back({
 		name = "modifier_stack",
@@ -67,21 +69,21 @@ func _set(property, value):
 		modifier_stack = value.duplicate(7)
 		call_deferred("clear")
 		return true
-	
+
 	# For some reason, set_modifier_stack is not always called when duplicating
 	# a node, but other parameters like transforms are so we check that as well
 	if property == "transform":
 		if modifier_stack:
 			modifier_stack = modifier_stack.duplicate(7)
 		else:
-			modifier_stack = _namespace.ModifierStack.new()
+			modifier_stack = Scatter.ModifierStack.new()
 			modifier_stack.just_created = true
 		# Duplicate the curve item too. If someone want to share data, it has
 		# to be explicitely done by the user
 
 		call_deferred("_make_curve_unique")
 		call_deferred("clear")
-	
+
 	return false
 
 
@@ -97,17 +99,27 @@ func update() -> void:
 
 	_discover_items()
 	if not _items.empty():
-		_transforms = _namespace.Transforms.new()
+		_transforms = Scatter.Transforms.new()
 		_transforms.set_path(self)
-		modifier_stack.update(_transforms, global_seed)
-		
+
 		if use_instancing:
+			modifier_stack.update(_transforms, global_seed)
 			_create_multimesh()
 		else:
+			_set_colliders_state(self, false)
+			modifier_stack.update(_transforms, global_seed)
+			_set_colliders_state(self, true)
 			_create_duplicates()
-	
+
+	_notify_parent()
+
+
+func _notify_parent() -> void:
 	var parent = get_parent()
-	if parent and parent.has_method("update"):
+	if not parent:
+		return
+
+	if parent is Scatter.Scatter or parent is Scatter.UpdateGroup:
 		parent.update()
 
 
@@ -127,10 +139,10 @@ func _discover_items() -> void:
 	_total_proportion = 0
 
 	for c in get_children():
-		if c is _namespace.ScatterItem:
+		if c is Scatter.ScatterItem:
 			_items.append(c)
 			_total_proportion += c.proportion
-	
+
 	if is_inside_tree():
 		get_tree().emit_signal("node_configuration_warning_changed", self)
 
@@ -144,7 +156,7 @@ func _create_duplicates() -> void:
 		var root = _get_or_create_instances_root(item)
 		var instances = root.get_children()
 		var child_count = instances.size()
-		
+
 		for i in count:
 			if (offset + i) >= transforms_count:
 				return
@@ -155,14 +167,14 @@ func _create_duplicates() -> void:
 			else:
 				# If not, create one
 				instance = _create_instance(item, root)
-			
+
 			instance.transform = _process_transform(item, _transforms.list[offset + i])
-		
+
 		# Delete the unused instances left in the pool if any
 		if count < child_count:
 			for i in (child_count - count):
 				instances[count + i].queue_free()
-		
+
 		offset += count
 
 
@@ -183,7 +195,7 @@ func _create_instance(item, root):
 	# Create item and add it to the scene
 	var instance = item.get_item_node()
 	root.add_child(instance)
-	instance.set_owner(get_tree().get_edited_scene_root())
+	_set_owner_recursive(instance, get_tree().get_edited_scene_root())
 	return instance
 
 
@@ -196,8 +208,11 @@ func _delete_duplicates():
 func _create_multimesh() -> void:
 	var offset := 0
 	var transforms_count: int = _transforms.list.size()
-	
+
 	for item in _items:
+		item.translation = Vector3.ZERO
+		item.rotation = Vector3.ZERO
+		item.scale = Vector3.ONE
 		var count = int(round(float(item.proportion) / _total_proportion * transforms_count))
 		var mmi = _setup_multi_mesh(item, count)
 		if not mmi:
@@ -208,12 +223,13 @@ func _create_multimesh() -> void:
 				return
 
 			mmi.multimesh.set_instance_transform(i, _process_transform(item, _transforms.list[offset + i]))
-			
+			mmi.multimesh.visible_instance_count = i + 1
+
 		offset += count
 
 
 func _setup_multi_mesh(item, count):
-	var instance
+	var instance: MultiMeshInstance
 	if item.has_node("MultiMeshInstance"):
 		instance = item.get_node("MultiMeshInstance")
 	else:
@@ -221,22 +237,28 @@ func _setup_multi_mesh(item, count):
 		instance.set_name("MultiMeshInstance")
 		item.add_child(instance)
 		instance.set_owner(get_tree().get_edited_scene_root())
-	
+
 	if not instance.multimesh:
 		instance.multimesh = MultiMesh.new()
-	
+
 	instance.translation = Vector3.ZERO
-	
-	var mesh_instance = item.get_mesh_instance()
+
+	var mesh_instance: MeshInstance = item.get_mesh_instance()
 	if not mesh_instance:
 		_delete_multimeshes()
 		return
-	
-	instance.material_override = mesh_instance.get_surface_material(0)
+
+	for i in mesh_instance.get_surface_material_count():
+		var mat = mesh_instance.get_surface_material(i)
+		if not mat:
+			continue
+		mesh_instance.mesh.surface_set_material(i, mat)
+
 	instance.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
 	instance.multimesh.mesh = mesh_instance.mesh
 	instance.multimesh.transform_format = 1
 	instance.multimesh.instance_count = count
+	instance.material_override = mesh_instance.material_override
 
 	return instance
 
@@ -253,23 +275,29 @@ func _delete_multimeshes() -> void:
 func _process_transform(item, t: Transform) -> Transform:
 	var origin = t.origin
 	t.origin = Vector3.ZERO
-	
+
 	t = t.scaled(Vector3.ONE * item.scale_modifier)
-	
+
 	if not item.ignore_initial_scale:
 		t = t.scaled(item.initial_scale)
-	
+
 	if not item.ignore_initial_rotation:
 		t = t.rotated(t.basis.x.normalized(), item.initial_rotation.x)
 		t = t.rotated(t.basis.y.normalized(), item.initial_rotation.y)
 		t = t.rotated(t.basis.z.normalized(), item.initial_rotation.z)
-	
+
 	t.origin = origin
-	
+
 	if not item.ignore_initial_position:
 		t.origin += item.initial_position
-	
+
 	return t
+
+
+func _set_owner_recursive(node: Node, owner: Node) -> void:
+	node.set_owner(owner)
+	for c in node.get_children():
+		_set_owner_recursive(c, owner)
 
 
 func _set_global_seed(val: int) -> void:
@@ -283,7 +311,7 @@ func _set_instancing(val: bool) -> void:
 		_delete_duplicates()
 	else:
 		_delete_multimeshes()
-	
+
 	update()
 
 
@@ -293,9 +321,9 @@ func _set_undo_redo(val) -> void:
 
 
 func _set_modifier_stack(val) -> void:
-	modifier_stack = _namespace.ModifierStack.new()
+	modifier_stack = Scatter.ModifierStack.new()
 	modifier_stack.stack = val.duplicate_stack()
-	
+
 	if not modifier_stack.is_connected("stack_changed", self, "update"):
 		modifier_stack.connect("stack_changed", self, "update")
 
@@ -309,6 +337,14 @@ func _reset_all_colliders(node) -> void:
 	if node is CollisionShape and not node.disabled:
 		node.disabled = true
 		node.disabled = false
-	
+
 	for c in node.get_children():
 		_reset_all_colliders(c)
+
+
+func _set_colliders_state(node, enabled: bool) -> void:
+	if node is CollisionShape:
+		node.disabled = not enabled
+
+	for c in node.get_children():
+		_set_colliders_state(c, enabled)

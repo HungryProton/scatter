@@ -11,6 +11,7 @@ var _rng: RandomNumberGenerator
 
 func _init() -> void:
 	display_name = "Distribute Inside (Random)"
+	category = "Distribute"
 	warning_ignore_no_transforms = true
 
 
@@ -22,13 +23,13 @@ func _process_transforms(transforms, global_seed) -> void:
 		_rng.set_seed(custom_seed)
 	else:
 		_rng.set_seed(global_seed)
-	
+
 	var center: Vector3 = transforms.path.center
 	var half_size: Vector3 = transforms.path.size * 0.5
 	var height: float = transforms.path.bounds_max.y
-	
+
 	for i in transforms.list.size():
-		# Don't use a while just in case the user-provided path is invalid 
+		# Don't use a while just in case the user-provided path is invalid
 		# and no position ends up inside the path.
 		for j in 100:
 			var pos = _random_vec3() * half_size + center

@@ -1,6 +1,9 @@
 tool
 extends Node
 
+# DO NOT replace the load by a preload, this will cause a cyclic dependency
+# with scatter.gd and prevent the plugin from loading.
+
 
 var _root = _get_root_folder()
 
@@ -9,6 +12,8 @@ var Scatter = load(_root + "/src/core/scatter.gd")
 var ScatterItem = load(_root + "/src/core/scatter_item.gd")
 var Transforms = load(_root + "/src/core/transforms.gd")
 var ModifierStack = load(_root + "/src/core/modifier_stack.gd")
+var UpdateGroup = load(_root + "/src/core/update_group.gd")
+var ExcludePoint = load(_root + "/src/core/scatter_exclude_point.gd")
 
 
 func _get_root_folder() -> String:

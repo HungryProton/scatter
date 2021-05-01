@@ -2,12 +2,13 @@ tool
 extends "base_modifier.gd"
 
 
-export(String) var path_name
+export(String, "Node") var path_name
 
 export(float, 0.0, 1.0) var strength = 1.0
 
 func _init() -> void:
 	display_name = "Exclude From Path"
+	category = "Remove"
 
 
 func _process_transforms(transforms, _seed) -> void:
@@ -15,10 +16,10 @@ func _process_transforms(transforms, _seed) -> void:
 		warning += "Could not find " + path_name
 		warning += "\n Make sure the curve exists as a child of the Scatter node"
 		return
-	
+
 	var exclude_root = transforms.path.get_node(path_name)
 	var paths := _get_paths_recursive(exclude_root)
-	
+
 	var global_transform = transforms.path.global_transform
 	var pos: Vector3
 	var i := 0
@@ -42,9 +43,9 @@ func _get_paths_recursive(root) -> Array:
 	var res = []
 	if root is Path:
 		res.push_back(root)
-		
+
 	for c in root.get_children():
 		if c is Path:
 			res += _get_paths_recursive(c)
-	
+
 	return res

@@ -17,27 +17,27 @@ __meta__ = {
 
 [node name="Label" type="Label" parent="."]
 margin_top = 2.0
-margin_right = 510.0
+margin_right = 638.0
 margin_bottom = 16.0
 size_flags_horizontal = 3
 text = "Parameter name"
 valign = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-margin_left = 514.0
-margin_right = 1024.0
+margin_left = 642.0
+margin_right = 1280.0
 margin_bottom = 18.0
 mouse_filter = 2
 size_flags_horizontal = 3
 
 [node name="Panel" type="Panel" parent="MarginContainer"]
-margin_right = 510.0
+margin_right = 638.0
 margin_bottom = 18.0
 mouse_filter = 2
 custom_styles/panel = SubResource( 1 )
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer"]
-margin_right = 510.0
+margin_right = 638.0
 margin_bottom = 18.0
 mouse_filter = 2
 custom_constants/margin_right = 4
@@ -48,7 +48,7 @@ custom_constants/margin_bottom = 2
 [node name="LineEdit" type="LineEdit" parent="MarginContainer/MarginContainer"]
 margin_left = 4.0
 margin_top = 2.0
-margin_right = 506.0
+margin_right = 634.0
 margin_bottom = 16.0
 mouse_filter = 1
 custom_styles/focus = SubResource( 2 )

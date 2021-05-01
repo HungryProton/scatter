@@ -1,0 +1,44 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/modifier_list_popup/popup.gd" type="Script" id=1]
+
+[node name="ModifiersPopup" type="PopupPanel"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -36.0
+margin_top = -69.0
+margin_right = 36.0
+margin_bottom = 69.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 628.0
+margin_bottom = 20.0
+custom_constants/margin_right = 6
+custom_constants/margin_top = 6
+custom_constants/margin_left = 6
+custom_constants/margin_bottom = 6
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CategoryRoot" type="HBoxContainer" parent="MarginContainer"]
+margin_left = 6.0
+margin_top = 6.0
+margin_right = 690.0
+margin_bottom = 148.0
+custom_constants/separation = 12
+__meta__ = {
+"_edit_use_anchors_": false
+}

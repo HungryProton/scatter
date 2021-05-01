@@ -2,7 +2,7 @@
 
 [ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/stack_panel.gd" type="Script" id=1]
 [ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/add_modifier_button.gd" type="Script" id=2]
-[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/modifiers_popup.tscn" type="PackedScene" id=3]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/modifier_list_popup/popup.tscn" type="PackedScene" id=3]
 [ext_resource path="res://addons/scatter/icons/add.svg" type="Texture" id=4]
 [ext_resource path="res://addons/scatter/icons/menu.svg" type="Texture" id=5]
 [ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/presets_button.gd" type="Script" id=6]
