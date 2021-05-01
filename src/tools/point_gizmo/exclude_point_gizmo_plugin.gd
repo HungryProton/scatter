@@ -62,13 +62,13 @@ func _update_current(point) -> void:
 	if point == _selected:
 		return
 
-	if _selected and _selected.is_connected("parameter_changed", self, "_on_parameter_changed"):
-		_selected.disconnect("parameter_changed", self, "_on_parameter_changed")
+	if _selected and is_instance_valid(_selected):
+		if _selected.is_connected("parameter_changed", self, "_on_parameter_changed"):
+			_selected.disconnect("parameter_changed", self, "_on_parameter_changed")
 
 	_selected = point
 	_selected.connect("parameter_changed", self, "_on_parameter_changed")
 
 
 func _on_parameter_changed() -> void:
-	print("parameter changed")
 	redraw(_gizmo)

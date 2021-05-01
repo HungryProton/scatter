@@ -2,7 +2,7 @@ tool
 extends "base_modifier.gd"
 
 
-export(String) var path_name
+export(String, "Node") var path_name
 export(float) var width = 4.0
 export(bool) var ignore_height = true
 

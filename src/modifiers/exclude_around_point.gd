@@ -2,7 +2,7 @@ tool
 extends "base_modifier.gd"
 
 
-export(String) var node_name
+export(String, "Node") var node_name
 export(float) var radius = 1.0
 export(bool) var ignore_height = true
 
@@ -15,9 +15,14 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, _seed) -> void:
+	if node_name.empty():
+		warning += "You must select a node for this modifier to work."
+		_notify_warning_changed()
+		return
+
 	if not transforms.path.has_node(node_name):
-		warning += "Could not find " + node_name
-		warning += "\n Make sure the node exists as a child of the Scatter node"
+		warning += "Could not find " + node_name + "."
+		warning += "\n Make sure the node exists in the scene tree."
 		_notify_warning_changed()
 		return
 

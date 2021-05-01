@@ -53,7 +53,11 @@ func create_ui_for(modifier) -> void:
 				parameter_ui = preload("./components/parameter_scalar.tscn").instance()
 				parameter_ui.mark_as_int(true)
 			TYPE_STRING:
-				parameter_ui = preload("./components/parameter_string.tscn").instance()
+				if property.hint_string == "Node":
+					parameter_ui = preload("./components/parameter_node_selector.tscn").instance()
+					parameter_ui.set_root(_scatter)
+				else:
+					parameter_ui = preload("./components/parameter_string.tscn").instance()
 			TYPE_VECTOR3:
 				parameter_ui = preload("./components/parameter_vector3.tscn").instance()
 

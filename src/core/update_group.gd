@@ -14,7 +14,6 @@ func _ready() -> void:
 func _notification(what):
 	match what:
 		NOTIFICATION_TRANSFORM_CHANGED:
-			print("Transform changed")
 			update()
 
 
