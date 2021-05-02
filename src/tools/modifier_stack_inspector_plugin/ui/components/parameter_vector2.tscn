@@ -1,0 +1,116 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_vector2.gd" type="Script" id=1]
+[ext_resource path="res://addons/scatter/icons/clear.svg" type="Texture" id=2]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0, 0, 0, 0.392157 )
+
+[node name="ParameterVector2" type="HBoxContainer"]
+anchor_right = 1.0
+margin_bottom = 60.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_right = 1151.0
+margin_bottom = 60.0
+size_flags_horizontal = 3
+size_flags_vertical = 5
+text = "Parameter name"
+autowrap = true
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+margin_left = 1155.0
+margin_right = 1280.0
+margin_bottom = 60.0
+mouse_filter = 2
+size_flags_horizontal = 0
+
+[node name="Panel" type="Panel" parent="MarginContainer"]
+margin_right = 125.0
+margin_bottom = 60.0
+mouse_filter = 2
+custom_styles/panel = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer"]
+margin_right = 125.0
+margin_bottom = 60.0
+mouse_filter = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+custom_constants/margin_right = 4
+custom_constants/margin_top = 4
+custom_constants/margin_left = 4
+custom_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/MarginContainer"]
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 121.0
+margin_bottom = 56.0
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/MarginContainer/HBoxContainer"]
+margin_right = 85.0
+margin_bottom = 52.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer"]
+margin_right = 85.0
+margin_bottom = 24.0
+
+[node name="Label" type="Label" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer"]
+modulate = Color( 1, 0.447059, 0.368627, 1 )
+margin_top = 5.0
+margin_right = 7.0
+margin_bottom = 19.0
+text = "x"
+
+[node name="X" type="SpinBox" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer"]
+margin_left = 11.0
+margin_right = 85.0
+margin_bottom = 24.0
+mouse_filter = 1
+min_value = -100.0
+step = 0.001
+allow_greater = true
+allow_lesser = true
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer"]
+margin_top = 28.0
+margin_right = 85.0
+margin_bottom = 52.0
+
+[node name="Label" type="Label" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer2"]
+modulate = Color( 0.564706, 0.992157, 0.298039, 1 )
+margin_top = 5.0
+margin_right = 7.0
+margin_bottom = 19.0
+text = "y"
+
+[node name="Y" type="SpinBox" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer2"]
+margin_left = 11.0
+margin_right = 85.0
+margin_bottom = 24.0
+mouse_filter = 1
+min_value = -100.0
+step = 0.001
+allow_greater = true
+allow_lesser = true
+
+[node name="ClearButton" type="Button" parent="MarginContainer/MarginContainer/HBoxContainer"]
+margin_left = 89.0
+margin_top = 15.0
+margin_right = 117.0
+margin_bottom = 37.0
+focus_mode = 0
+mouse_filter = 1
+size_flags_vertical = 4
+icon = ExtResource( 2 )
+flat = true
+
+[connection signal="pressed" from="MarginContainer/MarginContainer/HBoxContainer/ClearButton" to="." method="_on_clear_pressed"]

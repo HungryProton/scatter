@@ -56,12 +56,17 @@ func create_ui_for(modifier) -> void:
 				if property.hint_string == "Node":
 					parameter_ui = preload("./components/parameter_node_selector.tscn").instance()
 					parameter_ui.set_root(_scatter)
+				elif property.hint_string == "File":
+					parameter_ui = preload("./components/parameter_file.tscn").instance()
 				elif property.hint_string == "Curve":
 					parameter_ui = preload("./components/parameter_curve.tscn").instance()
 				else:
 					parameter_ui = preload("./components/parameter_string.tscn").instance()
 			TYPE_VECTOR3:
 				parameter_ui = preload("./components/parameter_vector3.tscn").instance()
+			TYPE_VECTOR2:
+				parameter_ui = preload("./components/parameter_vector2.tscn").instance()
+
 
 		if parameter_ui:
 			_parameters.add_child(parameter_ui)
