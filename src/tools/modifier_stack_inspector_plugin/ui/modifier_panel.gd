@@ -56,7 +56,7 @@ func create_ui_for(modifier) -> void:
 				if property.hint_string == "Node":
 					parameter_ui = preload("./components/parameter_node_selector.tscn").instance()
 					parameter_ui.set_root(_scatter)
-				elif property.hint_string == "File":
+				elif property.hint_string == "File" or property.hint_string == "Texture":
 					parameter_ui = preload("./components/parameter_file.tscn").instance()
 				elif property.hint_string == "Curve":
 					parameter_ui = preload("./components/parameter_curve.tscn").instance()
