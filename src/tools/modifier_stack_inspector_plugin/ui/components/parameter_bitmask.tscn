@@ -1,0 +1,142 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_bitmask.gd" type="Script" id=1]
+[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/bitmask_button.tscn" type="PackedScene" id=2]
+
+[node name="parameter_bitmask" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_right = 1280.0
+margin_bottom = 14.0
+text = "Parameter name"
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+margin_top = 18.0
+margin_right = 1280.0
+margin_bottom = 47.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+margin_right = 1280.0
+margin_bottom = 29.0
+alignment = 2
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer"]
+margin_left = 1126.0
+margin_right = 1280.0
+margin_bottom = 29.0
+custom_constants/vseparation = 1
+custom_constants/hseparation = 1
+columns = 11
+
+[node name="Button" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+
+[node name="Button2" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 15.0
+margin_right = 29.0
+
+[node name="Button3" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 30.0
+margin_right = 44.0
+
+[node name="Button4" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 45.0
+margin_right = 59.0
+
+[node name="Button5" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 60.0
+margin_right = 74.0
+
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/HBoxContainer/GridContainer"]
+margin_left = 75.0
+margin_right = 79.0
+margin_bottom = 14.0
+
+[node name="Button6" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 80.0
+margin_right = 94.0
+
+[node name="Button7" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 95.0
+margin_right = 109.0
+
+[node name="Button8" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 110.0
+margin_right = 124.0
+
+[node name="Button9" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 125.0
+margin_right = 139.0
+
+[node name="Button10" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 140.0
+margin_right = 154.0
+
+[node name="Button11" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_top = 15.0
+margin_bottom = 29.0
+
+[node name="Button12" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 15.0
+margin_top = 15.0
+margin_right = 29.0
+margin_bottom = 29.0
+
+[node name="Button13" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 30.0
+margin_top = 15.0
+margin_right = 44.0
+margin_bottom = 29.0
+
+[node name="Button14" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 45.0
+margin_top = 15.0
+margin_right = 59.0
+margin_bottom = 29.0
+
+[node name="Button15" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 60.0
+margin_top = 15.0
+margin_right = 74.0
+margin_bottom = 29.0
+
+[node name="VSeparator2" type="VSeparator" parent="MarginContainer/HBoxContainer/GridContainer"]
+margin_left = 75.0
+margin_top = 15.0
+margin_right = 79.0
+margin_bottom = 29.0
+
+[node name="Button16" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 80.0
+margin_top = 15.0
+margin_right = 94.0
+margin_bottom = 29.0
+
+[node name="Button17" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 95.0
+margin_top = 15.0
+margin_right = 109.0
+margin_bottom = 29.0
+
+[node name="Button18" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 110.0
+margin_top = 15.0
+margin_right = 124.0
+margin_bottom = 29.0
+
+[node name="Button19" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 125.0
+margin_top = 15.0
+margin_right = 139.0
+margin_bottom = 29.0
+
+[node name="Button20" parent="MarginContainer/HBoxContainer/GridContainer" instance=ExtResource( 2 )]
+margin_left = 140.0
+margin_top = 15.0
+margin_right = 154.0
+margin_bottom = 29.0

@@ -9,6 +9,7 @@ export var align_with_floor_normal := false
 export var invert_ray_direction := false
 export var floor_direction := Vector3.DOWN
 export(float, 0.0, 1.0) var max_slope = 1.0
+export(String, "bitmask") var mask = "1048575"
 
 
 func _init() -> void:
@@ -71,7 +72,7 @@ func _project_on_floor(pos, path, space_state):
 	start = path.to_global(start)
 	end = path.to_global(end)
 
-	return space_state.intersect_ray(start, end)
+	return space_state.intersect_ray(start, end, [], int(mask))
 
 
 func _align_with(t: Transform, normal: Vector3) -> Transform:

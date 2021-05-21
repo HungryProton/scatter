@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=2]
+
+[sub_resource type="StyleBoxFlat" id=1]
+
+[sub_resource type="StyleBoxFlat" id=2]
+bg_color = Color( 0.756863, 0.756863, 0.756863, 1 )
+
+[sub_resource type="StyleBoxFlat" id=3]
+bg_color = Color( 0.309804, 0.309804, 0.309804, 1 )
+
+[node name="Button" type="Button"]
+margin_right = 14.0
+margin_bottom = 14.0
+rect_min_size = Vector2( 14, 14 )
+focus_mode = 0
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/normal = SubResource( 3 )
+toggle_mode = true
+__meta__ = {
+"_edit_use_anchors_": false
+}

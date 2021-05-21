@@ -60,6 +60,8 @@ func create_ui_for(modifier) -> void:
 					parameter_ui = preload("./components/parameter_file.tscn").instance()
 				elif property.hint_string == "Curve":
 					parameter_ui = preload("./components/parameter_curve.tscn").instance()
+				elif property.hint_string == "bitmask":
+					parameter_ui = preload("./components/parameter_bitmask.tscn").instance()
 				else:
 					parameter_ui = preload("./components/parameter_string.tscn").instance()
 			TYPE_VECTOR3:
