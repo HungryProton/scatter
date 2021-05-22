@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_bitmask.gd" type="Script" id=1]
 [ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/bitmask_button.tscn" type="PackedScene" id=2]
+[ext_resource path="res://addons/scatter/icons/menu.svg" type="Texture" id=3]
 
 [node name="parameter_bitmask" type="VBoxContainer"]
 anchor_right = 1.0
@@ -27,8 +28,8 @@ margin_bottom = 29.0
 alignment = 2
 
 [node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer"]
-margin_left = 1126.0
-margin_right = 1280.0
+margin_left = 1094.0
+margin_right = 1248.0
 margin_bottom = 29.0
 custom_constants/vseparation = 1
 custom_constants/hseparation = 1
@@ -140,3 +141,9 @@ margin_left = 140.0
 margin_top = 15.0
 margin_right = 154.0
 margin_bottom = 29.0
+
+[node name="MenuButton" type="MenuButton" parent="MarginContainer/HBoxContainer"]
+margin_left = 1252.0
+margin_right = 1280.0
+margin_bottom = 29.0
+icon = ExtResource( 3 )
