@@ -13,7 +13,10 @@ you can setup your scenes and how this addon can be used.
 ![image](https://user-images.githubusercontent.com/52043844/103458397-d5158800-4d07-11eb-8e87-4a81d754c2ef.png)
 
 ### Installation guide
-[This project's wiki pages](https://github.com/HungryProton/scatter/wiki) has all the information you should know
++ Make sure you're using **Godot 3.3**
+  - This add-on is not compatible with 4.0 yet
+  - Older 3.x versions may or may not be compatible  
++ [This project's wiki pages](https://github.com/HungryProton/scatter/wiki) has all the information you should know
 in order to use this plugin.
 + [Installation and basic setup](https://github.com/HungryProton/scatter/wiki/Installation-and-basic-setup)
 + [Modifiers](https://github.com/HungryProton/scatter/wiki/Modifiers)
