@@ -7,7 +7,7 @@ var options setget _set_options
 
 var _namespace = load(_get_root_folder() + "/src/core/namespace.gd").new()
 var _axis_mesh: ArrayMesh
-var _selection
+var _selected
 var _cached_gizmo
 var _old_position
 
@@ -135,7 +135,7 @@ func redraw(gizmo: EditorSpatialGizmo):
 	if not path:
 		return
 
-	if not _selection or path != _selection:
+	if not _selected or path != _selected:
 		_draw_path(gizmo)
 		return
 
@@ -177,8 +177,11 @@ func create_custom_material(name, color := Color.white):
 	add_material(name, material)
 
 
-func set_selection(path) -> void:
-	_selection = path
+func set_selected(path) -> void:
+	if _selected and _selected.is_connected("curve_updated", self, "_on_curve_updated"):
+		_selected.disconnect("curve_updated", self, "_on_curve_updated")
+
+	_selected = path
 
 	if not path:
 		return

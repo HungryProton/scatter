@@ -80,10 +80,10 @@ func _on_selection_changed() -> void:
 
 	if selected.empty() or not selected[0] is ScatterPath:
 		_hide_options_panel()
-		_scatter_path_gizmo_plugin.set_selection(null)
+		_scatter_path_gizmo_plugin.set_selected(null)
 	else:
 		_show_options_panel()
-		_scatter_path_gizmo_plugin.set_selection(selected[0])
+		_scatter_path_gizmo_plugin.set_selected(selected[0])
 		selected[0].undo_redo = get_undo_redo()
 
 		if _gizmo_options.snap_to_colliders():
@@ -94,7 +94,7 @@ func _on_scene_changed(_root) -> void:
 	var selected = _editor_selection.get_selected_nodes()
 	if selected.empty():
 		_hide_options_panel()
-		_scatter_path_gizmo_plugin.set_selection(null)
+		_scatter_path_gizmo_plugin.set_selected(null)
 
 
 func _show_options_panel():

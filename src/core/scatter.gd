@@ -37,8 +37,7 @@ func remove_child(node) -> void:
 
 
 func _get_configuration_warning() -> String:
-	#_discover_items()
-	if _items and _items.empty():
+	if _items.empty():
 		return "Scatter requires at least one ScatterItem node as a child to work."
 	return ""
 
