@@ -36,7 +36,7 @@ func _ready() -> void:
 	plugin.queue_free()
 
 	update()
-	Signals.safe_connect(self, "resized", self, "_on_resized")
+	connect("resized", self, "_on_resized")
 
 
 func set_curve(c: Curve) -> void:
