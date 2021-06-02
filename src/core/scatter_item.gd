@@ -99,6 +99,10 @@ func get_item_node():
 	return null
 
 
+func is_local() -> bool:
+	return not local_item_path.is_empty()
+
+
 func update_warning() -> void:
 	if is_inside_tree():
 		get_tree().emit_signal("node_configuration_warning_changed", self)

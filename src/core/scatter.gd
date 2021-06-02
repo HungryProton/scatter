@@ -192,10 +192,13 @@ func _get_or_create_instances_root(item):
 
 
 func _create_instance(item, root):
-	# Create item and add it to the scene
 	var instance = item.get_item_node()
 	root.add_child(instance)
-	_set_owner_recursive(instance, get_tree().get_edited_scene_root())
+	if item.is_local():
+		_set_owner_recursive(instance, get_tree().get_edited_scene_root())
+	else:
+		instance.set_owner(get_tree().get_edited_scene_root())
+
 	return instance
 
 
