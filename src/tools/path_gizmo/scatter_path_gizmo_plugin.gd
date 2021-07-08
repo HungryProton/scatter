@@ -148,7 +148,7 @@ func redraw(gizmo: EditorSpatialGizmo):
 
 func create_custom_handle_material(name, icon: Texture, color := Color.white):
 	var handle_material = SpatialMaterial.new()
-	handle_material.render_priority = 1
+	handle_material.render_priority = 100
 
 	handle_material.set_feature(SpatialMaterial.FEATURE_TRANSPARENT, true)
 	handle_material.set_flag(SpatialMaterial.FLAG_UNSHADED, true)
@@ -165,7 +165,7 @@ func create_custom_handle_material(name, icon: Texture, color := Color.white):
 
 func create_custom_material(name, color := Color.white):
 	var material = SpatialMaterial.new()
-	material.render_priority = 1
+	material.render_priority = 100
 
 	material.set_feature(SpatialMaterial.FEATURE_TRANSPARENT, true)
 	material.set_flag(SpatialMaterial.FLAG_UNSHADED, true)

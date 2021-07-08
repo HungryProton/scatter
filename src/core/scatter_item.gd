@@ -14,11 +14,14 @@ var initial_position: Vector3
 var initial_rotation: Vector3
 var initial_scale: Vector3
 
+var materials := []
+
 var _parent
 
 
 func _ready():
 	_parent = get_parent()
+	_restore_multimesh_materials()
 
 
 func _get_configuration_warning() -> String:
@@ -29,6 +32,14 @@ func _get_configuration_warning() -> String:
 			- If your Node is in another scene, fill the 'Item Path' variable.
 		"""
 	return ""
+
+
+func _get_property_list() -> Array:
+	return [{
+		"name": "materials",
+		"type": TYPE_ARRAY,
+		"usage": PROPERTY_USAGE_STORAGE
+	}]
 
 
 func _set(property, _value):
@@ -120,15 +131,36 @@ func _get_mesh_from_scene(node):
 	for c in node.get_children():
 		var res = _get_mesh_from_scene(c)
 		if res:
-			return res.duplicate()
+			return res#.duplicate()
 
 	return null
 
 
-func _save_initial_data(node) -> void:
-	initial_position = node.translation
-	initial_rotation = node.rotation
-	initial_scale = node.scale
+func _save_initial_data(mesh: MeshInstance) -> void:
+	initial_position = mesh.translation
+	initial_rotation = mesh.rotation
+	initial_scale = mesh.scale
+
+	# Save the materials applied to the mesh instance, not on the mesh itself
+	# Needed for obj meshes with multiple surfaces
+	materials = []
+	for i in mesh.get_surface_material_count():
+		materials.append(mesh.get_surface_material(i))
+
+
+func _restore_multimesh_materials():
+	if not has_node("MultiMeshInstance"):
+		return
+
+	var mmi: MultiMeshInstance = get_node("MultiMeshInstance")
+	var mesh: Mesh = mmi.multimesh.mesh
+	var surface_count = mesh.get_surface_count()
+
+	if not mesh or surface_count > materials.size():
+		return
+
+	for i in surface_count:
+		mesh.surface_set_material(i, materials[i])
 
 
 func _set_proportion(val):
