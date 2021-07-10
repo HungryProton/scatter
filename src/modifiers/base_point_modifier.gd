@@ -17,6 +17,7 @@ var t: Transform
 func _init() -> void:
 	display_name = "(Virtual) Base Point Modifier"
 	enabled = false
+	warning_ignore_no_path = true
 
 
 func is_inside(pos: Vector3) -> bool:
