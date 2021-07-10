@@ -13,6 +13,7 @@ func _init() -> void:
 	display_name = "Distribute Inside (Poisson)"
 	category = "Distribute"
 	warning_ignore_no_transforms = true
+	warning_ignore_no_path = false
 
 
 func _process_transforms(transforms, global_seed) -> void:

@@ -15,6 +15,7 @@ func _init() -> void:
 	display_name = "Distribute Along Path (Even)"
 	category = "Distribute"
 	warning_ignore_no_transforms = true
+	warning_ignore_no_path = false
 
 
 func _process_transforms(transforms, _seed) -> void:

@@ -2,6 +2,7 @@ tool
 extends "base_point_modifier.gd"
 
 
+export var filter_overlaps := false
 export var x_spacing := 2.0
 export var z_spacing := 2.0
 
@@ -25,7 +26,6 @@ func _process_transforms(transforms, global_seed) -> void:
 	var width: int = ceil(size.x / x_spacing)
 	var length: int = ceil(size.z / z_spacing)
 	var max_count: int = width * length
-	var height: float = bounds_max.y
 	var gt = transforms.path.get_global_transform()
 
 	for i in max_count:
@@ -33,11 +33,15 @@ func _process_transforms(transforms, global_seed) -> void:
 		pos.x = (i % width) * x_spacing
 		pos.z = (i / width) * z_spacing
 		pos += center - half_size
-		pos.y = height
 
-		if is_inside(pos):
-			var t = Transform()
-			t.origin = pos
-			transforms.list.push_back(t)
+		for p in points:
+			if is_inside(pos, p):
+				var p_pos = t.xform_inv(p.get_global_transform().origin)
+				pos.y = p_pos.y
+				var t = Transform()
+				t.origin = pos
+				transforms.list.push_back(t)
+				if filter_overlaps:
+					break
 
 	shuffle(transforms.list, global_seed)

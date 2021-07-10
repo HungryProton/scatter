@@ -6,7 +6,7 @@ var Scatter = preload("../core/namespace.gd").new()
 
 export(String, "Node") var node_name
 export var radius := 1.0
-export var ignore_height := true
+
 
 var points := []
 var bounds_min: Vector3
@@ -20,20 +20,23 @@ func _init() -> void:
 	warning_ignore_no_path = true
 
 
-func is_inside(pos: Vector3) -> bool:
+func is_inside_any(pos: Vector3) -> bool:
 	for p in points:
-		var point_pos = t.xform_inv(p.get_global_transform().origin)
-		if ignore_height:
-			pos.y = 0.0
-			point_pos.y = 0.0
-
-		var distance_to_point := pos.distance_to(point_pos)
-		var max_distance = (radius * p.radius)
-
-		if distance_to_point <= max_distance:
+		if is_inside(pos, p):
 			return true
 
 	return false
+
+
+func is_inside(pos: Vector3, p) -> bool:
+	var point_pos = t.xform_inv(p.get_global_transform().origin)
+	pos.y = 0.0
+	point_pos.y = 0.0
+
+	var distance_to_point := pos.distance_to(point_pos)
+	var max_distance = (radius * p.radius)
+
+	return distance_to_point <= max_distance
 
 
 func _process_transforms(transforms, global_seed) -> void:

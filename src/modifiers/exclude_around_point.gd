@@ -3,6 +3,7 @@ extends "base_point_modifier.gd"
 
 
 export(String, "Curve") var falloff
+export var ignore_height := true
 export var override_global_seed := false
 export var custom_seed := 0
 

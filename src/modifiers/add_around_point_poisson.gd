@@ -4,6 +4,7 @@ extends "base_point_modifier.gd"
 
 export var override_global_seed := false
 export var custom_seed := 0
+export var filter_overlaps := false
 export var distribution_radius := 1.0
 export var distribution_retries := 20
 
@@ -34,7 +35,12 @@ func _process_transforms(transforms, global_seed) -> void:
 
 	for s in samples:
 		var pos = Vector3(s.x, height, s.y)
-		if is_inside(pos):
-			var t := Transform()
-			t.origin = pos
-			transforms.list.push_back(t)
+		for p in points:
+			if is_inside(pos, p):
+				var p_pos = t.xform_inv(p.get_global_transform().origin)
+				pos.y = p_pos.y
+				var t := Transform()
+				t.origin = pos
+				transforms.list.push_back(t)
+				if filter_overlaps:
+					break
