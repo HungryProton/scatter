@@ -1,12 +1,7 @@
 tool
-extends "base_modifier.gd"
+extends "base_point_modifier.gd"
 
 
-var Scatter = preload("../core/namespace.gd").new()
-
-export(String, "Node") var node_name
-export var radius := 1.0
-export var ignore_height := true
 export(String, "Curve") var falloff
 export var override_global_seed := false
 export var custom_seed := 0
@@ -15,8 +10,9 @@ var _rng: RandomNumberGenerator
 
 
 func _init() -> void:
-	display_name = "Exclude Around Point"
+	display_name = "Remove Around Point"
 	category = "Remove"
+	enabled = true
 
 	if falloff.empty():
 		var curve = Curve.new()
@@ -27,19 +23,7 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, global_seed) -> void:
-	if node_name.empty():
-		warning += "You must select a node for this modifier to work."
-		_notify_warning_changed()
-		return
-
-	if not transforms.path.has_node(node_name):
-		warning += "Could not find " + node_name + "."
-		warning += "\n Make sure the node exists in the scene tree."
-		_notify_warning_changed()
-		return
-
-	var exclude_root = transforms.path.get_node(node_name)
-	var points := _get_exclude_points_recursive(exclude_root)
+	._process_transforms(transforms, global_seed)
 
 	var global_transform = transforms.path.global_transform
 	var pos: Vector3
@@ -73,14 +57,3 @@ func _process_transforms(transforms, global_seed) -> void:
 					i -= 1
 					break
 		i += 1
-
-
-func _get_exclude_points_recursive(root) -> Array:
-	var res = []
-	if root is Scatter.ExcludePoint:
-		res.push_back(root)
-
-	for child in root.get_children():
-		res += _get_exclude_points_recursive(child)
-
-	return res

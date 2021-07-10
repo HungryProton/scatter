@@ -1,21 +1,21 @@
 # https://github.com/udit/poisson-disc-sampling
-# 
+#
 # Modified to use RandomNumberGenerator instead of global random
-# 
+#
 # MIT License
-# 
+#
 # Copyright (c) 2020 Udit Parmar
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -57,7 +57,7 @@ func generate_points(radius: float, sample_region_shape, retries: int, start_pos
 	_retries = retries
 	_start_pos = start_pos
 	_init_vars()
-	
+
 	while _spawn_points.size() > 0:
 		var spawn_index: int = rng.randi() % _spawn_points.size()
 		var spawn_centre: Vector2 = _spawn_points[spawn_index]
@@ -81,7 +81,7 @@ func _is_valid_sample(sample: Vector2) -> bool:
 		var cell := Vector2(int((_transpose.x + sample.x) / _cell_size_scaled.x), int((_transpose.y + sample.y) / _cell_size_scaled.y))
 		var cell_start := Vector2(max(0, cell.x - 2), max(0, cell.y - 2))
 		var cell_end := Vector2(min(cell.x + 2, _cols - 1), min(cell.y + 2, _rows - 1))
-	
+
 		for i in range(cell_start.x, cell_end.x + 1):
 			for j in range(cell_start.y, cell_end.y + 1):
 				var search_index: int = _grid[i][j]
@@ -112,7 +112,7 @@ func _init_vars() -> void:
 	if !rng:
 		rng = RandomNumberGenerator.new()
 		rng.randomize()
-	
+
 	# identify the type of shape and it's bounding rectangle and starting point
 	match typeof(_sample_region_shape):
 		TYPE_RECT2:
@@ -120,7 +120,7 @@ func _init_vars() -> void:
 			if _start_pos.x == INF:
 				_start_pos.x = _sample_region_rect.position.x + _sample_region_rect.size.x * rng.randf()
 				_start_pos.y = _sample_region_rect.position.y + _sample_region_rect.size.y * rng.randf()
-			
+
 		TYPE_VECTOR2_ARRAY, TYPE_ARRAY:
 			var start: Vector2 = _sample_region_shape[0]
 			var end: Vector2 = _sample_region_shape[0]
@@ -134,7 +134,7 @@ func _init_vars() -> void:
 				var n: int = _sample_region_shape.size()
 				var i: int = rng.randi() % n
 				_start_pos = _sample_region_shape[i] + (_sample_region_shape[(i + 1) % n] - _sample_region_shape[i]) * rng.randf()
-			
+
 		TYPE_VECTOR3:
 			var x = _sample_region_shape.x
 			var y = _sample_region_shape.y
@@ -146,22 +146,22 @@ func _init_vars() -> void:
 		_:
 			_sample_region_shape = Rect2(0, 0, 0, 0)
 			push_error("Unrecognized shape!!! Please input a valid shape")
-	
+
 	_cell_size = _radius / sqrt(2)
 	_cols = max(floor(_sample_region_rect.size.x / _cell_size), 1)
 	_rows = max(floor(_sample_region_rect.size.y / _cell_size), 1)
-	# scale the cell size in each axis 
-	_cell_size_scaled.x = _sample_region_rect.size.x / _cols 
+	# scale the cell size in each axis
+	_cell_size_scaled.x = _sample_region_rect.size.x / _cols
 	_cell_size_scaled.y = _sample_region_rect.size.y / _rows
 	# use tranpose to map points starting from origin to calculate grid position
 	_transpose = -_sample_region_rect.position
-	
+
 	_grid = []
 	for i in _cols:
 		_grid.append([])
 		for j in _rows:
 			_grid[i].append(-1)
-	
+
 	_points = []
 	_spawn_points = []
 	_spawn_points.append(_start_pos)

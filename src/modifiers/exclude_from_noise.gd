@@ -17,7 +17,7 @@ export var lacunarity := 2.0
 
 
 func _init() -> void:
-	display_name = "Exclude From noise"
+	display_name = "Remove From noise"
 	category = "Remove"
 
 

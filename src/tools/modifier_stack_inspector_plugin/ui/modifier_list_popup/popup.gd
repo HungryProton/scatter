@@ -20,11 +20,14 @@ func _rebuild_ui():
 	for script in _get_all_modifier_scripts(folder):
 		var modifier = load(script)
 		var instance = modifier.new()
-		var category = _get_or_create_category(instance.category)
-		var button = _create_button(instance.display_name)
+		if instance.enabled:
+			var category = _get_or_create_category(instance.category)
+			var button = _create_button(instance.display_name)
+			category.add_child(button)
+			button.connect("pressed", self, "_on_pressed", [modifier])
+
 		instance.queue_free()
-		category.add_child(button)
-		button.connect("pressed", self, "_on_pressed", [modifier])
+
 
 	for category in _category_root.get_children():
 		var header = category.get_child(0)

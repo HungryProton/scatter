@@ -10,7 +10,7 @@ export var scale := Vector3.ZERO
 
 func _init() -> void:
 	display_name = "Add Single Item"
-	category = "Edit"
+	category = "Create"
 
 
 func _process_transforms(transforms, _seed) -> void:

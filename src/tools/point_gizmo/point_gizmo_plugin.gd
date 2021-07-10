@@ -13,11 +13,11 @@ func _init():
 
 
 func get_name() -> String:
-	return "ScatterExcludePoint"
+	return "ScatterPoint"
 
 
 func has_gizmo(node):
-	return node is Scatter.ExcludePoint
+	return node is Scatter.Point
 
 
 func redraw(gizmo: EditorSpatialGizmo):

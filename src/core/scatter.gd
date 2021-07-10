@@ -22,7 +22,7 @@ func _ready() -> void:
 		modifier_stack = Scatter.ModifierStack.new()
 		modifier_stack.just_created = true
 
-	self.connect("curve_updated", self, "update")
+	var _err = self.connect("curve_updated", self, "update")
 	_discover_items()
 
 

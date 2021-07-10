@@ -13,7 +13,7 @@ var ScatterItem = load(_root + "/src/core/scatter_item.gd")
 var Transforms = load(_root + "/src/core/transforms.gd")
 var ModifierStack = load(_root + "/src/core/modifier_stack.gd")
 var UpdateGroup = load(_root + "/src/core/update_group.gd")
-var ExcludePoint = load(_root + "/src/core/scatter_exclude_point.gd")
+var Point = load(_root + "/src/core/scatter_exclude_point.gd")
 var Util = load(_root + "/src/common/util.gd")
 
 

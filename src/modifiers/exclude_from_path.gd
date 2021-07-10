@@ -11,7 +11,7 @@ var _rng: RandomNumberGenerator
 
 
 func _init() -> void:
-	display_name = "Exclude From Path"
+	display_name = "Remove From Path"
 	category = "Remove"
 
 

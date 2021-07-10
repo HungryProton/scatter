@@ -15,7 +15,7 @@ var _rng: RandomNumberGenerator
 
 
 func _init() -> void:
-	display_name = "Exclude Along Path"
+	display_name = "Remove Along Path"
 	category = "Remove"
 
 	if falloff.empty():

@@ -4,6 +4,7 @@ extends "base_modifier.gd"
 # Takes existing objects and duplicates them recursively with given transforms
 
 export var amount := 1
+export var min_amount := -1
 export var local_offset := false
 export var offset := Vector3.ZERO
 export var local_rotation := false
@@ -12,18 +13,29 @@ export var individual_rotation_pivots := true
 export var rotation_pivot := Vector3.ZERO
 export var local_scale := true
 export var scale := Vector3.ONE
+export var randomize_indices := true
+export var override_global_seed := false
+export var custom_seed := 0
+
+var _rng: RandomNumberGenerator
 
 
 func _init() -> void:
 	display_name = "Array"
-	category = "Edit"
+	category = "Create"
 
 
 func _process_transforms(transforms, global_seed: int) -> void:
+	_rng = RandomNumberGenerator.new()
+
+	if override_global_seed:
+		_rng.set_seed(custom_seed)
+	else:
+		_rng.set_seed(global_seed)
+
 	var new_transforms := []
 	var rotation_rad := Vector3.ZERO
 
-	# Convert rotation in radians
 	rotation_rad.x = deg2rad(rotation.x)
 	rotation_rad.y = deg2rad(rotation.y)
 	rotation_rad.z = deg2rad(rotation.z)
@@ -34,7 +46,11 @@ func _process_transforms(transforms, global_seed: int) -> void:
 		new_transforms.push_back(transforms.list[t])
 
 		# for each iteration of the array
-		for a in amount:
+		var steps = amount
+		if min_amount >= 0:
+			steps = _rng.randi_range(min_amount, amount)
+
+		for a in steps:
 			a += 1
 
 			# use original object's transform as base transform
@@ -74,5 +90,7 @@ func _process_transforms(transforms, global_seed: int) -> void:
 			# store the final result
 			new_transforms.push_back(transform)
 
-	shuffle(new_transforms, global_seed)
+	if randomize_indices:
+		shuffle(new_transforms, global_seed)
+
 	transforms.list = new_transforms

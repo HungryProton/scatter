@@ -137,6 +137,9 @@ func _get_mesh_from_scene(node):
 
 
 func _save_initial_data(mesh: MeshInstance) -> void:
+	if not mesh:
+		return
+
 	initial_position = mesh.translation
 	initial_rotation = mesh.rotation
 	initial_scale = mesh.scale
