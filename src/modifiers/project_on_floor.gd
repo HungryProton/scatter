@@ -22,6 +22,9 @@ func _process_transforms(transforms, _seed) -> void:
 		return
 
 	var path = transforms.path
+	if not path or not path.get_world():
+		return
+
 	var space_state = path.get_world().get_direct_space_state()
 	var hit
 	var d: float

@@ -7,6 +7,8 @@ var Scatter = preload("namespace.gd").new()
 export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
 export var disable_updates_in_game := true
+export var force_update_when_loaded := true
+
 
 var modifier_stack setget _set_modifier_stack
 var undo_redo setget _set_undo_redo
@@ -24,6 +26,10 @@ func _ready() -> void:
 
 	var _err = self.connect("curve_updated", self, "update")
 	_discover_items()
+
+	if force_update_when_loaded:
+		yield(get_tree(), "idle_frame")
+		_do_update()
 
 
 func add_child(node, legible_name := false) -> void:
@@ -94,6 +100,12 @@ func clear() -> void:
 
 func update() -> void:
 	if disable_updates_in_game and not Engine.is_editor_hint():
+		return
+	_do_update()
+
+
+func _do_update() -> void:
+	if not is_inside_tree():
 		return
 
 	_discover_items()
@@ -232,12 +244,9 @@ func _create_multimesh() -> void:
 
 
 func _setup_multi_mesh(item, count):
-	var instance: MultiMeshInstance
-	if item.has_node("MultiMeshInstance"):
-		instance = item.get_node("MultiMeshInstance")
-	else:
+	var instance: MultiMeshInstance = item.get_multimesh_instance()
+	if not instance:
 		instance = MultiMeshInstance.new()
-		instance.set_name("MultiMeshInstance")
 		item.add_child(instance)
 		instance.set_owner(get_tree().get_edited_scene_root())
 
@@ -271,8 +280,7 @@ func _delete_multimeshes() -> void:
 		_discover_items()
 
 	for item in _items:
-		if item.has_node("MultiMeshInstance"):
-			item.get_node("MultiMeshInstance").queue_free()
+		item.delete_multimesh()
 
 
 func _process_transform(item, t: Transform) -> Transform:
@@ -323,6 +331,9 @@ func _set_undo_redo(val) -> void:
 
 
 func _set_modifier_stack(val) -> void:
+	if not val:
+		return
+
 	modifier_stack = Scatter.ModifierStack.new()
 	modifier_stack.stack = val.duplicate_stack()
 

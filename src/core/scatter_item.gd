@@ -45,7 +45,7 @@ func _get_property_list() -> Array:
 func _set(property, _value):
 	# Hack to detect if the node was just duplicated from the editor
 	if property == "transform":
-		call_deferred("_delete_multimesh")
+		call_deferred("delete_multimesh")
 	return false
 
 
@@ -119,9 +119,17 @@ func update_warning() -> void:
 		get_tree().emit_signal("node_configuration_warning_changed", self)
 
 
-func _delete_multimesh() -> void:
-	if has_node("MultiMeshInstance"):
-		get_node("MultiMeshInstance").queue_free()
+func get_multimesh_instance() -> MultiMeshInstance:
+	for c in get_children():
+		if c is MultiMeshInstance:
+			return c
+	return null
+
+
+func delete_multimesh() -> void:
+	var mmi = get_multimesh_instance()
+	if mmi:
+		mmi.queue_free()
 
 
 func _get_mesh_from_scene(node):
@@ -152,10 +160,10 @@ func _save_initial_data(mesh: MeshInstance) -> void:
 
 
 func _restore_multimesh_materials():
-	if not has_node("MultiMeshInstance"):
+	var mmi := get_multimesh_instance()
+	if not mmi:
 		return
 
-	var mmi: MultiMeshInstance = get_node("MultiMeshInstance")
 	var mesh: Mesh = mmi.multimesh.mesh
 	var surface_count = mesh.get_surface_count()
 
