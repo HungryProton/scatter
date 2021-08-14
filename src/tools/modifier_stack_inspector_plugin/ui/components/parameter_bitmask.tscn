@@ -1,8 +1,10 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_bitmask.gd" type="Script" id=1]
 [ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/bitmask_button.tscn" type="PackedScene" id=2]
 [ext_resource path="res://addons/scatter/icons/menu.svg" type="Texture" id=3]
+[ext_resource path="res://addons/scatter/icons/clear.svg" type="Texture" id=4]
+[ext_resource path="res://addons/scatter/icons/enabled.svg" type="Texture" id=5]
 
 [node name="parameter_bitmask" type="VBoxContainer"]
 anchor_right = 1.0
@@ -27,9 +29,16 @@ margin_right = 1280.0
 margin_bottom = 29.0
 alignment = 2
 
+[node name="MenuButton" type="MenuButton" parent="MarginContainer/HBoxContainer"]
+margin_left = 1030.0
+margin_right = 1058.0
+margin_bottom = 29.0
+icon = ExtResource( 3 )
+items = [ "Default", null, 1, false, false, 19, 0, null, "", false, "Layer 2", null, 1, false, false, 18, 0, null, "", false, "Layer 3", null, 1, false, false, 17, 0, null, "", false, "Layer 4", null, 1, false, false, 16, 0, null, "", false, "Layer 5", null, 1, false, false, 15, 0, null, "", false, "", null, 0, false, false, 105, 0, null, "", true, "Layer 6", null, 1, false, false, 14, 0, null, "", false, "Layer 7", null, 1, false, false, 13, 0, null, "", false, "Layer 8", null, 1, false, false, 12, 0, null, "", false, "Layer 9", null, 1, false, false, 11, 0, null, "", false, "InvisibleWalls - All", null, 1, false, false, 10, 0, null, "", false, "", null, 0, false, false, 110, 0, null, "", true, "InvisibleWalls - Player Only", null, 1, false, false, 9, 0, null, "", false, "InvisibleWalls - AI Only", null, 1, false, false, 8, 0, null, "", false, "InvisibleWalls - Sensors Only", null, 1, false, false, 7, 0, null, "", false, "Layer 14", null, 1, false, false, 6, 0, null, "", false, "Layer 15", null, 1, false, false, 5, 0, null, "", false, "", null, 0, false, false, 115, 0, null, "", true, "Layer 16", null, 1, false, false, 4, 0, null, "", false, "Layer 17", null, 1, false, false, 3, 0, null, "", false, "Layer 18", null, 1, false, false, 2, 0, null, "", false, "Layer 19", null, 1, false, false, 1, 0, null, "", false, "Layer 20", null, 1, false, false, 0, 0, null, "", false ]
+
 [node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer"]
-margin_left = 1094.0
-margin_right = 1248.0
+margin_left = 1062.0
+margin_right = 1216.0
 margin_bottom = 29.0
 custom_constants/vseparation = 1
 custom_constants/hseparation = 1
@@ -142,8 +151,21 @@ margin_top = 15.0
 margin_right = 154.0
 margin_bottom = 29.0
 
-[node name="MenuButton" type="MenuButton" parent="MarginContainer/HBoxContainer"]
+[node name="EnableAll" type="Button" parent="MarginContainer/HBoxContainer"]
+margin_left = 1220.0
+margin_right = 1248.0
+margin_bottom = 29.0
+hint_tooltip = "Enable all layers"
+icon = ExtResource( 5 )
+flat = true
+
+[node name="ClearButton" type="Button" parent="MarginContainer/HBoxContainer"]
 margin_left = 1252.0
 margin_right = 1280.0
 margin_bottom = 29.0
-icon = ExtResource( 3 )
+hint_tooltip = "Clear all layers"
+icon = ExtResource( 4 )
+flat = true
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/EnableAll" to="." method="_on_enable_all_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/ClearButton" to="." method="_on_clear_pressed"]

@@ -17,6 +17,8 @@ func _ready() -> void:
 			c.connect("pressed", self, "_on_button_pressed")
 
 	_popup = _menu_button.get_popup()
+	_popup.clear()
+
 	var layer_name := ""
 	for i in 20:
 		if i != 0 and i % 5 == 0:
@@ -60,8 +62,10 @@ func get_value() -> String:
 
 
 func _dec2bin(var value: int) -> String:
-	var binary_string = ""
+	if value == 0:
+		return "0"
 
+	var binary_string = ""
 	while value != 0:
 		var m = value % 2
 		binary_string = String(m) + binary_string
@@ -102,3 +106,13 @@ func _on_id_pressed(id: int) -> void:
 	_buttons[id].pressed = checked
 	_popup.set_item_checked(idx, checked)
 	_on_button_pressed()
+
+
+func _on_enable_all_pressed() -> void:
+	_set_value("1048575")
+	_on_value_changed(null)
+
+
+func _on_clear_pressed() -> void:
+	_set_value("0")
+	_on_value_changed(null)
