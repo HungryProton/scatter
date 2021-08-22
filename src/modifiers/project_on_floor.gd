@@ -42,7 +42,8 @@ func _process_transforms(transforms, _seed) -> void:
 				continue
 
 			if align_with_floor_normal:
-				t = _align_with(t, hit.normal)
+				var gt: Transform = transforms.path.get_global_transform()
+				t = _align_with(t, gt.basis.xform_inv(hit.normal))
 
 			t.origin = path.to_local(hit.position)
 			transforms.list[i] = t
