@@ -2,15 +2,23 @@ tool
 extends EditorSpatialGizmoPlugin
 
 
-var editor_plugin: EditorPlugin
+class PointState:
+	var point_count: int
+	var position: Vector3
+	var version: int
+
+var editor_plugin: EditorPlugin setget set_editor_plugin
 var options setget _set_options
 
 var _namespace = load(_get_root_folder() + "/src/core/namespace.gd").new()
 var _axis_mesh: ArrayMesh
 var _selected
-var _previous_point_count: int
+var _old_position: Vector3
 var _cached_gizmo
-var _old_position
+var _camera: Camera
+var _previous_state := PointState.new()
+var _is_forcing_projection := false
+var _undo: UndoRedo
 
 
 func _init():
@@ -31,7 +39,7 @@ func has_gizmo(node):
 	return node is _namespace.ScatterPath
 
 
-func get_handle_name(gizmo: EditorSpatialGizmo, index: int) -> String:
+func get_handle_name(_gizmo: EditorSpatialGizmo, index: int) -> String:
 	return "Handle " + String(index)
 
 
@@ -109,27 +117,20 @@ func set_handle(gizmo: EditorSpatialGizmo, index: int, camera: Camera, point: Ve
 
 
 # Handle Undo / Redo after a handle was moved.
-func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, cancel: bool = false) -> void:
+func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, _cancel: bool = false) -> void:
 	var path = gizmo.get_spatial_node()
 	if not path:
 		return
 
 	var count = path.curve.get_point_count()
-	var ur = editor_plugin.get_undo_redo()
-	var undo: UndoRedo = editor_plugin.get_undo_redo()
 
 	if index >= count:
 		index = int((index - count) / 2)
 
-	undo.create_action("Moved Path Point")
-	undo.add_undo_method(self, "_set_point", path, restore)
-	undo.add_do_method(self, "_set_point", path, _get_point_data(path.curve, index))
-	undo.commit_action()
-
-
-func forward_spatial_input_event(camera, event):
-	print(camera)
-	return false
+	_undo.create_action("Moved Path Point")
+	_undo.add_undo_method(self, "_set_point", path, restore)
+	_undo.add_do_method(self, "_set_point", path, _get_point_data(path.curve, index))
+	_undo.commit_action()
 
 
 func redraw(gizmo: EditorSpatialGizmo):
@@ -201,6 +202,19 @@ func set_selected(path) -> void:
 
 	if not path.is_connected("curve_changed", self, "_on_curve_changed"):
 		path.connect("curve_changed", self, "_on_curve_changed")
+
+	_previous_state.point_count = _selected.curve.get_point_count()
+	_previous_state.position = _selected.curve.get_point_position(_previous_state.point_count - 1)
+
+
+func set_editor_camera(camera: Camera) -> void:
+	_camera = camera
+
+
+func set_editor_plugin(val: EditorPlugin) -> void:
+	editor_plugin = val
+	_undo = editor_plugin.get_undo_redo()
+	_previous_state.version = _undo.get_version()
 
 
 func _draw_handles(gizmo):
@@ -367,21 +381,79 @@ func _on_curve_updated() -> void:
 
 
 # Force the newly added points on the plane if the option is enabled
+# Could have been avoided if Scatter didn't inherited from Path
 func _on_curve_changed() -> void:
-	print("changed ")
-	var current_point_count: int = _selected.curve.get_point_count()
+	if _is_forcing_projection:
+		print("a")
+		return
 
-	if _previous_point_count < current_point_count: # Only if a point is added
-		if options and options.lock_to_plane():
-			var idx := current_point_count - 1
-			var position = _selected.curve.get_point_position(idx)
-			if not is_equal_approx(position.y, 0.0): # If the point is not on the plane
+	var current_count: int = _selected.curve.get_point_count()
+	var idx := current_count - 1
+	var current_position: Vector3 = _selected.curve.get_point_position(idx)
+	var current_version = _undo.get_version()
 
-				position.y = 0.0
-				_selected.curve.set_point_position(idx, position)
+	var previous_count: int = _previous_state.point_count
+	var previous_pos: Vector3 = _previous_state.position
+	var previous_version: int = _previous_state.version
 
+	_previous_state.point_count = current_count
+	_previous_state.position = current_position
+	_previous_state.version = current_version
 
-	_previous_point_count = current_point_count
+	print("v: ", current_version)
+
+	# Ensure we're constrained by the plane
+	if options and not options.lock_to_plane():
+		print("b")
+		return
+
+	# Ensure a new point was added
+	if previous_count >= current_count:
+		print("c")
+		return
+
+	# Ensure the newly added point is the last one, not one in the middle of
+	# an existing segment
+	if previous_pos == current_position:
+		print("d")
+		return
+
+	# Ensure the new point is NOT the result of an undo command
+	# TODO: turns out this doesn't work in every case
+	if previous_version > current_version:
+		print("e")
+		return
+
+	var new_position := current_position
+
+	if _camera:
+		var point = _camera.unproject_position(current_position)
+		var projected = _intersect_with_plane(_selected, _camera, point)
+		new_position = _selected.to_local(projected)
+	else:
+		new_position.y = 0.0
+
+	_is_forcing_projection = true
+
+	# TODO:
+	# This code was supposed to cancel the previous Add point, and replace it
+	# with another action with the proper projected position. BUT, godot crashes
+	# when we do this and I don't understand why
+#	_undo.undo()
+#	_undo.create_action("Add Point To Curve")
+#	_undo.add_undo_method(_selected.curve, "remove_point", idx)
+#	_undo.add_do_method(_selected.curve, "add_point", new_position)
+#	_undo.commit_action()
+
+	# The temporary solution is to just add an extra option on top but that's
+	# annoying as it adds an extra step for the user when doing / undoing actions
+
+	_undo.create_action("Reproject Point To Plane")
+	_undo.add_undo_method(_selected.curve, "set_point_position", idx, current_position)
+	_undo.add_do_method(_selected.curve, "set_point_position", idx, new_position)
+	_undo.commit_action()
+
+	_is_forcing_projection = false
 
 
 func _on_color_changed() -> void:

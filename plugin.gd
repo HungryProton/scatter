@@ -50,6 +50,7 @@ func _enter_tree():
 		preload("./icons/group.svg")
 	)
 
+	set_input_event_forwarding_always_enabled()
 	_setup_options_panel()
 
 	_scatter_path_gizmo_plugin.editor_plugin = self
@@ -62,7 +63,6 @@ func _enter_tree():
 	connect("scene_changed", self, "_on_scene_changed")
 
 
-
 func _exit_tree():
 	remove_inspector_plugin(_modifier_stack_plugin)
 	remove_custom_type("Scatter")
@@ -73,6 +73,13 @@ func _exit_tree():
 	remove_spatial_gizmo_plugin(_scatter_path_gizmo_plugin)
 	remove_spatial_gizmo_plugin(_point_gizmo_plugin)
 	_gizmo_options.queue_free()
+
+
+func forward_spatial_gui_input(camera: Camera, _event: InputEvent) -> bool:
+	if _scatter_path_gizmo_plugin:
+		_scatter_path_gizmo_plugin.set_editor_camera(camera)
+
+	return false
 
 
 func _on_selection_changed() -> void:
