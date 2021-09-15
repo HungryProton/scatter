@@ -8,6 +8,7 @@ var options setget _set_options
 var _namespace = load(_get_root_folder() + "/src/core/namespace.gd").new()
 var _axis_mesh: ArrayMesh
 var _selected
+var _previous_point_count: int
 var _cached_gizmo
 var _old_position
 
@@ -126,6 +127,11 @@ func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, cancel: bool 
 	undo.commit_action()
 
 
+func forward_spatial_input_event(camera, event):
+	print(camera)
+	return false
+
+
 func redraw(gizmo: EditorSpatialGizmo):
 	if not gizmo:
 		return
@@ -178,8 +184,12 @@ func create_custom_material(name, color := Color.white):
 
 
 func set_selected(path) -> void:
-	if _selected and _selected.is_connected("curve_updated", self, "_on_curve_updated"):
-		_selected.disconnect("curve_updated", self, "_on_curve_updated")
+	if _selected and is_instance_valid(_selected):
+		if _selected.is_connected("curve_updated", self, "_on_curve_updated"):
+			_selected.disconnect("curve_updated", self, "_on_curve_updated")
+
+		if _selected.is_connected("curve_changed", self, "_on_curve_changed"):
+			_selected.disconnect("curve_changed", self, "_on_curve_changed")
 
 	_selected = path
 
@@ -188,6 +198,9 @@ func set_selected(path) -> void:
 
 	if not path.is_connected("curve_updated", self, "_on_curve_updated"):
 		path.connect("curve_updated", self, "_on_curve_updated")
+
+	if not path.is_connected("curve_changed", self, "_on_curve_changed"):
+		path.connect("curve_changed", self, "_on_curve_changed")
 
 
 func _draw_handles(gizmo):
@@ -351,6 +364,24 @@ func _on_option_changed() -> void:
 
 func _on_curve_updated() -> void:
 	redraw(_cached_gizmo)
+
+
+# Force the newly added points on the plane if the option is enabled
+func _on_curve_changed() -> void:
+	print("changed ")
+	var current_point_count: int = _selected.curve.get_point_count()
+
+	if _previous_point_count < current_point_count: # Only if a point is added
+		if options and options.lock_to_plane():
+			var idx := current_point_count - 1
+			var position = _selected.curve.get_point_position(idx)
+			if not is_equal_approx(position.y, 0.0): # If the point is not on the plane
+
+				position.y = 0.0
+				_selected.curve.set_point_position(idx, position)
+
+
+	_previous_point_count = current_point_count
 
 
 func _on_color_changed() -> void:
