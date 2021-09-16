@@ -4,6 +4,7 @@ extends EditorPlugin
 
 const Util = preload("src/util.gd")
 const ScatterPath = preload("./src/core/scatter_path.gd")
+const Scatter = preload("./src/core/scatter.gd")
 
 var _modifier_stack_plugin: EditorInspectorPlugin = preload("./src/tools/modifier_stack_inspector_plugin/modifier_stack_plugin.gd").new()
 var _scatter_path_gizmo_plugin: EditorSpatialGizmoPlugin = preload("./src/tools/path_gizmo/scatter_path_gizmo_plugin.gd").new()
@@ -50,6 +51,7 @@ func _enter_tree():
 		preload("./icons/group.svg")
 	)
 
+	set_input_event_forwarding_always_enabled()
 	_setup_options_panel()
 
 	_scatter_path_gizmo_plugin.editor_plugin = self
@@ -60,7 +62,6 @@ func _enter_tree():
 	_editor_selection = get_editor_interface().get_selection()
 	_editor_selection.connect("selection_changed", self, "_on_selection_changed")
 	connect("scene_changed", self, "_on_scene_changed")
-
 
 
 func _exit_tree():
@@ -75,6 +76,13 @@ func _exit_tree():
 	_gizmo_options.queue_free()
 
 
+func forward_spatial_gui_input(camera: Camera, _event: InputEvent) -> bool:
+	if _scatter_path_gizmo_plugin:
+		_scatter_path_gizmo_plugin.set_editor_camera(camera)
+
+	return false
+
+
 func _on_selection_changed() -> void:
 	var selected = _editor_selection.get_selected_nodes()
 
@@ -84,7 +92,9 @@ func _on_selection_changed() -> void:
 	else:
 		_show_options_panel()
 		_scatter_path_gizmo_plugin.set_selected(selected[0])
-		selected[0].undo_redo = get_undo_redo()
+
+		if selected[0] is Scatter:
+			selected[0].undo_redo = get_undo_redo()
 
 		if _gizmo_options.snap_to_colliders():
 			_on_snap_to_colliders_enabled()

@@ -13,6 +13,7 @@ onready var _options_button: Button = $VBoxContainer/Options
 onready var _options: Control = $VBoxContainer/MarginContainer
 onready var _grid_density: SpinBox = $VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/GridDensity/SpinBox
 onready var _hide_grid: CheckButton = $VBoxContainer/MarginContainer/VBoxContainer/HideGrid
+onready var _force_plane_projection: CheckButton = $VBoxContainer/MarginContainer/VBoxContainer/ForceProjection
 onready var _path_color: ColorRect = $VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PathColor/MarginContainer/Button/ColorRect
 onready var _grid_color: ColorRect = $VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/GridColor/MarginContainer/Button/ColorRect
 onready var _color_picker: ColorPicker = $Popup/MarginContainer/ColorPicker
@@ -41,6 +42,10 @@ func lock_to_plane() -> bool:
 
 func hide_grid() -> bool:
 	return _hide_grid.pressed
+
+
+func force_plane_projection() -> bool:
+	return _force_plane_projection.pressed
 
 
 func get_path_color() -> Color:
@@ -76,13 +81,14 @@ func _load_config_file() -> bool:
 	if err != OK:
 		return false
 
-	_path_color.color = config.get_value("colors", "path")
-	_grid_color.color = config.get_value("colors", "grid")
+	_path_color.color = config.get_value("colors", "path", Color("ff2f2f"))
+	_grid_color.color = config.get_value("colors", "grid", Color("c8ffbe11"))
 
-	_colliders.pressed = config.get_value("general", "snap_to_colliders")
-	_plane.pressed = config.get_value("general", "lock_to_plane")
-	_hide_grid.pressed = config.get_value("general", "always_hide_grid")
-	_grid_density.value = config.get_value("general", "grid_density")
+	_colliders.pressed = config.get_value("general", "snap_to_colliders", false)
+	_plane.pressed = config.get_value("general", "lock_to_plane", true)
+	_hide_grid.pressed = config.get_value("general", "always_hide_grid", false)
+	_grid_density.value = config.get_value("general", "grid_density", 7)
+	_force_plane_projection.pressed = config.get_value("general", "force_plane_projection", false)
 
 	return true
 
@@ -96,6 +102,7 @@ func _save_config_file() -> void:
 	config.set_value("general", "lock_to_plane", _plane.pressed)
 	config.set_value("general", "always_hide_grid", _hide_grid.pressed)
 	config.set_value("general", "grid_density", _grid_density.value)
+	config.set_value("general", "force_plane_projection", _force_plane_projection.pressed)
 
 	config.save("user://scatter_config.cfg")
 

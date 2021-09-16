@@ -2,14 +2,23 @@ tool
 extends EditorSpatialGizmoPlugin
 
 
-var editor_plugin: EditorPlugin
+class PointState:
+	var point_count: int
+	var position: Vector3
+	var version: int
+
+var editor_plugin: EditorPlugin setget set_editor_plugin
 var options setget _set_options
 
 var _namespace = load(_get_root_folder() + "/src/core/namespace.gd").new()
 var _axis_mesh: ArrayMesh
 var _selected
+var _old_position: Vector3
 var _cached_gizmo
-var _old_position
+var _camera: Camera
+var _previous_state := PointState.new()
+var _is_forcing_projection := false
+var _undo: UndoRedo
 
 
 func _init():
@@ -30,7 +39,7 @@ func has_gizmo(node):
 	return node is _namespace.ScatterPath
 
 
-func get_handle_name(gizmo: EditorSpatialGizmo, index: int) -> String:
+func get_handle_name(_gizmo: EditorSpatialGizmo, index: int) -> String:
 	return "Handle " + String(index)
 
 
@@ -108,22 +117,20 @@ func set_handle(gizmo: EditorSpatialGizmo, index: int, camera: Camera, point: Ve
 
 
 # Handle Undo / Redo after a handle was moved.
-func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, cancel: bool = false) -> void:
+func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, _cancel: bool = false) -> void:
 	var path = gizmo.get_spatial_node()
 	if not path:
 		return
 
 	var count = path.curve.get_point_count()
-	var ur = editor_plugin.get_undo_redo()
-	var undo: UndoRedo = editor_plugin.get_undo_redo()
 
 	if index >= count:
 		index = int((index - count) / 2)
 
-	undo.create_action("Moved Path Point")
-	undo.add_undo_method(self, "_set_point", path, restore)
-	undo.add_do_method(self, "_set_point", path, _get_point_data(path.curve, index))
-	undo.commit_action()
+	_undo.create_action("Moved Path Point")
+	_undo.add_undo_method(self, "_set_point", path, restore)
+	_undo.add_do_method(self, "_set_point", path, _get_point_data(path.curve, index))
+	_undo.commit_action()
 
 
 func redraw(gizmo: EditorSpatialGizmo):
@@ -178,16 +185,40 @@ func create_custom_material(name, color := Color.white):
 
 
 func set_selected(path) -> void:
-	if _selected and _selected.is_connected("curve_updated", self, "_on_curve_updated"):
-		_selected.disconnect("curve_updated", self, "_on_curve_updated")
+	if _selected and is_instance_valid(_selected):
+		if _selected.is_connected("curve_updated", self, "_on_curve_updated"):
+			_selected.disconnect("curve_updated", self, "_on_curve_updated")
+
+		if _selected.is_connected("curve_changed", self, "_on_curve_changed"):
+			_selected.disconnect("curve_changed", self, "_on_curve_changed")
 
 	_selected = path
 
 	if not path:
 		return
 
+	if not path is _namespace.ScatterPath:
+		path = null
+		return
+
 	if not path.is_connected("curve_updated", self, "_on_curve_updated"):
 		path.connect("curve_updated", self, "_on_curve_updated")
+
+	if not path.is_connected("curve_changed", self, "_on_curve_changed"):
+		path.connect("curve_changed", self, "_on_curve_changed")
+
+	_previous_state.point_count = _selected.curve.get_point_count()
+	_previous_state.position = _selected.curve.get_point_position(_previous_state.point_count - 1)
+
+
+func set_editor_camera(camera: Camera) -> void:
+	_camera = camera
+
+
+func set_editor_plugin(val: EditorPlugin) -> void:
+	editor_plugin = val
+	_undo = editor_plugin.get_undo_redo()
+	_previous_state.version = _undo.get_version()
 
 
 func _draw_handles(gizmo):
@@ -351,6 +382,60 @@ func _on_option_changed() -> void:
 
 func _on_curve_updated() -> void:
 	redraw(_cached_gizmo)
+
+
+# Force the newly added points on the plane if the option is enabled
+# Could have been avoided if Scatter didn't inherited from Path
+func _on_curve_changed() -> void:
+	if _is_forcing_projection:
+		return
+
+	var current_count: int = _selected.curve.get_point_count()
+	var idx := current_count - 1
+	var current_position: Vector3 = _selected.curve.get_point_position(idx)
+	var current_version = _undo.get_version()
+
+	var previous_count: int = _previous_state.point_count
+	var previous_pos: Vector3 = _previous_state.position
+	var previous_version: int = _previous_state.version
+
+	_previous_state.point_count = current_count
+	_previous_state.position = current_position
+	_previous_state.version = current_version
+
+	# Ensure we're constrained by the plane
+	if not options:
+		return
+
+	if not options.lock_to_plane():
+		return
+
+	if not options.force_plane_projection():
+		return
+
+	# Ensure a new point was added
+	if previous_count >= current_count:
+		return
+
+	# Ensure the newly added point is the last one, not one in the middle of
+	# an existing segment
+	if previous_pos == current_position:
+		return
+
+	# TODO: Ensure the new point is NOT the result of a redo command
+
+	var new_position := current_position
+
+	if _camera:
+		var point = _camera.unproject_position(current_position)
+		var projected = _intersect_with_plane(_selected, _camera, point)
+		new_position = _selected.to_local(projected)
+	else:
+		new_position.y = 0.0
+
+	_is_forcing_projection = true
+	_selected.curve.set_point_position(idx, new_position)
+	_is_forcing_projection = false
 
 
 func _on_color_changed() -> void:
