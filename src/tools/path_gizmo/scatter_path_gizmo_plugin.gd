@@ -197,6 +197,10 @@ func set_selected(path) -> void:
 	if not path:
 		return
 
+	if not path is _namespace.ScatterPath:
+		path = null
+		return
+
 	if not path.is_connected("curve_updated", self, "_on_curve_updated"):
 		path.connect("curve_updated", self, "_on_curve_updated")
 
@@ -384,7 +388,6 @@ func _on_curve_updated() -> void:
 # Could have been avoided if Scatter didn't inherited from Path
 func _on_curve_changed() -> void:
 	if _is_forcing_projection:
-		print("a")
 		return
 
 	var current_count: int = _selected.curve.get_point_count()
@@ -400,29 +403,26 @@ func _on_curve_changed() -> void:
 	_previous_state.position = current_position
 	_previous_state.version = current_version
 
-	print("v: ", current_version)
-
 	# Ensure we're constrained by the plane
-	if options and not options.lock_to_plane():
-		print("b")
+	if not options:
+		return
+
+	if not options.lock_to_plane():
+		return
+
+	if not options.force_plane_projection():
 		return
 
 	# Ensure a new point was added
 	if previous_count >= current_count:
-		print("c")
 		return
 
 	# Ensure the newly added point is the last one, not one in the middle of
 	# an existing segment
 	if previous_pos == current_position:
-		print("d")
 		return
 
-	# Ensure the new point is NOT the result of an undo command
-	# TODO: turns out this doesn't work in every case
-	if previous_version > current_version:
-		print("e")
-		return
+	# TODO: Ensure the new point is NOT the result of a redo command
 
 	var new_position := current_position
 
@@ -434,25 +434,7 @@ func _on_curve_changed() -> void:
 		new_position.y = 0.0
 
 	_is_forcing_projection = true
-
-	# TODO:
-	# This code was supposed to cancel the previous Add point, and replace it
-	# with another action with the proper projected position. BUT, godot crashes
-	# when we do this and I don't understand why
-#	_undo.undo()
-#	_undo.create_action("Add Point To Curve")
-#	_undo.add_undo_method(_selected.curve, "remove_point", idx)
-#	_undo.add_do_method(_selected.curve, "add_point", new_position)
-#	_undo.commit_action()
-
-	# The temporary solution is to just add an extra option on top but that's
-	# annoying as it adds an extra step for the user when doing / undoing actions
-
-	_undo.create_action("Reproject Point To Plane")
-	_undo.add_undo_method(_selected.curve, "set_point_position", idx, current_position)
-	_undo.add_do_method(_selected.curve, "set_point_position", idx, new_position)
-	_undo.commit_action()
-
+	_selected.curve.set_point_position(idx, new_position)
 	_is_forcing_projection = false
 
 

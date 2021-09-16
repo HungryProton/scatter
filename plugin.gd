@@ -4,6 +4,7 @@ extends EditorPlugin
 
 const Util = preload("src/util.gd")
 const ScatterPath = preload("./src/core/scatter_path.gd")
+const Scatter = preload("./src/core/scatter.gd")
 
 var _modifier_stack_plugin: EditorInspectorPlugin = preload("./src/tools/modifier_stack_inspector_plugin/modifier_stack_plugin.gd").new()
 var _scatter_path_gizmo_plugin: EditorSpatialGizmoPlugin = preload("./src/tools/path_gizmo/scatter_path_gizmo_plugin.gd").new()
@@ -91,7 +92,9 @@ func _on_selection_changed() -> void:
 	else:
 		_show_options_panel()
 		_scatter_path_gizmo_plugin.set_selected(selected[0])
-		selected[0].undo_redo = get_undo_redo()
+
+		if selected[0] is Scatter:
+			selected[0].undo_redo = get_undo_redo()
 
 		if _gizmo_options.snap_to_colliders():
 			_on_snap_to_colliders_enabled()

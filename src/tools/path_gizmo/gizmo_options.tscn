@@ -70,11 +70,11 @@ align = 0
 [node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
 margin_top = 112.0
 margin_right = 316.0
-margin_bottom = 228.0
+margin_bottom = 272.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/MarginContainer"]
 margin_right = 316.0
-margin_bottom = 116.0
+margin_bottom = 160.0
 
 [node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/MarginContainer/VBoxContainer"]
 margin_right = 316.0
@@ -99,8 +99,8 @@ size_flags_horizontal = 3
 text = "Path color"
 
 [node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PathColor"]
-margin_left = 281.0
-margin_right = 305.0
+margin_left = 282.0
+margin_right = 306.0
 margin_bottom = 20.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -110,8 +110,7 @@ custom_constants/margin_left = 0
 custom_constants/margin_bottom = 0
 
 [node name="Button" type="Button" parent="VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PathColor/MarginContainer"]
-margin_left = -1.0
-margin_right = 23.0
+margin_right = 24.0
 margin_bottom = 20.0
 rect_min_size = Vector2( 24, 20 )
 size_flags_horizontal = 4
@@ -130,7 +129,7 @@ __meta__ = {
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-color = Color( 1, 0.183594, 0.183594, 1 )
+color = Color( 1, 0.184314, 0.184314, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -154,8 +153,8 @@ size_flags_horizontal = 3
 text = "Grid color"
 
 [node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/GridColor"]
-margin_left = 281.0
-margin_right = 305.0
+margin_left = 282.0
+margin_right = 306.0
 margin_bottom = 20.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -165,8 +164,7 @@ custom_constants/margin_left = 0
 custom_constants/margin_bottom = 0
 
 [node name="Button" type="Button" parent="VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/GridColor/MarginContainer"]
-margin_left = -1.0
-margin_right = 23.0
+margin_right = 24.0
 margin_bottom = 20.0
 rect_min_size = Vector2( 24, 0 )
 size_flags_horizontal = 4
@@ -188,7 +186,7 @@ __meta__ = {
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-color = Color( 1, 0.74472, 0.0664062, 0.784314 )
+color = Color( 1, 0.745098, 0.0666667, 0.784314 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -227,8 +225,13 @@ margin_bottom = 116.0
 focus_mode = 0
 text = "Always hide the grid"
 
+[node name="ForceProjection" type="CheckButton" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+margin_top = 120.0
+margin_right = 316.0
+margin_bottom = 160.0
+text = "Force plane projection"
+
 [node name="Popup" type="PopupPanel" parent="."]
-visible = true
 margin_left = 4.0
 margin_top = 4.0
 margin_right = 320.0
@@ -259,4 +262,5 @@ __meta__ = {
 [connection signal="pressed" from="VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/GridColor/MarginContainer/Button" to="." method="_on_grid_color_select"]
 [connection signal="value_changed" from="VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/GridDensity/SpinBox" to="." method="_on_button_toggled"]
 [connection signal="toggled" from="VBoxContainer/MarginContainer/VBoxContainer/HideGrid" to="." method="_on_button_toggled"]
+[connection signal="toggled" from="VBoxContainer/MarginContainer/VBoxContainer/ForceProjection" to="." method="_on_button_toggled"]
 [connection signal="color_changed" from="Popup/MarginContainer/ColorPicker" to="." method="_on_color_changed"]
