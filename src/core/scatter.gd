@@ -8,6 +8,7 @@ export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
 export var disable_updates_in_game := true
 export var force_update_when_loaded := true
+export var make_children_unselectable := true
 
 
 var modifier_stack setget _set_modifier_stack
@@ -199,6 +200,7 @@ func _get_or_create_instances_root(item):
 		root.set_name("Duplicates")
 		item.add_child(root)
 		root.set_owner(get_tree().get_edited_scene_root())
+		root.set_meta("_edit_group_", make_children_unselectable)
 	root.translation = Vector3.ZERO
 	return root
 
@@ -271,6 +273,8 @@ func _setup_multi_mesh(item, count):
 	instance.multimesh.transform_format = 1
 	instance.multimesh.instance_count = count
 	instance.material_override = mesh_instance.material_override
+
+	instance.set_meta("_edit_group_", make_children_unselectable)
 
 	return instance
 
