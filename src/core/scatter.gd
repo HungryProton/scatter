@@ -201,6 +201,7 @@ func _get_or_create_instances_root(item):
 		item.add_child(root)
 		root.set_owner(get_tree().get_edited_scene_root())
 		root.set_meta("_edit_group_", make_children_unselectable)
+		root.set_meta("_edit_lock_", true)
 	root.translation = Vector3.ZERO
 	return root
 
@@ -275,6 +276,7 @@ func _setup_multi_mesh(item, count):
 	instance.material_override = mesh_instance.material_override
 
 	instance.set_meta("_edit_group_", make_children_unselectable)
+	instance.set_meta("_edit_lock_", true)
 
 	return instance
 
