@@ -427,7 +427,7 @@ func _on_curve_changed() -> void:
 	var new_position := current_position
 
 	if _camera:
-		var point = _camera.unproject_position(current_position)
+		var point = _camera.unproject_position(_selected.to_global(current_position))
 		var projected = _intersect_with_plane(_selected, _camera, point)
 		new_position = _selected.to_local(projected)
 	else:
