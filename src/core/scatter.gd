@@ -10,7 +10,6 @@ export var disable_updates_in_game := true
 export var force_update_when_loaded := true
 export var make_children_unselectable := true
 
-
 var modifier_stack setget _set_modifier_stack
 var undo_redo setget _set_undo_redo
 
@@ -58,6 +57,7 @@ func _get_property_list() -> Array:
 		type = TYPE_OBJECT,
 		hint_string =  "ScatterModifierStack",
 	})
+
 	return list
 
 
@@ -246,6 +246,7 @@ func _create_multimesh() -> void:
 		offset += count
 
 
+# TODO: Move this to scatter_item.gd?
 func _setup_multi_mesh(item, count):
 	var instance: MultiMeshInstance = item.get_multimesh_instance()
 	if not instance:
@@ -257,6 +258,7 @@ func _setup_multi_mesh(item, count):
 		instance.multimesh = MultiMesh.new()
 
 	instance.translation = Vector3.ZERO
+	item.update_shadows()
 
 	var mesh_instance: MeshInstance = item.get_mesh_instance()
 	if not mesh_instance:
@@ -328,6 +330,10 @@ func _set_instancing(val: bool) -> void:
 		_delete_duplicates()
 	else:
 		_delete_multimeshes()
+
+	for item in _items:
+		item.use_instancing = val
+
 	update()
 
 

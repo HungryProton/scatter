@@ -2,13 +2,16 @@ tool
 extends Spatial
 
 
-export(int) var proportion : int = 100 setget _set_proportion
-export(NodePath) var local_item_path setget _set_local_path
-export(String, FILE) var item_path : String setget _set_path
-export(float) var scale_modifier : float = 1.0 setget _set_scale_modifier
-export(bool) var ignore_initial_position := true setget _set_ignore_pos
-export(bool) var ignore_initial_rotation := true setget _set_ignore_rot
-export(bool) var ignore_initial_scale := true setget _set_ignore_scale
+export var proportion := 100 setget _set_proportion
+export var local_item_path: NodePath setget _set_local_path
+export(String, FILE) var item_path setget _set_path
+export var scale_modifier := 1.0 setget _set_scale_modifier
+export var ignore_initial_position := true setget _set_ignore_pos
+export var ignore_initial_rotation := true setget _set_ignore_rot
+export var ignore_initial_scale := true setget _set_ignore_scale
+
+var use_instancing := true setget _set_use_instancing
+var cast_shadow := 1 setget _set_cast_shadow
 
 var initial_position: Vector3
 var initial_rotation: Vector3
@@ -22,6 +25,7 @@ var _parent
 func _ready():
 	_parent = get_parent()
 	_restore_multimesh_materials()
+	use_instancing = _parent.use_instancing
 
 
 func _get_configuration_warning() -> String:
@@ -35,11 +39,29 @@ func _get_configuration_warning() -> String:
 
 
 func _get_property_list() -> Array:
-	return [{
+	var list = []
+
+	list.push_back({
 		"name": "materials",
 		"type": TYPE_ARRAY,
 		"usage": PROPERTY_USAGE_STORAGE
-	}]
+	})
+
+	if use_instancing: # Only display the option is instancing is used
+		list.push_back({
+			"name": "cast_shadow",
+			"type": TYPE_INT,
+			"hint": PROPERTY_HINT_ENUM,
+			"hint_string": "Off,On,Double-Sided,Shadows Only"
+		})
+	else: # but store the previous value if it's not
+		list.push_back({
+			"name": "cast_shadow",
+			"type": TYPE_INT,
+			"usage": PROPERTY_USAGE_STORAGE
+		})
+
+	return list
 
 
 func _set(property, _value):
@@ -132,6 +154,25 @@ func delete_multimesh() -> void:
 		mmi.queue_free()
 
 
+func update_shadows() -> void:
+	var mmi: MultiMeshInstance = get_multimesh_instance()
+	if not mmi:
+		return
+
+	mmi.cast_shadow = cast_shadow
+	return
+
+	match cast_shadow:
+		0:
+			mmi.cast_shadows = GeometryInstance.SHADOW_CASTING_SETTING_OFF
+		1:
+			mmi.cast_shadows = GeometryInstance.SHADOW_CASTING_SETTING_ON
+		2:
+			mmi.cast_shadows = GeometryInstance.SHADOW_CASTING_SETTING_DOUBLE_SIDED
+		3:
+			mmi.cast_shadows = GeometryInstance.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+
+
 func _get_mesh_from_scene(node):
 	if node is MeshInstance:
 		return node
@@ -159,7 +200,7 @@ func _save_initial_data(mesh: MeshInstance) -> void:
 		materials.append(mesh.get_surface_material(i))
 
 
-func _restore_multimesh_materials():
+func _restore_multimesh_materials() -> void:
 	var mmi := get_multimesh_instance()
 	if not mmi:
 		return
@@ -174,36 +215,46 @@ func _restore_multimesh_materials():
 		mesh.surface_set_material(i, materials[i])
 
 
-func _set_proportion(val):
+func _set_proportion(val: int) -> void:
 	proportion = val
 	update()
 
 
-func _set_path(val):
+func _set_path(val: String) -> void:
 	item_path = val
 	update()
 
 
-func _set_scale_modifier(val):
+func _set_scale_modifier(val: float) -> void:
 	scale_modifier = val
 	update()
 
 
-func _set_local_path(val):
+func _set_local_path(val: NodePath) -> void:
 	local_item_path = val
 	update()
 
 
-func _set_ignore_pos(val):
+func _set_ignore_pos(val: bool) -> void:
 	ignore_initial_position = val
 	update()
 
 
-func _set_ignore_rot(val):
+func _set_ignore_rot(val: bool) -> void:
 	ignore_initial_rotation = val
 	update()
 
 
-func _set_ignore_scale(val):
+func _set_ignore_scale(val: bool) -> void:
 	ignore_initial_scale = val
 	update()
+
+
+func _set_use_instancing(val: bool) -> void:
+	use_instancing = val
+	property_list_changed_notify()
+
+
+func _set_cast_shadow(val: int) -> void:
+	cast_shadow = val
+	update_shadows()

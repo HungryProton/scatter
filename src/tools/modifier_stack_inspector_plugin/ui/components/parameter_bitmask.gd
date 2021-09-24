@@ -3,31 +3,38 @@ extends "base_parameter.gd"
 
 
 onready var _label: Label = $Label
-onready var _root: Control = $MarginContainer/HBoxContainer/GridContainer
+onready var _grid_1: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1
+onready var _grid_2: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2
+onready var _grid_3: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3
+onready var _grid_4: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4
 onready var _menu_button: MenuButton = $MarginContainer/HBoxContainer/MenuButton
 
 var _buttons: Array
 var _popup: PopupMenu
+var _layer_count := 32
 
 
 func _ready() -> void:
-	for c in _root.get_children():
-		if c is Button:
-			_buttons.push_front(c)
-			c.connect("pressed", self, "_on_button_pressed")
+	_buttons = []
+	var grids = [_grid_1, _grid_2, _grid_3, _grid_4]
+	for g in grids:
+		for c in g.get_children():
+			if c is Button:
+				_buttons.push_front(c)
+				c.connect("pressed", self, "_on_button_pressed")
 
 	_popup = _menu_button.get_popup()
 	_popup.clear()
 
 	var layer_name := ""
-	for i in 20:
-		if i != 0 and i % 5 == 0:
+	for i in _layer_count:
+		if i != 0 and i % 4 == 0:
 			_popup.add_separator("", 100 + i)
 
 		layer_name = ProjectSettings.get_setting("layer_names/3d_physics/layer_" + String(i + 1))
 		if layer_name.empty():
 			layer_name = "Layer " + String(i + 1)
-		_popup.add_check_item(layer_name, 19 - i)
+		_popup.add_check_item(layer_name, _layer_count - 1 - i)
 
 	_sync_popup_state()
 	_popup.connect("id_pressed", self, "_on_id_pressed")
@@ -41,12 +48,12 @@ func _set_value(val: String) -> void:
 	var binary_string: String = _dec2bin(int(val))
 	var length = binary_string.length()
 
-	if length < 20:
-		binary_string = binary_string.pad_zeros(20)
-	elif length > 20:
-		binary_string = binary_string.substr(length - 20, length)
+	if length < _layer_count:
+		binary_string = binary_string.pad_zeros(_layer_count)
+	elif length > _layer_count:
+		binary_string = binary_string.substr(length - _layer_count, length)
 
-	for i in 20:
+	for i in _layer_count:
 		_buttons[i].pressed = binary_string[i] == "1"
 
 	_sync_popup_state()
@@ -90,7 +97,7 @@ func _sync_popup_state() -> void:
 	if not _popup:
 		return
 
-	for i in 20:
+	for i in _layer_count:
 		var idx = _popup.get_item_index(i)
 		_popup.set_item_checked(idx, _buttons[i].pressed)
 
@@ -102,6 +109,7 @@ func _on_button_pressed() -> void:
 
 func _on_id_pressed(id: int) -> void:
 	var idx = _popup.get_item_index(id)
+	print("id ", id, " - idx ", idx)
 	var checked = not _popup.is_item_checked(idx)
 	_buttons[id].pressed = checked
 	_popup.set_item_checked(idx, checked)
@@ -109,7 +117,7 @@ func _on_id_pressed(id: int) -> void:
 
 
 func _on_enable_all_pressed() -> void:
-	_set_value("1048575")
+	_set_value("4294967295")
 	_on_value_changed(null)
 
 
