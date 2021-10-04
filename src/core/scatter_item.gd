@@ -2,6 +2,8 @@ tool
 extends Spatial
 
 
+const Util = preload("../common/util.gd")
+
 export var proportion := 100 setget _set_proportion
 export var local_item_path: NodePath setget _set_local_path
 export(String, FILE) var item_path setget _set_path
@@ -11,6 +13,7 @@ export var ignore_initial_rotation := true setget _set_ignore_rot
 export var ignore_initial_scale := true setget _set_ignore_scale
 
 var use_instancing := true setget _set_use_instancing
+var merge_target_meshes := false setget _set_merge_target_meshes
 var cast_shadow := 1 setget _set_cast_shadow
 
 var initial_position: Vector3
@@ -47,19 +50,25 @@ func _get_property_list() -> Array:
 		"usage": PROPERTY_USAGE_STORAGE
 	})
 
-	if use_instancing: # Only display the option is instancing is used
-		list.push_back({
-			"name": "cast_shadow",
-			"type": TYPE_INT,
-			"hint": PROPERTY_HINT_ENUM,
-			"hint_string": "Off,On,Double-Sided,Shadows Only"
-		})
-	else: # but store the previous value if it's not
-		list.push_back({
-			"name": "cast_shadow",
-			"type": TYPE_INT,
-			"usage": PROPERTY_USAGE_STORAGE
-		})
+	var merge_target_meshes_property = {
+		"name": "merge_target_meshes",
+		"type": TYPE_BOOL,
+	}
+	var cast_shadow_property = {
+		"name": "cast_shadow",
+		"type": TYPE_INT,
+		"hint": PROPERTY_HINT_ENUM,
+		"hint_string": "Off,On,Double-Sided,Shadows Only"
+	}
+
+	# Only display the options if instancing is used but store the
+	# previous values if it's not
+	if not use_instancing:
+		merge_target_meshes_property["usage"] = PROPERTY_USAGE_STORAGE
+		cast_shadow_property["usage"] = PROPERTY_USAGE_STORAGE
+
+	list.push_back(merge_target_meshes_property)
+	list.push_back(cast_shadow_property)
 
 	return list
 
@@ -174,15 +183,47 @@ func update_shadows() -> void:
 
 
 func _get_mesh_from_scene(node):
+	if merge_target_meshes:
+		return _get_merged_mesh_from(node)
+
+	return _get_first_mesh_from_scene(node)
+
+
+# Finds the first MeshInstance in the given hierarchy and returns it.
+func _get_first_mesh_from_scene(node):
 	if node is MeshInstance:
 		return node
 
 	for c in node.get_children():
-		var res = _get_mesh_from_scene(c)
+		var res = _get_first_mesh_from_scene(c)
 		if res:
-			return res#.duplicate()
+			return res
 
 	return null
+
+
+# Find all the meshes in the tree and create a new mesh with multiple surfaces
+# from all of them
+func _get_merged_mesh_from(node):
+	var instances = _get_all_mesh_instances_from(node)
+	if not instances or instances.empty():
+		return null
+
+	var mesh_instance := MeshInstance.new()
+	mesh_instance.mesh = Util.create_mesh_from(instances)
+
+	return mesh_instance
+
+
+func _get_all_mesh_instances_from(node) -> Array:
+	var res = []
+	if node is MeshInstance:
+		res.push_back(node)
+
+	for c in node.get_children():
+		res += _get_all_mesh_instances_from(c)
+
+	return res
 
 
 func _save_initial_data(mesh: MeshInstance) -> void:
@@ -212,7 +253,9 @@ func _restore_multimesh_materials() -> void:
 		return
 
 	for i in surface_count:
-		mesh.surface_set_material(i, materials[i])
+		var material = materials[i]
+		if material:
+			mesh.surface_set_material(i, material)
 
 
 func _set_proportion(val: int) -> void:
@@ -258,3 +301,8 @@ func _set_use_instancing(val: bool) -> void:
 func _set_cast_shadow(val: int) -> void:
 	cast_shadow = val
 	update_shadows()
+
+
+func _set_merge_target_meshes(val: bool) -> void:
+	merge_target_meshes = val
+	update()
