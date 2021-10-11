@@ -1,5 +1,5 @@
 tool
-extends Node
+extends Reference
 
 # DO NOT replace the load by a preload, this will cause a cyclic dependency
 # with scatter.gd and prevent the plugin from loading.

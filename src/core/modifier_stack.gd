@@ -10,6 +10,12 @@ var just_created := false
 var undo_redo: UndoRedo
 
 
+func _ready():
+	for m in stack:
+		if not m.get_parent():
+			add_child(m)
+
+
 func update(transforms, random_seed) -> void:
 	for modifier in stack:
 		if modifier.enabled:
@@ -26,6 +32,7 @@ func duplicate_stack() -> Array:
 func add_modifier(modifier) -> void:
 	var restore = duplicate_stack()
 	stack.push_back(modifier)
+	add_child(modifier)
 	_create_undo_action("Added Modifier", restore)
 	emit_signal("stack_changed")
 
@@ -61,6 +68,7 @@ func remove(modifier) -> void:
 	if stack.has(modifier):
 		var restore = duplicate_stack()
 		stack.erase(modifier)
+		modifier.queue_free()
 		_create_undo_action("Removed Modifier", restore)
 		emit_signal("stack_changed")
 
@@ -74,5 +82,11 @@ func _create_undo_action(name, restore) -> void:
 
 
 func _restore_stack(s) -> void:
+	for c in get_children():
+		c.queue_free()
+
 	stack = s
+	for m in stack:
+		add_child(m)
+
 	emit_signal("stack_changed")

@@ -115,6 +115,8 @@ func set_handle(gizmo: EditorSpatialGizmo, index: int, camera: Camera, point: Ve
 			if shift_pressed:
 				path.curve.set_point_in(p_index, -(local_pos - base))
 
+	redraw(gizmo)
+
 
 # Handle Undo / Redo after a handle was moved.
 func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, _cancel: bool = false) -> void:
@@ -186,9 +188,6 @@ func create_custom_material(name, color := Color.white):
 
 func set_selected(path) -> void:
 	if _selected and is_instance_valid(_selected):
-		if _selected.is_connected("curve_updated", self, "_on_curve_updated"):
-			_selected.disconnect("curve_updated", self, "_on_curve_updated")
-
 		if _selected.is_connected("curve_changed", self, "_on_curve_changed"):
 			_selected.disconnect("curve_changed", self, "_on_curve_changed")
 
@@ -200,9 +199,6 @@ func set_selected(path) -> void:
 	if not path is _namespace.ScatterPath:
 		path = null
 		return
-
-	if not path.is_connected("curve_updated", self, "_on_curve_updated"):
-		path.connect("curve_updated", self, "_on_curve_updated")
 
 	if not path.is_connected("curve_changed", self, "_on_curve_changed"):
 		path.connect("curve_changed", self, "_on_curve_changed")
@@ -377,10 +373,6 @@ func _set_options(val) -> void:
 
 
 func _on_option_changed() -> void:
-	redraw(_cached_gizmo)
-
-
-func _on_curve_updated() -> void:
 	redraw(_cached_gizmo)
 
 

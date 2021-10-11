@@ -28,7 +28,6 @@ func _rebuild_ui():
 
 		instance.queue_free()
 
-
 	for category in _category_root.get_children():
 		var header = category.get_child(0)
 		_sort_children_by_name(category)

@@ -109,7 +109,6 @@ func _on_button_pressed() -> void:
 
 func _on_id_pressed(id: int) -> void:
 	var idx = _popup.get_item_index(id)
-	print("id ", id, " - idx ", idx)
 	var checked = not _popup.is_item_checked(idx)
 	_buttons[id].pressed = checked
 	_popup.set_item_checked(idx, checked)

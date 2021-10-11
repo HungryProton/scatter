@@ -86,23 +86,23 @@ func update():
 		_parent.update()
 
 
-func get_mesh_instance() -> MeshInstance:
-	# Check the supplied local path.
-	if local_item_path:
-		if has_node(local_item_path):
-			var mesh = _get_mesh_from_scene(get_node(local_item_path))
-			if mesh:
-				_save_initial_data(mesh)
-				return mesh
+func get_mesh_instance_copy() -> MeshInstance:
+	var root = null
 
-	# Check the remote scene.
+	if local_item_path:
+		root = get_node_or_null(local_item_path)
+
 	if item_path:
-		var node = load(item_path)
-		if node:
-			var mesh = _get_mesh_from_scene(node.instance())
-			if mesh:
-				_save_initial_data(mesh)
-				return mesh
+		var scene = load(item_path)
+		if scene:
+			root = scene.instance()
+
+	if root:
+		var mesh = _get_mesh_from_scene(root)
+		root.queue_free()
+		if mesh:
+			_save_initial_data(mesh)
+			return mesh
 
 	# Nothing found, print the relevant warning in the console.
 	if local_item_path:
@@ -192,7 +192,7 @@ func _get_mesh_from_scene(node):
 # Finds the first MeshInstance in the given hierarchy and returns it.
 func _get_first_mesh_from_scene(node):
 	if node is MeshInstance:
-		return node
+		return node.duplicate()
 
 	for c in node.get_children():
 		var res = _get_first_mesh_from_scene(c)
