@@ -17,10 +17,20 @@ var _layer_count := 32
 func _ready() -> void:
 	_buttons = []
 	var grids = [_grid_1, _grid_2, _grid_3, _grid_4]
+
+	# Disable the extra layers if we're on 3.3
+	if not ProjectSettings.has_setting("layer_names/3d_physics/layer_21"):
+		_layer_count = 20
+
 	for g in grids:
 		for c in g.get_children():
 			if c is Button:
+				var layer_number = int(c.text)
+				if layer_number > _layer_count:
+					c.visible = false
+					continue
 				_buttons.push_front(c)
+				c.focus_mode = Control.FOCUS_NONE
 				c.connect("pressed", self, "_on_button_pressed")
 
 	_popup = _menu_button.get_popup()

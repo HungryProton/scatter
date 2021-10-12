@@ -88,9 +88,11 @@ func update():
 
 func get_mesh_instance_copy() -> MeshInstance:
 	var root = null
+	var local_root = false
 
 	if local_item_path:
 		root = get_node_or_null(local_item_path)
+		local_root = true
 
 	if item_path:
 		var scene = load(item_path)
@@ -99,7 +101,8 @@ func get_mesh_instance_copy() -> MeshInstance:
 
 	if root:
 		var mesh = _get_mesh_from_scene(root)
-		root.queue_free()
+		if not local_root:
+			root.queue_free()
 		if mesh:
 			_save_initial_data(mesh)
 			return mesh
