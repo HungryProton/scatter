@@ -204,7 +204,9 @@ func set_selected(path) -> void:
 		path.connect("curve_changed", self, "_on_curve_changed")
 
 	_previous_state.point_count = _selected.curve.get_point_count()
-	_previous_state.position = _selected.curve.get_point_position(_previous_state.point_count - 1)
+	_previous_state.position = Vector3.ZERO
+	if _previous_state.point_count > 0:
+		_previous_state.position = _selected.curve.get_point_position(_previous_state.point_count - 1)
 
 
 func set_editor_camera(camera: Camera) -> void:
@@ -382,9 +384,13 @@ func _on_curve_changed() -> void:
 	if _is_forcing_projection:
 		return
 
+	var idx: int = -1
+
 	var current_count: int = _selected.curve.get_point_count()
-	var idx := current_count - 1
-	var current_position: Vector3 = _selected.curve.get_point_position(idx)
+	var current_position: Vector3 = Vector3.ZERO
+	if current_count > 0:
+		idx = current_count - 1
+		current_position = _selected.curve.get_point_position(idx)
 	var current_version = _undo.get_version()
 
 	var previous_count: int = _previous_state.point_count
@@ -394,6 +400,10 @@ func _on_curve_changed() -> void:
 	_previous_state.point_count = current_count
 	_previous_state.position = current_position
 	_previous_state.version = current_version
+
+	# There are no points in the curve, so nothing to do further.
+	if idx < 0:
+		return
 
 	# Ensure we're constrained by the plane
 	if not options:
