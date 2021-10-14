@@ -28,7 +28,7 @@ func _process_transforms(transforms, global_seed) -> void:
 	transforms.resize(max_count)
 
 	var t_index := 0
-	for i in max_count:
+	for i in transforms.list.size():
 		var pos = Vector3.ZERO
 		pos.x = (i % width) * x_spacing
 		pos.z = (i / width) * z_spacing

@@ -79,6 +79,7 @@ func set_handle(gizmo: EditorSpatialGizmo, index: int, camera: Camera, point: Ve
 	if not path:
 		return
 
+	path.is_moving = true
 	var local_pos
 
 	if options and options.snap_to_colliders():
@@ -133,6 +134,9 @@ func commit_handle(gizmo: EditorSpatialGizmo, index: int, restore, _cancel: bool
 	_undo.add_undo_method(self, "_set_point", path, restore)
 	_undo.add_do_method(self, "_set_point", path, _get_point_data(path.curve, index))
 	_undo.commit_action()
+
+	path.is_moving = false
+	path.update()
 
 
 func redraw(gizmo: EditorSpatialGizmo):

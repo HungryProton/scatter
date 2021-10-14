@@ -15,10 +15,11 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, global_seed) -> void:
-	var texture = load(mask)
-	if not texture:
+	if not ResourceLoader.exists(mask):
 		warning += "The specified file " + mask + " could not be loaded"
 		return
+
+	var texture = load(mask)
 
 	if not texture is Texture:
 		warning += "The specified file is not a valid texture"

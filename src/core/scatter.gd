@@ -9,9 +9,11 @@ export var use_instancing := true setget _set_instancing
 export var disable_updates_in_game := true
 export var force_update_when_loaded := true
 export var make_children_unselectable := true
+export var preview_count := -1
 
 var modifier_stack setget _set_modifier_stack
 var undo_redo setget _set_undo_redo
+var is_moving := false
 
 var _transforms
 var _items := []
@@ -96,8 +98,15 @@ func _do_update() -> void:
 
 	_discover_items()
 	if not _items.empty():
-		_transforms = Scatter.Transforms.new()
-		_transforms.set_path(self)
+		if not _transforms:
+			_transforms = Scatter.Transforms.new()
+			_transforms.set_path(self)
+
+		_transforms.clear()
+		if is_moving:
+			_transforms.max_count = preview_count
+		else:
+			_transforms.max_count = -1
 
 		if use_instancing:
 			modifier_stack.update(_transforms, global_seed)

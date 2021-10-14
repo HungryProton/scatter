@@ -3,7 +3,8 @@ extends Reference
 
 
 var list := []
-var path # ScatterPath object
+var path setget set_path
+var max_count := -1
 
 
 func add(count: int) -> void:
@@ -19,11 +20,18 @@ func remove(count: int) -> void:
 
 
 func resize(count: int) -> void:
+	if max_count > 0:
+		count = min(count, max_count)
+
 	var size = list.size()
 	if count > size:
 		add(count - size)
 	else:
 		remove(size - count)
+
+
+func clear() -> void:
+	list = []
 
 
 func set_path(p: Path) -> void:
