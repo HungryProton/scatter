@@ -200,7 +200,7 @@ transform_array = PoolVector3Array( 0.718468, 0.161408, -0.950373, -0.550511, 1.
 
 [sub_resource type="Curve3D" id=32]
 _data = {
-"points": PoolVector3Array( 0, 0, 0, 0, 0, 0, -2.76202, 0, -2.84128, 0, 0, 0, 0, 0, 0, 2.59319, 0, -2.66768, 0, 0, 0, 0, 0, 0, 2.66222, 0, 2.64061, 0, 0, 0, 0, 0, 0, -2.80173, 0, 2.4771 ),
+"points": PoolVector3Array( 0, 0, 0, 0, 0, 0, -2.76202, 0, -2.84128, 0, 0, 0, 0, 0, 0, 2.46649, 0, -2.94056, 0, 0, 0, 0, 0, 0, 2.66222, 0, 2.64061, 0, 0, 0, 0, 0, 0, -2.80173, 0, 2.4771 ),
 "tilts": PoolRealArray( 0, 0, 0, 0 )
 }
 
@@ -212,10 +212,10 @@ height = 1.0
 
 [sub_resource type="MultiMesh" id=34]
 transform_format = 1
-instance_count = 21
-visible_instance_count = 21
+instance_count = 19
+visible_instance_count = 19
 mesh = SubResource( 33 )
-transform_array = PoolVector3Array( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0986528, 0, -0.226974, 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.90201, 0, 1.82879, 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.741663, 0, 0.886874, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.463284, 0, 2.45672, 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5798, 0, 0.081623, 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.421647, 0, 1.85669, 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.75182, 0, 0.698689, 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.69913, 0, -1.48735, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.95237, 0, 1.69253, 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35837, 0, -1.44656, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.58991, 0, 0.459179, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.513066, 0, -1.07624, 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.19131, 0, -0.379011, 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7331, 0, -2.50019, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.157914, 0, -2.05537, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.919309, 0, 1.48052, 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.27482, 0, -0.764613, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.34728, 0, -1.98034, 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7435, 0, -2.56974, 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.67759, 0, 1.16881, 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.725385, 0, -2.64354 )
+transform_array = PoolVector3Array( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0986528, 0, -0.255276, 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.90201, 0, 1.80048, 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.741663, 0, 0.858572, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.463284, 0, 2.42842, 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5798, 0, 0.0533212, 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.421647, 0, 1.82839, 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.75182, 0, 0.670387, 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.69913, 0, -1.51565, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.95237, 0, 1.66423, 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35837, 0, -1.47486, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.58991, 0, 0.430878, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.513066, 0, -1.10454, 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.19131, 0, -0.407313, 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7331, 0, -2.5285, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.157914, 0, -2.08367, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.919309, 0, 1.45222, 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.27482, 0, -0.792915, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.34728, 0, -2.00864, 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7435, 0, -2.59804 )
 
 [sub_resource type="Curve3D" id=35]
 _data = {
@@ -592,7 +592,8 @@ modifier_stack = Object(Node,"_import_path":NodePath(""),"pause_mode":0,"process
 , Object(Node,"_import_path":NodePath(""),"pause_mode":0,"process_priority":0,"script":Resource( "res://addons/scatter/src/modifiers/randomize_transforms.gd" ),"enabled":true,"display_name":"Randomize Transforms","category":"Edit","warning":"","warning_ignore_no_transforms":false,"warning_ignore_no_path":true,"override_global_seed":false,"custom_seed":0,"local_space":true,"position":Vector3( 0, 0, 0 ),"rotation":Vector3( 0, 180, 0 ),"scale":Vector3( 1, 1, 1 ),"_rng":Object(RandomNumberGenerator,"seed":-302040807144837129,"state":-115954724392568310,"script":null)
 )
 , Object(Node,"_import_path":NodePath(""),"pause_mode":0,"process_priority":0,"script":Resource( "res://addons/scatter/src/modifiers/project_on_floor.gd" ),"enabled":true,"display_name":"Project On Floor","category":"Edit","warning":"","warning_ignore_no_transforms":false,"warning_ignore_no_path":true,"ray_length":10.0,"ray_offset":1.0,"remove_points_on_miss":false,"align_with_floor_normal":true,"invert_ray_direction":false,"floor_direction":Vector3( 0, -1, 0 ),"max_slope":1.0,"mask":"1048575")
- ],"just_created":false,"undo_redo":null)
+ ],"just_created":false,"undo_redo":Object(UndoRedo,"script":null)
+)
 
 
 [node name="ScatterItem" type="Spatial" parent="Scatter - Project on Floor"]
@@ -617,8 +618,9 @@ __meta__ = {
 "_editor_description_": "Poisson distribution makes sure the items don't overlap with each other."
 }
 global_seed = 3
-modifier_stack = Object(Node,"_import_path":NodePath(""),"pause_mode":0,"process_priority":0,"script":Resource( "res://addons/scatter/src/core/modifier_stack.gd" ),"stack":[ Object(Node,"_import_path":NodePath(""),"pause_mode":0,"process_priority":0,"script":Resource( "res://addons/scatter/src/modifiers/distribute_inside_poisson.gd" ),"enabled":true,"display_name":"Distribute Inside (Poisson)","category":"Distribute","warning":"","warning_ignore_no_transforms":true,"warning_ignore_no_path":false,"override_global_seed":false,"custom_seed":0,"distribution_radius":1.0,"distribution_retries":20,"_sampler":Object(Reference,"script":Resource( "res://addons/scatter/src/common/poisson_disc_sampling.gd" ),"rng":Object(RandomNumberGenerator,"seed":3684924924398666589,"state":-3489714528687506184,"script":null)
-,"_radius":1.0,"_sample_region_shape":Rect2( -2.80173, -2.84128, 5.46395, 5.48189 ),"_retries":20,"_start_pos":Vector2( -0.0725353, 1.07786 ),"_sample_region_rect":Rect2( -2.80173, -2.84128, 5.46395, 5.48189 ),"_cell_size":0.707107,"_rows":7,"_cols":7,"_cell_size_scaled":Vector2( 0.780564, 0.783127 ),"_grid":[ [ 19, 7, -1, 4, -1, 20, -1 ], [ 13, 9, -1, -1, 6, 1, -1 ], [ 21, -1, -1, 12, 2, -1, -1 ], [ -1, 14, -1, 0, -1, 5, -1 ], [ -1, -1, 11, -1, -1, 15, 3 ], [ -1, 17, -1, -1, 10, -1, -1 ], [ -1, 18, 16, -1, -1, 8, -1 ] ],"_points":[ Vector2( -0.0986528, -0.226974 ), Vector2( -1.90201, 1.82879 ), Vector2( -0.741663, 0.886874 ), Vector2( 0.463284, 2.45672 ), Vector2( -2.5798, 0.081623 ), Vector2( -0.421647, 1.85669 ), Vector2( -1.75182, 0.698689 ), Vector2( -2.69913, -1.48735 ), Vector2( 1.95237, 1.69253 ), Vector2( -1.35837, -1.44656 ), Vector2( 1.58991, 0.459179 ), Vector2( 0.513066, -1.07624 ), Vector2( -1.19131, -0.379011 ), Vector2( -1.7331, -2.50019 ), Vector2( 0.157914, -2.05537 ), Vector2( 0.919309, 1.48052 ), Vector2( 2.27482, -0.764613 ), Vector2( 1.34728, -1.98034 ), Vector2( 2.6274, -1.88363 ), Vector2( -2.7435, -2.56974 ), Vector2( -2.67759, 1.16881 ), Vector2( -0.725385, -2.64354 ) ],"_spawn_points":[  ],"_transpose":Vector2( 2.80173, 2.84128 ))
+preview_count = 15
+modifier_stack = Object(Node,"_import_path":NodePath(""),"pause_mode":0,"process_priority":0,"script":Resource( "res://addons/scatter/src/core/modifier_stack.gd" ),"stack":[ Object(Node,"_import_path":NodePath(""),"pause_mode":0,"process_priority":0,"script":Resource( "res://addons/scatter/src/modifiers/distribute_inside_poisson.gd" ),"enabled":true,"display_name":"Distribute Inside (Poisson)","category":"Distribute","warning":"","warning_ignore_no_transforms":true,"warning_ignore_no_path":false,"override_global_seed":false,"custom_seed":0,"distribution_radius":1.0,"distribution_retries":20,"_sampler":Object(Reference,"script":Resource( "res://addons/scatter/src/common/poisson_disc_sampling.gd" ),"rng":Object(RandomNumberGenerator,"seed":-2720747773702693661,"state":-869015600113142906,"script":null)
+,"_radius":1.0,"_sample_region_shape":Rect2( -2.80173, -2.94056, 5.46395, 5.58117 ),"_retries":20,"_start_pos":Vector2( -0.0725353, 1.04956 ),"_sample_region_rect":Rect2( -2.80173, -2.94056, 5.46395, 5.58117 ),"_cell_size":0.707107,"_rows":7,"_cols":7,"_cell_size_scaled":Vector2( 0.780564, 0.79731 ),"_grid":[ [ 19, 7, -1, 4, -1, -1, -1 ], [ 13, 9, -1, -1, 6, 1, -1 ], [ -1, -1, -1, 12, 2, -1, -1 ], [ -1, 14, -1, 0, -1, 5, -1 ], [ -1, -1, 11, -1, -1, 15, 3 ], [ -1, 17, -1, -1, 10, -1, -1 ], [ -1, 18, 16, -1, -1, 8, 20 ] ],"_points":[ Vector2( -0.0986528, -0.255276 ), Vector2( -1.90201, 1.80048 ), Vector2( -0.741663, 0.858572 ), Vector2( 0.463284, 2.42842 ), Vector2( -2.5798, 0.0533212 ), Vector2( -0.421647, 1.82839 ), Vector2( -1.75182, 0.670387 ), Vector2( -2.69913, -1.51565 ), Vector2( 1.95237, 1.66423 ), Vector2( -1.35837, -1.47486 ), Vector2( 1.58991, 0.430878 ), Vector2( 0.513066, -1.10454 ), Vector2( -1.19131, -0.407313 ), Vector2( -1.7331, -2.5285 ), Vector2( 0.157914, -2.08367 ), Vector2( 0.919309, 1.45222 ), Vector2( 2.27482, -0.792915 ), Vector2( 1.34728, -2.00864 ), Vector2( 2.6274, -1.91193 ), Vector2( -2.7435, -2.59804 ), Vector2( 2.44032, 2.64001 ) ],"_spawn_points":[  ],"_transpose":Vector2( 2.80173, 2.94056 ))
 )
  ],"just_created":false,"undo_redo":Object(UndoRedo,"script":null)
 )

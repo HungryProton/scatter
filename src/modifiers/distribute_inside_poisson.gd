@@ -24,8 +24,14 @@ func _process_transforms(transforms, global_seed) -> void:
 	else:
 		_sampler.rng.set_seed(global_seed)
 
-	var rect_min = Vector2(transforms.path.bounds_min.x, transforms.path.bounds_min.z)
-	var samples = _sampler.generate_points(distribution_radius, Rect2(rect_min, Vector2(transforms.path.size.x, transforms.path.size.z)), distribution_retries)
+	var rect_pos = Vector2(transforms.path.bounds_min.x, transforms.path.bounds_min.z)
+	var rect_size = Vector2(transforms.path.size.x, transforms.path.size.z)
+	var bounds = Rect2(rect_pos, rect_size)
+	var retries = distribution_retries
+	if transforms.max_count >= 0:
+		retries = 1
+
+	var samples = _sampler.generate_points(distribution_radius, bounds, retries)
 	transforms.resize(samples.size())
 
 	if transforms.list.size() == 0:
