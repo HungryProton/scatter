@@ -5,7 +5,7 @@ extends Path
 signal curve_updated
 
 
-export var bake_interval := 1.0 setget _set_bake_interval
+export var curve_tolerance_degrees := 5.0 setget _set_curve_tolerance_degrees
 
 var polygon : PolygonPathFinder
 var baked_points : PoolVector3Array
@@ -77,7 +77,6 @@ func _update_from_curve():
 	bounds_min = null
 	var connections = PoolIntArray()
 	var polygon_points = PoolVector2Array()
-	baked_points = PoolVector3Array()
 
 	if not curve:
 		curve = Curve3D.new()
@@ -89,17 +88,16 @@ func _update_from_curve():
 	if not polygon:
 		polygon = PolygonPathFinder.new()
 
-	var length: float = curve.get_baked_length()
-	var steps := int(max(3, round(length / bake_interval)))
+	baked_points = curve.tessellate(4, curve_tolerance_degrees)
 
-	for i in steps:
-		# Get a point on the curve
-		var coords_3d = curve.interpolate_baked((float(i) / (steps - 2)) * length)
-		var coords = _get_projected_coords(coords_3d)
+	var steps := baked_points.size()
+
+	for i in baked_points.size():
+		var point = baked_points[i]
+		var projected_point = _get_projected_coords(point)
 
 		# Store polygon data
-		baked_points.append(coords_3d)
-		polygon_points.append(coords)
+		polygon_points.push_back(projected_point)
 		connections.append(i)
 		if i == steps - 1:
 			connections.append(0)
@@ -108,21 +106,21 @@ func _update_from_curve():
 
 		# Check for bounds
 		if i == 0:
-			bounds_min = coords_3d
-			bounds_max = coords_3d
+			bounds_min = point
+			bounds_max = point
 		else:
-			if coords_3d.x > bounds_max.x:
-				bounds_max.x = coords_3d.x
-			if coords_3d.x < bounds_min.x:
-				bounds_min.x = coords_3d.x
-			if coords_3d.y > bounds_max.y:
-				bounds_max.y = coords_3d.y
-			if coords_3d.y < bounds_min.y:
-				bounds_min.y = coords_3d.y
-			if coords_3d.z > bounds_max.z:
-				bounds_max.z = coords_3d.z
-			if coords_3d.z < bounds_min.z:
-				bounds_min.z = coords_3d.z
+			if point.x > bounds_max.x:
+				bounds_max.x = point.x
+			if point.x < bounds_min.x:
+				bounds_min.x = point.x
+			if point.y > bounds_max.y:
+				bounds_max.y = point.y
+			if point.y < bounds_min.y:
+				bounds_min.y = point.y
+			if point.z > bounds_max.z:
+				bounds_max.z = point.z
+			if point.z < bounds_min.z:
+				bounds_min.z = point.z
 
 	polygon.setup(polygon_points, connections)
 	size = Vector3(bounds_max.x - bounds_min.x, bounds_max.z - bounds_min.z, bounds_max.z - bounds_min.z)
@@ -131,8 +129,8 @@ func _update_from_curve():
 	emit_signal("curve_updated")
 
 
-func _set_bake_interval(val) -> void:
-	bake_interval = val
+func _set_curve_tolerance_degrees(val) -> void:
+	curve_tolerance_degrees = val
 	_update_from_curve()
 
 
