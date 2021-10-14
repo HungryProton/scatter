@@ -250,6 +250,9 @@ func _restore_multimesh_materials() -> void:
 		return
 
 	var mesh: Mesh = mmi.multimesh.mesh
+	if not mesh:
+		return
+
 	var surface_count = mesh.get_surface_count()
 
 	if not mesh or surface_count > materials.size():

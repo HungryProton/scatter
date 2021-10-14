@@ -67,7 +67,13 @@ static func create_mesh_from(mesh_instances: Array) -> Mesh:
 				arrays[ArrayMesh.ARRAY_VERTEX][j] = pos
 
 			array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
-			array_mesh.surface_set_material(total_surfaces, mesh.surface_get_material(i))
+
+			# Retrieve the material on the MeshInstance first, if none is defined,
+			# use the one from the mesh resource.
+			var material = mi.get_surface_material(i)
+			if not material:
+				 material = mesh.surface_get_material(i)
+			array_mesh.surface_set_material(total_surfaces, material)
 
 			total_surfaces += 1
 
