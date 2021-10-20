@@ -213,8 +213,7 @@ func _create_instance(item, root):
 
 func _delete_duplicates():
 	for item in _items:
-		if item.has_node("Duplicates"):
-			item.get_node("Duplicates").queue_free()
+		item.delete_duplicates()
 
 
 func _create_multimesh() -> void:
@@ -339,7 +338,7 @@ func _set_undo_redo(val) -> void:
 
 
 func _set_modifier_stack(val) -> void:
-	if not val:
+	if not val or not is_instance_valid(val):
 		return
 
 	if modifier_stack:

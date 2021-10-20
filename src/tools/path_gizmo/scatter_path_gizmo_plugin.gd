@@ -14,7 +14,6 @@ var _namespace = load(_get_root_folder() + "/src/core/namespace.gd").new()
 var _axis_mesh: ArrayMesh
 var _selected
 var _old_position: Vector3
-var _cached_gizmo
 var _camera: Camera
 var _previous_state := PointState.new()
 var _is_forcing_projection := false
@@ -152,11 +151,15 @@ func redraw(gizmo: EditorSpatialGizmo):
 		_draw_path(gizmo)
 		return
 
-	_cached_gizmo = gizmo
 	_draw_handles(gizmo)
 	_draw_path(gizmo)
 	if options and options.lock_to_plane():
 		_draw_grid(gizmo)
+
+
+func force_redraw():
+	if _selected and is_instance_valid(_selected):
+		_selected.update_gizmo()
 
 
 func create_custom_handle_material(name, icon: Texture, color := Color.white):
@@ -379,7 +382,7 @@ func _set_options(val) -> void:
 
 
 func _on_option_changed() -> void:
-	redraw(_cached_gizmo)
+	force_redraw()
 
 
 # Force the newly added points on the plane if the option is enabled
@@ -447,4 +450,4 @@ func _on_curve_changed() -> void:
 func _on_color_changed() -> void:
 	create_custom_material("grid", options.get_grid_color())
 	create_custom_material("path", options.get_path_color())
-	redraw(_cached_gizmo)
+	force_redraw()

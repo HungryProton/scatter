@@ -161,9 +161,15 @@ func get_multimesh_instance() -> MultiMeshInstance:
 
 
 func delete_multimesh() -> void:
-	var mmi = get_multimesh_instance()
-	if mmi:
-		mmi.queue_free()
+	for c in get_children():
+		if c is MultiMeshInstance:
+			c.queue_free()
+
+
+func delete_duplicates() -> void:
+	for c in get_children():
+		if c.name.begins_with("Duplicates"):
+			c.queue_free()
 
 
 func update_shadows() -> void:
