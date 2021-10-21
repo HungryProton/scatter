@@ -21,7 +21,7 @@ func remove(count: int) -> void:
 
 func resize(count: int) -> void:
 	if max_count >= 0:
-		count = min(count, max_count)
+		count = int(min(count, max_count))
 
 	var size = list.size()
 	if count > size:

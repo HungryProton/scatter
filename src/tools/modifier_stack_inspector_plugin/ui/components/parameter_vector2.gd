@@ -1,3 +1,5 @@
+# warning-ignore-all:return_value_discarded
+
 tool
 extends "base_parameter.gd"
 

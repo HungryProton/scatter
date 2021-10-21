@@ -47,6 +47,8 @@ func _ready() -> void:
 		_popup.add_check_item(layer_name, _layer_count - 1 - i)
 
 	_sync_popup_state()
+
+	# warning-ignore:return_value_discarded
 	_popup.connect("id_pressed", self, "_on_id_pressed")
 
 

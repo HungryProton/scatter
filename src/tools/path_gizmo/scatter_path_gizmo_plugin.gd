@@ -402,7 +402,6 @@ func _on_curve_changed() -> void:
 
 	var previous_count: int = _previous_state.point_count
 	var previous_pos: Vector3 = _previous_state.position
-	var previous_version: int = _previous_state.version
 
 	_previous_state.point_count = current_count
 	_previous_state.position = current_position

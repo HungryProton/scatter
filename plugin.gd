@@ -61,6 +61,8 @@ func _enter_tree():
 
 	_editor_selection = get_editor_interface().get_selection()
 	_editor_selection.connect("selection_changed", self, "_on_selection_changed")
+
+	# warning-ignore:return_value_discarded
 	connect("scene_changed", self, "_on_scene_changed")
 
 
@@ -137,6 +139,8 @@ func _setup_options_panel() -> void:
 		])
 	_gizmo_options = preload("./src/tools/path_gizmo/gizmo_options.tscn").instance()
 	_options_root.add_child(_gizmo_options)
+
+	# warning-ignore:return_value_discarded
 	_gizmo_options.connect("snap_to_colliders_enabled", self, "_on_snap_to_colliders_enabled")
 	_gizmo_options.visible = false
 

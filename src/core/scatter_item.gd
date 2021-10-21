@@ -178,17 +178,6 @@ func update_shadows() -> void:
 		return
 
 	mmi.cast_shadow = cast_shadow
-	return
-
-	match cast_shadow:
-		0:
-			mmi.cast_shadows = GeometryInstance.SHADOW_CASTING_SETTING_OFF
-		1:
-			mmi.cast_shadows = GeometryInstance.SHADOW_CASTING_SETTING_ON
-		2:
-			mmi.cast_shadows = GeometryInstance.SHADOW_CASTING_SETTING_DOUBLE_SIDED
-		3:
-			mmi.cast_shadows = GeometryInstance.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 
 
 func _get_mesh_from_scene(node):

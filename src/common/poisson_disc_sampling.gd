@@ -149,8 +149,8 @@ func _init_vars() -> void:
 			push_error("Unrecognized shape!!! Please input a valid shape")
 
 	_cell_size = _radius / sqrt(2)
-	_cols = max(floor(_sample_region_rect.size.x / _cell_size), 1)
-	_rows = max(floor(_sample_region_rect.size.y / _cell_size), 1)
+	_cols = int(max(floor(_sample_region_rect.size.x / _cell_size), 1))
+	_rows = int(max(floor(_sample_region_rect.size.y / _cell_size), 1))
 	# scale the cell size in each axis
 	_cell_size_scaled.x = _sample_region_rect.size.x / _cols
 	_cell_size_scaled.y = _sample_region_rect.size.y / _rows

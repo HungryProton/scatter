@@ -21,7 +21,7 @@ func _init() -> void:
 func _process_transforms(transforms, _seed) -> void:
 	var path = transforms.path
 	var length: float = path.curve.get_baked_length()
-	var total_count: int = round(length / interval)
+	var total_count := int(round(length / interval))
 	var stepped_length: float = total_count * interval
 
 	if total_count == 0:

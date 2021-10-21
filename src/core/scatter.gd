@@ -65,7 +65,7 @@ func _get(property):
 	return null
 
 
-func _set(property, value):
+func _set(property, _value):
 	if not Engine.editor_hint:
 		return false
 

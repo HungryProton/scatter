@@ -1,8 +1,6 @@
 tool
 extends Button
 
-signal add_modifier
-
 
 onready var _popup = $ModifiersPopup
 var _modifiers := []

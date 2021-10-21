@@ -14,7 +14,7 @@ func can_handle(object):
 	return object is _namespace.Scatter
 
 
-func parse_property(object, type, path, hint, hint_text, usage):
+func parse_property(object, type, path, _hint, hint_text, _usage):
 	if type == TYPE_OBJECT and hint_text == "ScatterModifierStack":
 		var editor_property = _editor.new()
 		editor_property.set_node(object)

@@ -10,14 +10,17 @@ var _root: Control
 var _scatter
 var _modifier_stack
 var _modifier_panel = preload("./modifier_panel.tscn")
-var _ready := false
+var _is_ready := false
 
 
 func _ready():
 	_modifiers_popup = get_node(modifiers_popup)
 	_root = get_node(root)
+
+	# warning-ignore:return_value_discarded
 	_modifiers_popup.connect("add_modifier", self, "_on_add_modifier")
-	_ready = true
+
+	_is_ready = true
 	rebuild_ui()
 
 
@@ -30,7 +33,7 @@ func set_node(node) -> void:
 
 
 func rebuild_ui() -> void:
-	if not _ready:
+	if not _is_ready:
 		return
 
 	_validate_stack_connections()
@@ -68,11 +71,11 @@ func _validate_stack_connections() -> void:
 		_on_load_preset("default")
 
 
-func _set_children_owner(root: Node, node: Node):
+func _set_children_owner(new_owner: Node, node: Node):
 	for child in node.get_children():
-		child.set_owner(root)
+		child.set_owner(new_owner)
 		if child.get_children().size() > 0:
-			_set_children_owner(root, child)
+			_set_children_owner(new_owner, child)
 
 
 func _get_root_folder() -> String:
@@ -126,7 +129,7 @@ func _on_save_preset(preset_name) -> void:
 		return
 
 	var preset_path = _get_root_folder() + "/presets/" + preset_name + ".tscn"
-	ResourceSaver.save(preset_path, packed_scene)
+	var _err= ResourceSaver.save(preset_path, packed_scene)
 
 
 func _on_load_preset(preset_name) -> void:

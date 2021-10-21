@@ -46,7 +46,7 @@ func process_transforms(transforms, global_seed) -> void:
 
 
 # Override in inherited class
-func _process_transforms(transforms, global_seed) -> void:
+func _process_transforms(_transforms, _global_seed) -> void:
 	pass
 
 

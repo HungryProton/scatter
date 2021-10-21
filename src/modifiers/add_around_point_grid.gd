@@ -23,10 +23,9 @@ func _process_transforms(transforms, global_seed) -> void:
 	var size = bounds_max - bounds_min
 	var half_size = size * 0.5
 	var center: Vector3 = bounds_min + half_size
-	var width: int = ceil(size.x / x_spacing)
-	var length: int = ceil(size.z / z_spacing)
+	var width := int(ceil(size.x / x_spacing))
+	var length := int(ceil(size.z / z_spacing))
 	var max_count: int = width * length
-	var gt = transforms.path.get_global_transform()
 
 	for i in max_count:
 		var pos = Vector3.ZERO

@@ -21,6 +21,7 @@ onready var _warning_popup: AcceptDialog = $AcceptDialog
 
 
 func _ready() -> void:
+	# warning-ignore:return_value_discarded
 	_margin_container.connect("resized", self, "_on_child_resized")
 
 

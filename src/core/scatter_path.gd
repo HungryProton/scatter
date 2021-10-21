@@ -20,7 +20,8 @@ var _previous_transform: Transform
 
 func _ready():
 	set_notify_transform(true)
-	self.connect("curve_changed", self, "_on_curve_changed")
+	# warning-ignore:return_value_discarded
+	connect("curve_changed", self, "_on_curve_changed")
 	_update_from_curve()
 
 

@@ -7,6 +7,7 @@ onready var _check_box: CheckBox = $CheckBox
 
 
 func _ready() -> void:
+	# warning-ignore:return_value_discarded
 	_check_box.connect("toggled", self, "_on_value_changed")
 
 

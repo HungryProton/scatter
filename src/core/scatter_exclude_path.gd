@@ -3,6 +3,7 @@ extends "scatter_path.gd"
 
 
 func _ready():
+	# warning-ignore:return_value_discarded
 	connect("curve_updated", self, "update")
 
 

@@ -39,7 +39,7 @@ func is_inside(pos: Vector3, p) -> bool:
 	return distance_to_point <= max_distance
 
 
-func _process_transforms(transforms, global_seed) -> void:
+func _process_transforms(transforms, _global_seed) -> void:
 	if node_name.empty():
 		warning += "You must select a node for this modifier to work."
 		_notify_warning_changed()

@@ -26,7 +26,6 @@ func _process_transforms(transforms, global_seed) -> void:
 
 	var t: Transform
 	var b: Basis
-	var s: Vector3
 
 	var gt: Transform = transforms.path.get_global_transform()
 	var gb: Basis = gt.basis
@@ -60,8 +59,8 @@ func _random_vec3() -> Vector3:
 	return vec3
 
 
-func _random_angle(rotation: float, snap: float) -> float:
-	return deg2rad(stepify(_rng.randf_range(-1.0, 1.0) * rotation, snap))
+func _random_angle(rot: float, snap: float) -> float:
+	return deg2rad(stepify(_rng.randf_range(-1.0, 1.0) * rot, snap))
 
 
 func _clamp_vector(vec3, vmin, vmax) -> Vector3:

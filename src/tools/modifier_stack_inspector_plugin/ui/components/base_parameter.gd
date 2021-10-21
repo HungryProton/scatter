@@ -8,11 +8,11 @@ var _previous
 var _locked := false
 
 
-func set_parameter_name(text: String) -> void:
+func set_parameter_name(_text: String) -> void:
 	pass
 
 
-func set_hint_string(hint: String) -> void:
+func set_hint_string(_hint: String) -> void:
 	pass
 
 
@@ -27,7 +27,7 @@ func get_value():
 	pass
 
 
-func _set_value(val):
+func _set_value(_val):
 	pass
 
 
