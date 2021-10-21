@@ -25,6 +25,12 @@ func _ready() -> void:
 	_ensure_stack_exists()
 	_discover_items()
 
+	if _items.empty():
+		var item = Scatter.ScatterItem.new()
+		add_child(item)
+		item.set_owner(get_tree().get_edited_scene_root())
+		item.set_name("ScatterItem")
+
 	if force_update_when_loaded:
 		yield(get_tree(), "idle_frame")
 		_do_update()
