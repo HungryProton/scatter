@@ -8,6 +8,7 @@ export var local_space := false
 export var position := Vector3.ONE
 export var rotation := Vector3(360.0, 360.0, 360.0)
 export var scale := Vector3.ONE
+export var rotation_snap := Vector3.ZERO
 
 var _rng: RandomNumberGenerator
 
@@ -46,19 +47,24 @@ func _process_transforms(transforms, global_seed) -> void:
 		t = t.scaled(s)
 
 		if local_space:
-			t = t.rotated(t.basis.x.normalized(), deg2rad(_random_float() * rotation.x))
-			t = t.rotated(t.basis.y.normalized(), deg2rad(_random_float() * rotation.y))
-			t = t.rotated(t.basis.z.normalized(), deg2rad(_random_float() * rotation.z))
+			t = t.rotated(t.basis.x.normalized(), _random_rot(rotation.x, rotation_snap.x))
+			t = t.rotated(t.basis.y.normalized(), _random_rot(rotation.y, rotation_snap.y))
+			t = t.rotated(t.basis.z.normalized(), _random_rot(rotation.z, rotation_snap.z))
 			t.origin = origin + t.xform(_random_vec3() * position)
 
 		else:
-			t = t.rotated(global_x, deg2rad(_random_float() * rotation.x))
-			t = t.rotated(global_y, deg2rad(_random_float() * rotation.y))
-			t = t.rotated(global_z, deg2rad(_random_float() * rotation.z))
+			t = t.rotated(global_x, _random_rot(rotation.x, rotation_snap.x))
+			t = t.rotated(global_y, _random_rot(rotation.y, rotation_snap.y))
+			t = t.rotated(global_z, _random_rot(rotation.z, rotation_snap.z))
 			t.origin = origin + _random_vec3() * position
 
 		transforms.list[i] = t
 
+func _random_rot(angle, step):
+	angle = _random_float() * angle
+	if step != 0:
+		angle = int(angle / step) * step
+	return deg2rad(angle)
 
 func _random_vec3() -> Vector3:
 	var vec3 = Vector3.ZERO
