@@ -1,14 +1,14 @@
-tool
-extends WindowDialog
+@tool
+extends Window
 
 
 signal load_preset
 signal delete_preset
 
 
-onready var _no_presets: Label = $MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/NoPresets
-onready var _root: VBoxContainer = $MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PresetsRoot
-onready var _confirmation_dialog: ConfirmationDialog = $ConfirmationDialog
+@onready var _no_presets: Label = $MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/NoPresets
+@onready var _root: VBoxContainer = $MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PresetsRoot
+@onready var _confirmation_dialog: ConfirmationDialog = $ConfirmationDialog
 
 var _selected: String
 var _selected_ui: Node
@@ -16,7 +16,7 @@ var _selected_ui: Node
 
 func _ready():
 	_rebuild_ui()
-	connect("about_to_show", self, "_rebuild_ui")
+	about_to_popup.connect(_rebuild_ui)
 
 
 func _rebuild_ui():
@@ -35,8 +35,8 @@ func _rebuild_ui():
 		var ui = preload("./preset.tscn").instance()
 		_root.add_child(ui)
 		ui.set_preset_name(p)
-		ui.connect("load_preset", self, "_on_load_preset", [p])
-		ui.connect("delete_preset", self, "_on_delete_preset", [p, ui])
+		ui.load_preset.connect(_on_load_preset.bind(p))
+		ui.delete_preset.connect(_on_delete_preset.bind(p, ui))
 
 
 func _find_all_presets() -> Array:
@@ -44,7 +44,7 @@ func _find_all_presets() -> Array:
 	var res := []
 	var dir = Directory.new()
 	dir.open(root)
-	dir.list_dir_begin(true, true)
+	dir.list_dir_begin()
 
 	while true:
 		var file = dir.get_next()

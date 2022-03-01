@@ -7,7 +7,7 @@ extends Button
 
 
 func _on_ready() -> void:
-	_on_toggled(pressed)
+	_on_toggled(button_pressed)
 
 
 func _on_toggled(pressed: bool) -> void:

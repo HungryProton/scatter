@@ -1,22 +1,22 @@
-tool
-extends WindowDialog
+@tool
+extends Window
 
 
 signal save_preset
 
 
-onready var _line_edit: LineEdit = $MarginContainer/VBoxContainer/LineEdit
-onready var _cancel: Button = $MarginContainer/VBoxContainer/HBoxContainer/Cancel
-onready var _save: Button = $MarginContainer/VBoxContainer/HBoxContainer/Save
-onready var _warning: Label = $MarginContainer/VBoxContainer/Warning
-onready var _confirm_overwrite = $ConfirmationDialog
+@onready var _line_edit: LineEdit = $MarginContainer/VBoxContainer/LineEdit
+@onready var _cancel: Button = $MarginContainer/VBoxContainer/HBoxContainer/Cancel
+@onready var _save: Button = $MarginContainer/VBoxContainer/HBoxContainer/Save
+@onready var _warning: Label = $MarginContainer/VBoxContainer/Warning
+@onready var _confirm_overwrite = $ConfirmationDialog
 
 
 func _ready():
-	_cancel.connect("pressed", self, "_on_cancel_pressed")
-	_save.connect("pressed", self, "_on_save_pressed")
+	_cancel.pressed.connect(_on_cancel_pressed)
+	_save.pressed.connect(_on_save_pressed)
 	_warning.text = ""
-	_confirm_overwrite.connect("confirmed", self, "_save_preset")
+	_confirm_overwrite.confirmed.connect(_save_preset)
 
 
 func _on_cancel_pressed() -> void:
@@ -26,7 +26,7 @@ func _on_cancel_pressed() -> void:
 
 func _on_save_pressed() -> void:
 	var preset_name: String = _line_edit.text
-	if preset_name.empty():
+	if preset_name.is_empty():
 		_warning.text = "Preset name can't be empty"
 		return
 
@@ -53,7 +53,7 @@ func _save_preset() -> void:
 func _exists(preset: String) -> bool:
 	var dir = Directory.new()
 	dir.open(_get_root_folder() + "/presets/")
-	dir.list_dir_begin(true, true)
+	dir.list_dir_begin()
 
 	while true:
 		var file = dir.get_next()

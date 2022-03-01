@@ -1,11 +1,11 @@
-tool
+@tool
 extends PopupPanel
 
 
 signal add_modifier
 
 
-onready var _category_root: Control = $MarginContainer/CategoryRoot
+@onready var _category_root: Control = $MarginContainer/CategoryRoot
 
 
 func _ready() -> void:
@@ -24,7 +24,7 @@ func _rebuild_ui():
 			var category = _get_or_create_category(instance.category)
 			var button = _create_button(instance.display_name)
 			category.add_child(button)
-			button.connect("pressed", self, "_on_pressed", [modifier])
+			button.pressed.connect(_on_pressed.bind(modifier))
 
 		instance.queue_free()
 
@@ -68,7 +68,7 @@ func _get_all_modifier_scripts(path) -> Array:
 	var res := []
 	var dir = Directory.new()
 	dir.open(path)
-	dir.list_dir_begin(true, true)
+	dir.list_dir_begin()
 	var path_root = dir.get_current_dir() + "/"
 
 	while true:

@@ -1,4 +1,4 @@
-tool
+@tool
 extends Control
 
 
@@ -11,18 +11,18 @@ signal value_changed
 var _scatter
 var _modifier
 
-onready var _parameters: Control = $MarginContainer/VBoxContainer/Parameters
-onready var _name: Label = $MarginContainer/VBoxContainer/HBoxContainer/Label
-onready var _margin_container: MarginContainer = $MarginContainer
-onready var _edit_buttons: Control = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/EditButtons
-onready var _enabled: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable
-onready var _warning: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Warning
-onready var _warning_popup: AcceptDialog = $AcceptDialog
+@onready var _parameters: Control = $MarginContainer/VBoxContainer/Parameters
+@onready var _name: Label = $MarginContainer/VBoxContainer/HBoxContainer/Label
+@onready var _margin_container: MarginContainer = $MarginContainer
+@onready var _edit_buttons: Control = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/EditButtons
+@onready var _enabled: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Enable
+@onready var _warning: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/HBoxContainer/Warning
+@onready var _warning_popup: AcceptDialog = $AcceptDialog
 
 
 func _ready() -> void:
 	# warning-ignore:return_value_discarded
-	_margin_container.connect("resized", self, "_on_child_resized")
+	_margin_container.resized.connect(_on_child_resized)
 
 
 func set_root(val) -> void:
@@ -31,11 +31,11 @@ func set_root(val) -> void:
 
 func create_ui_for(modifier) -> void:
 	_modifier = modifier
-	_modifier.connect("warning_changed", self, "_on_warning_changed")
+	_modifier.warning_changed.connect(_on_warning_changed)
 	_on_warning_changed()
 
 	_name.text = modifier.display_name
-	_enabled.pressed = modifier.enabled
+	_enabled.button_pressed = modifier.enabled
 
 	for property in modifier.get_property_list():
 		if property.usage != PROPERTY_USAGE_DEFAULT + PROPERTY_USAGE_SCRIPT_VARIABLE:
@@ -48,7 +48,7 @@ func create_ui_for(modifier) -> void:
 		match property.type:
 			TYPE_BOOL:
 				parameter_ui = preload("./components/parameter_bool.tscn").instance()
-			TYPE_REAL:
+			TYPE_FLOAT:
 				parameter_ui = preload("./components/parameter_scalar.tscn").instance()
 			TYPE_INT:
 				parameter_ui = preload("./components/parameter_scalar.tscn").instance()

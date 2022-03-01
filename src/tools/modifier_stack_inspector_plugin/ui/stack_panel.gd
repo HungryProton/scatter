@@ -43,10 +43,10 @@ func rebuild_ui() -> void:
 		_root.add_child(ui)
 		ui.set_root(_scatter)
 		ui.create_ui_for(m)
-		ui.connect("move_up", self, "_on_move_up", [m])
-		ui.connect("move_down", self, "_on_move_down", [m])
-		ui.connect("remove_modifier", self, "_on_remove", [m])
-		ui.connect("value_changed", self, "_on_value_changed")
+		ui.move_up.connect(_on_move_up.bind(m))
+		ui.move_down.connect(_on_move_down.bind(m))
+		ui.remove_modifier.connect(_on_remove.bind(m))
+		ui.value_changed.connect(_on_value_changed.bind(m))
 
 
 func _clear() -> void:
@@ -62,10 +62,10 @@ func _validate_stack_connections() -> void:
 		return
 
 	if _modifier_stack:
-		_modifier_stack.disconnect("stack_changed", self, "_on_stack_changed")
+		_modifier_stack.stack_changed.disconnect(_on_stack_changed)
 
 	_modifier_stack = _scatter.modifier_stack
-	_modifier_stack.connect("stack_changed", self, "_on_stack_changed")
+	_modifier_stack.stack_changed.connect(_on_stack_changed)
 
 	if _modifier_stack.just_created:
 		_on_load_preset("default")
@@ -139,7 +139,7 @@ func _on_load_preset(preset_name) -> void:
 		return
 
 	_modifier_stack = preset.modifier_stack.duplicate(7)
-	_modifier_stack.connect("stack_changed", self, "_on_stack_changed")
+	_modifier_stack.stack_changed.connect(_on_stack_changed)
 	_scatter.modifier_stack = _modifier_stack
 	rebuild_ui()
 	_scatter.update()

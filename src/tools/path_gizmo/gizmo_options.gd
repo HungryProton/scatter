@@ -29,7 +29,7 @@ func _ready() -> void:
 
 
 func snap_to_colliders() -> bool:
-	return _colliders.pressed
+	return _colliders.button_pressed
 
 
 # This option is disabled when snap_to_colliders is enabled
@@ -37,15 +37,15 @@ func lock_to_plane() -> bool:
 	if snap_to_colliders():
 		return false
 
-	return _plane.pressed
+	return _plane.button_pressed
 
 
 func hide_grid() -> bool:
-	return _hide_grid.pressed
+	return _hide_grid.button_pressed
 
 
 func force_plane_projection() -> bool:
-	return _force_plane_projection.pressed
+	return _force_plane_projection.button_pressed
 
 
 func get_path_color() -> Color:
@@ -63,7 +63,7 @@ func get_grid_density() -> float:
 # Auto hide the extra options
 func _set(property, value):
 	if property == "visible":
-		_options_button.pressed = false
+		_options_button.button_pressed = false
 		_on_option_button_toggled(false)
 	return false
 
@@ -84,11 +84,11 @@ func _load_config_file() -> bool:
 	_path_color.color = config.get_value("colors", "path", Color("ff2f2f"))
 	_grid_color.color = config.get_value("colors", "grid", Color("c8ffbe11"))
 
-	_colliders.pressed = config.get_value("general", "snap_to_colliders", false)
-	_plane.pressed = config.get_value("general", "lock_to_plane", true)
-	_hide_grid.pressed = config.get_value("general", "always_hide_grid", false)
+	_colliders.button_pressed = config.get_value("general", "snap_to_colliders", false)
+	_plane.button_pressed = config.get_value("general", "lock_to_plane", true)
+	_hide_grid.button_pressed = config.get_value("general", "always_hide_grid", false)
 	_grid_density.value = config.get_value("general", "grid_density", 7)
-	_force_plane_projection.pressed = config.get_value("general", "force_plane_projection", false)
+	_force_plane_projection.button_pressed = config.get_value("general", "force_plane_projection", false)
 
 	return true
 

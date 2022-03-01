@@ -1,4 +1,4 @@
-tool
+@tool
 extends Button
 
 
@@ -6,7 +6,7 @@ signal load_preset
 signal delete_preset
 
 
-onready var _label: Label = $MarginContainer/HBoxContainer/Label
+@onready var _label: Label = $MarginContainer/HBoxContainer/Label
 
 
 func set_preset_name(text) -> void:
