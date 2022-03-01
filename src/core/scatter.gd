@@ -1,18 +1,56 @@
-tool
+@tool
 extends "scatter_path.gd"
 
+signal updated
 
-var Scatter = preload("namespace.gd").new()
 
-export var global_seed := 0 setget _set_global_seed
-export var use_instancing := true setget _set_instancing
-export var disable_updates_in_game := true
-export var force_update_when_loaded := true
-export var make_children_unselectable := true
-export var preview_count := -1
+var Scatter = load("namespace.gd").new()
 
-var modifier_stack setget _set_modifier_stack
-var undo_redo setget _set_undo_redo
+@export var global_seed := 0:
+	set(val):
+		global_seed = val
+		update()
+
+@export var use_instancing := true:
+	set(val):
+		use_instancing = val
+		if use_instancing:
+			_delete_duplicates()
+		else:
+			_delete_multimeshes()
+		for item in _items:
+			item.use_instancing = val
+		update()
+
+@export var disable_updates_in_game := true
+@export var force_update_when_loaded := true
+@export var make_children_unselectable := true
+@export var preview_count := -1
+
+var modifier_stack:
+	set(val):
+		if not val or not is_instance_valid(val):
+			return
+
+		if modifier_stack:
+			modifier_stack.queue_free()
+
+		if val.get_parent(): # Trying to reference an existing stack, unwanted.
+			modifier_stack = Scatter.ModifierStack.new()
+			modifier_stack.stack = val.duplicate_stack()
+		else:
+			modifier_stack = val
+
+		add_child(modifier_stack)
+
+		if not modifier_stack.is_connected("stack_changed", self, "update"):
+			modifier_stack.connect("stack_changed", self, "update")
+		
+var undo_redo:
+	set(val):
+		undo_redo = val
+		modifier_stack.undo_redo = val
+
 var is_moving := false
 
 var _transforms
@@ -21,33 +59,33 @@ var _total_proportion: int
 
 
 func _ready() -> void:
-	var _err = self.connect("curve_updated", self, "update")
+	var _err = connect("curve_updated", update)
 	_ensure_stack_exists()
 	_discover_items()
 
-	if _items.empty():
+	if _items.is_empty():
 		var item = Scatter.ScatterItem.new()
 		add_child(item)
 		item.set_owner(get_tree().get_edited_scene_root())
 		item.set_name("ScatterItem")
 
 	if force_update_when_loaded:
-		yield(get_tree(), "idle_frame")
+		await(get_tree().process_frame)
 		_do_update()
 
 
 func add_child(node, legible_name := false) -> void:
-	.add_child(node, legible_name)
+	super(node, legible_name)
 	_discover_items()
 
 
 func remove_child(node) -> void:
-	.remove_child(node)
+	super(node)
 	_discover_items()
 
 
 func _get_configuration_warning() -> String:
-	if _items.empty():
+	if _items.is_empty():
 		return "Scatter requires at least one ScatterItem node as a child to work."
 	return ""
 
@@ -103,7 +141,7 @@ func _do_update() -> void:
 		return
 
 	_discover_items()
-	if not _items.empty():
+	if not _items.is_empty():
 		if not _transforms:
 			_transforms = Scatter.Transforms.new()
 			_transforms.set_path(self)
@@ -124,6 +162,7 @@ func _do_update() -> void:
 			_create_duplicates()
 
 	_notify_parent()
+	emit_signal("updated")
 
 
 func _notify_parent() -> void:
@@ -142,7 +181,7 @@ func full_update() -> void:
 	_reset_all_colliders(get_tree().root)
 	_delete_duplicates()
 	_delete_multimeshes()
-	yield(get_tree(), "idle_frame")
+	await(get_tree().process_frame)
 	update()
 
 
@@ -192,11 +231,11 @@ func _create_duplicates() -> void:
 
 
 func _get_or_create_instances_root(item):
-	var root: Spatial
+	var root: Node3D
 	if item.has_node("Duplicates"):
 		root = item.get_node("Duplicates")
 	else:
-		root = Spatial.new()
+		root = Node3D.new()
 		root.set_name("Duplicates")
 		item.add_child(root)
 		root.set_owner(get_tree().get_edited_scene_root())
@@ -247,9 +286,9 @@ func _create_multimesh() -> void:
 
 # TODO: Move this to scatter_item.gd?
 func _setup_multi_mesh(item, count):
-	var instance: MultiMeshInstance = item.get_multimesh_instance()
+	var instance: MultiMeshInstance3D = item.get_multimesh_instance()
 	if not instance:
-		instance = MultiMeshInstance.new()
+		instance = MultiMeshInstance3D.new()
 		item.add_child(instance)
 		instance.set_owner(get_tree().get_edited_scene_root())
 
@@ -259,7 +298,7 @@ func _setup_multi_mesh(item, count):
 	instance.translation = Vector3.ZERO
 	item.update_shadows()
 
-	var mesh_instance: MeshInstance = item.get_mesh_instance_copy()
+	var mesh_instance: MeshInstance3D = item.get_mesh_instance_copy()
 	if not mesh_instance:
 		_delete_multimeshes()
 		return
@@ -285,14 +324,14 @@ func _setup_multi_mesh(item, count):
 
 
 func _delete_multimeshes() -> void:
-	if _items.empty():
+	if _items.is_empty():
 		_discover_items()
 
 	for item in _items:
 		item.delete_multimesh()
 
 
-func _process_transform(item, t: Transform) -> Transform:
+func _process_transform(item, t: Transform3D) -> Transform3D:
 	var origin = t.origin
 	t.origin = Vector3.ZERO
 
@@ -318,29 +357,6 @@ func _set_owner_recursive(node: Node, owner: Node) -> void:
 	node.set_owner(owner)
 	for c in node.get_children():
 		_set_owner_recursive(c, owner)
-
-
-func _set_global_seed(val: int) -> void:
-	global_seed = val
-	update()
-
-
-func _set_instancing(val: bool) -> void:
-	use_instancing = val
-	if use_instancing:
-		_delete_duplicates()
-	else:
-		_delete_multimeshes()
-
-	for item in _items:
-		item.use_instancing = val
-
-	update()
-
-
-func _set_undo_redo(val) -> void:
-	undo_redo = val
-	modifier_stack.undo_redo = val
 
 
 func _set_modifier_stack(val) -> void:
@@ -388,7 +404,7 @@ func _ensure_stack_exists() -> void:
 
 
 func _reset_all_colliders(node) -> void:
-	if node is CollisionShape and not node.disabled:
+	if node is CollisionShape3D and not node.disabled:
 		node.disabled = true
 		node.disabled = false
 
@@ -397,7 +413,7 @@ func _reset_all_colliders(node) -> void:
 
 
 func _set_colliders_state(node, enabled: bool) -> void:
-	if node is CollisionShape:
+	if node is CollisionShape3D:
 		node.disabled = not enabled
 
 	for c in node.get_children():

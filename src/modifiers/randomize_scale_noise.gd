@@ -1,13 +1,13 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 
-export var override_global_seed := false
-export var custom_seed := 0
-export var octaves := 4
-export var period := 20.0
-export var persistence := 0.8
-export var scale := Vector3.ONE
+@export var override_global_seed := false
+@export var custom_seed := 0
+@export var octaves := 4
+@export var period := 20.0
+@export var persistence := 0.8
+@export var scale := Vector3.ONE
 
 var _noise: OpenSimplexNoise
 
@@ -28,7 +28,7 @@ func _process_transforms(transforms, global_seed) -> void:
 	else:
 		_noise.set_seed(global_seed)
 
-	var t: Transform
+	var t: Transform3D
 	var origin: Vector3
 	var s: Vector3
 	for i in transforms.list.size():

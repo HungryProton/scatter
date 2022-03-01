@@ -1,14 +1,14 @@
-tool
+@tool
 extends "base_parameter.gd"
 
 
-onready var _label: Label = $Label
-onready var _line_edit: LineEdit = $MarginContainer/MarginContainer/LineEdit
+@onready var _label: Label = $Label
+@onready var _line_edit: LineEdit = $MarginContainer/MarginContainer/LineEdit
 
 
 func _ready() -> void:
-	_line_edit.connect("text_entered", self, "_on_value_changed")
-	_line_edit.connect("focus_exited", self, "_on_focus_exited")
+	_line_edit.connect("text_entered", _on_value_changed)
+	_line_edit.connect("focus_exited", _on_focus_exited)
 
 
 func set_parameter_name(text: String) -> void:

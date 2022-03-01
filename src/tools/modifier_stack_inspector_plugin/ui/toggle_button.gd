@@ -1,9 +1,9 @@
-tool
+@tool
 extends Button
 
 
-export var default_icon: Texture
-export var pressed_icon: Texture
+@export var default_icon: Texture
+@export var pressed_icon: Texture
 
 
 func _on_ready() -> void:

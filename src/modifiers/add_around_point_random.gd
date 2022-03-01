@@ -1,11 +1,11 @@
-tool
+@tool
 extends "base_point_modifier.gd"
 
 
-export var override_global_seed := false
-export var custom_seed := 0
-export var filter_overlaps := false
-export var instance_count := 10
+@export var override_global_seed := false
+@export var custom_seed := 0
+@export var filter_overlaps := false
+@export var instance_count := 10
 
 
 var _rng: RandomNumberGenerator
@@ -19,7 +19,7 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, global_seed) -> void:
-	._process_transforms(transforms, global_seed)
+	super(transforms, global_seed)
 
 	_rng = RandomNumberGenerator.new()
 
@@ -39,9 +39,9 @@ func _process_transforms(transforms, global_seed) -> void:
 
 			for p in points:
 				if is_inside(pos, p):
-					var p_pos = t.xform_inv(p.get_global_transform().origin)
+					var p_pos = p.get_global_transform().origin * t
 					pos.y = p_pos.y
-					var t = Transform()
+					var t = Transform3D()
 					t.origin = pos
 					transforms.list.push_back(t)
 					inside = true

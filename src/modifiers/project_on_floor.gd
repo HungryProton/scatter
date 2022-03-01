@@ -1,15 +1,15 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 
-export var ray_length := 10.0
-export var ray_offset := 1.0
-export var remove_points_on_miss := true
-export var align_with_floor_normal := false
-export var invert_ray_direction := false
-export var floor_direction := Vector3.DOWN
-export(float, 0.0, 1.0) var max_slope = 1.0
-export(String, "bitmask") var mask = "1048575"
+@export var ray_length := 10.0
+@export var ray_offset := 1.0
+@export var remove_points_on_miss := true
+@export var align_with_floor_normal := false
+@export var invert_ray_direction := false
+@export var floor_direction := Vector3.DOWN
+@export_range(0.0, 1.0) var max_slope = 1.0
+@export_flags_3d_physics var mask = 1048575
 
 
 func _init() -> void:
@@ -28,7 +28,7 @@ func _process_transforms(transforms, _seed) -> void:
 	var space_state = path.get_world().get_direct_space_state()
 	var hit
 	var d: float
-	var t: Transform
+	var t: Transform3D
 	var i := 0
 
 	while i < transforms.list.size():
@@ -42,8 +42,8 @@ func _process_transforms(transforms, _seed) -> void:
 				continue
 
 			if align_with_floor_normal:
-				var gt: Transform = transforms.path.get_global_transform()
-				t = _align_with(t, gt.basis.xform_inv(hit.normal))
+				var gt: Transform3D = transforms.path.get_global_transform()
+				t = _align_with(t, hit.normal * gt.basis)
 
 			t.origin = path.to_local(hit.position)
 			transforms.list[i] = t
@@ -79,7 +79,7 @@ func _project_on_floor(pos, path, space_state):
 	return space_state.intersect_ray(start, end, [], int(mask))
 
 
-func _align_with(t: Transform, normal: Vector3) -> Transform:
+func _align_with(t: Transform3D, normal: Vector3) -> Transform3D:
 	var n1 = t.basis.y.normalized()
 	var n2 = normal.normalized()
 

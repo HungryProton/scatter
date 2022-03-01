@@ -1,4 +1,4 @@
-tool
+@tool
 extends EditorPlugin
 
 
@@ -7,8 +7,8 @@ const ScatterPath = preload("./src/core/scatter_path.gd")
 const Scatter = preload("./src/core/scatter.gd")
 
 var _modifier_stack_plugin: EditorInspectorPlugin = preload("./src/tools/modifier_stack_inspector_plugin/modifier_stack_plugin.gd").new()
-var _scatter_path_gizmo_plugin: EditorSpatialGizmoPlugin = preload("./src/tools/path_gizmo/scatter_path_gizmo_plugin.gd").new()
-var _point_gizmo_plugin: EditorSpatialGizmoPlugin = preload("./src/tools/point_gizmo/point_gizmo_plugin.gd").new()
+var _scatter_path_gizmo_plugin: EditorNode3DGizmoPlugin = preload("./src/tools/path_gizmo/scatter_path_gizmo_plugin.gd").new()
+var _point_gizmo_plugin: EditorNode3DGizmoPlugin = preload("./src/tools/point_gizmo/point_gizmo_plugin.gd").new()
 var _editor_selection
 var _gizmo_options: Control
 var _options_root: Control
@@ -63,7 +63,7 @@ func _enter_tree():
 	_editor_selection.connect("selection_changed", self, "_on_selection_changed")
 
 	# warning-ignore:return_value_discarded
-	connect("scene_changed", self, "_on_scene_changed")
+	connect("scene_changed", _on_scene_changed)
 
 
 func _exit_tree():
@@ -78,7 +78,7 @@ func _exit_tree():
 	_gizmo_options.queue_free()
 
 
-func forward_spatial_gui_input(camera: Camera, _event: InputEvent) -> bool:
+func forward_spatial_gui_input(camera: Camera3D, _event: InputEvent) -> bool:
 	if _scatter_path_gizmo_plugin:
 		_scatter_path_gizmo_plugin.set_editor_camera(camera)
 
@@ -118,7 +118,7 @@ func _hide_options_panel():
 
 
 func _reset_all_colliders(node) -> void:
-	if node is CollisionShape and not node.disabled:
+	if node is CollisionShape3D and not node.disabled:
 		node.disabled = true
 		node.disabled = false
 
@@ -127,7 +127,9 @@ func _reset_all_colliders(node) -> void:
 
 
 func _setup_options_panel() -> void:
-	var editor_viewport:VBoxContainer = get_editor_interface().get_editor_viewport()
+	_gizmo_options = preload("./src/tools/path_gizmo/gizmo_options.tscn").instance()
+	return
+	var editor_viewport:VBoxContainer = get_editor_interface().get_editor_main_control()
 	_options_root = Util.get_node_by_class_path(editor_viewport, [
 		'SpatialEditor',
 		'HSplitContainer',
@@ -137,11 +139,11 @@ func _setup_options_panel() -> void:
 		'Control',
 		'VBoxContainer',
 		])
-	_gizmo_options = preload("./src/tools/path_gizmo/gizmo_options.tscn").instance()
+
 	_options_root.add_child(_gizmo_options)
 
 	# warning-ignore:return_value_discarded
-	_gizmo_options.connect("snap_to_colliders_enabled", self, "_on_snap_to_colliders_enabled")
+	_gizmo_options.connect("snap_to_colliders_enabled", _on_snap_to_colliders_enabled)
 	_gizmo_options.visible = false
 
 

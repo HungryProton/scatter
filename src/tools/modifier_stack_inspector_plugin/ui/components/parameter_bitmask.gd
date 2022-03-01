@@ -1,13 +1,13 @@
-tool
+@tool
 extends "base_parameter.gd"
 
 
-onready var _label: Label = $Label
-onready var _grid_1: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1
-onready var _grid_2: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2
-onready var _grid_3: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3
-onready var _grid_4: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4
-onready var _menu_button: MenuButton = $MarginContainer/HBoxContainer/MenuButton
+@onready var _label: Label = $Label
+@onready var _grid_1: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1
+@onready var _grid_2: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2
+@onready var _grid_3: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3
+@onready var _grid_4: Control = $MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4
+@onready var _menu_button: MenuButton = $MarginContainer/HBoxContainer/MenuButton
 
 var _buttons: Array
 var _popup: PopupMenu
@@ -42,14 +42,14 @@ func _ready() -> void:
 			_popup.add_separator("", 100 + i)
 
 		layer_name = ProjectSettings.get_setting("layer_names/3d_physics/layer_" + String(i + 1))
-		if layer_name.empty():
+		if layer_name.is_empty():
 			layer_name = "Layer " + String(i + 1)
 		_popup.add_check_item(layer_name, _layer_count - 1 - i)
 
 	_sync_popup_state()
 
 	# warning-ignore:return_value_discarded
-	_popup.connect("id_pressed", self, "_on_id_pressed")
+	_popup.connect("id_pressed", _on_id_pressed)
 
 
 func set_parameter_name(text: String) -> void:
@@ -57,7 +57,7 @@ func set_parameter_name(text: String) -> void:
 
 
 func _set_value(val: String) -> void:
-	var binary_string: String = _dec2bin(int(val))
+	var binary_string: String = _dec2bin(val.to_int())
 	var length = binary_string.length()
 
 	if length < _layer_count:
@@ -77,29 +77,29 @@ func get_value() -> String:
 		binary_string += "1" if b.pressed else "0"
 
 	var val = _bin2dec(binary_string)
-	return String(val)
+	return str(val)
 
 
-func _dec2bin(var value: int) -> String:
+func _dec2bin(value: int) -> String:
 	if value == 0:
 		return "0"
 
 	var binary_string = ""
 	while value != 0:
 		var m = value % 2
-		binary_string = String(m) + binary_string
+		binary_string = str(m) + binary_string
 		# warning-ignore:integer_division
 		value = value / 2
 
 	return binary_string
 
 
-func _bin2dec(var binary_string: String) -> int:
+func _bin2dec(binary_string: String) -> int:
 	var decimal_value = 0
 	var count = binary_string.length() - 1
 
 	for i in binary_string.length():
-		decimal_value += pow(2, count) * int(binary_string[i])
+		decimal_value += pow(2, count) * binary_string[i].to_int()
 		count -= 1
 
 	return decimal_value

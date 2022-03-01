@@ -1,11 +1,11 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 
-export var local_space := false
-export var position := Vector3.ZERO
-export var rotation := Vector3(0.0, 0.0, 0.0)
-export var scale := Vector3.ONE
+@export var local_space := false
+@export var position := Vector3.ZERO
+@export var rotation := Vector3(0.0, 0.0, 0.0)
+@export var scale := Vector3.ONE
 
 
 func _init() -> void:
@@ -14,15 +14,15 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, _global_seed) -> void:
-	var t: Transform
+	var t: Transform3D
 	var origin: Vector3
 
-	var gt: Transform = transforms.path.get_global_transform()
+	var gt: Transform3D = transforms.path.get_global_transform()
 	origin = gt.origin
 	gt.origin = Vector3.ZERO
-	var global_x: Vector3 = gt.xform_inv(Vector3.RIGHT).normalized()
-	var global_y: Vector3 = gt.xform_inv(Vector3.UP).normalized()
-	var global_z: Vector3 = gt.xform_inv(Vector3.DOWN).normalized()
+	var global_x: Vector3 = (Vector3.RIGHT * gt).normalized()
+	var global_y: Vector3 = (Vector3.UP * gt).normalized()
+	var global_z: Vector3 = (Vector3.DOWN * gt).normalized()
 	gt.origin = origin
 
 	for i in transforms.list.size():
@@ -37,7 +37,7 @@ func _process_transforms(transforms, _global_seed) -> void:
 			t.basis.x *= scale.x
 			t.basis.y *= scale.y
 			t.basis.z *= scale.z
-			t.origin = origin + t.xform(position)
+			t.origin = origin + (t * position)
 
 		else:
 			t = t.rotated(global_x, deg2rad(rotation.x))

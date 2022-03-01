@@ -1,27 +1,30 @@
-tool
-extends Path
+@tool
+extends Path3D
 
 
 signal curve_updated
 
 
-export var curve_tolerance_degrees := 5.0 setget _set_curve_tolerance_degrees
-
+@export var curve_tolerance_degrees := 5.0:
+	set(val):
+		curve_tolerance_degrees = val
+		_update_from_curve()
+	
 var polygon : PolygonPathFinder
-var baked_points : PoolVector3Array
+var baked_points : PackedVector3Array
 var size : Vector3
 var center : Vector3
 var bounds_max
 var bounds_min
 var closed_curve : bool = false
 
-var _previous_transform: Transform
+var _previous_transform: Transform3D
 
 
 func _ready():
 	set_notify_transform(true)
 	# warning-ignore:return_value_discarded
-	connect("curve_changed", self, "_on_curve_changed")
+	connect("curve_changed", _on_curve_changed)
 	_update_from_curve()
 
 
@@ -76,8 +79,8 @@ func _get_projected_coords(coords : Vector3):
 func _update_from_curve():
 	bounds_max = null
 	bounds_min = null
-	var connections = PoolIntArray()
-	var polygon_points = PoolVector2Array()
+	var connections = PackedInt32Array()
+	var polygon_points = PackedVector2Array()
 
 	if not curve:
 		curve = Curve3D.new()

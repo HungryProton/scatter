@@ -1,8 +1,8 @@
-tool
-extends Spatial
+@tool
+extends Node3D
 
 
-var Scatter = preload("namespace.gd").new()
+var Scatter = load("namespace.gd").new()
 
 var _is_updating := false
 
@@ -28,7 +28,7 @@ func update() -> void:
 
 
 func _update_children_recursive(node: Node) -> void:
-	if node is Scatter.Scatter:
+	if node is Scatter:
 		node.update()
 
 	for child in node.get_children():

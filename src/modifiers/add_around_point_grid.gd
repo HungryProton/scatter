@@ -1,10 +1,10 @@
-tool
+@tool
 extends "base_point_modifier.gd"
 
 
-export var filter_overlaps := false
-export var x_spacing := 2.0
-export var z_spacing := 2.0
+@export var filter_overlaps := false
+@export var x_spacing := 2.0
+@export var z_spacing := 2.0
 
 
 func _init() -> void:
@@ -15,7 +15,7 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, global_seed) -> void:
-	._process_transforms(transforms, global_seed)
+	super(transforms, global_seed)
 
 	x_spacing = max(0.05, x_spacing)
 	z_spacing = max(0.05, z_spacing)
@@ -35,9 +35,9 @@ func _process_transforms(transforms, global_seed) -> void:
 
 		for p in points:
 			if is_inside(pos, p):
-				var p_pos = t.xform_inv(p.get_global_transform().origin)
+				var p_pos = p.get_global_transform().origin * t
 				pos.y = p_pos.y
-				var t = Transform()
+				var t = Transform3D()
 				t.origin = pos
 				transforms.list.push_back(t)
 				if filter_overlaps:

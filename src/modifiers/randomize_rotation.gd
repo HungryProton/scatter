@@ -1,12 +1,12 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 
-export var override_global_seed := false
-export var custom_seed := 0
-export var local_space := false
-export var rotation := Vector3(360.0, 360.0, 360.0)
-export var snap_angle := Vector3.ZERO
+@export var override_global_seed := false
+@export var custom_seed := 0
+@export var local_space := false
+@export var rotation := Vector3(360.0, 360.0, 360.0)
+@export var snap_angle := Vector3.ZERO
 
 var _rng: RandomNumberGenerator
 
@@ -24,14 +24,14 @@ func _process_transforms(transforms, global_seed) -> void:
 	else:
 		_rng.set_seed(global_seed)
 
-	var t: Transform
+	var t: Transform3D
 	var b: Basis
 
-	var gt: Transform = transforms.path.get_global_transform()
+	var gt: Transform3D = transforms.path.get_global_transform()
 	var gb: Basis = gt.basis
-	var global_x: Vector3 = gb.xform_inv(Vector3.RIGHT).normalized()
-	var global_y: Vector3 = gb.xform_inv(Vector3.UP).normalized()
-	var global_z: Vector3 = gb.xform_inv(Vector3.DOWN).normalized()
+	var global_x: Vector3 = (Vector3.RIGHT * gb).normalized()
+	var global_y: Vector3 = (Vector3.UP * gb).normalized()
+	var global_z: Vector3 = (Vector3.DOWN * gb).normalized()
 
 	for i in transforms.list.size():
 		t = transforms.list[i]
@@ -60,7 +60,7 @@ func _random_vec3() -> Vector3:
 
 
 func _random_angle(rot: float, snap: float) -> float:
-	return deg2rad(stepify(_rng.randf_range(-1.0, 1.0) * rot, snap))
+	return deg2rad(snapped(_rng.randf_range(-1.0, 1.0) * rot, snap))
 
 
 func _clamp_vector(vec3, vmin, vmax) -> Vector3:

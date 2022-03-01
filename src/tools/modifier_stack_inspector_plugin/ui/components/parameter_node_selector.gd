@@ -1,12 +1,12 @@
-tool
+@tool
 extends "base_parameter.gd"
 
 
-onready var _label: Label = $HBoxContainer/Label
-onready var _select_button: Button = $HBoxContainer/Button
-onready var _clear_button: Button = $HBoxContainer/ClearButton
-onready var _popup: Popup = $Control/ConfirmationDialog
-onready var _tree: Tree = $Control/ConfirmationDialog/ScrollContainer/Tree
+@onready var _label: Label = $HBoxContainer/Label
+@onready var _select_button: Button = $HBoxContainer/Button
+@onready var _clear_button: Button = $HBoxContainer/ClearButton
+@onready var _popup: Popup = $Control/ConfirmationDialog
+@onready var _tree: Tree = $Control/ConfirmationDialog/ScrollContainer/Tree
 
 var _full_path := ""
 var _root: Node
@@ -28,7 +28,7 @@ func _set_value(val: String) -> void:
 	if _root and _root.has_node(val):
 		_selected = _root.get_node(val)
 
-	if val.empty():
+	if val.is_empty():
 		_select_button.text = "Select a node"
 
 

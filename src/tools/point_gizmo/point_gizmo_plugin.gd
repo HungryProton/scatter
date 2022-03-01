@@ -1,8 +1,8 @@
-tool
-extends EditorSpatialGizmoPlugin
+@tool
+extends EditorNode3DGizmoPlugin
 
 
-var Scatter = load(_get_root_folder() + "/src/core/namespace.gd").new()
+var Scatter = preload("res://addons/proton_scatter/src/core/namespace.gd")
 
 var _selected
 var _gizmo
@@ -20,7 +20,7 @@ func has_gizmo(node):
 	return node is Scatter.Point
 
 
-func redraw(gizmo: EditorSpatialGizmo):
+func redraw(gizmo: EditorNode3DGizmo):
 	_gizmo = gizmo
 	if not gizmo:
 		return
@@ -29,7 +29,7 @@ func redraw(gizmo: EditorSpatialGizmo):
 	var point = gizmo.get_spatial_node()
 	_update_current(point)
 
-	var lines = PoolVector3Array()
+	var lines = PackedVector3Array()
 	var steps = 32
 	var step_angle = 2 * PI / steps
 	var radius = point.radius
@@ -48,14 +48,6 @@ func redraw(gizmo: EditorSpatialGizmo):
 
 	gizmo.add_lines(lines, get_material("lines", gizmo))
 	gizmo.add_collision_segments(lines)
-
-
-func _get_root_folder() -> String:
-	var script: Script = get_script()
-	var path: String = script.get_path().get_base_dir()
-	var folders = path.right(6) # Remove the res://
-	var tokens = folders.split('/')
-	return "res://" + tokens[0] + "/" + tokens[1]
 
 
 func _update_current(point) -> void:

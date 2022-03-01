@@ -1,29 +1,32 @@
 # warning-ignore-all:return_value_discarded
 
-tool
+@tool
 extends Control
 
 
 signal curve_updated
 
 
-export var grid_color := Color(1, 1, 1, 0.2)
-export var grid_color_sub := Color(1, 1, 1, 0.1)
-export var curve_color := Color(1, 1, 1, 0.9)
-export var point_color := Color.white
-export var selected_point_color := Color.orange
-export var point_radius := 4.0
-export var text_color := Color(0.9, 0.9, 0.9)
-export var columns := 4
-export var rows := 2
-export var dynamic_row_count := true
+@export var grid_color := Color(1, 1, 1, 0.2)
+@export var grid_color_sub := Color(1, 1, 1, 0.1)
+@export var curve_color := Color(1, 1, 1, 0.9)
+@export var point_color := Color.WHITE
+@export var selected_point_color := Color.ORANGE
+@export var point_radius := 4.0
+@export var text_color := Color(0.9, 0.9, 0.9)
+@export var columns := 4
+@export var rows := 2
+@export var dynamic_row_count := true
 
 var curve: Curve
 var gt: Transform2D
 
-var _hover_point := -1 setget set_hover
-var _selected_point := -1 setget set_selected_point
-var _selected_tangent := -1 setget set_selected_tangent
+var _hover_point := -1:
+	set(val): set_hover(val)
+var _selected_point := -1:
+	set(val): set_selected_point(val)
+var _selected_tangent := -1:
+	set(val): set_selected_tangent(val)
 var _dragging := false
 var _hover_radius := 50.0 # Squared
 var _tangents_length := 30.0
@@ -38,7 +41,7 @@ func _ready() -> void:
 	plugin.queue_free()
 
 	update()
-	connect("resized", self, "_on_resized")
+	connect("resized", _on_resized)
 
 
 func set_curve(c: Curve) -> void:
@@ -59,12 +62,12 @@ func _gui_input(event) -> void:
 		if event.doubleclick:
 			add_point(_to_curve_space(event.position))
 
-		elif event.pressed and event.button_index == BUTTON_MIDDLE:
+		elif event.pressed and event.button_index == MOUSE_BUTTON_MIDDLE:
 			var i = get_point_at(event.position)
 			if i != -1:
 				remove_point(i)
 
-		elif event.pressed and event.button_index == BUTTON_LEFT:
+		elif event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			set_selected_tangent(get_tangent_at(event.position))
 
 			if _selected_tangent == -1:
@@ -221,7 +224,7 @@ func _draw() -> void:
 	for i in columns + 1:
 		var x = width * (i * x_offset) + min_inner.x
 		draw_line(Vector2(x, max_outer.y), Vector2(x, min_outer.y), grid_color_sub)
-		draw_string(_font, Vector2(x + margin, min_outer.y - margin), String(stepify(i * x_offset, 0.01)), text_color)
+		draw_string(_font, Vector2(x + margin, min_outer.y - margin), str(snapped(i * x_offset, 0.01)), 0, -1, -1, text_color)
 
 	## Horizontal lines
 	var y_offset = 1.0 / rows
@@ -230,7 +233,7 @@ func _draw() -> void:
 		var y = height * (i * y_offset) + min_inner.y
 		draw_line(Vector2(min_outer.x, y), Vector2(max_outer.x, y), grid_color_sub)
 		var y_value = i * ((curve_max - curve_min) / rows) + curve_min
-		draw_string(_font, Vector2(min_inner.x + margin, y - margin), String(stepify(y_value, 0.01)), text_color)
+		draw_string(_font, Vector2(min_inner.x + margin, y - margin), str(snapped(y_value, 0.01)), 0, -1, -1, text_color)
 
 	# Plot curve
 	var steps = 100

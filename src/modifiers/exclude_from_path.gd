@@ -1,11 +1,11 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 
-export(String, "Node") var path_name
-export(float, 0.0, 1.0) var strength = 1.0
-export var override_global_seed := false
-export var custom_seed := 0
+@export_node_path var path_name
+@export_range(0.0, 1.0) var strength = 1.0
+@export var override_global_seed := false
+@export var custom_seed := 0
 
 var _rng: RandomNumberGenerator
 
@@ -48,11 +48,11 @@ func _process_transforms(transforms, global_seed) -> void:
 
 func _get_paths_recursive(root) -> Array:
 	var res = []
-	if root is Path:
+	if root is Path3D:
 		res.push_back(root)
 
 	for c in root.get_children():
-		if c is Path:
+		if c is Path3D:
 			res += _get_paths_recursive(c)
 
 	return res

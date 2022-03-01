@@ -1,9 +1,9 @@
-tool
+@tool
 extends Control
 
 
-export var modifiers_popup: NodePath
-export var root: NodePath
+@export var modifiers_popup: NodePath
+@export var root: NodePath
 
 var _modifiers_popup: PopupPanel
 var _root: Control
@@ -18,7 +18,7 @@ func _ready():
 	_root = get_node(root)
 
 	# warning-ignore:return_value_discarded
-	_modifiers_popup.connect("add_modifier", self, "_on_add_modifier")
+	_modifiers_popup.connect("add_modifier", _on_add_modifier)
 
 	_is_ready = true
 	rebuild_ui()

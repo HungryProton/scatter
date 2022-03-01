@@ -1,34 +1,35 @@
 [remap]
 
 importer="texture"
-type="StreamTexture"
-path="res://.import/scatter.svg-acee3f4d6f8ddf1b21e205247a8c8a0e.stex"
+type="StreamTexture2D"
+uid="uid://chwotbfago2uu"
+path="res://.godot/imported/scatter.svg-bfff578dc360b745c3834db069a4a315.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/scatter/icons/scatter.svg"
-dest_files=[ "res://.import/scatter.svg-acee3f4d6f8ddf1b21e205247a8c8a0e.stex" ]
+source_file="res://addons/proton_scatter/icons/scatter.svg"
+dest_files=["res://.godot/imported/scatter.svg-bfff578dc360b745c3834db069a4a315.stex"]
 
 [params]
 
 compress/mode=0
 compress/lossy_quality=0.7
-compress/hdr_mode=0
+compress/hdr_compression=1
 compress/bptc_ldr=0
 compress/normal_map=0
-flags/repeat=0
-flags/filter=true
-flags/mipmaps=false
-flags/anisotropic=false
-flags/srgb=2
+compress/channel_pack=0
+compress/streamed=false
+mipmaps/generate=false
+mipmaps/limit=-1
+roughness/mode=0
+roughness/src_normal=""
 process/fix_alpha_border=true
 process/premult_alpha=false
-process/HDR_as_SRGB=false
-process/invert_color=false
-stream=false
-size_limit=0
-detect_3d=true
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/size_limit=0
+detect_3d/compress_to=1
 svg/scale=1.0

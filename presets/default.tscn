@@ -1,7 +1,7 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=4 format=3]
 
-[ext_resource path="res://addons/scatter/src/core/scatter.gd" type="Script" id=1]
-[ext_resource path="res://addons/scatter/src/core/scatter_item.gd" type="Script" id=2]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/core/scatter.gd" id="1"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/core/scatter_item.gd" id="2"]
 
 [sub_resource type="Curve3D" id=1]
 _data = {

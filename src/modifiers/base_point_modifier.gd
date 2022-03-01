@@ -1,17 +1,17 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 
-var Scatter = preload("../core/namespace.gd").new()
+var Scatter = preload("../core/namespace.gd")
 
-export(String, "Node") var node_name
-export var radius := 1.0
+@export_node_path var node_name
+@export var radius := 1.0
 
 
 var points := []
 var bounds_min: Vector3
 var bounds_max: Vector3
-var t: Transform
+var t: Transform3D
 
 
 func _init() -> void:
@@ -29,7 +29,7 @@ func is_inside_any(pos: Vector3) -> bool:
 
 
 func is_inside(pos: Vector3, p) -> bool:
-	var point_pos = t.xform_inv(p.get_global_transform().origin)
+	var point_pos = p.get_global_transform().origin * t
 	pos.y = 0.0
 	point_pos.y = 0.0
 
@@ -72,7 +72,7 @@ func _update_bounds() -> void:
 	for i in points.size():
 		var p = points[i]
 		var r = p.radius * radius
-		var pos = t.xform_inv(p.get_global_transform().origin)
+		var pos = p.get_global_transform().origin * t
 		var pmin = pos - Vector3(r, 0.0, r)
 		var pmax = pos + Vector3(r, 0.0, r)
 

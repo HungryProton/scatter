@@ -1,19 +1,13 @@
-tool
-extends Node
+@tool
+extends Resource
 
 
 signal stack_changed
 
 
-export var stack := []
+@export var stack := []
 var just_created := false
 var undo_redo: UndoRedo
-
-
-func _ready():
-	for m in stack:
-		if not m.get_parent():
-			add_child(m)
 
 
 func update(transforms, random_seed) -> void:
@@ -32,7 +26,6 @@ func duplicate_stack() -> Array:
 func add_modifier(modifier) -> void:
 	var restore = duplicate_stack()
 	stack.push_back(modifier)
-	add_child(modifier)
 	_create_undo_action("Added Modifier", restore)
 	emit_signal("stack_changed")
 
@@ -43,7 +36,7 @@ func move_up(modifier) -> void:
 		return
 
 	var restore = duplicate_stack()
-	stack.remove(index)
+	stack.remove_at(index)
 	stack.insert(index - 1, modifier)
 	_create_undo_action("Moved Modifier Up", restore)
 
@@ -57,7 +50,7 @@ func move_down(modifier) -> void:
 		return
 
 	var restore = duplicate_stack()
-	stack.remove(index)
+	stack.remove_at(index)
 	stack.insert(index + 1, modifier)
 	_create_undo_action("Moved Modifier Down", restore)
 
@@ -82,11 +75,5 @@ func _create_undo_action(name, restore) -> void:
 
 
 func _restore_stack(s) -> void:
-	for c in get_children():
-		c.queue_free()
-
 	stack = s
-	for m in stack:
-		add_child(m)
-
 	emit_signal("stack_changed")

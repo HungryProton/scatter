@@ -1,11 +1,11 @@
-tool
+@tool
 extends "base_parameter.gd"
 
 
-onready var _label: Label = $HBoxContainer/Label
-onready var _select_button: Button = $HBoxContainer/HBoxContainer/FileButton
-onready var _dialog: FileDialog = $Control/FileDialog
-onready var _texture: Button = $VBoxContainer/TextureButton
+@onready var _label: Label = $HBoxContainer/Label
+@onready var _select_button: Button = $HBoxContainer/HBoxContainer/FileButton
+@onready var _dialog: FileDialog = $Control/FileDialog
+@onready var _texture: Button = $VBoxContainer/TextureButton
 
 var _path := ""
 var _is_texture := false
@@ -25,7 +25,7 @@ func _set_value(val: String) -> void:
 	_select_button.text = val.get_file()
 	_texture.visible = false
 
-	if val.empty():
+	if val.is_empty():
 		_select_button.text = "Select a file"
 
 	if _is_texture:

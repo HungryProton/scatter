@@ -1,3 +1,4 @@
+@tool
 extends EditorInspectorPlugin
 
 # Displays a control panel in the inspector to monitor the connection status
@@ -5,27 +6,18 @@ extends EditorInspectorPlugin
 # needed.
 
 
-var _root := _get_root_folder()
-var _namespace = load(_root + "/src/core/namespace.gd").new()
-var _editor = load(_root + "/src/tools/modifier_stack_inspector_plugin/editor_property.gd")
+const Scatter = preload("res://addons/proton_scatter/src/core/namespace.gd")
+const Editor = preload("res://addons/proton_scatter/src/tools/modifier_stack_inspector_plugin/editor_property.gd")
 
 
 func can_handle(object):
-	return object is _namespace.Scatter
+	return object is Scatter.Scatter
 
 
 func parse_property(object, type, path, _hint, hint_text, _usage):
 	if type == TYPE_OBJECT and hint_text == "ScatterModifierStack":
-		var editor_property = _editor.new()
+		var editor_property = Editor.new()
 		editor_property.set_node(object)
 		add_property_editor(path, editor_property)
 		return true
 	return false
-
-
-func _get_root_folder() -> String:
-	var script: Script = get_script()
-	var path: String = script.get_path().get_base_dir()
-	var folders = path.right(6) # Remove the res://
-	var tokens = folders.split('/')
-	return "res://" + tokens[0] + "/" + tokens[1]

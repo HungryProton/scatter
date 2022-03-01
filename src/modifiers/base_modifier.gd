@@ -1,11 +1,11 @@
-tool
-extends Node
+@tool
+extends Resource
 
 
 signal warning_changed
 
 
-export var enabled := true
+@export var enabled := true
 
 
 var display_name: String = "Base Modifier Name"

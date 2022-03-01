@@ -1,17 +1,17 @@
-tool
+@tool
 extends "base_parameter.gd"
 
 
-onready var _label: Label = $Label
-onready var _x: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer/X
-onready var _y: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer2/Y
-onready var _z: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer3/Z
+@onready var _label: Label = $Label
+@onready var _x: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer/X
+@onready var _y: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer2/Y
+@onready var _z: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer3/Z
 
 
 func _ready() -> void:
-	_x.connect("value_changed", self, "_on_value_changed")
-	_y.connect("value_changed", self, "_on_value_changed")
-	_z.connect("value_changed", self, "_on_value_changed")
+	_x.connect("value_changed", _on_value_changed)
+	_y.connect("value_changed", _on_value_changed)
+	_z.connect("value_changed", _on_value_changed)
 
 
 func set_parameter_name(text: String) -> void:

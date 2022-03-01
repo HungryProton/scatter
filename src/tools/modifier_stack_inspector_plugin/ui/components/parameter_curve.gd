@@ -1,12 +1,12 @@
-tool
+@tool
 extends "base_parameter.gd"
 
 
 const Util = preload("../../../../common/util.gd")
 
 
-onready var _label: Label = $Label
-onready var _panel: Control = $MarginContainer/CurvePanel
+@onready var _label: Label = $Label
+@onready var _panel: Control = $MarginContainer/CurvePanel
 
 
 func set_parameter_name(text: String) -> void:

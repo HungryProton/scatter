@@ -24,8 +24,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-tool
-extends Reference
+@tool
+extends RefCounted
 
 var rng: RandomNumberGenerator
 
@@ -73,7 +73,7 @@ func generate_points(radius: float, sample_region_shape, retries: int, start_pos
 				sample_accepted = true
 				break
 		if not sample_accepted:
-			_spawn_points.remove(spawn_index)
+			_spawn_points.remove_at(spawn_index)
 	return _points
 
 
@@ -99,11 +99,11 @@ func _is_point_in_sample_region(sample: Vector2) -> bool:
 		match typeof(_sample_region_shape):
 			TYPE_RECT2:
 				return true
-			TYPE_VECTOR2_ARRAY, TYPE_ARRAY:
-				if Geometry.is_point_in_polygon(sample, _sample_region_shape):
+			TYPE_PACKED_VECTOR2_ARRAY, TYPE_ARRAY:
+				if Geometry2D.is_point_in_polygon(sample, _sample_region_shape):
 					return true
 			TYPE_VECTOR3:
-				if Geometry.is_point_in_circle(sample, Vector2(_sample_region_shape.x, _sample_region_shape.y), _sample_region_shape.z):
+				if Geometry2D.is_point_in_circle(sample, Vector2(_sample_region_shape.x, _sample_region_shape.y), _sample_region_shape.z):
 					return true
 			_:
 				return false
@@ -122,7 +122,7 @@ func _init_vars() -> void:
 				_start_pos.x = _sample_region_rect.position.x + _sample_region_rect.size.x * rng.randf()
 				_start_pos.y = _sample_region_rect.position.y + _sample_region_rect.size.y * rng.randf()
 
-		TYPE_VECTOR2_ARRAY, TYPE_ARRAY:
+		TYPE_PACKED_VECTOR2_ARRAY, TYPE_ARRAY:
 			var start: Vector2 = _sample_region_shape[0]
 			var end: Vector2 = _sample_region_shape[0]
 			for i in range(1, _sample_region_shape.size()):

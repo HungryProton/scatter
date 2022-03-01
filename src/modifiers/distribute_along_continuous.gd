@@ -1,9 +1,9 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 
-export var item_length := 2.0
-export var ignore_slopes := false
+@export var item_length := 2.0
+@export var ignore_slopes := false
 
 var _current_offset = 0.0
 
@@ -16,7 +16,7 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, _seed) -> void:
-	var path: Path = transforms.path
+	var path: Path3D = transforms.path
 	var curve: Curve3D
 	if not ignore_slopes:
 		curve = path.curve.duplicate()
@@ -31,7 +31,7 @@ func _process_transforms(transforms, _seed) -> void:
 	transforms.resize(count - 2)
 	var p1: Vector3
 	var p2: Vector3
-	var t: Transform
+	var t: Transform3D
 
 	for i in transforms.list.size():
 		p1 = points[i]

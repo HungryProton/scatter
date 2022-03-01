@@ -1,4 +1,4 @@
-tool
+@tool
 extends Control
 
 
@@ -7,17 +7,17 @@ signal color_changed
 signal snap_to_colliders_enabled
 
 
-onready var _colliders: Button = $VBoxContainer/Colliders
-onready var _plane: Button = $VBoxContainer/Plane
-onready var _options_button: Button = $VBoxContainer/Options
-onready var _options: Control = $VBoxContainer/MarginContainer
-onready var _grid_density: SpinBox = $VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/GridDensity/SpinBox
-onready var _hide_grid: CheckButton = $VBoxContainer/MarginContainer/VBoxContainer/HideGrid
-onready var _force_plane_projection: CheckButton = $VBoxContainer/MarginContainer/VBoxContainer/ForceProjection
-onready var _path_color: ColorRect = $VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PathColor/MarginContainer/Button/ColorRect
-onready var _grid_color: ColorRect = $VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/GridColor/MarginContainer/Button/ColorRect
-onready var _color_picker: ColorPicker = $Popup/MarginContainer/ColorPicker
-onready var _color_popup: Popup = $Popup
+@onready var _colliders: Button = $VBoxContainer/Colliders
+@onready var _plane: Button = $VBoxContainer/Plane
+@onready var _options_button: Button = $VBoxContainer/Options
+@onready var _options: Control = $VBoxContainer/MarginContainer
+@onready var _grid_density: SpinBox = $VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/GridDensity/SpinBox
+@onready var _hide_grid: CheckButton = $VBoxContainer/MarginContainer/VBoxContainer/HideGrid
+@onready var _force_plane_projection: CheckButton = $VBoxContainer/MarginContainer/VBoxContainer/ForceProjection
+@onready var _path_color: ColorRect = $VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/PathColor/MarginContainer/Button/ColorRect
+@onready var _grid_color: ColorRect = $VBoxContainer/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/GridColor/MarginContainer/Button/ColorRect
+@onready var _color_picker: ColorPicker = $Popup/MarginContainer/ColorPicker
+@onready var _color_popup: Popup = $Popup
 
 
 var _selected_color

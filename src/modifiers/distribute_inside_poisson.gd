@@ -1,10 +1,11 @@
-tool
+@tool
 extends "base_modifier.gd"
 
-export var override_global_seed := false
-export var custom_seed := 0
-export var distribution_radius := 1.0
-export var distribution_retries := 20
+
+@export var override_global_seed := false
+@export var custom_seed := 0
+@export var distribution_radius := 1.0
+@export var distribution_retries := 20
 
 var _sampler = preload("../common/poisson_disc_sampling.gd").new()
 

@@ -1,21 +1,21 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 # Takes existing objects and duplicates them recursively with given transforms
 
-export var amount := 1
-export var min_amount := -1
-export var local_offset := false
-export var offset := Vector3.ZERO
-export var local_rotation := false
-export var rotation := Vector3.ZERO
-export var individual_rotation_pivots := true
-export var rotation_pivot := Vector3.ZERO
-export var local_scale := true
-export var scale := Vector3.ONE
-export var randomize_indices := true
-export var override_global_seed := false
-export var custom_seed := 0
+@export var amount := 1
+@export var min_amount := -1
+@export var local_offset := false
+@export var offset := Vector3.ZERO
+@export var local_rotation := false
+@export var rotation := Vector3.ZERO
+@export var individual_rotation_pivots := true
+@export var rotation_pivot := Vector3.ZERO
+@export var local_scale := true
+@export var scale := Vector3.ONE
+@export var randomize_indices := true
+@export var override_global_seed := false
+@export var custom_seed := 0
 
 var _rng: RandomNumberGenerator
 
@@ -54,11 +54,11 @@ func _process_transforms(transforms, global_seed: int) -> void:
 			a += 1
 
 			# use original object's transform as base transform
-			var transform : Transform = transforms.list[t]
+			var transform : Transform3D = transforms.list[t]
 			var basis := transform.basis
 
 			# first move to rotation point defined in rotation offset
-			var rotation_pivot_offset = (float(individual_rotation_pivots) * transform.xform(rotation_pivot) + float(!individual_rotation_pivots) * (rotation_pivot))
+			var rotation_pivot_offset = (float(individual_rotation_pivots) * (transform * rotation_pivot) + float(!individual_rotation_pivots) * (rotation_pivot))
 			transform.origin -= rotation_pivot_offset
 
 			# then rotate
@@ -85,7 +85,7 @@ func _process_transforms(transforms, global_seed: int) -> void:
 			transform.origin += rotation_pivot_offset
 
 			# offset
-			transform.origin += (float(!local_offset) * offset * a) + (float(local_offset) * basis.xform(offset) * a)
+			transform.origin += (float(!local_offset) * offset * a) + (float(local_offset) * (basis * offset) * a)
 
 			# store the final result
 			new_transforms.push_back(transform)

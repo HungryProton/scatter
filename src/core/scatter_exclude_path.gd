@@ -1,10 +1,10 @@
-tool
+@tool
 extends "scatter_path.gd"
 
 
 func _ready():
 	# warning-ignore:return_value_discarded
-	connect("curve_updated", self, "update")
+	connect("curve_updated", update)
 
 
 func update():

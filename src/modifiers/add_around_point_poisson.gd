@@ -1,12 +1,12 @@
-tool
+@tool
 extends "base_point_modifier.gd"
 
 
-export var override_global_seed := false
-export var custom_seed := 0
-export var filter_overlaps := false
-export var distribution_radius := 1.0
-export var distribution_retries := 20
+@export var override_global_seed := false
+@export var custom_seed := 0
+@export var filter_overlaps := false
+@export var distribution_radius := 1.0
+@export var distribution_retries := 20
 
 var _sampler = preload("../common/poisson_disc_sampling.gd").new()
 
@@ -19,7 +19,7 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, global_seed) -> void:
-	._process_transforms(transforms, global_seed)
+	super(transforms, global_seed)
 
 	_sampler.rng = RandomNumberGenerator.new()
 
@@ -37,9 +37,9 @@ func _process_transforms(transforms, global_seed) -> void:
 		var pos = Vector3(s.x, height, s.y)
 		for p in points:
 			if is_inside(pos, p):
-				var p_pos = t.xform_inv(p.get_global_transform().origin)
+				var p_pos = p.get_global_transform().origin * t
 				pos.y = p_pos.y
-				var t := Transform()
+				var t := Transform3D()
 				t.origin = pos
 				transforms.list.push_back(t)
 				if filter_overlaps:

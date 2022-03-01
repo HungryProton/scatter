@@ -1,13 +1,13 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 
-export var override_global_seed := false
-export var custom_seed := 0
-export var local_space := false
-export var position := Vector3.ONE
-export var rotation := Vector3(360.0, 360.0, 360.0)
-export var scale := Vector3.ONE
+@export var override_global_seed := false
+@export var custom_seed := 0
+@export var local_space := false
+@export var position := Vector3.ONE
+@export var rotation := Vector3(360.0, 360.0, 360.0)
+@export var scale := Vector3.ONE
 
 var _rng: RandomNumberGenerator
 
@@ -25,16 +25,16 @@ func _process_transforms(transforms, global_seed) -> void:
 	else:
 		_rng.set_seed(global_seed)
 
-	var t: Transform
+	var t: Transform3D
 	var s: Vector3
 	var origin: Vector3
 
-	var gt: Transform = transforms.path.get_global_transform()
+	var gt: Transform3D = transforms.path.get_global_transform()
 	origin = gt.origin
 	gt.origin = Vector3.ZERO
-	var global_x: Vector3 = gt.xform_inv(Vector3.RIGHT).normalized()
-	var global_y: Vector3 = gt.xform_inv(Vector3.UP).normalized()
-	var global_z: Vector3 = gt.xform_inv(Vector3.DOWN).normalized()
+	var global_x: Vector3 = (Vector3.RIGHT * gt).normalized()
+	var global_y: Vector3 = (Vector3.UP * gt).normalized()
+	var global_z: Vector3 = (Vector3.DOWN * gt).normalized()
 	gt.origin = origin
 
 	for i in transforms.list.size():
@@ -49,7 +49,7 @@ func _process_transforms(transforms, global_seed) -> void:
 			t = t.rotated(t.basis.x.normalized(), deg2rad(_random_float() * rotation.x))
 			t = t.rotated(t.basis.y.normalized(), deg2rad(_random_float() * rotation.y))
 			t = t.rotated(t.basis.z.normalized(), deg2rad(_random_float() * rotation.z))
-			t.origin = origin + t.xform(_random_vec3() * position)
+			t.origin = origin + t * (_random_vec3() * position)
 
 		else:
 			t = t.rotated(global_x, deg2rad(_random_float() * rotation.x))

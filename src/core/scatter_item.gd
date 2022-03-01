@@ -1,20 +1,30 @@
-tool
-extends Spatial
+@tool
+extends Node3D
 
 
 const Util = preload("../common/util.gd")
 
-export var proportion := 100 setget _set_proportion
-export var local_item_path: NodePath setget _set_local_path
-export(String, FILE) var item_path setget _set_path
-export var scale_modifier := 1.0 setget _set_scale_modifier
-export var ignore_initial_position := true setget _set_ignore_pos
-export var ignore_initial_rotation := true setget _set_ignore_rot
-export var ignore_initial_scale := true setget _set_ignore_scale
+@export var proportion := 100:
+	set(val): _set_proportion(val)
+@export var local_item_path: NodePath:
+	set(val): _set_local_path(val)
+@export_file var item_path:
+	set(val): _set_path(val)
+@export var scale_modifier := 1.0:
+	set(val): _set_scale_modifier(val)
+@export var ignore_initial_position := true:
+	set(val): _set_ignore_pos(val)
+@export var ignore_initial_rotation := true:
+	set(val): _set_ignore_rot(val)
+@export var ignore_initial_scale := true:
+	set(val): _set_ignore_scale(val)
 
-var use_instancing := true setget _set_use_instancing
-var merge_target_meshes := false setget _set_merge_target_meshes
-var cast_shadow := 1 setget _set_cast_shadow
+var use_instancing := true:
+	set(val): _set_use_instancing(val)
+var merge_target_meshes := false:
+	set(val): _set_merge_target_meshes(val)
+var cast_shadow := 1:
+	set(val): _set_cast_shadow(val)
 
 var initial_position: Vector3
 var initial_rotation: Vector3
@@ -86,7 +96,7 @@ func update():
 		_parent.update()
 
 
-func get_mesh_instance_copy() -> MeshInstance:
+func get_mesh_instance_copy() -> MeshInstance3D:
 	var root = null
 	var local_root = false
 
@@ -153,27 +163,28 @@ func update_warning() -> void:
 		get_tree().emit_signal("node_configuration_warning_changed", self)
 
 
-func get_multimesh_instance() -> MultiMeshInstance:
+func get_multimesh_instance() -> MultiMeshInstance3D:
 	for c in get_children():
-		if c is MultiMeshInstance:
+		if c is MultiMeshInstance3D:
 			return c
 	return null
 
 
 func delete_multimesh() -> void:
 	for c in get_children():
-		if c is MultiMeshInstance:
+		if c is MultiMeshInstance3D:
 			c.queue_free()
 
 
 func delete_duplicates() -> void:
 	for c in get_children():
-		if c.name.begins_with("Duplicates"):
+		var name = String(c.name)
+		if name.begins_with("Duplicates"):
 			c.queue_free()
 
 
 func update_shadows() -> void:
-	var mmi: MultiMeshInstance = get_multimesh_instance()
+	var mmi: MultiMeshInstance3D = get_multimesh_instance()
 	if not mmi:
 		return
 
@@ -189,7 +200,7 @@ func _get_mesh_from_scene(node):
 
 # Finds the first MeshInstance in the given hierarchy and returns it.
 func _get_first_mesh_from_scene(node):
-	if node is MeshInstance:
+	if node is MeshInstance3D:
 		return node.duplicate()
 
 	for c in node.get_children():
@@ -204,10 +215,10 @@ func _get_first_mesh_from_scene(node):
 # from all of them
 func _get_merged_mesh_from(node):
 	var instances = _get_all_mesh_instances_from(node)
-	if not instances or instances.empty():
+	if instances == null or instances.empty():
 		return null
 
-	var mesh_instance := MeshInstance.new()
+	var mesh_instance := MeshInstance3D.new()
 	mesh_instance.mesh = Util.create_mesh_from(instances)
 
 	return mesh_instance
@@ -215,7 +226,7 @@ func _get_merged_mesh_from(node):
 
 func _get_all_mesh_instances_from(node) -> Array:
 	var res = []
-	if node is MeshInstance:
+	if node is MeshInstance3D:
 		res.push_back(node)
 
 	for c in node.get_children():
@@ -224,7 +235,7 @@ func _get_all_mesh_instances_from(node) -> Array:
 	return res
 
 
-func _save_initial_data(mesh: MeshInstance) -> void:
+func _save_initial_data(mesh: MeshInstance3D) -> void:
 	if not mesh:
 		return
 
@@ -296,7 +307,7 @@ func _set_ignore_scale(val: bool) -> void:
 
 func _set_use_instancing(val: bool) -> void:
 	use_instancing = val
-	property_list_changed_notify()
+	notify_property_list_changed()
 
 
 func _set_cast_shadow(val: int) -> void:

@@ -1,9 +1,9 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 
-export var local_space := false
-export var position := Vector3.ZERO
+@export var local_space := false
+@export var position := Vector3.ZERO
 
 
 func _init() -> void:
@@ -12,13 +12,13 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, _global_seed) -> void:
-	var t: Transform
+	var t: Transform3D
 
 	for i in transforms.list.size():
 		t = transforms.list[i]
 
 		if local_space:
-			t.origin += t.basis.xform(position)
+			t.origin += t.basis * position
 		else:
 			t.origin += position
 

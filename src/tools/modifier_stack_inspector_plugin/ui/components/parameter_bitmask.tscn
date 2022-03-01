@@ -1,10 +1,10 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=6 format=3]
 
-[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_bitmask.gd" type="Script" id=1]
-[ext_resource path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/bitmask_button.tscn" type="PackedScene" id=2]
-[ext_resource path="res://addons/scatter/icons/menu.svg" type="Texture" id=3]
-[ext_resource path="res://addons/scatter/icons/clear.svg" type="Texture" id=4]
-[ext_resource path="res://addons/scatter/icons/enabled.svg" type="Texture" id=5]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_bitmask.gd" id="1"]
+[ext_resource type="PackedScene" path="res://addons/proton_scatter/src/tools/modifier_stack_inspector_plugin/ui/components/bitmask_button.tscn" id="2"]
+[ext_resource type="Texture" path="res://addons/proton_scatter/icons/menu.svg" id="3"]
+[ext_resource type="Texture" path="res://addons/proton_scatter/icons/clear.svg" id="4"]
+[ext_resource type="Texture" path="res://addons/proton_scatter/icons/enabled.svg" id="5"]
 
 [node name="parameter_bitmask" type="VBoxContainer"]
 anchor_right = 1.0

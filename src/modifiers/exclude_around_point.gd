@@ -1,11 +1,11 @@
-tool
+@tool
 extends "base_point_modifier.gd"
 
 
-export(String, "Curve") var falloff
-export var ignore_height := true
-export var override_global_seed := false
-export var custom_seed := 0
+@export var falloff: Curve
+@export var ignore_height := true
+@export var override_global_seed := false
+@export var custom_seed := 0
 
 var _rng: RandomNumberGenerator
 
@@ -24,7 +24,7 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, global_seed) -> void:
-	._process_transforms(transforms, global_seed)
+	super(transforms, global_seed)
 
 	var global_transform = transforms.path.global_transform
 	var pos: Vector3

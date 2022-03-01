@@ -1,19 +1,16 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 
-
-export var override_global_seed := false
-export var custom_seed := 0
-
-export var threshold := 0.0
-export var invert := false
-export var local := false
-
-export var octaves := 3
-export var period := 64.0
-export var persistence := 0.5
-export var lacunarity := 2.0
+@export var override_global_seed := false
+@export var custom_seed := 0
+@export var threshold := 0.0
+@export var invert := false
+@export var local := false
+@export var octaves := 3
+@export var period := 64.0
+@export var persistence := 0.5
+@export var lacunarity := 2.0
 
 
 func _init() -> void:

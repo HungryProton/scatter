@@ -1,4 +1,4 @@
-extends Node
+extends RefCounted
 
 
 static func get_node_by_class_path(node: Node, class_path: Array) -> Node:
@@ -13,7 +13,7 @@ static func get_node_by_class_path(node: Node, class_path: Array) -> Node:
 			stack.push_back(c)
 			depths.push_back(0)
 
-	if not stack: return res
+	if stack.is_empty(): return res
 
 	var max_ = class_path.size()-1
 

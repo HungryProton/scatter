@@ -1,15 +1,16 @@
-tool
-extends Reference
+@tool
+extends RefCounted
 
 
 var list := []
-var path setget set_path
+var path:
+	set(val): set_path(val)
 var max_count := -1
 
 
 func add(count: int) -> void:
 	for i in count:
-		var t := Transform()
+		var t := Transform3D()
 		list.push_back(t)
 
 
@@ -34,5 +35,5 @@ func clear() -> void:
 	list = []
 
 
-func set_path(p: Path) -> void:
+func set_path(p: Path3D) -> void:
 	path = p

@@ -1,11 +1,15 @@
-tool
-extends Spatial
+@tool
+extends Node3D
 
 
 signal parameter_changed
 
 
-export var radius := 1.0 setget set_radius
+@export var radius := 1.0:
+	set(val):
+		radius = val
+		emit_signal("parameter_changed")
+		update()
 
 
 func _ready():
@@ -22,9 +26,3 @@ func update():
 	var parent = get_parent()
 	if parent and parent.has_method("update"):
 		parent.update()
-
-
-func set_radius(val):
-	radius = val
-	emit_signal("parameter_changed")
-	update()

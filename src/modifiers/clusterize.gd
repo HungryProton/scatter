@@ -1,12 +1,12 @@
-tool
+@tool
 extends "base_modifier.gd"
 
 
-export(String, "Texture") var mask
-export var mask_scale := Vector2.ONE
-export var mask_offset := Vector2.ZERO
-export var rotation := 0.0
-export(float, 0.0, 1.0) var remove_below = 0.1
+@export_file("Texture") var mask
+@export var mask_scale := Vector2.ONE
+@export var mask_offset := Vector2.ZERO
+@export var rotation := 0.0
+@export_range(0.0, 1.0) var remove_below = 0.1
 
 
 func _init() -> void:

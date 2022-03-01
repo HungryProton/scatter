@@ -1,20 +1,20 @@
 # warning-ignore-all:return_value_discarded
 
-tool
+@tool
 extends "base_parameter.gd"
 
 
 var _is_int := false
 var _is_enum := false
 
-onready var _label: Label = $Label
-onready var _spinbox: SpinBox = $MarginContainer/MarginContainer/SpinBox
-onready var _option: OptionButton = $MarginContainer/MarginContainer/OptionButton
+@onready var _label: Label = $Label
+@onready var _spinbox: SpinBox = $MarginContainer/MarginContainer/SpinBox
+@onready var _option: OptionButton = $MarginContainer/MarginContainer/OptionButton
 
 
 func _ready() -> void:
-	_spinbox.connect("value_changed", self, "_on_value_changed")
-	_option.connect("item_selected", self, "_on_value_changed")
+	_spinbox.connect("value_changed", _on_value_changed)
+	_option.connect("item_selected", _on_value_changed)
 	mark_as_int(_is_int)
 
 
@@ -30,12 +30,12 @@ func set_parameter_name(text: String) -> void:
 
 func set_hint_string(hint: String) -> void:
 	# No hint provided, ignore.
-	if hint.empty():
+	if hint.is_empty():
 		return
 
 	# One integer provided
-	if hint.is_valid_integer():
-		_set_range(0, int(hint))
+	if hint.is_valid_int():
+		_set_range(0, hint.to_int())
 		return
 
 	# Multiple items provided, check their types
@@ -44,22 +44,22 @@ func set_hint_string(hint: String) -> void:
 	var all_float = true
 
 	for t in tokens:
-		if not t.is_valid_integer():
+		if not t.is_valid_int():
 			all_int = false
 		if not t.is_valid_float():
 			all_float = false
 
 	# All items are integer
 	if all_int and tokens.size() >= 2:
-		_set_range(int(tokens[0]), int(tokens[1]))
+		_set_range(tokens[0].to_int(), tokens[1].to_int())
 		return
 
 	# All items are float
 	if all_float:
 		if tokens.size() >= 2:
-			_set_range(float(tokens[0]), float(tokens[1]))
+			_set_range(tokens[0].to_float(), tokens[1].to_float())
 		if tokens.size() >= 3:
-			_spinbox.step = float(tokens[2])
+			_spinbox.step = tokens[2].to_float()
 		return
 
 	# All items are strings, make it a dropdown
