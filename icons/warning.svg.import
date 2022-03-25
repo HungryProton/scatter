@@ -1,17 +1,17 @@
 [remap]
 
 importer="texture"
-type="StreamTexture2D"
-uid="uid://dj0y6peid681t"
-path="res://.godot/imported/warning.svg-edf1b604537b5af6863f92713f96edb5.stex"
+type="CompressedTexture2D"
+uid="uid://bexxa5bpm2afe"
+path="res://.godot/imported/warning.svg-0cbf15ba6a6e0e24a04ea5489b11f04d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/proton_scatter/icons/warning.svg"
-dest_files=["res://.godot/imported/warning.svg-edf1b604537b5af6863f92713f96edb5.stex"]
+source_file="res://addons/scatter/icons/warning.svg"
+dest_files=["res://.godot/imported/warning.svg-0cbf15ba6a6e0e24a04ea5489b11f04d.ctex"]
 
 [params]
 
@@ -21,7 +21,6 @@ compress/hdr_compression=1
 compress/bptc_ldr=0
 compress/normal_map=0
 compress/channel_pack=0
-compress/streamed=false
 mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0

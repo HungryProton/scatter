@@ -3,8 +3,8 @@ extends MenuButton
 
 
 var _popup: PopupMenu
-var _save_icon = preload("res://addons/proton_scatter/icons/save.svg")
-var _load_icon = preload("res://addons/proton_scatter/icons/load.svg")
+var _save_icon = preload("../../../../icons/save.svg")
+var _load_icon = preload("../../../../icons/load.svg")
 var _load_popup: FileDialog
 var _save_popup: FileDialog
 

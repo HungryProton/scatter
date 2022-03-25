@@ -127,7 +127,7 @@ func _reset_all_colliders(node) -> void:
 
 
 func _setup_options_panel() -> void:
-	_gizmo_options = preload("./src/tools/path_gizmo/gizmo_options.tscn").instance()
+	_gizmo_options = preload("./src/tools/path_gizmo/gizmo_options.tscn").instantiate()
 	return
 	var editor_viewport:VBoxContainer = get_editor_interface().get_editor_main_control()
 	_options_root = Util.get_node_by_class_path(editor_viewport, [

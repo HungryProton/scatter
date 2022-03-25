@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://addons/proton_scatter/src/tools/modifier_stack_inspector_plugin/ui/modifier_list_popup/popup.gd" id="1"]
+[ext_resource type="Script" path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/modifier_list_popup/popup.gd" id="1"]
 
 [node name="ModifiersPopup" type="PopupPanel"]
 anchor_left = 0.5

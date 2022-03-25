@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://addons/proton_scatter/src/tools/path_gizmo/gizmo_options.gd" id="1"]
-[ext_resource type="Texture" path="res://addons/proton_scatter/icons/checker.png" id="2"]
+[ext_resource type="Script" path="res://addons/scatter/src/tools/path_gizmo/gizmo_options.gd" id="1"]
+[ext_resource type="Texture" path="res://addons/scatter/icons/checker.png" id="2"]
 
 [sub_resource type="StyleBoxFlat" id=1]
 content_margin_left = 4.0

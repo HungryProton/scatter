@@ -16,8 +16,8 @@ func set_parameter_name(text: String) -> void:
 
 
 func get_value() -> bool:
-	return _check_box.pressed
+	return _check_box.button_pressed
 
 
 func _set_value(val: bool) -> void:
-	_check_box.pressed = val
+	_check_box.button_pressed = val

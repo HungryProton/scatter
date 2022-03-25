@@ -74,7 +74,7 @@ func _ready() -> void:
 		_do_update()
 
 
-func add_child(node, legible_name := false) -> void:
+func add_child(node, legible_name := false, internal : int = 0) -> void:
 	super(node, legible_name)
 	_discover_items()
 

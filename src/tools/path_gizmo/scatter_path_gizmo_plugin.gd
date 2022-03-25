@@ -167,8 +167,9 @@ func force_redraw():
 func create_custom_handle_material(name, icon: Texture, color := Color.WHITE):
 	var handle_material = StandardMaterial3D.new()
 	handle_material.render_priority = 100
-	handle_material.set_feature(StandardMaterial3D.FEATURE_TRANSPARENT, true)
-	handle_material.set_flag(StandardMaterial3D.FLAG_UNSHADED, true)
+	
+	handle_material.set_transparency(StandardMaterial3D.TRANSPARENCY_ALPHA_SCISSOR)
+	handle_material.set_shading_mode(StandardMaterial3D.SHADING_MODE_UNSHADED)
 	handle_material.set_flag(StandardMaterial3D.FLAG_USE_POINT_SIZE, true)
 	handle_material.set_flag(StandardMaterial3D.FLAG_ALBEDO_FROM_VERTEX_COLOR, true)
 	handle_material.set_flag(StandardMaterial3D.FLAG_SRGB_VERTEX_COLOR, true)
@@ -182,8 +183,10 @@ func create_custom_handle_material(name, icon: Texture, color := Color.WHITE):
 func create_custom_material(name, color := Color.WHITE):
 	var material = StandardMaterial3D.new()
 	material.render_priority = 100
-	material.set_feature(StandardMaterial3D.FEATURE_TRANSPARENT, true)
-	material.set_flag(StandardMaterial3D.FLAG_UNSHADED, true)
+	
+	
+	material.set_transparency(StandardMaterial3D.TRANSPARENCY_ALPHA_SCISSOR)
+	material.set_shading_mode(StandardMaterial3D.SHADING_MODE_UNSHADED)
 	material.set_flag(StandardMaterial3D.FLAG_ALBEDO_FROM_VERTEX_COLOR, true)
 	material.set_flag(StandardMaterial3D.FLAG_SRGB_VERTEX_COLOR, true)
 	material.set_flag(StandardMaterial3D.FLAG_DISABLE_DEPTH_TEST, true)
@@ -307,8 +310,9 @@ func _draw_grid(gizmo):
 func _get_root_folder() -> String:
 	var script: Script = get_script()
 	var path: String = script.get_path().get_base_dir()
-	var folders = path.right(6) # Remove the res://
+	var folders = path.right(-6) # Remove the res:// negative causes letters to be cut from the beginning
 	var tokens = folders.split('/')
+	
 	return "res://" + tokens[0] + "/" + tokens[1]
 
 

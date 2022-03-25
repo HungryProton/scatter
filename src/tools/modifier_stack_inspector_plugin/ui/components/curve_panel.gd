@@ -198,10 +198,10 @@ func _draw() -> void:
 		return
 
 	var text_height = _font.get_height()
-	var min_outer := Vector2(0, rect_size.y)
-	var max_outer := Vector2(rect_size.x, 0)
-	var min_inner := Vector2(text_height, rect_size.y - text_height)
-	var max_inner := Vector2(rect_size.x - text_height, text_height)
+	var min_outer := Vector2(0, size.y)
+	var max_outer := Vector2(size.x, 0)
+	var min_inner := Vector2(text_height, size.y - text_height)
+	var max_inner := Vector2(size.x - text_height, text_height)
 
 	var width: float = max_inner.x - min_inner.x
 	var height: float = max_inner.y - min_inner.y
@@ -283,15 +283,15 @@ func _draw() -> void:
 
 func _to_view_space(pos: Vector2) -> Vector2:
 	var h = _font.get_height()
-	pos.x = range_lerp(pos.x, 0.0, 1.0, h, rect_size.x - h)
-	pos.y = range_lerp(pos.y, curve.get_min_value(), curve.get_max_value(), rect_size.y - h, h)
+	pos.x = range_lerp(pos.x, 0.0, 1.0, h, size.x - h)
+	pos.y = range_lerp(pos.y, curve.get_min_value(), curve.get_max_value(), size.y - h, h)
 	return pos
 
 
 func _to_curve_space(pos: Vector2) -> Vector2:
 	var h = _font.get_height()
-	pos.x = range_lerp(pos.x, h, rect_size.x - h, 0.0, 1.0)
-	pos.y = range_lerp(pos.y, rect_size.y - h, h, curve.get_min_value(), curve.get_max_value())
+	pos.x = range_lerp(pos.x, h, size.x - h, 0.0, 1.0)
+	pos.y = range_lerp(pos.y, size.y - h, h, curve.get_min_value(), curve.get_max_value())
 	return pos
 
 
@@ -329,4 +329,4 @@ func set_selected_tangent(val: int) -> void:
 
 func _on_resized() -> void:
 	if dynamic_row_count:
-		rows = (int(rect_size.y / rect_min_size.y) + 1) * 2
+		rows = (int(size.y / minimum_size.y) + 1) * 2

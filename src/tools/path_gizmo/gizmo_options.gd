@@ -70,7 +70,7 @@ func _set(property, value):
 
 func _show_color_picker() -> void:
 	var origin := get_global_transform().origin
-	origin.x += rect_size.x + 12
+	origin.x += size.x + 12
 	_color_popup.popup(Rect2(origin, Vector2.ONE))
 
 

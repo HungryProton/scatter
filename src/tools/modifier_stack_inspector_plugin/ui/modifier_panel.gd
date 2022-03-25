@@ -88,7 +88,7 @@ func _restore_value(name, val, ui) -> void:
 func _on_expand_toggled(toggled: bool) -> void:
 	_parameters.visible = toggled
 	if _margin_container:
-		_margin_container.rect_size.y = 0.0
+		_margin_container.size.y = 0.0
 
 
 func _on_move_up_pressed() -> void:
@@ -105,7 +105,7 @@ func _on_remove_pressed() -> void:
 
 func _on_child_resized() -> void:
 	if _margin_container:
-		rect_min_size.y = _margin_container.rect_size.y
+		minimum_size.y = _margin_container.size.y
 
 
 func _on_parameter_value_changed(value, previous, name, ui) -> void:

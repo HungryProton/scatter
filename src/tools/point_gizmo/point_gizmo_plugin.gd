@@ -2,7 +2,7 @@
 extends EditorNode3DGizmoPlugin
 
 
-var Scatter = preload("res://addons/proton_scatter/src/core/namespace.gd")
+var Scatter = preload("../../core/namespace.gd")
 
 var _selected
 var _gizmo

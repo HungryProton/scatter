@@ -1,8 +1,9 @@
 [gd_scene load_steps=4 format=3]
 
-[ext_resource type="Texture" path="res://addons/proton_scatter/icons/clear.svg" id="1"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_file.gd" id="2"]
-[ext_resource type="Texture" path="res://addons/proton_scatter/masks/bars.png" id="3"]
+[ext_resource type="Texture" uid="uid://b2h0fd3pxj0e4" path="res://addons/scatter/icons/clear.svg" id="1"]
+[ext_resource type="Script" path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_file.gd" id="2"]
+[ext_resource type="Texture" uid="uid://dcv3fjd1aljbf" path="res://addons/scatter/masks/bars.png" id="3"]
+
 
 [node name="ParameterFile" type="VBoxContainer"]
 anchor_right = 1.0

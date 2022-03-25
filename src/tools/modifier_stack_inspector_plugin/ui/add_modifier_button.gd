@@ -12,7 +12,7 @@ func _ready() -> void:
 
 func _toggled(button_pressed):
 	if button_pressed:
-		_popup.rect_position = rect_global_position + Vector2(0.0, rect_size.y)
+		_popup.rect_position = global_position + Vector2(0.0, size.y)
 		_popup.popup()
 
 

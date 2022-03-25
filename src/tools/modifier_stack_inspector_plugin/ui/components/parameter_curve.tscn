@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://addons/proton_scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_curve.gd" id="1"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/tools/modifier_stack_inspector_plugin/ui/components/curve_panel.gd" id="2"]
+[ext_resource type="Script" path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/parameter_curve.gd" id="1"]
+[ext_resource type="Script" path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/components/curve_panel.gd" id="2"]
 
 [node name="ParameterCurve" type="VBoxContainer"]
 anchor_right = 1.0

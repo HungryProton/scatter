@@ -6,8 +6,8 @@ extends EditorInspectorPlugin
 # needed.
 
 
-const Scatter = preload("res://addons/proton_scatter/src/core/namespace.gd")
-const Editor = preload("res://addons/proton_scatter/src/tools/modifier_stack_inspector_plugin/editor_property.gd")
+const Scatter = preload("../../core/namespace.gd")
+const Editor = preload("../modifier_stack_inspector_plugin/editor_property.gd")
 
 
 func can_handle(object):

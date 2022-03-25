@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Texture" path="res://addons/proton_scatter/icons/close.svg" id="1"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/tools/modifier_stack_inspector_plugin/ui/presets/preset.gd" id="2"]
+[ext_resource type="Texture" path="res://addons/scatter/icons/close.svg" id="1"]
+[ext_resource type="Script" path="res://addons/scatter/src/tools/modifier_stack_inspector_plugin/ui/presets/preset.gd" id="2"]
 
 [node name="Preset" type="Button"]
 anchor_top = 0.5

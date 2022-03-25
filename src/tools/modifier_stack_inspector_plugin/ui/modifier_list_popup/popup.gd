@@ -57,7 +57,7 @@ func _get_or_create_category(text: String) -> Control:
 	if _category_root.has_node(text):
 		return _category_root.get_node(text) as Control
 
-	var c = preload("category.tscn").instance()
+	var c = preload("./category.tscn").instance()
 	c.name = text
 	_category_root.add_child(c, true)
 	c.set_category_name(text)

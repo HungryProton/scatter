@@ -26,8 +26,8 @@ func _process_transforms(transforms, global_seed) -> void:
 		_sampler.rng.set_seed(global_seed)
 
 	var rect_pos = Vector2(transforms.path.bounds_min.x, transforms.path.bounds_min.z)
-	var rect_size = Vector2(transforms.path.size.x, transforms.path.size.z)
-	var bounds = Rect2(rect_pos, rect_size)
+	var size = Vector2(transforms.path.size.x, transforms.path.size.z)
+	var bounds = Rect2(rect_pos, size)
 	var retries = distribution_retries
 	if transforms.max_count >= 0:
 		retries = 1
