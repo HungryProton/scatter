@@ -125,11 +125,11 @@ func _reset_all_colliders(node) -> void:
 	for c in node.get_children():
 		_reset_all_colliders(c)
 
-
 func _setup_options_panel() -> void:
 	var editor_viewport:VBoxContainer = get_editor_interface().get_editor_viewport()
 	_options_root = Util.get_node_by_class_path(editor_viewport, [
 		'SpatialEditor',
+		'HSplitContainer',
 		'HSplitContainer',
 		'VSplitContainer',
 		'SpatialEditorViewportContainer',
@@ -137,6 +137,7 @@ func _setup_options_panel() -> void:
 		'Control',
 		'VBoxContainer',
 		])
+	
 	_gizmo_options = preload("./src/tools/path_gizmo/gizmo_options.tscn").instance()
 	_options_root.add_child(_gizmo_options)
 
