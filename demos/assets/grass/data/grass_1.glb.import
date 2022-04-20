@@ -20,6 +20,7 @@ nodes/use_legacy_names=true
 materials/location=0
 materials/storage=0
 materials/keep_on_reimport=false
+meshes/octahedral_compression=true
 meshes/compress=true
 meshes/ensure_tangents=true
 meshes/storage=0

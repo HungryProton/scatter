@@ -125,18 +125,23 @@ func _reset_all_colliders(node) -> void:
 	for c in node.get_children():
 		_reset_all_colliders(c)
 
-
 func _setup_options_panel() -> void:
 	var editor_viewport:VBoxContainer = get_editor_interface().get_editor_viewport()
-	_options_root = Util.get_node_by_class_path(editor_viewport, [
-		'SpatialEditor',
-		'HSplitContainer',
-		'VSplitContainer',
-		'SpatialEditorViewportContainer',
-		'SpatialEditorViewport',
+	
+	#slow, easy cause of future issues
+	var descendants := get_child_recursive(editor_viewport)
+	var spatial_viewport
+	for child in descendants:
+		if child.get_class() == "SpatialEditorViewport":
+			spatial_viewport = child
+			return
+	
+	_options_root = Util.get_node_by_class_path(spatial_viewport, [
 		'Control',
 		'VBoxContainer',
 		])
+	
+	
 	_gizmo_options = preload("./src/tools/path_gizmo/gizmo_options.tscn").instance()
 	_options_root.add_child(_gizmo_options)
 
@@ -150,3 +155,17 @@ func _on_snap_to_colliders_enabled():
 	if not selected.empty():
 		var root = selected[0].get_tree().root
 		_reset_all_colliders(root)
+
+#from https://github.com/addmix/godot_utils nodeutils.gd
+static func get_child_recursive(obj : Node) -> Array:
+	var children : Array = obj.get_children()
+
+	#array for storing all descendants
+	var arr := []
+
+	for i in range(children.size()):
+		arr.append(children[i])
+		#add child's array contents to self's array
+		arr += get_child_recursive(children[i])
+
+	return arr
