@@ -125,23 +125,23 @@ func _reset_all_colliders(node) -> void:
 	for c in node.get_children():
 		_reset_all_colliders(c)
 
+
 func _setup_options_panel() -> void:
-	var editor_viewport:VBoxContainer = get_editor_interface().get_editor_viewport()
-	
+	var editor_viewport: VBoxContainer = get_editor_interface().get_editor_viewport()
+
 	#slow, easy cause of future issues
 	var descendants := get_child_recursive(editor_viewport)
 	var spatial_viewport
 	for child in descendants:
 		if child.get_class() == "SpatialEditorViewport":
 			spatial_viewport = child
-			return
-	
+			break
+
 	_options_root = Util.get_node_by_class_path(spatial_viewport, [
 		'Control',
 		'VBoxContainer',
 		])
-	
-	
+
 	_gizmo_options = preload("./src/tools/path_gizmo/gizmo_options.tscn").instance()
 	_options_root.add_child(_gizmo_options)
 

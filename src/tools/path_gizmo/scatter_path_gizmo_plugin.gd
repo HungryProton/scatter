@@ -375,6 +375,9 @@ func _set_point(path, data: Dictionary) -> void:
 
 func _set_options(val) -> void:
 	options = val
+	if not options:
+		return
+
 	options.connect("option_changed", self, "_on_option_changed")
 	options.connect("color_changed", self, "_on_color_changed")
 	create_custom_material("grid", options.get_grid_color())
