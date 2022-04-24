@@ -24,7 +24,7 @@ func _clear_warning() -> void:
 
 
 func _notify_warning_changed() -> void:
-	emit_signal("warning_changed")
+	warning_changed.emit()
 
 
 func process_transforms(transforms, global_seed) -> void:

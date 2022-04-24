@@ -1,0 +1,95 @@
+[gd_scene load_steps=9 format=3 uid="uid://dllpt2dven8vw"]
+
+[ext_resource type="Texture2D" uid="uid://cun73k8jdmr4e" path="res://addons/proton_scatter/icons/add.svg" id="1_4vwtj"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/stack_panel.gd" id="1_ga4or"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/drag_container.gd" id="1_hg5ys"]
+[ext_resource type="Texture2D" uid="uid://d2q0ecpon840i" path="res://addons/proton_scatter/icons/rebuild.svg" id="2_svid4"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/add_modifier_button.gd" id="3_01ldn"]
+[ext_resource type="PackedScene" uid="uid://belutr5odecw2" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier_list_popup/popup.tscn" id="3_pkswu"]
+[ext_resource type="Texture2D" uid="uid://ddjrq1h4mkn6a" path="res://addons/proton_scatter/icons/load.svg" id="3_w72lv"]
+[ext_resource type="Texture2D" uid="uid://b2omj2e03x72e" path="res://addons/proton_scatter/icons/save.svg" id="4_5l2cx"]
+
+[node name="StackPanel" type="MarginContainer"]
+clip_children = true
+offset_right = 456.0
+offset_bottom = 144.0
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_bottom = 4
+script = ExtResource( "1_ga4or" )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 452.0
+offset_bottom = 140.0
+theme_override_constants/separation = 16
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+offset_right = 448.0
+offset_bottom = 31.0
+
+[node name="Add" type="Button" parent="VBoxContainer/HBoxContainer"]
+offset_right = 131.0
+offset_bottom = 31.0
+size_flags_horizontal = 2
+focus_mode = 0
+toggle_mode = true
+text = " Add modifier"
+icon = ExtResource( "1_4vwtj" )
+script = ExtResource( "3_01ldn" )
+
+[node name="ModifiersPopup" parent="VBoxContainer/HBoxContainer/Add" instance=ExtResource( "3_pkswu" )]
+size = Vector2i(755, 252)
+
+[node name="Rebuild" type="Button" parent="VBoxContainer/HBoxContainer"]
+minimum_size = Vector2(30, 0)
+offset_left = 342.0
+offset_right = 372.0
+offset_bottom = 31.0
+size_flags_horizontal = 4
+hint_tooltip = "Force rebuild"
+focus_mode = 0
+icon = ExtResource( "2_svid4" )
+icon_alignment = 1
+
+[node name="VSeparator" type="VSeparator" parent="VBoxContainer/HBoxContainer"]
+modulate = Color(1, 1, 1, 0.54902)
+offset_left = 376.0
+offset_right = 380.0
+offset_bottom = 31.0
+
+[node name="LoadPreset" type="Button" parent="VBoxContainer/HBoxContainer"]
+minimum_size = Vector2(30, 0)
+offset_left = 384.0
+offset_right = 414.0
+offset_bottom = 31.0
+hint_tooltip = "Load preset"
+focus_mode = 0
+text = "
+"
+icon = ExtResource( "3_w72lv" )
+icon_alignment = 1
+
+[node name="SavePreset" type="Button" parent="VBoxContainer/HBoxContainer"]
+minimum_size = Vector2(30, 0)
+offset_left = 418.0
+offset_right = 448.0
+offset_bottom = 31.0
+hint_tooltip = "Save preset"
+focus_mode = 0
+text = "
+"
+icon = ExtResource( "4_5l2cx" )
+icon_alignment = 1
+
+[node name="DragContainer" type="Container" parent="VBoxContainer"]
+clip_children = true
+offset_top = 47.0
+offset_right = 448.0
+offset_bottom = 136.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( "1_hg5ys" )
+separation = 0

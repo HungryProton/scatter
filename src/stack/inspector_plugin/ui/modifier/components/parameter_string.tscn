@@ -1,0 +1,56 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/components/parameter_string.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0, 0, 0, 0.392157 )
+
+[sub_resource type="StyleBoxFlat" id=2]
+bg_color = Color( 0.6, 0.6, 0.6, 0 )
+
+[node name="ParameterString" type="HBoxContainer"]
+anchor_right = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_top = 2.0
+margin_right = 638.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+text = "Parameter name"
+valign = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+margin_left = 642.0
+margin_right = 1280.0
+margin_bottom = 18.0
+mouse_filter = 2
+size_flags_horizontal = 3
+
+[node name="Panel" type="Panel" parent="MarginContainer"]
+margin_right = 638.0
+margin_bottom = 18.0
+mouse_filter = 2
+custom_styles/panel = SubResource( 1 )
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer"]
+margin_right = 638.0
+margin_bottom = 18.0
+mouse_filter = 2
+custom_constants/margin_right = 4
+custom_constants/margin_top = 2
+custom_constants/margin_left = 4
+custom_constants/margin_bottom = 2
+
+[node name="LineEdit" type="LineEdit" parent="MarginContainer/MarginContainer"]
+margin_left = 4.0
+margin_top = 2.0
+margin_right = 634.0
+margin_bottom = 16.0
+mouse_filter = 1
+custom_styles/focus = SubResource( 2 )
+custom_styles/normal = SubResource( 2 )
+clear_button_enabled = true

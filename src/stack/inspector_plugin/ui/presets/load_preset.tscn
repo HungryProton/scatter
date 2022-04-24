@@ -1,0 +1,101 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/presets/load_preset.gd" id="1"]
+
+[node name="LoadPresetPopup" type="WindowDialog"]
+visible = true
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -147.5
+margin_top = -156.5
+margin_right = 147.5
+margin_bottom = 156.5
+size_flags_horizontal = 5
+size_flags_vertical = 5
+window_title = "Load Presets"
+resizable = true
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/margin_right = 8
+custom_constants/margin_top = 8
+custom_constants/margin_left = 8
+custom_constants/margin_bottom = 8
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 287.0
+margin_bottom = 305.0
+custom_constants/separation = 6
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+margin_right = 279.0
+margin_bottom = 271.0
+size_flags_vertical = 3
+scroll_horizontal_enabled = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+margin_right = 279.0
+margin_bottom = 271.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="NoPresets" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+visible = false
+margin_right = 247.0
+margin_bottom = 118.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "No presets found.
+
+Create new presets by pressing the \"Save Preset\" button first."
+valign = 1
+autowrap = true
+
+[node name="PresetsRoot" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_right = 279.0
+margin_bottom = 271.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+margin_left = 112.0
+margin_top = 277.0
+margin_right = 166.0
+margin_bottom = 297.0
+size_flags_horizontal = 4
+
+[node name="CancelButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+margin_right = 54.0
+margin_bottom = 20.0
+text = "Cancel"
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+visible = true
+margin_left = -320.0
+margin_top = 37.0
+margin_right = -120.0
+margin_bottom = 112.0
+dialog_text = "Delete preset?
+(This action can't be undone)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PresetsRoot/Preset" to="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PresetsRoot/Preset" method="_on_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PresetsRoot/Preset2" to="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PresetsRoot/Preset2" method="_on_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PresetsRoot/Preset3" to="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PresetsRoot/Preset3" method="_on_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PresetsRoot/Preset4" to="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PresetsRoot/Preset4" method="_on_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/CancelButton" to="." method="_on_cancel_pressed"]
+[connection signal="confirmed" from="ConfirmationDialog" to="." method="_on_delete_preset_confirmed"]

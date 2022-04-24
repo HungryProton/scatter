@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier_list_popup/category.gd" id="1"]
+
+[node name="VBoxContainer" type="VBoxContainer"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_pivot_offset = Vector2( -591.851, -77.5574 )
+size_flags_horizontal = 3
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Header" type="VBoxContainer" parent="."]
+margin_right = 40.0
+margin_bottom = 22.0
+
+[node name="Label" type="Label" parent="Header"]
+margin_right = 40.0
+margin_bottom = 14.0
+
+[node name="HSeparator" type="HSeparator" parent="Header"]
+margin_top = 18.0
+margin_right = 40.0
+margin_bottom = 22.0
