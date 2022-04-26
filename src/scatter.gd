@@ -12,7 +12,6 @@ var modifier_stack: ModifierStack
 
 func _ready() -> void:
 	_ensure_stack_exists()
-	print("Scatter ready done")
 
 
 func _get_property_list() -> Array:

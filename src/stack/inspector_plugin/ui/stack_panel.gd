@@ -2,6 +2,7 @@
 extends Control
 
 
+@onready var _modifiers_container: Control = $VBoxContainer/DragContainer
 @onready var _modifiers_popup: PopupPanel = $VBoxContainer/HBoxContainer/Add/ModifiersPopup
 @onready var _root: Control = $VBoxContainer/DragContainer
 
@@ -12,7 +13,8 @@ var _is_ready := false
 
 
 func _ready():
-	_modifiers_popup.add_modifier.connect(_on_add_modifier)
+	_modifiers_popup.add_modifier.connect(_on_modifier_added)
+	_modifiers_container.child_moved.connect(_on_modifier_moved)
 
 	_is_ready = true
 	rebuild_ui()
@@ -37,7 +39,7 @@ func rebuild_ui() -> void:
 		_root.add_child(ui)
 		ui.set_root(_scatter)
 		ui.create_ui_for(m)
-		ui.removed.connect(_on_removed.bind(m))
+		ui.removed.connect(_on_modifier_removed.bind(m))
 		ui.value_changed.connect(_on_value_changed.bind(m))
 
 
@@ -52,7 +54,7 @@ func _validate_stack_connections() -> void:
 		return
 
 	if _modifier_stack:
-		_modifier_stack.stack_changed.disconnect(_on_stack_changed)
+		_modifier_stack.changed.disconnect(_on_stack_changed)
 
 	_modifier_stack = _scatter.modifier_stack
 	_modifier_stack.changed.connect(_on_stack_changed)
@@ -75,16 +77,20 @@ func _get_root_folder() -> String:
 	return "res://" + tokens[0] + "/" + tokens[1]
 
 
-func _on_add_modifier(modifier) -> void:
-	_modifier_stack.add_modifier(modifier)
+func _on_modifier_added(modifier) -> void:
+	_modifier_stack.add(modifier)
+
+
+func _on_modifier_moved(old_index: int, new_index: int) -> void:
+	_modifier_stack.move(old_index, new_index)
+
+
+func _on_modifier_removed(m) -> void:
+	_modifier_stack.remove(m)
 
 
 func _on_stack_changed() -> void:
 	rebuild_ui()
-
-
-func _on_removed(m) -> void:
-	_modifier_stack.remove(m)
 
 
 func _on_value_changed() -> void:
@@ -121,7 +127,7 @@ func _on_load_preset(preset_name) -> void:
 		return
 
 	_modifier_stack = preset.modifier_stack.duplicate(7)
-	_modifier_stack.stack_changed.connect(_on_stack_changed)
+	_modifier_stack.changed.connect(_on_stack_changed)
 	_scatter.modifier_stack = _modifier_stack
 	rebuild_ui()
 	_scatter.update()

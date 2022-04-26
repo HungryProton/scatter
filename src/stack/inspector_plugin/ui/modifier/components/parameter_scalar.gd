@@ -33,6 +33,14 @@ func set_hint_string(hint: String) -> void:
 	if hint.is_empty():
 		return
 
+	if hint == "float":
+		_spinbox.step = 0.01
+		return
+
+	if hint == "int":
+		_spinbox.step = 1
+		return
+
 	# One integer provided
 	if hint.is_valid_int():
 		_set_range(0, hint.to_int())

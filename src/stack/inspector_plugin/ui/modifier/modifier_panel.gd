@@ -13,12 +13,14 @@ var _modifier
 @onready var _parameters: Control = $MarginContainer/VBoxContainer/Parameters
 @onready var _name: Label = $MarginContainer/VBoxContainer/HBoxContainer/ModifierName
 @onready var _enabled: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/Enabled
+@onready var _remove: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/Remove
 @onready var _warning: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/Warning
 @onready var _warning_dialog: AcceptDialog = $WarningDialog
 
 
 func _ready() -> void:
 	_name.text = name
+	_remove.pressed.connect(_on_remove_pressed)
 
 
 func set_root(val) -> void:
@@ -102,6 +104,10 @@ func _on_parameter_value_changed(value, previous, name, ui) -> void:
 func _on_enable_toggled(pressed: bool):
 	_modifier.enabled = pressed
 	value_changed.emit()
+
+
+func _on_removed_pressed() -> void:
+	removed.emit()
 
 
 func _on_warning_changed() -> void:
