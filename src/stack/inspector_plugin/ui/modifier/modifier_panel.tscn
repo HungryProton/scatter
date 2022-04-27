@@ -1,19 +1,16 @@
-[gd_scene load_steps=11 format=3 uid="uid://blpobpd0eweog"]
+[gd_scene load_steps=8 format=3 uid="uid://blpobpd0eweog"]
 
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/modifier_panel.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://c5x3svtghg355" path="res://addons/proton_scatter/icons/right.svg" id="2"]
+[ext_resource type="Texture2D" uid="uid://hshxh8s6k677" path="res://addons/proton_scatter/icons/arrow_right.svg" id="2_2djuo"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/toggle_button.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://85r2q2fd8gyh" path="res://addons/proton_scatter/icons/arrow_down.svg" id="4_7nlfc"]
 [ext_resource type="Texture2D" uid="uid://dahwdjl2er75o" path="res://addons/proton_scatter/icons/close.svg" id="5"]
-[ext_resource type="Texture2D" uid="uid://pnkkrn8h6eun" path="res://addons/proton_scatter/icons/down.svg" id="6"]
-[ext_resource type="Texture2D" uid="uid://pqr6rieoatt2" path="res://addons/proton_scatter/icons/enabled.svg" id="7"]
-[ext_resource type="Texture2D" uid="uid://bs1fqiny4gnuh" path="res://addons/proton_scatter/icons/disabled.svg" id="8"]
 [ext_resource type="Texture2D" uid="uid://dj0y6peid681t" path="res://addons/proton_scatter/icons/warning.svg" id="9"]
 [ext_resource type="Texture2D" uid="uid://lkb3k4nuipjn" path="res://addons/proton_scatter/icons/drag_area.svg" id="9_t6pse"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/drag_area.gd" id="10_lprjt"]
 
-[node name="ModifierPanel" type="PanelContainer"]
+[node name="ModifierPanel" type="MarginContainer"]
 anchor_right = 1.0
-offset_bottom = 31.0
+mouse_filter = 2
 theme_type_variation = &"fg"
 script = ExtResource( "1" )
 
@@ -52,17 +49,17 @@ offset_bottom = 31.0
 focus_mode = 0
 mouse_filter = 1
 toggle_mode = true
-icon = ExtResource( "2" )
+icon = ExtResource( "2_2djuo" )
 flat = true
 icon_alignment = 1
 script = ExtResource( "4" )
-default_icon = ExtResource( "2" )
-pressed_icon = ExtResource( "6" )
+default_icon = ExtResource( "2_2djuo" )
+pressed_icon = ExtResource( "4_7nlfc" )
 
 [node name="ModifierName" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 offset_left = 34.0
 offset_top = 2.0
-offset_right = 912.0
+offset_right = 918.0
 offset_bottom = 28.0
 size_flags_horizontal = 3
 text = "ModifierPanel"
@@ -70,7 +67,7 @@ vertical_alignment = 1
 clip_text = true
 
 [node name="Buttons" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-offset_left = 916.0
+offset_left = 922.0
 offset_right = 1016.0
 offset_bottom = 31.0
 theme_override_constants/separation = 2
@@ -86,27 +83,17 @@ mouse_filter = 1
 icon = ExtResource( "9" )
 flat = true
 
-[node name="Enabled" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
-minimum_size = Vector2(30, 0)
-offset_right = 30.0
+[node name="Enabled" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
+offset_right = 24.0
 offset_bottom = 31.0
-size_flags_vertical = 4
-hint_tooltip = "Enable or Disable the modifier.
-If a modifier is disabled, it will stay in the stack but wont contribute to the final result."
+hint_tooltip = "Enable modifier. Disabled modifier still appear in the stack but won't contribute to the final result."
 focus_mode = 0
 mouse_filter = 1
-toggle_mode = true
-icon = ExtResource( "7" )
-flat = true
-icon_alignment = 1
-script = ExtResource( "4" )
-default_icon = ExtResource( "8" )
-pressed_icon = ExtResource( "7" )
 
 [node name="Remove" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 minimum_size = Vector2(30, 0)
-offset_left = 32.0
-offset_right = 62.0
+offset_left = 26.0
+offset_right = 56.0
 offset_bottom = 31.0
 size_flags_vertical = 4
 focus_mode = 0
@@ -117,19 +104,18 @@ icon_alignment = 1
 
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 modulate = Color(1, 1, 1, 0.54902)
-offset_left = 64.0
-offset_right = 68.0
+offset_left = 58.0
+offset_right = 62.0
 offset_bottom = 31.0
 
-[node name="DragArea" type="TextureRect" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
+[node name="DragControl" type="TextureRect" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 minimum_size = Vector2(30, 0)
-offset_left = 70.0
-offset_right = 100.0
+offset_left = 64.0
+offset_right = 94.0
 offset_bottom = 31.0
 mouse_default_cursor_shape = 6
 texture = ExtResource( "9_t6pse" )
 stretch_mode = 3
-script = ExtResource( "10_lprjt" )
 
 [node name="Parameters" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
 visible = false
@@ -144,4 +130,3 @@ popup_window = true
 
 [connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="." method="_on_expand_toggled"]
 [connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="MarginContainer/VBoxContainer/HBoxContainer/Expand" method="_on_toggled"]
-[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Buttons/Enabled" to="MarginContainer/VBoxContainer/HBoxContainer/Buttons/Enabled" method="_on_toggled"]

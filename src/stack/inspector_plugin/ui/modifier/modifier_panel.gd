@@ -2,7 +2,6 @@
 extends Control
 
 
-signal dragged
 signal removed
 signal value_changed
 
@@ -16,11 +15,21 @@ var _modifier
 @onready var _remove: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/Remove
 @onready var _warning: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/Warning
 @onready var _warning_dialog: AcceptDialog = $WarningDialog
+@onready var _drag_control: Control = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/DragControl
 
 
 func _ready() -> void:
 	_name.text = name
 	_remove.pressed.connect(_on_remove_pressed)
+
+
+func _get_drag_data(at_position: Vector2):
+	var drag_control_position = _drag_control.global_position - global_position
+	var drag_rect := Rect2(drag_control_position, _drag_control.size)
+	if drag_rect.has_point(at_position):
+		return self
+
+	return null
 
 
 func set_root(val) -> void:

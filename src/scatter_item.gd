@@ -9,7 +9,6 @@ extends Node3D
 @export var ignore_source_scale := true
 @export_enum("From current scene", "From disk") var source:
 	set(val):
-		print("in setter")
 		source = val
 		property_list_changed.emit()
 

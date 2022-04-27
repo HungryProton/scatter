@@ -87,10 +87,9 @@ icon_alignment = 1
 
 [node name="DragContainer" type="Container" parent="VBoxContainer"]
 clip_children = true
-minimum_size = Vector2(0, -4)
 offset_top = 47.0
 offset_right = 448.0
 offset_bottom = 136.0
 size_flags_vertical = 3
+mouse_filter = 0
 script = ExtResource( "1_hg5ys" )
-separation = 0
