@@ -1,11 +1,51 @@
+@tool
 extends Node3D
 
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
+const BaseShape = preload("./shapes/base_shape.gd")
+const PathShape = preload("./shapes/path_shape.gd")
+const PointShape = preload("./shapes/point_shape.gd")
+
+@export_enum("Add", "Substract") var mode
+@export_enum("Path", "Point") var shape_type:
+	set(val):
+		if val == shape_type:
+			return
+
+		shape_type = val
+		match shape_type:
+			0:
+				shape = PathShape.new()
+			1:
+				shape = PointShape.new()
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+var shape: BaseShape:
+	set(val):
+		shape = val
+		shape.changed.connect(_on_shape_changed)
+
+
+func _get_property_list() -> Array:
+	var list := []
+	list.push_back({
+		name = "ScatterShape",
+		type = TYPE_NIL,
+		usage = PROPERTY_USAGE_CATEGORY | PROPERTY_USAGE_SCRIPT_VARIABLE,
+	})
+	list.push_back({
+		name = "shape",
+		type = TYPE_OBJECT,
+	})
+	return list
+
+
+func is_point_inside(point: Vector3) -> bool:
+	if not shape:
+		return false
+
+	return shape.is_point_inside(point)
+
+
+func _on_shape_changed() -> void:
+	update_gizmos()

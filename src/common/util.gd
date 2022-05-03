@@ -1,6 +1,7 @@
 @tool
 extends RefCounted
 
+
 # Create a new Mesh with as many surfaces as inputs
 static func create_mesh_from(mesh_instances: Array) -> Mesh:
 	var total_surfaces = 0
