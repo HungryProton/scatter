@@ -11,7 +11,7 @@ func _init() -> void:
 	category = "Offset"
 
 
-func _process_transforms(transforms, _seed) -> void:
+func _process_transforms(transforms, domain, _seed) -> void:
 	var basis: Basis
 	for t in transforms.list.size():
 		basis = transforms.list[t].basis

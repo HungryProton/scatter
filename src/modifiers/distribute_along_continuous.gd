@@ -12,10 +12,10 @@ func _init() -> void:
 	display_name = "Distribute Along Path (Continuous)"
 	category = "Distribute"
 	warning_ignore_no_transforms = true
-	warning_ignore_no_path = false
+	warning_ignore_no_shape = false
 
 
-func _process_transforms(transforms, _seed) -> void:
+func _process_transforms(transforms, domain, _seed) -> void:
 	var path: Path3D = transforms.path
 	var curve: Curve3D
 	if not ignore_slopes:

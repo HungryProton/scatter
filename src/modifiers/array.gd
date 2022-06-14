@@ -14,8 +14,6 @@ extends "base_modifier.gd"
 @export var local_scale := true
 @export var scale := Vector3.ONE
 @export var randomize_indices := true
-@export var override_global_seed := false
-@export var custom_seed := 0
 
 var _rng: RandomNumberGenerator
 
@@ -25,13 +23,9 @@ func _init() -> void:
 	category = "Create"
 
 
-func _process_transforms(transforms, global_seed: int) -> void:
+func _process_transforms(transforms, domain, seed: int) -> void:
 	_rng = RandomNumberGenerator.new()
-
-	if override_global_seed:
-		_rng.set_seed(custom_seed)
-	else:
-		_rng.set_seed(global_seed)
+	_rng.set_seed(seed)
 
 	var new_transforms := []
 	var rotation_rad := Vector3.ZERO
@@ -90,7 +84,9 @@ func _process_transforms(transforms, global_seed: int) -> void:
 			# store the final result
 			new_transforms.push_back(transform)
 
-	if randomize_indices:
-		shuffle(new_transforms, global_seed)
-
 	transforms.list = new_transforms
+
+	if randomize_indices:
+		transforms.shuffle(seed)
+
+

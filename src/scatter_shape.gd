@@ -6,7 +6,7 @@ const BaseShape = preload("./shapes/base_shape.gd")
 const PathShape = preload("./shapes/path_shape.gd")
 const PointShape = preload("./shapes/point_shape.gd")
 
-@export_enum("Add", "Substract") var mode
+@export var exclusive = false
 @export_enum("Path", "Point") var shape_type:
 	set(val):
 		if val == shape_type:
@@ -24,6 +24,7 @@ var shape: BaseShape:
 	set(val):
 		shape = val
 		shape.changed.connect(_on_shape_changed)
+		shape.owner = self
 
 
 func _get_property_list() -> Array:

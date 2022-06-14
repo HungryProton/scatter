@@ -2,8 +2,6 @@
 extends "base_modifier.gd"
 
 
-@export var override_global_seed := false
-@export var custom_seed := 0
 @export var local_space := false
 @export var rotation := Vector3(360.0, 360.0, 360.0)
 @export var snap_angle := Vector3.ZERO
@@ -16,13 +14,9 @@ func _init() -> void:
 	category = "Edit"
 
 
-func _process_transforms(transforms, global_seed) -> void:
+func _process_transforms(transforms, domain, seed) -> void:
 	_rng = RandomNumberGenerator.new()
-
-	if override_global_seed:
-		_rng.set_seed(custom_seed)
-	else:
-		_rng.set_seed(global_seed)
+	_rng.set_seed(seed)
 
 	var t: Transform3D
 	var b: Basis

@@ -2,42 +2,64 @@
 extends "base_modifier.gd"
 
 
-@export var override_global_seed := false
-@export var custom_seed := 0
-@export var instance_count := 10
+@export var amount := 10
 
 var _rng: RandomNumberGenerator
 
 
 func _init() -> void:
-	display_name = "Distribute Inside (Random)"
-	category = "Distribute"
+	display_name = "Add Inside (Random)"
+	category = "Add"
 	warning_ignore_no_transforms = true
-	warning_ignore_no_path = false
+	warning_ignore_no_shape = false
+	can_override_seed = true
+
+	documentation.add_paragraph(
+		"""Randomly place new transforms in the area defined by
+		the ScatterShape nodes""")
+	documentation.add_parameter(
+		"Amount",
+		"How many transforms will be created.")
+	documentation.add_warning(
+		"""In some cases, the amount of transforms created by this modifier
+		might be lower than the requested amount (but never higher). This is to
+		prevent an infinite loop if the provided ScatterShape has a huge
+		bounding box but a tiny valid space, like a curved path.""")
 
 
-func _process_transforms(transforms, global_seed) -> void:
-	transforms.resize(instance_count)
+func _process_transforms(transforms, domain, seed) -> void:
 	_rng = RandomNumberGenerator.new()
+	_rng.set_seed(seed)
 
-	if override_global_seed:
-		_rng.set_seed(custom_seed)
-	else:
-		_rng.set_seed(global_seed)
+	var center: Vector3 = domain.bounds.center
+	var half_size: Vector3 = domain.bounds.size / 2.0
+	var height: float = domain.bounds.center.y
 
-	var center: Vector3 = transforms.path.center
-	var half_size: Vector3 = transforms.path.size * 0.5
-	var height: float = transforms.path.bounds_max.y
+	# Generate a random point in the bounding box. Store if it's inside the
+	# domain, or discard if invalid. Repeat until enough valid points are found.
+	var positions := []
+	var max_retries = amount * 100
+	var tries := 0
 
-	for i in transforms.list.size():
-		# Don't use a while just in case the user-provided path is invalid
-		# and no position ends up inside the path.
-		for j in 100:
-			var pos = _random_vec3() * half_size + center
-			if transforms.path.is_point_inside(pos):
-				pos.y = height
-				transforms.list[i].origin = pos
-				break
+	while positions.size() != amount:
+		var pos = _random_vec3() * half_size + center
+		if domain.is_point_inside(pos):
+			pos.y = height
+			positions.push_back(pos)
+
+		# Prevents an infinite loop
+		tries += 1
+		if tries > max_retries:
+			break
+
+	print("positions ", positions)
+	# Create the new transforms using the previously generated array
+	var start_index = transforms.list.size()
+	transforms.add(positions.size())
+	for i in positions.size():
+		transforms.list[start_index + i].origin = positions[i]
+
+	print(transforms.list)
 
 
 func _random_vec3() -> Vector3:

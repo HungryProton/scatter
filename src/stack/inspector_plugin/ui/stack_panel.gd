@@ -2,9 +2,8 @@
 extends Control
 
 
-@onready var _modifiers_container: Control = $VBoxContainer/DragContainer
+@onready var _modifiers_container: Control = $VBoxContainer/ModifiersContainer
 @onready var _modifiers_popup: PopupPanel = $VBoxContainer/HBoxContainer/Add/ModifiersPopup
-@onready var _root: Control = $VBoxContainer/DragContainer
 
 var _scatter
 var _modifier_stack
@@ -36,16 +35,16 @@ func rebuild_ui() -> void:
 	_clear()
 	for m in _modifier_stack.stack:
 		var ui = _modifier_panel.instantiate()
-		_root.add_child(ui)
+		_modifiers_container.add_child(ui)
 		ui.set_root(_scatter)
 		ui.create_ui_for(m)
 		ui.removed.connect(_on_modifier_removed.bind(m))
-		ui.value_changed.connect(_on_value_changed.bind(m))
+		ui.value_changed.connect(_on_value_changed)
 
 
 func _clear() -> void:
-	for c in _root.get_children():
-		_root.remove_child(c)
+	for c in _modifiers_container.get_children():
+		_modifiers_container.remove_child(c)
 		c.queue_free()
 
 
@@ -94,8 +93,7 @@ func _on_stack_changed() -> void:
 
 
 func _on_value_changed() -> void:
-	if _scatter:
-		_scatter.update()
+	_modifier_stack.value_changed.emit()
 
 
 func _on_rebuild_pressed() -> void:

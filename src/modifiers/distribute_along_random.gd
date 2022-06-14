@@ -2,8 +2,6 @@
 extends "base_modifier.gd"
 
 
-@export var override_global_seed := false
-@export var custom_seed := 0
 @export var instance_count := 10
 @export var align_to_path := false
 @export var align_up_axis := 1
@@ -18,18 +16,15 @@ func _init() -> void:
 	display_name = "Distribute Along Path (Random)"
 	category = "Distribute"
 	warning_ignore_no_transforms = true
-	warning_ignore_no_path = false
+	warning_ignore_no_shape = false
 
 
-func _process_transforms(transforms, global_seed) -> void:
+func _process_transforms(transforms, domain, seed) -> void:
 	var path = transforms.path
 	transforms.resize(instance_count)
 
 	_rng = RandomNumberGenerator.new()
-	if override_global_seed:
-		_rng.set_seed(custom_seed)
-	else:
-		_rng.set_seed(global_seed)
+	_rng.set_seed(seed)
 
 	var length: float = path.curve.get_baked_length()
 	for i in transforms.list.size():

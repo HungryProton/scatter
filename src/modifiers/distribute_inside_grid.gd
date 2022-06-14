@@ -10,10 +10,10 @@ func _init() -> void:
 	display_name = "Distribute Inside (Grid)"
 	category = "Distribute"
 	warning_ignore_no_transforms = true
-	warning_ignore_no_path = false
+	warning_ignore_no_shape = false
 
 
-func _process_transforms(transforms, global_seed) -> void:
+func _process_transforms(transforms, domain, seed) -> void:
 	x_spacing = max(0.05, x_spacing)
 	z_spacing = max(0.05, z_spacing)
 
@@ -42,4 +42,4 @@ func _process_transforms(transforms, global_seed) -> void:
 	if t_index < max_count:
 		transforms.remove(max_count - t_index)
 
-	shuffle(transforms.list, global_seed)
+	transforms.shuffle(seed)

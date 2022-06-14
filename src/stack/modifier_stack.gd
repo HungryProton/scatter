@@ -2,6 +2,11 @@
 extends Resource
 
 
+signal value_changed
+
+const TransformList = preload("../common/transform_list.gd")
+
+
 @export var stack: Array[Resource] = []
 
 var owner: Node
@@ -9,10 +14,13 @@ var just_created := false
 var undo_redo: UndoRedo
 
 
-func update(transforms, random_seed) -> void:
+func update() -> TransformList:
+	var transforms = TransformList.new()
 	for modifier in stack:
 		if modifier.enabled:
-			modifier.process_transforms(transforms, random_seed)
+			modifier.process_transforms(transforms, owner.domain, owner.global_seed)
+
+	return transforms
 
 
 func add(modifier) -> void:

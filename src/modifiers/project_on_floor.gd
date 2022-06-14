@@ -17,7 +17,7 @@ func _init() -> void:
 	category = "Edit"
 
 
-func _process_transforms(transforms, _seed) -> void:
+func _process_transforms(transforms, domain, _seed) -> void:
 	if transforms.list.empty():
 		return
 

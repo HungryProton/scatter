@@ -15,10 +15,10 @@ func _init() -> void:
 	display_name = "Distribute Along Path (Even)"
 	category = "Distribute"
 	warning_ignore_no_transforms = true
-	warning_ignore_no_path = false
+	warning_ignore_no_shape = false
 
 
-func _process_transforms(transforms, _seed) -> void:
+func _process_transforms(transforms, domain, _seed) -> void:
 	var path = transforms.path
 	var length: float = path.curve.get_baked_length()
 	var total_count := int(round(length / interval))

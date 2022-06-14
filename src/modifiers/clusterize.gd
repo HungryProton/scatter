@@ -14,7 +14,7 @@ func _init() -> void:
 	category = "Edit"
 
 
-func _process_transforms(transforms, _global_seed) -> void:
+func _process_transforms(transforms, domain, _seed) -> void:
 	if not ResourceLoader.exists(mask):
 		warning += "The specified file " + mask + " could not be loaded"
 		return

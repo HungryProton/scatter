@@ -13,7 +13,7 @@ func _init() -> void:
 	category = "Offset"
 
 
-func _process_transforms(transforms, _global_seed) -> void:
+func _process_transforms(transforms, domain, _seed) -> void:
 	var t: Transform3D
 	var origin: Vector3
 
