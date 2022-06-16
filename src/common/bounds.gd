@@ -1,6 +1,9 @@
 @tool
 extends RefCounted
 
+# Essentially a Rect3
+# Used by the Domain class
+
 
 var size: Vector3
 var center: Vector3
@@ -28,6 +31,7 @@ func feed(point: Vector3) -> void:
 	_points += 1
 
 
+# Call this after you've called feed() with all the points in your data set
 func compute_bounds() -> void:
 	if min == null or max == null:
 		return

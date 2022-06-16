@@ -11,5 +11,5 @@ func is_point_inside(point: Vector3) -> bool:
 
 # Returns an array of Vector3. This should contain enough points to compute
 # a bounding box for the given shape.
-func get_corners() -> Array:
+func get_corners_global() -> Array:
 	return []

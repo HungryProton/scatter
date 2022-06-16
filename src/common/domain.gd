@@ -16,6 +16,7 @@ const Bounds := preload("../common/bounds.gd")
 
 var bounds: Bounds = Bounds.new()
 
+var _root: Node3D
 var _shapes: Dictionary
 
 
@@ -38,17 +39,39 @@ func is_point_inside(point: Vector3) -> bool:
 	return false
 
 
+func get_global_transform() -> Transform3D:
+	return _root.get_global_transform()
+
+
+func get_local_transform() -> Transform3D:
+	return _root.get_transform()
+
+
 # Recursively find all ScatterShape nodes under the provided root. In case of
 # nested Scatter nodes, shapes under these other Scatter nodes will be ignored
-func discover_shapes(root) -> void:
+func discover_shapes(root: Node3D) -> void:
+	_root = root
 	_shapes = {
 		inclusive = [],
 		exclusive = []
 	}
-	var root_type = root.get_script() # Can preload the scatter script here (cyclic dependency)
+	var root_type = root.get_script() # Can't preload the scatter script here (cyclic dependency)
 	for c in root.get_children():
 		_discover_shapes_recursive(c, root_type)
-	_compute_bounds()
+	compute_bounds(root)
+
+
+func compute_bounds(root: Node3D) -> void:
+	if _shapes.is_empty():
+		discover_shapes(root)
+		return
+
+	bounds.clear()
+	for node in _shapes.inclusive:
+		for point in node.shape.get_corners_global():
+			bounds.feed(point)
+
+	bounds.compute_bounds()
 
 
 func _discover_shapes_recursive(node: Node3D, type_to_ignore) -> void:
@@ -63,13 +86,3 @@ func _discover_shapes_recursive(node: Node3D, type_to_ignore) -> void:
 
 	for c in node.get_children():
 		_discover_shapes_recursive(c, type_to_ignore)
-
-
-func _compute_bounds() -> void:
-	bounds.clear()
-	for node in _shapes.inclusive:
-		for point in node.shape.get_corners():
-			bounds.feed(point)
-
-	bounds.compute_bounds()
-	print("Bounds: ", bounds.center, ", ", bounds.size)

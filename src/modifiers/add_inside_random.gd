@@ -31,6 +31,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 	_rng = RandomNumberGenerator.new()
 	_rng.set_seed(seed)
 
+	var gt: Transform3D = domain.get_global_transform()
 	var center: Vector3 = domain.bounds.center
 	var half_size: Vector3 = domain.bounds.size / 2.0
 	var height: float = domain.bounds.center.y
@@ -38,13 +39,14 @@ func _process_transforms(transforms, domain, seed) -> void:
 	# Generate a random point in the bounding box. Store if it's inside the
 	# domain, or discard if invalid. Repeat until enough valid points are found.
 	var positions := []
-	var max_retries = amount * 100
+	var max_retries = amount * 10
 	var tries := 0
 
 	while positions.size() != amount:
 		var pos = _random_vec3() * half_size + center
 		if domain.is_point_inside(pos):
-			pos.y = height
+			if restrict_volume:
+				pos.y = height
 			positions.push_back(pos)
 
 		# Prevents an infinite loop
@@ -52,14 +54,13 @@ func _process_transforms(transforms, domain, seed) -> void:
 		if tries > max_retries:
 			break
 
-	print("positions ", positions)
+	#print("positions ", positions)
+
 	# Create the new transforms using the previously generated array
 	var start_index = transforms.list.size()
 	transforms.add(positions.size())
 	for i in positions.size():
 		transforms.list[start_index + i].origin = positions[i]
-
-	print(transforms.list)
 
 
 func _random_vec3() -> Vector3:

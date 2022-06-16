@@ -2,18 +2,20 @@
 extends Control
 
 
-@onready var _modifiers_container: Control = $VBoxContainer/ModifiersContainer
-@onready var _modifiers_popup: PopupPanel = $VBoxContainer/HBoxContainer/Add/ModifiersPopup
+const ModifierPanel := preload("./modifier/modifier_panel.tscn")
+
+@onready var _modifiers_container: Control = $%ModifiersContainer
+@onready var _modifiers_popup: PopupPanel = $%ModifiersPopup
 
 var _scatter
 var _modifier_stack
-var _modifier_panel = preload("./modifier/modifier_panel.tscn")
 var _is_ready := false
 
 
 func _ready():
 	_modifiers_popup.add_modifier.connect(_on_modifier_added)
 	_modifiers_container.child_moved.connect(_on_modifier_moved)
+	$%Rebuild.pressed.connect(_on_rebuild_pressed)
 
 	_is_ready = true
 	rebuild_ui()
@@ -34,7 +36,7 @@ func rebuild_ui() -> void:
 	_validate_stack_connections()
 	_clear()
 	for m in _modifier_stack.stack:
-		var ui = _modifier_panel.instantiate()
+		var ui = ModifierPanel.instantiate()
 		_modifiers_container.add_child(ui)
 		ui.set_root(_scatter)
 		ui.create_ui_for(m)
@@ -98,7 +100,7 @@ func _on_value_changed() -> void:
 
 func _on_rebuild_pressed() -> void:
 	if _scatter:
-		_scatter.full_update()
+		_scatter.rebuild(true)
 
 
 func _on_save_preset(preset_name) -> void:

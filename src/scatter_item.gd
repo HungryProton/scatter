@@ -14,7 +14,10 @@ extends Node3D
 
 
 var path: String
-var test: int
+var source_position: Vector3
+var source_rotation: Vector3
+var source_scale: Vector3
+
 
 func _get_property_list() -> Array:
 	var list := []
@@ -44,11 +47,48 @@ func get_item() -> Node3D:
 	if path.is_empty():
 		return null
 
-	if source == 0:
-		return get_node_or_null(path)
+	var node: Node3D
 
-	var scene = load(path)
-	if scene:
-		return scene.instantiate()
+	if source == 0:
+		node = get_node_or_null(path)
+	else:
+		var scene = load(path)
+		if scene:
+			node = scene.instantiate()
+
+	if node:
+		_save_source_data(node)
+		return node
 
 	return null
+
+
+func process_transform(t: Transform3D) -> Transform3D:
+	var origin = t.origin
+	t.origin = Vector3.ZERO
+
+	t = t.scaled(Vector3.ONE * scale_modifier)
+
+	if not ignore_source_scale:
+		t = t.scaled(source_scale)
+
+	if not ignore_source_rotation:
+		t = t.rotated(t.basis.x.normalized(), source_rotation.x)
+		t = t.rotated(t.basis.y.normalized(), source_rotation.y)
+		t = t.rotated(t.basis.z.normalized(), source_rotation.z)
+
+	t.origin = origin
+
+	if not ignore_source_position:
+		t.origin += source_position
+
+	return t
+
+
+func _save_source_data(node: Node3D) -> void:
+	if not node:
+		return
+
+	source_position = node.position
+	source_rotation = node.rotation
+	source_scale = node.scale

@@ -21,7 +21,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 	var t: Transform3D
 	var b: Basis
 
-	var gt: Transform3D = transforms.path.get_global_transform()
+	var gt: Transform3D = domain.get_global_transform()
 	var gb: Basis = gt.basis
 	var global_x: Vector3 = (Vector3.RIGHT * gb).normalized()
 	var global_y: Vector3 = (Vector3.UP * gb).normalized()

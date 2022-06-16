@@ -10,13 +10,16 @@ extends "base_shape.gd"
 
 var _radius_squared := 0
 
+
 func is_point_inside(point: Vector3) -> bool:
 	var gt = owner.get_global_transform()
-	var shape_center = Vector3.ZERO * gt
-	return point.distance_squared_to(shape_center) < _radius_squared
+	var shape_center = gt * Vector3.ZERO
+	#print("center ", shape_center, " point, ", point)
+
+	return shape_center.distance_squared_to(point) < _radius_squared
 
 
-func get_corners() -> Array:
+func get_corners_global() -> Array:
 	var res := []
 
 	if not owner:

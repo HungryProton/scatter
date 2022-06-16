@@ -4,6 +4,7 @@ extends Resource
 # Modifiers place transforms. They create, edit or remove transforms in a list,
 # before the next Modifier in the stack does the same.
 # All Modifiers must inherit from this class.
+# Transforms in the provided transforms list must be in global space.
 
 
 signal warning_changed
@@ -22,6 +23,7 @@ var warning: String = ""
 var warning_ignore_no_transforms := false
 var warning_ignore_no_shape := false
 var can_override_seed := false
+var restrict_volume := false # Tells the modifier to constrain new transforms to a plane or not
 var documentation := Documentation.new()
 
 

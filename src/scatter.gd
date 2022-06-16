@@ -2,7 +2,8 @@
 extends Node3D
 
 
-signal updated
+signal shape_changed
+
 
 const ScatterUtil := preload('./common/scatter_util.gd')
 const ModifierStack := preload("./stack/modifier_stack.gd")
@@ -13,22 +14,31 @@ const Domain := preload("./common/domain.gd")
 
 
 @export var global_seed := 0
+@export var use_instancing := true:
+	set(val):
+		use_instancing = val
+		rebuild(true)
 
 var undo_redo: UndoRedo
 var modifier_stack: ModifierStack:
 	set(val):
 		modifier_stack = val
-		if not modifier_stack.value_changed.is_connected(_rebuild):
-			modifier_stack.value_changed.connect(_rebuild)
+		if not modifier_stack.value_changed.is_connected(rebuild):
+			modifier_stack.value_changed.connect(rebuild)
 var domain: Domain = Domain.new()
-var items: Array
+var items: Array[ScatterItem]
+var total_item_proportion: int
+var output_root: Node3D
 
-var _total_item_proportion: int
-var _output: Node3D
+var _rebuilt_this_frame := false
 
 
 func _ready() -> void:
+	set_notify_transform(true)
 	ScatterUtil.ensure_stack_exists(self)
+	ScatterUtil.discover_items(self)
+	domain.discover_shapes(self)
+	rebuild()
 
 
 func _get_property_list() -> Array:
@@ -55,27 +65,109 @@ func _get_configuration_warning() -> String:
 	return warning
 
 
-func _ensure_output_root_exists() -> void:
-	if not _output or not is_instance_valid(_output):
-		_output = get_node_or_null("./ScatterOutput")
-
-	if not _output:
-		_output = Position3D.new()
-		add_child(_output)
+func _notification(what):
+	match what:
+		NOTIFICATION_TRANSFORM_CHANGED:
+			domain.compute_bounds(self)
+			rebuild()
 
 
-func _clear_output() -> void:
-	_ensure_output_root_exists()
-	for c in _output.get_children():
-		c.queue_free()
+func _set(property, _value):
+	if not Engine.is_editor_hint():
+		return false
+
+	# Workaround to detect when the node was duplicated from the editor.
+	if property == "transform":
+		call_deferred("_on_node_duplicated")
+
+	return false
 
 
-func _rebuild() -> void:
-	ScatterUtil.discover_items(self)
-	domain.discover_shapes(self)
+# Only used for type checking.
+# Useful to other scripts who can't preload this due to cyclic references
+func is_scatter_node() -> bool:
+	return true
+
+
+func full_rebuild():
+	_clear_output()
+	_rebuild(true)
+
+
+# A wrapper around the _rebuild function. Ensure it's not called more than once
+# per frame. (Happens when the Scatter node is mode, which triggers the
+# TRANSFORM_CHANGED notification in all children, which in turn notify the
+# Scatter node back about the changes.
+func rebuild(force_discover := false) -> void:
+	if not is_inside_tree():
+		return
+
+	if _rebuilt_this_frame:
+		return
+
+	_rebuild(force_discover)
+
+	_rebuilt_this_frame = true
+	await get_tree().process_frame
+	_rebuilt_this_frame = false
+
+
+# Re compute the desired output.
+# This is the main function, scattering the objects in the scene.
+# Scattered objects are stored under a Position3D node called "ScatterOutput"
+# DON'T call this function directly outside of the 'rebuild()' function above.
+func _rebuild(force_discover) -> void:
+	if force_discover:
+		ScatterUtil.discover_items(self)
+		domain.discover_shapes(self)
+
 	if items.is_empty() or domain.is_empty():
 		return
 
 	var transforms: TransformList = modifier_stack.update()
-	print(transforms.list.size())
+	if use_instancing:
+		_update_multimeshes(transforms)
+	else:
+		_update_duplicates(transforms)
 
+
+# Creates one MultimeshInstance3D for each ScatterItem node.
+func _update_multimeshes(transforms: TransformList) -> void:
+	var offset := 0
+	var transforms_count: int = transforms.size()
+	var inverse_transform := global_transform.affine_inverse()
+
+	for item in items:
+		var item_root = ScatterUtil.get_or_create_item_root(item)
+		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
+		var mmi = ScatterUtil.get_or_create_multimesh(item, count)
+		if not mmi:
+			return
+
+		var t: Transform3D
+		for i in count:
+			# Extra check because of how 'count' is calculated
+			if (offset + i) >= transforms_count:
+				mmi.multimesh.instance_count = i - 1
+				return
+
+			t = item.process_transform(transforms.list[offset + i])
+			mmi.multimesh.set_instance_transform(i, inverse_transform * t)
+
+		offset += count
+
+
+func _update_duplicates(transforms: TransformList) -> void:
+	pass
+
+
+func _clear_output() -> void:
+	ScatterUtil.ensure_output_root_exists(self)
+	for c in output_root.get_children():
+		c.queue_free()
+
+
+func _on_node_duplicated() -> void:
+	ScatterUtil.ensure_stack_exists(self)
+	domain.discover_shapes(self)
+	ScatterUtil.discover_items(self)
