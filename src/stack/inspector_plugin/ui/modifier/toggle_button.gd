@@ -6,7 +6,8 @@ extends Button
 @export var pressed_icon: Texture
 
 
-func _on_ready() -> void:
+func _ready() -> void:
+	toggled.connect(_on_toggled)
 	_on_toggled(button_pressed)
 
 

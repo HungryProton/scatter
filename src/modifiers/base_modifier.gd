@@ -16,15 +16,19 @@ const Documentation = preload("../common/documentation.gd")
 @export var enabled := true
 @export var override_global_seed := false
 @export var custom_seed := 0
+@export var restrict_height := false # Tells the modifier to constrain new transforms to a plane or not
+@export var use_local_space := false
 
 var display_name: String = "Base Modifier Name"
 var category: String = "None"
+var documentation := Documentation.new()
 var warning: String = ""
 var warning_ignore_no_transforms := false
 var warning_ignore_no_shape := false
 var can_override_seed := false
-var restrict_volume := false # Tells the modifier to constrain new transforms to a plane or not
-var documentation := Documentation.new()
+var can_restrict_height := true
+var is_transform_space_relevant := true
+var expanded := false
 
 
 func get_warning() -> String:

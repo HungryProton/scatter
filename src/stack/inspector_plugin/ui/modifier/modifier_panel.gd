@@ -2,20 +2,40 @@
 extends Control
 
 
-signal removed
 signal value_changed
+signal removed
 
+const ParameterBool := preload("./components/parameter_bool.tscn")
+const ParameterScalar := preload("./components/parameter_scalar.tscn")
+const ParameterNodeSelector = preload("./components/parameter_node_selector.tscn")
+const ParameterFile = preload("./components/parameter_file.tscn")
+const ParameterCurve = preload("./components/parameter_curve.tscn")
+const ParameterBitmask = preload("./components/parameter_bitmask.tscn")
+const ParameterString = preload("./components/parameter_string.tscn")
+const ParameterVector3 = preload("./components/parameter_vector3.tscn")
+const ParameterVector2 = preload("./components/parameter_vector2.tscn")
+const PARAMETER_IGNORE_LIST := [
+	"enabled",
+	"override_global_seed",
+	"custom_seed",
+	"restrict_height",
+	"use_local_space",
+	]
 
 var _scatter
 var _modifier
 
-@onready var _parameters: Control = $MarginContainer/VBoxContainer/Parameters
-@onready var _name: Label = $MarginContainer/VBoxContainer/HBoxContainer/ModifierName
-@onready var _enabled: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/Enabled
-@onready var _remove: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/Remove
-@onready var _warning: Button = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/Warning
+@onready var _parameters: Control = $%ParametersRoot
+@onready var _name: Label = $%ModifierName
+@onready var _enabled: Button = $%Enabled
+@onready var _remove: Button = $%Remove
+@onready var _warning: Button = $%Warning
 @onready var _warning_dialog: AcceptDialog = $WarningDialog
-@onready var _drag_control: Control = $MarginContainer/VBoxContainer/HBoxContainer/Buttons/DragControl
+@onready var _drag_control: Control = $%DragControl
+@onready var _override_ui = $%OverrideGlobalSeed
+@onready var _custom_seed_ui = $%CustomSeed
+@onready var _restrict_height_ui = $%RestrictHeight
+@onready var _transform_space_ui = $%TransformSpace
 
 
 func _ready() -> void:
@@ -36,6 +56,9 @@ func set_root(val) -> void:
 	_scatter = val
 
 
+# Loops through all exposed parameters and create an UI component for each of
+# them. For special properties (listed in PARAMATER_IGNORE_LIST), a special
+# UI is created.
 func create_ui_for(modifier) -> void:
 	_modifier = modifier
 	_modifier.warning_changed.connect(_on_warning_changed)
@@ -44,38 +67,56 @@ func create_ui_for(modifier) -> void:
 	_name.text = modifier.display_name
 	_enabled.button_pressed = modifier.enabled
 
+	# Enable or disable irrelevant controls for this modifier
+	_override_ui.enable(modifier.can_override_seed)
+	_transform_space_ui.enable(modifier.is_transform_space_relevant)
+	_restrict_height_ui.enable(modifier.can_restrict_height)
+
+	# Setup header connections
+	_override_ui.value_changed.connect(_on_parameter_value_changed.bind("override_global_seed", _override_ui))
+	_custom_seed_ui.value_changed.connect(_on_parameter_value_changed.bind("custom_seed", _custom_seed_ui))
+	_restrict_height_ui.value_changed.connect(_on_parameter_value_changed.bind("restrict_height", _restrict_height_ui))
+	_transform_space_ui.value_changed.connect(_on_parameter_value_changed.bind("use_local_space", _transform_space_ui))
+
+	# Restore header values
+	_override_ui.set_value(modifier.override_global_seed)
+	_custom_seed_ui.set_value(modifier.custom_seed)
+	_restrict_height_ui.set_value(modifier.restrict_height)
+	_transform_space_ui.set_value(modifier.use_local_space)
+
+	# Loop over the other properties and create a ui component for each of them
 	for property in modifier.get_property_list():
 		if property.usage != PROPERTY_USAGE_DEFAULT + PROPERTY_USAGE_SCRIPT_VARIABLE:
 			continue
 
-		if property.name == "enabled":
+		if property.name in PARAMETER_IGNORE_LIST:
 			continue
 
 		var parameter_ui
 		match property.type:
 			TYPE_BOOL:
-				parameter_ui = preload("./components/parameter_bool.tscn").instantiate()
+				parameter_ui = ParameterBool.instantiate()
 			TYPE_FLOAT:
-				parameter_ui = preload("./components/parameter_scalar.tscn").instantiate()
+				parameter_ui = ParameterScalar.instantiate()
 			TYPE_INT:
-				parameter_ui = preload("./components/parameter_scalar.tscn").instantiate()
+				parameter_ui = ParameterScalar.instantiate()
 				parameter_ui.mark_as_int(true)
 			TYPE_STRING:
 				if property.hint_string == "Node":
-					parameter_ui = preload("./components/parameter_node_selector.tscn").instantiate()
+					parameter_ui = ParameterNodeSelector.instantiate()
 					parameter_ui.set_root(_scatter)
 				elif property.hint_string == "File" or property.hint_string == "Texture":
-					parameter_ui = preload("./components/parameter_file.tscn").instantiate()
+					parameter_ui = ParameterFile.instantiate()
 				elif property.hint_string == "Curve":
-					parameter_ui = preload("./components/parameter_curve.tscn").instantiate()
+					parameter_ui = ParameterCurve.instantiate()
 				elif property.hint_string == "bitmask":
-					parameter_ui = preload("./components/parameter_bitmask.tscn").instantiate()
+					parameter_ui = ParameterBitmask.instantiate()
 				else:
-					parameter_ui = preload("./components/parameter_string.tscn").instantiate()
+					parameter_ui = ParameterString.instantiate()
 			TYPE_VECTOR3:
-				parameter_ui = preload("./components/parameter_vector3.tscn").instantiate()
+				parameter_ui = ParameterVector3.instantiate()
 			TYPE_VECTOR2:
-				parameter_ui = preload("./components/parameter_vector2.tscn").instantiate()
+				parameter_ui = ParameterVector2.instantiate()
 
 		if parameter_ui:
 			_parameters.add_child(parameter_ui)
@@ -83,6 +124,8 @@ func create_ui_for(modifier) -> void:
 			parameter_ui.set_value(modifier.get(property.name))
 			parameter_ui.set_hint_string(property.hint_string)
 			parameter_ui.value_changed.connect(_on_parameter_value_changed.bind(property.name, parameter_ui))
+
+	_on_expand_toggled(_modifier.expanded)
 
 
 func _restore_value(name, val, ui) -> void:
@@ -92,7 +135,8 @@ func _restore_value(name, val, ui) -> void:
 
 
 func _on_expand_toggled(toggled: bool) -> void:
-	_parameters.visible = toggled
+	$%ParametersContainer.visible = toggled
+	_modifier.expanded = toggled
 
 
 func _on_remove_pressed() -> void:
@@ -105,14 +149,14 @@ func _on_parameter_value_changed(value, previous, name, ui) -> void:
 		_scatter.undo_redo.add_undo_method(self, "_restore_value", name, previous, ui)
 		_scatter.undo_redo.add_do_method(self, "_restore_value", name, value, ui)
 		_scatter.undo_redo.commit_action()
-
-	_modifier.set(name, value)
-	value_changed.emit()
+	else:
+		_modifier.set(name, value)
+		value_changed.emit()
 
 
 func _on_enable_toggled(pressed: bool):
 	_modifier.enabled = pressed
-	value_changed.emit()
+	_modifier.value_changed.emit()
 
 
 func _on_removed_pressed() -> void:

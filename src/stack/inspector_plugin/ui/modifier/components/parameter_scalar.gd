@@ -13,8 +13,8 @@ var _is_enum := false
 
 
 func _ready() -> void:
-	_spinbox.connect("value_changed", _on_value_changed)
-	_option.connect("item_selected", _on_value_changed)
+	_spinbox.value_changed.connect(_on_value_changed)
+	_option.item_selected.connect(_on_value_changed)
 	mark_as_int(_is_int)
 
 

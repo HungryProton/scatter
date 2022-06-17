@@ -7,19 +7,9 @@ extends Node
 
 const ModifierStack := preload("../stack/modifier_stack.gd")
 const ScatterItem := preload("../scatter_item.gd")
-const Domain := preload("./domain.gd")
 
 
 ### SCATTER UTILITY FUNCTIONS ###
-
-# Enforce the Scatter node has its required variables set.
-static func perform_sanity_check(s) -> void:
-	if not s.modifier_stack:
-		s.modifier_stack = ModifierStack.new()
-
-	if not s.domain:
-		s.domain = Domain.new()
-
 
 # Find all ScatterItems nodes among first level children.
 static func discover_items(s) -> void:

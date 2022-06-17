@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://c36gqn03pvlnr"]
+
+[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/components/header/parameter_spinbox.gd" id="1_f0oq6"]
+
+[node name="ParameterSpinbox" type="MarginContainer"]
+offset_right = 83.0625
+offset_bottom = 31.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource( "1_f0oq6" )
+
+[node name="SpinBox" type="SpinBox" parent="."]
+offset_right = 83.0
+offset_bottom = 31.0
+min_value = -100.0
+allow_greater = true
+allow_lesser = true

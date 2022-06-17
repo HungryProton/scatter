@@ -20,6 +20,7 @@ offset_bottom = 31.0
 mouse_filter = 2
 
 [node name="Panel" type="Panel" parent="MarginContainer"]
+visible = false
 offset_right = 83.0
 offset_bottom = 31.0
 mouse_filter = 2

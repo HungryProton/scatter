@@ -55,10 +55,10 @@ func _validate_stack_connections() -> void:
 		return
 
 	if _modifier_stack:
-		_modifier_stack.changed.disconnect(_on_stack_changed)
+		_modifier_stack.stack_changed.disconnect(_on_stack_changed)
 
 	_modifier_stack = _scatter.modifier_stack
-	_modifier_stack.changed.connect(_on_stack_changed)
+	_modifier_stack.stack_changed.connect(_on_stack_changed)
 
 	if _modifier_stack.just_created:
 		_on_load_preset("default")
@@ -127,7 +127,7 @@ func _on_load_preset(preset_name) -> void:
 		return
 
 	_modifier_stack = preset.modifier_stack.duplicate(7)
-	_modifier_stack.changed.connect(_on_stack_changed)
+	_modifier_stack.stack_changed.connect(_on_stack_changed)
 	_scatter.modifier_stack = _modifier_stack
 	rebuild_ui()
 	_scatter.update()

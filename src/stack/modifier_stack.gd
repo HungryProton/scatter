@@ -2,7 +2,9 @@
 extends Resource
 
 
+signal stack_changed
 signal value_changed
+
 
 const TransformList = preload("../common/transform_list.gd")
 
@@ -25,18 +27,19 @@ func update() -> TransformList:
 
 func add(modifier) -> void:
 	stack.push_back(modifier)
-	changed.emit()
+	stack_changed.emit()
 
 
 func move(old_index: int, new_index: int) -> void:
 	var modifier = stack.pop_at(old_index)
 	stack.insert(new_index, modifier)
+	stack_changed.emit()
 
 
 func remove(modifier) -> void:
 	if stack.has(modifier):
 		stack.erase(modifier)
-		changed.emit()
+		stack_changed.emit()
 
 
 func get_copy():

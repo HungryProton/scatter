@@ -35,4 +35,4 @@ func _on_value_changed(_val) -> void:
 	if not _locked:
 		var value = get_value()
 		if value != _previous:
-			emit_signal("value_changed", value, _previous)
+			value_changed.emit(value, _previous)

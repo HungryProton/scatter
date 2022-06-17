@@ -13,7 +13,11 @@ const ScatterShape := preload("./scatter_shape.gd")
 const Domain := preload("./common/domain.gd")
 
 
-@export var global_seed := 0
+@export var global_seed := 0:
+	set(val):
+		global_seed = val
+		rebuild()
+
 @export var use_instancing := true:
 	set(val):
 		use_instancing = val
@@ -25,6 +29,7 @@ var modifier_stack: ModifierStack:
 		modifier_stack = val.get_copy() # Enfore uniqueness
 		modifier_stack.owner = self
 		modifier_stack.value_changed.connect(rebuild)
+		modifier_stack.stack_changed.connect(rebuild)
 
 var domain: Domain:
 	set(val):
@@ -38,7 +43,7 @@ var _rebuilt_this_frame := false
 
 
 func _ready() -> void:
-	ScatterUtil.perform_sanity_check(self)
+	_perform_sanity_check()
 	set_notify_transform(true)
 	rebuild(true)
 
@@ -172,6 +177,15 @@ func _clear_output() -> void:
 		c.queue_free()
 
 
+# Enforce the Scatter node has its required variables set.
+func _perform_sanity_check() -> void:
+	if not modifier_stack:
+		modifier_stack = ModifierStack.new()
+
+	if not domain:
+		domain = Domain.new()
+
+
 func _on_node_duplicated() -> void:
-	ScatterUtil.perform_sanity_check(self)
+	_perform_sanity_check()
 	full_rebuild() # Otherwise we get linked multimeshes or other unwanted side effects

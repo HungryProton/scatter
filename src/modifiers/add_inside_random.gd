@@ -45,7 +45,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 	while positions.size() != amount:
 		var pos = _random_vec3() * half_size + center
 		if domain.is_point_inside(pos):
-			if restrict_volume:
+			if restrict_height:
 				pos.y = height
 			positions.push_back(pos)
 

@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://w6ycb4oveqhd"]
+
+[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/components/header/parameter_button.gd" id="1_f6puy"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/toggle_button.gd" id="2_167vc"]
+
+[node name="MarginContainer" type="MarginContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource( "1_f6puy" )
+
+[node name="Button" type="Button" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+focus_mode = 0
+toggle_mode = true
+icon_alignment = 1
+script = ExtResource( "2_167vc" )
