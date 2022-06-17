@@ -11,7 +11,16 @@ extends "base_shape.gd"
 var _radius_squared := 0
 
 
+func get_copy():
+	var copy = get_script().new()
+	copy.radius = radius
+	return copy
+
+
 func is_point_inside(point: Vector3) -> bool:
+	if not owner:
+		return false
+
 	var gt = owner.get_global_transform()
 	var shape_center = gt * Vector3.ZERO
 	#print("center ", shape_center, " point, ", point)

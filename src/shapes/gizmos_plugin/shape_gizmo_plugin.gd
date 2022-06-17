@@ -23,6 +23,8 @@ func _has_gizmo(node):
 func _redraw(gizmo: EditorNode3DGizmo):
 	gizmo.clear()
 	var shape = gizmo.get_spatial_node().shape
+	if not shape:
+		return
 
 	match shape.get_script():
 		PointShape:

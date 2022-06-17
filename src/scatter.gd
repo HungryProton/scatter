@@ -22,10 +22,14 @@ const Domain := preload("./common/domain.gd")
 var undo_redo: UndoRedo
 var modifier_stack: ModifierStack:
 	set(val):
-		modifier_stack = val
-		if not modifier_stack.value_changed.is_connected(rebuild):
-			modifier_stack.value_changed.connect(rebuild)
-var domain: Domain = Domain.new()
+		modifier_stack = val.get_copy() # Enfore uniqueness
+		modifier_stack.owner = self
+		modifier_stack.value_changed.connect(rebuild)
+
+var domain: Domain:
+	set(val):
+		domain = Domain.new() # Enforce uniqueness
+
 var items: Array[ScatterItem]
 var total_item_proportion: int
 var output_root: Node3D
@@ -34,11 +38,9 @@ var _rebuilt_this_frame := false
 
 
 func _ready() -> void:
+	ScatterUtil.perform_sanity_check(self)
 	set_notify_transform(true)
-	ScatterUtil.ensure_stack_exists(self)
-	ScatterUtil.discover_items(self)
-	domain.discover_shapes(self)
-	rebuild()
+	rebuild(true)
 
 
 func _get_property_list() -> Array:
@@ -84,7 +86,7 @@ func _set(property, _value):
 
 
 # Only used for type checking.
-# Useful to other scripts who can't preload this due to cyclic references
+# Useful to other scripts which can't preload this due to cyclic references.
 func is_scatter_node() -> bool:
 	return true
 
@@ -95,9 +97,9 @@ func full_rebuild():
 
 
 # A wrapper around the _rebuild function. Ensure it's not called more than once
-# per frame. (Happens when the Scatter node is mode, which triggers the
-# TRANSFORM_CHANGED notification in all children, which in turn notify the
-# Scatter node back about the changes.
+# per frame. (Happens when the Scatter node is moved, which triggers the
+# TRANSFORM_CHANGED notification in every children, which in turn notify the
+# parent Scatter node back about the changes.
 func rebuild(force_discover := false) -> void:
 	if not is_inside_tree():
 		return
@@ -105,9 +107,11 @@ func rebuild(force_discover := false) -> void:
 	if _rebuilt_this_frame:
 		return
 
+	_rebuilt_this_frame = true
+
+	force_discover = true # TMP while we fix the other issues
 	_rebuild(force_discover)
 
-	_rebuilt_this_frame = true
 	await get_tree().process_frame
 	_rebuilt_this_frame = false
 
@@ -161,6 +165,7 @@ func _update_duplicates(transforms: TransformList) -> void:
 	pass
 
 
+# Deletes what the Scatter node generated.
 func _clear_output() -> void:
 	ScatterUtil.ensure_output_root_exists(self)
 	for c in output_root.get_children():
@@ -168,6 +173,5 @@ func _clear_output() -> void:
 
 
 func _on_node_duplicated() -> void:
-	ScatterUtil.ensure_stack_exists(self)
-	domain.discover_shapes(self)
-	ScatterUtil.discover_items(self)
+	ScatterUtil.perform_sanity_check(self)
+	full_rebuild() # Otherwise we get linked multimeshes or other unwanted side effects

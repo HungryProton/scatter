@@ -24,11 +24,9 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 
 var shape: BaseShape:
 	set(val):
-		print("in shape setter")
-		shape = val
-		shape.changed.connect(_on_shape_changed)
+		shape = val.get_copy() # Enfore uniqueness
 		shape.owner = self
-		print("new shape ", shape)
+		shape.changed.connect(_on_shape_changed)
 
 
 func _ready() -> void:
@@ -61,7 +59,8 @@ func _set(property, _value):
 
 	# Workaround to detect when the node was duplicated from the editor.
 	if property == "transform":
-		call_deferred("_on_node_duplicated")
+		pass
+		#call_deferred("_on_node_duplicated")
 
 	return false
 
@@ -75,11 +74,4 @@ func is_point_inside(point: Vector3) -> bool:
 
 func _on_shape_changed() -> void:
 	update_gizmos()
-
-
-func _on_node_duplicated() -> void:
-	print("shape: ", shape)
-	var duplicate = shape.duplicate(true)
-	print("duplicate", duplicate)
-	shape = duplicate
-
+	ScatterUtil.request_parent_to_rebuild(self)

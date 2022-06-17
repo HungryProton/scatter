@@ -37,3 +37,10 @@ func remove(modifier) -> void:
 	if stack.has(modifier):
 		stack.erase(modifier)
 		changed.emit()
+
+
+func get_copy():
+	var copy = get_script().new()
+	for modifier in stack:
+		copy.stack.push_back(modifier.duplicate())
+	return copy

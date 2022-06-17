@@ -7,30 +7,18 @@ extends Node
 
 const ModifierStack := preload("../stack/modifier_stack.gd")
 const ScatterItem := preload("../scatter_item.gd")
+const Domain := preload("./domain.gd")
 
 
 ### SCATTER UTILITY FUNCTIONS ###
 
-# Enforce the Scatter node to always have a unique modifier_stack
-# (This resource must never be null, nor shared with another Scatter node)
-static func ensure_stack_exists(s) -> void:
+# Enforce the Scatter node has its required variables set.
+static func perform_sanity_check(s) -> void:
 	if not s.modifier_stack:
 		s.modifier_stack = ModifierStack.new()
-		s.modifier_stack.owner = s
 
-	if s.modifier_stack.owner != s:
-		s.modifier_stack = duplicate_modifier_stack(s)
-		s.modifier_stack.owner = s
-
-
-# A modifier stack has nested resources that apparently don't play well
-# with the built-in duplicate(true) method, so we recreate an empty stack and
-# duplicate modifiers into it one by one.
-static func duplicate_modifier_stack(s) -> ModifierStack:
-	var new_stack = ModifierStack.new()
-	for modifier in s.modifier_stack.stack:
-		new_stack.stack.push_back(modifier.duplicate())
-	return new_stack
+	if not s.domain:
+		s.domain = Domain.new()
 
 
 # Find all ScatterItems nodes among first level children.
@@ -116,6 +104,9 @@ static func get_or_create_multimesh(item: ScatterItem, count: int) -> MultiMeshI
 # this method.
 static func request_parent_to_rebuild(node: Node) -> void:
 	var parent = node.get_parent()
+	if not parent.is_inside_tree():
+		return
+
 	# Can't include the Scatter script here because of cyclic references
 	if parent and parent.has_method("is_scatter_node"):
 		parent.rebuild(true)
