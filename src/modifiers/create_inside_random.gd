@@ -32,37 +32,40 @@ func _process_transforms(transforms, domain, seed) -> void:
 	_rng.set_seed(seed)
 
 	var gt: Transform3D = domain.get_global_transform()
+	var gt_inverse = gt.affine_inverse()
 	var center: Vector3 = domain.bounds.center
 	var half_size: Vector3 = domain.bounds.size / 2.0
 	var height: float = domain.bounds.center.y
 
 	# Generate a random point in the bounding box. Store if it's inside the
 	# domain, or discard if invalid. Repeat until enough valid points are found.
-	var positions := []
+	var t: Transform3D
+	var pos: Vector3
+	var new_transforms: Array[Transform3D] = []
 	var max_retries = amount * 10
 	var tries := 0
 
-	while positions.size() != amount:
-		var pos = _random_vec3() * half_size + center
+	while new_transforms.size() != amount:
+		t = Transform3D()
+		pos = _random_vec3() * half_size + center
+
+		if restrict_height:
+			pos.y = height
+
+		if use_local_space:
+			pos = (pos * gt_inverse) - gt.origin
+			t.basis = gt.basis
+
 		if domain.is_point_inside(pos):
-			if restrict_height:
-				pos.y = height
-			positions.push_back(pos)
+			t.origin = pos
+			new_transforms.push_back(t)
 
 		# Prevents an infinite loop
 		tries += 1
 		if tries > max_retries:
 			break
 
-	#print("positions ", positions)
-
-	# Create the new transforms using the previously generated array
-	# TODO: maybe generate the transforms directly to avoid a second loop and
-	# append the array directly
-	var start_index = transforms.list.size()
-	transforms.add(positions.size())
-	for i in positions.size():
-		transforms.list[start_index + i].origin = positions[i]
+	transforms.append(new_transforms)
 
 
 func _random_vec3() -> Vector3:

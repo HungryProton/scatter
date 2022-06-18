@@ -25,10 +25,10 @@ var documentation := Documentation.new()
 var warning: String = ""
 var warning_ignore_no_transforms := false
 var warning_ignore_no_shape := false
+var expanded := false
 var can_override_seed := false
 var can_restrict_height := true
-var is_transform_space_relevant := true
-var expanded := false
+var can_use_global_and_local_space := true
 
 
 func get_warning() -> String:

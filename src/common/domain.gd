@@ -15,8 +15,8 @@ const ScatterShape := preload("../scatter_shape.gd")
 const Bounds := preload("../common/bounds.gd")
 
 var bounds: Bounds = Bounds.new()
+var root: Node3D
 
-var _root: Node3D
 var _shapes: Dictionary
 
 
@@ -40,17 +40,17 @@ func is_point_inside(point: Vector3) -> bool:
 
 
 func get_global_transform() -> Transform3D:
-	return _root.get_global_transform()
+	return root.get_global_transform()
 
 
 func get_local_transform() -> Transform3D:
-	return _root.get_transform()
+	return root.get_transform()
 
 
 # Recursively find all ScatterShape nodes under the provided root. In case of
 # nested Scatter nodes, shapes under these other Scatter nodes will be ignored
-func discover_shapes(root: Node3D) -> void:
-	_root = root
+func discover_shapes(root_node: Node3D) -> void:
+	root = root_node
 	_shapes = {
 		inclusive = [],
 		exclusive = []
@@ -61,9 +61,9 @@ func discover_shapes(root: Node3D) -> void:
 	compute_bounds(root)
 
 
-func compute_bounds(root: Node3D) -> void:
+func compute_bounds(root_node: Node3D) -> void:
 	if _shapes.is_empty():
-		discover_shapes(root)
+		discover_shapes(root_node)
 		return
 
 	bounds.clear()

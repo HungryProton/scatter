@@ -2,7 +2,6 @@
 extends "base_modifier.gd"
 
 
-@export var local_space := false
 @export var rotation := Vector3(360.0, 360.0, 360.0)
 @export var snap_angle := Vector3.ZERO
 
@@ -31,7 +30,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 		t = transforms.list[i]
 		b = t.basis
 
-		if local_space:
+		if use_local_space:
 			b = b.rotated(t.basis.x.normalized(), _random_angle(rotation.x, snap_angle.x))
 			b = b.rotated(t.basis.y.normalized(), _random_angle(rotation.y, snap_angle.y))
 			b = b.rotated(t.basis.z.normalized(), _random_angle(rotation.z, snap_angle.z))

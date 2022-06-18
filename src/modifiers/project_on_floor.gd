@@ -6,8 +6,7 @@ extends "base_modifier.gd"
 @export var ray_offset := 1.0
 @export var remove_points_on_miss := true
 @export var align_with_floor_normal := false
-@export var invert_ray_direction := false
-@export var floor_direction := Vector3.DOWN
+@export var ray_direction := Vector3.DOWN
 @export_range(0.0, 1.0) var max_slope = 1.0
 @export_flags_3d_physics var mask = 1048575
 
@@ -15,68 +14,66 @@ extends "base_modifier.gd"
 func _init() -> void:
 	display_name = "Project On Floor"
 	category = "Edit"
+	can_use_global_and_local_space = true
+	can_restrict_height = false
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
-	if transforms.list.empty():
+	if transforms.list.is_empty():
 		return
 
-	var path = transforms.path
-	if not path or not path.get_world():
-		return
-
-	var space_state = path.get_world().get_direct_space_state()
+	var space_state = domain.root.get_world_3d().get_direct_space_state()
 	var hit
 	var d: float
 	var t: Transform3D
 	var i := 0
 
-	while i < transforms.list.size():
+	while i < transforms.size():
 		t = transforms.list[i]
-		hit = _project_on_floor(t.origin, path, space_state)
+		hit = _project_on_floor(t, domain.root, space_state)
 
-		if hit != null and not hit.empty():
+		if hit != null and not hit.is_empty():
 			d = abs(Vector3.UP.dot(hit.normal))
 			if d < (1.0 - max_slope):
 				transforms.list.remove(i)
 				continue
 
 			if align_with_floor_normal:
-				var gt: Transform3D = transforms.path.get_global_transform()
-				t = _align_with(t, hit.normal * gt.basis)
+				t = _align_with(t, hit.normal)
 
-			t.origin = path.to_local(hit.position)
+			t.origin = hit.position
 			transforms.list[i] = t
 
 		elif remove_points_on_miss:
-			transforms.list.remove(i)
+			transforms.list.remove_at(i)
 			continue
 
 		i += 1
 
-	if transforms.list.empty():
+	if transforms.list.is_empty():
 		warning += """All the transforms have been removed. Possible reasons: \n
 		+ There is no collider close enough to the path.
-		+ The Ray length is not long enough.
-		+ The floor direction is incorrect.
+		+ The ray length is not long enough.
+		+ The ray direction is incorrect.
 		"""
 
 
-func _project_on_floor(pos, path, space_state):
-	var start = pos
-	var end = pos
+func _project_on_floor(t: Transform3D, root: Node3D, physics_state: PhysicsDirectSpaceState3D):
+	var start = t.origin
+	var end = t.origin
+	var dir = ray_direction.normalized()
 
-	if invert_ray_direction:
-		start += ray_offset * floor_direction
-		end -= ray_length * floor_direction
-	else:
-		start -= ray_offset * floor_direction
-		end += ray_length * floor_direction
+	if use_local_space:
+		dir *= t.basis
 
-	start = path.to_global(start)
-	end = path.to_global(end)
+	start -= ray_offset * dir
+	end += ray_length * dir
 
-	return space_state.intersect_ray(start, end, [], int(mask))
+	var ray_query := PhysicsRayQueryParameters3D.new()
+	ray_query.from = start
+	ray_query.to = end
+	ray_query.collision_mask = int(mask)
+	return physics_state.intersect_ray(ray_query)
 
 
 func _align_with(t: Transform3D, normal: Vector3) -> Transform3D:

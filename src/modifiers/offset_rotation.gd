@@ -2,13 +2,14 @@
 extends "base_modifier.gd"
 
 
-@export var local_space := false
 @export var rotation := Vector3.ZERO
 
 
 func _init() -> void:
 	display_name = "Offset Rotation"
 	category = "Offset"
+	can_use_global_and_local_space = true
+	can_restrict_height = false
 
 
 func _process_transforms(transforms, domain, _seed : int) -> void:
@@ -22,13 +23,13 @@ func _process_transforms(transforms, domain, _seed : int) -> void:
 	for t in transforms.list.size():
 		basis = transforms.list[t].basis
 
-		axis = (float(local_space) * basis.x + float(!local_space) * Vector3(1, 0, 0)).normalized()
+		axis = (float(use_local_space) * basis.x + float(!use_local_space) * Vector3(1, 0, 0)).normalized()
 		basis = basis.rotated(axis, rotation_rad.x)
 
-		axis = (float(local_space) * basis.y + float(!local_space) * Vector3(0, 1, 0)).normalized()
+		axis = (float(use_local_space) * basis.y + float(!use_local_space) * Vector3(0, 1, 0)).normalized()
 		basis = basis.rotated(axis, rotation_rad.y)
 
-		axis = (float(local_space) * basis.z + float(!local_space) * Vector3(0, 0, 1)).normalized()
+		axis = (float(use_local_space) * basis.z + float(!use_local_space) * Vector3(0, 0, 1)).normalized()
 		basis = basis.rotated(axis, rotation_rad.z)
 
 		transforms.list[t].basis = basis

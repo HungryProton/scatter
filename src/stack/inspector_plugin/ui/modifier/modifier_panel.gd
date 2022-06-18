@@ -40,6 +40,7 @@ var _modifier
 
 func _ready() -> void:
 	_name.text = name
+	_enabled.toggled.connect(_on_enable_toggled)
 	_remove.pressed.connect(_on_remove_pressed)
 
 
@@ -69,7 +70,7 @@ func create_ui_for(modifier) -> void:
 
 	# Enable or disable irrelevant controls for this modifier
 	_override_ui.enable(modifier.can_override_seed)
-	_transform_space_ui.enable(modifier.is_transform_space_relevant)
+	_transform_space_ui.enable(modifier.can_use_global_and_local_space)
 	_restrict_height_ui.enable(modifier.can_restrict_height)
 
 	# Setup header connections
@@ -156,7 +157,7 @@ func _on_parameter_value_changed(value, previous, name, ui) -> void:
 
 func _on_enable_toggled(pressed: bool):
 	_modifier.enabled = pressed
-	_modifier.value_changed.emit()
+	value_changed.emit()
 
 
 func _on_removed_pressed() -> void:

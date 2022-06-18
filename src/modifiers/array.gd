@@ -21,6 +21,10 @@ var _rng: RandomNumberGenerator
 func _init() -> void:
 	display_name = "Array"
 	category = "Create"
+	can_override_seed = true
+	can_restrict_height = false
+	can_use_global_and_local_space = false
+
 
 
 func _process_transforms(transforms, domain, seed: int) -> void:

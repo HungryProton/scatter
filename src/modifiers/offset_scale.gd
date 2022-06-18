@@ -9,6 +9,8 @@ extends "base_modifier.gd"
 func _init() -> void:
 	display_name = "Offset Scale"
 	category = "Offset"
+	can_use_global_and_local_space = true
+	can_restrict_height = false
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
