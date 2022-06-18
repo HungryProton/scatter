@@ -198,6 +198,7 @@ size_flags_vertical = 3
 [node name="Button" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton/OverrideGlobalSeed" index="0"]
 offset_right = 24.0
 offset_bottom = 24.0
+hint_tooltip = "Override global seed"
 icon = ExtResource( "11_qwhro" )
 icon_alignment = 0
 default_icon = ExtResource( "11_qwhro" )
@@ -238,6 +239,7 @@ size_flags_vertical = 3
 [node name="Button" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/RestrictHeight" index="0"]
 offset_right = 24.0
 offset_bottom = 24.0
+hint_tooltip = "Restrict height"
 icon = ExtResource( "12_lx60d" )
 default_icon = ExtResource( "12_lx60d" )
 pressed_icon = ExtResource( "15_0w0as" )
@@ -253,6 +255,8 @@ size_flags_vertical = 3
 [node name="Button" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/TransformSpace" index="0"]
 offset_right = 24.0
 offset_bottom = 24.0
+hint_tooltip = "Enabled: Use local space
+Disabled: Use global space"
 icon = ExtResource( "16_ocvvf" )
 default_icon = ExtResource( "16_ocvvf" )
 pressed_icon = ExtResource( "13_txjs8" )

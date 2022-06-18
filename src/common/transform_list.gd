@@ -2,7 +2,7 @@
 extends RefCounted
 
 
-var list := []
+var list: Array[Transform3D] = []
 var max_count := -1
 
 
@@ -10,6 +10,10 @@ func add(count: int) -> void:
 	for i in count:
 		var t := Transform3D()
 		list.push_back(t)
+
+
+func append(array: Array[Transform3D]) -> void:
+	list.append_array(array)
 
 
 func remove(count: int) -> void:

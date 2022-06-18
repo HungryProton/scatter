@@ -92,14 +92,18 @@ static func get_or_create_multimesh(item: ScatterItem, count: int) -> MultiMeshI
 # other edge cases).
 # So instead, when a child changed, it notifies the parent Scatter node through
 # this method.
-static func request_parent_to_rebuild(node: Node) -> void:
+static func request_parent_to_rebuild(node: Node, deferred := false) -> void:
 	var parent = node.get_parent()
 	if not parent.is_inside_tree():
 		return
 
-	# Can't include the Scatter script here because of cyclic references
+	# Can't include the Scatter script here because of cyclic references so we
+	# typecheck it differently
 	if parent and parent.has_method("is_scatter_node"):
-		parent.rebuild(true)
+		if deferred:
+			parent.call_deferred("rebuild", true)
+		else:
+			parent.rebuild(true)
 
 
 ### MESH UTILITY ###

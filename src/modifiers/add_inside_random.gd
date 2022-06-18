@@ -8,8 +8,8 @@ var _rng: RandomNumberGenerator
 
 
 func _init() -> void:
-	display_name = "Add Inside (Random)"
-	category = "Add"
+	display_name = "Create Inside (Random)"
+	category = "Create"
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 	can_override_seed = true
@@ -57,6 +57,8 @@ func _process_transforms(transforms, domain, seed) -> void:
 	#print("positions ", positions)
 
 	# Create the new transforms using the previously generated array
+	# TODO: maybe generate the transforms directly to avoid a second loop and
+	# append the array directly
 	var start_index = transforms.list.size()
 	transforms.add(positions.size())
 	for i in positions.size():

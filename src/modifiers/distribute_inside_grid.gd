@@ -2,44 +2,58 @@
 extends "base_modifier.gd"
 
 
-@export var x_spacing := 2.0
-@export var z_spacing := 2.0
+@export var spacing := Vector3(2.0, 2.0, 2.0)
+
+var _min_spacing := 0.05
 
 
 func _init() -> void:
-	display_name = "Distribute Inside (Grid)"
-	category = "Distribute"
+	display_name = "Create Inside (Grid)"
+	category = "Create"
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 
 
 func _process_transforms(transforms, domain, seed) -> void:
-	x_spacing = max(0.05, x_spacing)
-	z_spacing = max(0.05, z_spacing)
+	spacing.x = max(_min_spacing, spacing.x)
+	spacing.y = max(_min_spacing, spacing.y)
+	spacing.z = max(_min_spacing, spacing.z)
 
-	var center = transforms.path.center
-	var size = transforms.path.size
+	var center = domain.bounds.center
+	var size = domain.bounds.size
 	var half_size = size * 0.5
-	var height: float = transforms.path.bounds_max.y
+	var baseline: float = 0.0
 
-	var width := int(ceil(size.x / x_spacing))
-	var length := int(ceil(size.z / z_spacing))
-	var max_count: int = width * length
-	transforms.resize(max_count)
+	var width := int(ceil(size.x / spacing.x))
+	var height := int(ceil(size.y / spacing.y))
+	var length := int(ceil(size.z / spacing.z))
 
+	if restrict_height:
+		height = 1
+		baseline = domain.bounds.max.y
+
+	var max_count: int = width * length * height
+	var new_transforms: Array[Transform3D] = []
+	new_transforms.resize(max_count)
+
+	var t: Transform3D
 	var t_index := 0
-	for i in transforms.list.size():
-		var pos = Vector3.ZERO
-		pos.x = (i % width) * x_spacing
-		pos.z = (i / width) * z_spacing
-		pos += (center - half_size)
-		pos.y = height
+	for i in width * length:
+		for j in height:
+			var pos = Vector3.ZERO
+			pos.x = (i % width) * spacing.x
+			pos.y = (j * spacing.y) + baseline
+			pos.z = (i / width) * spacing.z
+			pos += (center - half_size)
 
-		if transforms.path.is_point_inside(pos):
-			transforms.list[t_index].origin = pos
-			t_index += 1
+			if domain.is_point_inside(pos):
+				t = Transform3D()
+				t.origin = pos
+				new_transforms[t_index] = t
+				t_index += 1
 
-	if t_index < max_count:
-		transforms.remove(max_count - t_index)
+	if t_index != new_transforms.size():
+		new_transforms.resize(t_index)
 
+	transforms.append(new_transforms)
 	transforms.shuffle(seed)

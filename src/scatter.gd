@@ -45,6 +45,7 @@ var _rebuilt_this_frame := false
 func _ready() -> void:
 	_perform_sanity_check()
 	set_notify_transform(true)
+	child_exited_tree.connect(_on_child_exited_tree)
 	rebuild(true)
 
 
@@ -189,3 +190,8 @@ func _perform_sanity_check() -> void:
 func _on_node_duplicated() -> void:
 	_perform_sanity_check()
 	full_rebuild() # Otherwise we get linked multimeshes or other unwanted side effects
+
+
+func _on_child_exited_tree(node: Node) -> void:
+	if node is ScatterShape or node is ScatterItem:
+		call_deferred("rebuild", true)
