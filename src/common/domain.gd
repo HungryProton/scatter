@@ -13,26 +13,25 @@ extends RefCounted
 const ScatterShape := preload("../scatter_shape.gd")
 const Bounds := preload("../common/bounds.gd")
 
-var bounds: Bounds = Bounds.new()
 var root: Node3D
-
-var _inclusive_shapes: Array[ScatterShape]
-var _exclusive_shapes: Array[ScatterShape]
+var inclusive_shapes: Array[ScatterShape]
+var exclusive_shapes: Array[ScatterShape]
+var bounds: Bounds = Bounds.new()
 
 
 func is_empty() -> bool:
-	return _inclusive_shapes.is_empty()
+	return inclusive_shapes.is_empty()
 
 
 # If a point is in an exclusion shape, returns false
 # If a point is in an inclusion shape (but not in an exclusion one), returns true
 # If a point is in neither, returns false
 func is_point_inside(point: Vector3) -> bool:
-	for s in _exclusive_shapes:
+	for s in exclusive_shapes:
 		if s.is_point_inside(point):
 			return false
 
-	for s in _inclusive_shapes:
+	for s in inclusive_shapes:
 		if s.is_point_inside(point):
 			return true
 
@@ -59,7 +58,7 @@ func discover_shapes(root_node: Node3D) -> void:
 
 func compute_bounds() -> void:
 	bounds.clear()
-	for node in _inclusive_shapes:
+	for node in inclusive_shapes:
 		for point in node.get_corners_global():
 			bounds.feed(point)
 
@@ -72,9 +71,9 @@ func _discover_shapes_recursive(node: Node3D, type_to_ignore) -> void:
 
 	if node is ScatterShape:
 		if node.exclusive:
-			_exclusive_shapes.push_back(node)
+			exclusive_shapes.push_back(node)
 		else:
-			_inclusive_shapes.push_back(node)
+			inclusive_shapes.push_back(node)
 
 	for c in node.get_children():
 		_discover_shapes_recursive(c, type_to_ignore)

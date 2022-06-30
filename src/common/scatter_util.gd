@@ -65,7 +65,6 @@ static func get_or_create_multimesh(item: ScatterItem, count: int) -> MultiMeshI
 	mmi.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
 	mmi.multimesh.mesh = mesh_instance.mesh
 	mmi.multimesh.transform_format = 1
-	mmi.multimesh.use_colors = true
 	mmi.multimesh.instance_count = count
 
 	mesh_instance.queue_free()

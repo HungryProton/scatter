@@ -166,8 +166,6 @@ func _update_multimeshes(transforms: TransformList) -> void:
 		var mmi = ScatterUtil.get_or_create_multimesh(item, count)
 		if not mmi:
 			return
-		var c = 0.0
-		var c_increments = 1.0 / count
 
 		var t: Transform3D
 		for i in count:
@@ -178,8 +176,6 @@ func _update_multimeshes(transforms: TransformList) -> void:
 
 			t = item.process_transform(transforms.list[offset + i])
 			mmi.multimesh.set_instance_transform(i, inverse_transform * t)
-			mmi.multimesh.set_instance_color(i, Color(c, c, c))
-			c += c_increments
 
 		offset += count
 

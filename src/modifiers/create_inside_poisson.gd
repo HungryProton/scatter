@@ -6,6 +6,9 @@ extends "base_modifier.gd"
 # support both 2D and 3D space.
 # Reference: https://www.youtube.com/watch?v=7WcmyxyFO7o
 
+# TODO: This doesn't work if the valid space isn't one solid space
+# (fails to fill the full domain if it's made of discrete, separate shapes)
+
 
 const Bounds := preload("../common/bounds.gd")
 
@@ -13,15 +16,18 @@ const Bounds := preload("../common/bounds.gd")
 @export var samples_before_rejection := 15
 
 
-var rng: RandomNumberGenerator
-var squared_radius: float
-var domain
-var bounds: Bounds
+var _rng: RandomNumberGenerator
+var _squared_radius: float
+var _domain
+var _bounds: Bounds
 
-var points: Array[Transform3D] # Stores the generated points
-var grid: Array[int] = [] # Flattened array
-var grid_size := Vector3i.ZERO
-var cell_size: float
+var _points: Array[Transform3D] # Stores the generated points
+var _grid: Array[int] = [] # Flattened array
+var _grid_size := Vector3i.ZERO
+var _cell_size: float
+var _cell_x: int
+var _cell_y: int
+var _cell_z: int
 
 
 func _init() -> void:
@@ -33,40 +39,34 @@ func _init() -> void:
 	can_override_seed = true
 
 
-func _process_transforms(transforms, d, seed) -> void:
-	rng = RandomNumberGenerator.new()
-	rng.set_seed(seed)
-	domain = d
-	bounds = domain.bounds
+func _process_transforms(transforms, domain, seed) -> void:
+	_rng = RandomNumberGenerator.new()
+	_rng.set_seed(seed)
+	_domain = domain
+	_bounds = _domain.bounds
 
 	_sample_poisson()
 
-	transforms.append(points)
-	#transforms.shuffle(seed)
+	transforms.append(_points)
+	transforms.shuffle(seed)
 
 
-func _sample_poisson() -> Array[Transform3D]:
+func _sample_poisson() -> void:
 	# Initialization
 	_init_grid()
-	points = []
+	_points = []
 
 	# Stores the possible starting points from where we run the sampling.
 	# This array will progressively be emptied as the algorithm progresses.
 	var spawn_points: Array[Transform3D]
-
-	# Create a starting point
-	var starting_point := Transform3D()
-	starting_point.origin = bounds.center
-	spawn_points.push_back(starting_point)
+	spawn_points.push_back(_get_starting_point())
 
 	# Sampler main loop
 	while not spawn_points.is_empty():
-		# Pick a starting point at random from the existing list
-		var spawn_index: int = rng.randi_range(0, spawn_points.size() - 1)
-		var spawn_center := spawn_points[spawn_index]
 
-		print("----- BEGIN ----")
-		print("Spawn index: ", spawn_index)
+		# Pick a starting point at random from the existing list
+		var spawn_index: int = _rng.randi_range(0, spawn_points.size() - 1)
+		var spawn_center := spawn_points[spawn_index]
 
 		var tries := 0
 		var candidate_accepted := false
@@ -75,9 +75,8 @@ func _sample_poisson() -> Array[Transform3D]:
 			tries += 1
 
 			# Generate a random point in space, outside the radius of the spawn point
-			var angle: float = rng.randf() * TAU
-			var dir: Vector3 = Vector3(sin(angle), 0.0, cos(angle))
-			var candidate: Vector3 = spawn_center.origin + dir * rng.randf_range(radius, radius * 2.0)
+			var dir: Vector3 = _generate_random_vector()
+			var candidate: Vector3 = spawn_center.origin + dir * _rng.randf_range(radius, radius * 2.0)
 
 			if _is_valid(candidate):
 				candidate_accepted = true
@@ -85,77 +84,108 @@ func _sample_poisson() -> Array[Transform3D]:
 				# Add new points to the lists
 				var t = Transform3D()
 				t.origin = candidate
-				points.push_back(t)
+				_points.push_back(t)
 				spawn_points.push_back(t)
-
-				# Stores the point index in the grid
-				var t_candidate = candidate - bounds.min
-				var cell_x: int = round(t_candidate.x / cell_size)
-				var cell_y: int = round(t_candidate.y / cell_size)
-				var cell_z: int = round(t_candidate.z / cell_size)
-
-				var id = cell_x + cell_z * grid_size.z
-				print("Accepting point, cell ", cell_x, ",", cell_z, ", id ", id, ", total ", points.size())
-				if (id < grid.size()):
-					grid[cell_x + cell_z * grid_size.z] = points.size() - 1
+				if restrict_height:
+					_grid[_cell_x + _cell_z * _grid_size.z] = _points.size() - 1
 				else:
-					print("size ", grid.size(), " id: ", id)
+					_grid[_cell_x + (_grid_size.y * _cell_y) + (_grid_size.x * _grid_size.y * _cell_z)] = _points.size() - 1
+
 				break
 
 		# Failed to find a point after too many tries. The space around this
 		# spawn point is probably full, discard it.
 		if not candidate_accepted:
-			print("REMOVING ", spawn_index, " remaining: ", spawn_points.size())
 			spawn_points.remove_at(spawn_index)
-
-	return points
 
 
 func _init_grid() -> void:
-	squared_radius = radius * radius
-	cell_size = radius / sqrt(2)
-	grid_size.x = ceil(bounds.size.x / cell_size)
-	grid_size.y = ceil(bounds.size.y / cell_size)
-	grid_size.z = ceil(bounds.size.z / cell_size)
-	print("Grid size: ", grid_size)
-	grid = []
-	grid.resize(grid_size.x * grid_size.z)
-	return
+	_squared_radius = radius * radius
+	_cell_size = radius / sqrt(2)
+	_grid_size.x = ceil(_bounds.size.x / _cell_size)
+	_grid_size.y = ceil(_bounds.size.y / _cell_size)
+	_grid_size.z = ceil(_bounds.size.z / _cell_size)
+
+	_grid = []
 	if restrict_height:
-		grid.resize(grid_size.x * grid_size.z)
+		_grid.resize(_grid_size.x * _grid_size.z)
 	else:
-		grid.resize(grid_size.x * grid_size.y * grid_size.z)
+		_grid.resize(_grid_size.x * _grid_size.y * _grid_size.z)
+
+
+# Starting point must be inside the domain, or we run the risk to never generate
+# any valid point later on
+func _get_starting_point() -> Transform3D:
+	var point: Vector3 = _bounds.center
+
+	var tries := 0
+	while not _domain.is_point_inside(point) or tries > 200:
+		tries += 1
+		point.x = _rng.randf_range(_bounds.min.x, _bounds.max.x)
+		point.y = _rng.randf_range(_bounds.min.y, _bounds.max.y)
+		point.z = _rng.randf_range(_bounds.min.z, _bounds.max.z)
+
+		if restrict_height:
+			point.y = _bounds.center.y
+
+	var starting_point := Transform3D()
+	starting_point.origin = point
+	return starting_point
 
 
 func _is_valid(candidate: Vector3) -> bool:
-	if not domain.is_point_inside(candidate):
+	if not _domain.is_point_inside(candidate):
 		return false
 
-	var t_candidate = candidate - bounds.min
+	# compute candidate current cell
+	var t_candidate = candidate - _bounds.min
+	_cell_x = floor(t_candidate.x / _cell_size)
+	_cell_y = floor(t_candidate.y / _cell_size)
+	_cell_z = floor(t_candidate.z / _cell_size)
 
 	# Search the surrounding cells for other points
-	var cell_x: int = round(t_candidate.x / cell_size)
-	var cell_y: int = round(t_candidate.y / cell_size)
-	var cell_z: int = round(t_candidate.z / cell_size)
+	var search_start_x: int = max(0, _cell_x - 2)
+	var search_end_x: int = min(_cell_x + 2, _grid_size.x - 1)
+	var search_start_y: int = max(0, _cell_y - 2)
+	var search_end_y: int = min(_cell_y + 2, _grid_size.y - 1)
+	var search_start_z: int = max(0, _cell_z - 2)
+	var search_end_z: int = min(_cell_z + 2, _grid_size.z - 1)
 
-	var search_start_x: int = max(0, cell_x - 2)
-	var search_end_x: int = min(cell_x + 2, grid_size.x - 1)
-	var search_start_y: int = max(0, cell_y - 2)
-	var search_end_y: int = min(cell_y + 2, grid_size.y - 1)
-	var search_start_z: int = max(0, cell_z - 2)
-	var search_end_z: int = min(cell_z + 2, grid_size.z - 1)
-
-	print("x:", search_start_x, "-", search_end_x, ", y: ", search_start_z, "-", search_end_z )
-
-	for x in range(search_start_x, search_end_x + 1):
-		for z in range(search_start_z, search_end_z + 1):
-			var point_index = grid[x + z * grid_size.z]
-			print(x, ",", z, "point index: ", point_index)
-			if point_index != null:
-				var other_point := points[point_index]
-				var squared_dist: float = candidate.distance_squared_to(other_point.origin)
-				print("Point in cell ", x, "," ,z, " id ", x + z * grid_size.z, " dist ", sqrt(squared_dist))
-				if squared_dist < squared_radius:
+	if restrict_height:
+		for x in range(search_start_x, search_end_x + 1):
+			for z in range(search_start_z, search_end_z + 1):
+				var point_index = _grid[x + z * _grid_size.z]
+				if _is_point_too_close(candidate, point_index):
 					return false
+	else:
+		for x in range(search_start_x, search_end_x + 1):
+			for y in range(search_start_y, search_end_y + 1):
+				for z in range(search_start_z, search_end_z + 1):
+					var point_index = _grid[x + (_grid_size.y * y) + (_grid_size.x * _grid_size.y * z)]
+					if _is_point_too_close(candidate, point_index):
+						return false
 
 	return true
+
+
+func _is_point_too_close(candidate: Vector3, point_index) -> bool:
+	if point_index == null:
+		return false
+
+	var other_point := _points[point_index]
+	var squared_dist: float = candidate.distance_squared_to(other_point.origin)
+	return squared_dist < _squared_radius
+
+
+func _generate_random_vector():
+	var angle = _rng.randf_range(0.0, TAU)
+	if restrict_height:
+		return Vector3(sin(angle), 0.0, cos(angle))
+
+	var costheta = _rng.randf_range(-1.0, 1.0)
+	var theta = acos(costheta)
+	var vector := Vector3.ZERO
+	vector.x = sin(theta) * cos(angle)
+	vector.y = sin(theta) * sin(angle)
+	vector.z = cos(theta)
+	return vector
