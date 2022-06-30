@@ -4,12 +4,12 @@ extends Node3D
 
 const BaseShape := preload("./shapes/base_shape.gd")
 const PathShape := preload("./shapes/path_shape.gd")
-const PointShape := preload("./shapes/point_shape.gd")
+const SphereShape := preload("./shapes/sphere_shape.gd")
 const ScatterUtil := preload('./common/scatter_util.gd')
 
 
 @export var exclusive = false
-@export_enum("Path", "Point") var shape_type:
+@export_enum("Path", "Sphere") var shape_type: #TODO: Remove this once the custom resource export works
 	set(val):
 		if val == shape_type:
 			return
@@ -19,13 +19,11 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 			0:
 				shape = PathShape.new()
 			1:
-				shape = PointShape.new()
-
+				shape = SphereShape.new()
 
 var shape: BaseShape:
 	set(val):
-		shape = val.get_copy() # Enfore uniqueness
-		shape.owner = self
+		shape = val.get_copy() # Enfore uniqueness, TODO, check if
 		shape.changed.connect(_on_shape_changed)
 
 
@@ -69,7 +67,14 @@ func is_point_inside(point: Vector3) -> bool:
 	if not shape:
 		return false
 
-	return shape.is_point_inside(point)
+	return shape.is_point_inside(point, global_transform)
+
+
+func get_corners_global() -> Array:
+	if not shape:
+		return []
+
+	return shape.get_corners_global(global_transform)
 
 
 func _on_shape_changed() -> void:

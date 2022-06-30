@@ -3,15 +3,16 @@ extends "base_parameter.gd"
 
 
 @onready var _label: Label = $Label
-@onready var _x: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer/X
-@onready var _y: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer2/Y
-@onready var _z: SpinBox = $MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer3/Z
+@onready var _x: SpinBox = $%X
+@onready var _y: SpinBox = $%Y
+@onready var _z: SpinBox = $%Z
+@onready var _link: Button = $%LinkButton
 
 
 func _ready() -> void:
-	_x.connect("value_changed", _on_value_changed)
-	_y.connect("value_changed", _on_value_changed)
-	_z.connect("value_changed", _on_value_changed)
+	_x.value_changed.connect(_on_spinbox_value_changed)
+	_y.value_changed.connect(_on_spinbox_value_changed)
+	_z.value_changed.connect(_on_spinbox_value_changed)
 
 
 func set_parameter_name(text: String) -> void:
@@ -37,3 +38,12 @@ func _on_clear_pressed():
 	set_value(Vector3.ZERO)
 	_previous = old
 	_on_value_changed(Vector3.ZERO)
+
+
+func _on_spinbox_value_changed(value: float) -> void:
+	if _link.button_pressed:
+		var old = get_value()
+		set_value(Vector3(value, value, value))
+		_previous = old
+
+	_on_value_changed(get_value())

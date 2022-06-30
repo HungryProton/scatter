@@ -1,25 +1,7 @@
-[gd_scene load_steps=4 format=2]
-
-[sub_resource type="StyleBoxFlat" id=1]
-
-[sub_resource type="StyleBoxFlat" id=2]
-bg_color = Color( 0.756863, 0.756863, 0.756863, 1 )
-
-[sub_resource type="StyleBoxFlat" id=3]
-bg_color = Color( 0.309804, 0.309804, 0.309804, 1 )
+[gd_scene format=3 uid="uid://cf4lrr5tnlwnw"]
 
 [node name="Button" type="Button"]
-margin_right = 14.0
-margin_bottom = 14.0
-rect_min_size = Vector2( 14, 14 )
-focus_mode = 0
+custom_minimum_size = Vector2(32, 32)
 size_flags_horizontal = 3
-custom_colors/font_color = Color( 0.690196, 0.690196, 0.690196, 1 )
-custom_colors/font_color_pressed = Color( 0.160784, 0.160784, 0.160784, 1 )
-custom_styles/hover = SubResource( 1 )
-custom_styles/pressed = SubResource( 2 )
-custom_styles/normal = SubResource( 3 )
+focus_mode = 0
 toggle_mode = true
-__meta__ = {
-"_edit_use_anchors_": false
-}

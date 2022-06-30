@@ -329,4 +329,4 @@ func set_selected_tangent(val: int) -> void:
 
 func _on_resized() -> void:
 	if dynamic_row_count:
-		rows = (int(size.y / minimum_size.y) + 1) * 2
+		rows = (int(size.y / custom_minimum_size.y) + 1) * 2

@@ -10,29 +10,29 @@ extends RefCounted
 #
 # An instance of this class is passed to the modifiers during a rebuild.
 
-
 const ScatterShape := preload("../scatter_shape.gd")
 const Bounds := preload("../common/bounds.gd")
 
 var bounds: Bounds = Bounds.new()
 var root: Node3D
 
-var _shapes: Dictionary
+var _inclusive_shapes: Array[ScatterShape]
+var _exclusive_shapes: Array[ScatterShape]
 
 
 func is_empty() -> bool:
-	return _shapes.inclusive.is_empty()
+	return _inclusive_shapes.is_empty()
 
 
 # If a point is in an exclusion shape, returns false
 # If a point is in an inclusion shape (but not in an exclusion one), returns true
 # If a point is in neither, returns false
 func is_point_inside(point: Vector3) -> bool:
-	for s in _shapes.exclusive:
+	for s in _exclusive_shapes:
 		if s.is_point_inside(point):
 			return false
 
-	for s in _shapes.inclusive:
+	for s in _inclusive_shapes:
 		if s.is_point_inside(point):
 			return true
 
@@ -51,24 +51,16 @@ func get_local_transform() -> Transform3D:
 # nested Scatter nodes, shapes under these other Scatter nodes will be ignored
 func discover_shapes(root_node: Node3D) -> void:
 	root = root_node
-	_shapes = {
-		inclusive = [],
-		exclusive = []
-	}
 	var root_type = root.get_script() # Can't preload the scatter script here (cyclic dependency)
 	for c in root.get_children():
 		_discover_shapes_recursive(c, root_type)
-	compute_bounds(root)
+	compute_bounds()
 
 
-func compute_bounds(root_node: Node3D) -> void:
-	if _shapes.is_empty():
-		discover_shapes(root_node)
-		return
-
+func compute_bounds() -> void:
 	bounds.clear()
-	for node in _shapes.inclusive:
-		for point in node.shape.get_corners_global():
+	for node in _inclusive_shapes:
+		for point in node.get_corners_global():
 			bounds.feed(point)
 
 	bounds.compute_bounds()
@@ -80,9 +72,9 @@ func _discover_shapes_recursive(node: Node3D, type_to_ignore) -> void:
 
 	if node is ScatterShape:
 		if node.exclusive:
-			_shapes.exclusive.push_back(node)
+			_exclusive_shapes.push_back(node)
 		else:
-			_shapes.inclusive.push_back(node)
+			_inclusive_shapes.push_back(node)
 
 	for c in node.get_children():
 		_discover_shapes_recursive(c, type_to_ignore)

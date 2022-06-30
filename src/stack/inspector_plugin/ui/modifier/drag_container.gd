@@ -90,4 +90,4 @@ func _update_layout() -> void:
 
 			offset.y += c.size.y + _separation
 
-	minimum_size.y = offset.y - _separation
+	custom_minimum_size.y = offset.y - _separation

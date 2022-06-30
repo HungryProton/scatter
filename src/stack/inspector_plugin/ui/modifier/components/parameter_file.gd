@@ -2,10 +2,11 @@
 extends "base_parameter.gd"
 
 
-@onready var _label: Label = $HBoxContainer/Label
-@onready var _select_button: Button = $HBoxContainer/HBoxContainer/FileButton
-@onready var _dialog: FileDialog = $Control/FileDialog
-@onready var _texture: Button = $VBoxContainer/TextureButton
+@onready var _label: Label = $%Label
+@onready var _select_button: Button = $%FileButton
+@onready var _dialog: FileDialog = $%FileDialog
+@onready var _texture: Button = $%TextureButton
+@onready var _preview_root: Control = $%PreviewRoot
 
 var _path := ""
 var _is_texture := false
@@ -23,7 +24,7 @@ func set_hint_string(hint: String) -> void:
 func _set_value(val: String) -> void:
 	_path = val
 	_select_button.text = val.get_file()
-	_texture.visible = false
+	_preview_root.visible = false
 
 	if val.is_empty():
 		_select_button.text = "Select a file"
@@ -32,7 +33,7 @@ func _set_value(val: String) -> void:
 		var texture = load(get_value())
 		if texture is Texture:
 			_texture.icon = texture
-			_texture.visible = true
+			_preview_root.visible = true
 
 
 func get_value() -> String:

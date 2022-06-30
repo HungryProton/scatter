@@ -1,21 +1,14 @@
 extends Resource
 
 
-var owner: Node3D # The ScatterShape node it's attached to.
-
-
-func _init():
-	resource_local_to_scene = true
-
-
 # point must be in global space
-func is_point_inside(point: Vector3) -> bool:
+func is_point_inside(point: Vector3, global_transform: Transform3D) -> bool:
 	return false
 
 
 # Returns an array of Vector3. This should contain enough points to compute
 # a bounding box for the given shape.
-func get_corners_global() -> Array:
+func get_corners_global(global_transform: Transform3D) -> Array:
 	return []
 
 

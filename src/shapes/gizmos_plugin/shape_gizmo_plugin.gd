@@ -3,7 +3,7 @@ extends EditorNode3DGizmoPlugin
 
 
 const ScatterShape = preload("../../scatter_shape.gd")
-const PointShape = preload("../point_shape.gd")
+const SphereShape = preload("../sphere_shape.gd")
 const PathShape = preload("../path_shape.gd")
 
 
@@ -27,13 +27,13 @@ func _redraw(gizmo: EditorNode3DGizmo):
 		return
 
 	match shape.get_script():
-		PointShape:
+		SphereShape:
 			_draw_point_gizmo(gizmo, shape)
 		PathShape:
 			_draw_path_gizmo(gizmo, shape)
 
 
-func _draw_point_gizmo(gizmo: EditorNode3DGizmo, shape: PointShape):
+func _draw_point_gizmo(gizmo: EditorNode3DGizmo, shape: SphereShape):
 	var lines = PackedVector3Array()
 	var steps = 32
 	var step_angle = 2 * PI / steps

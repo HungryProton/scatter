@@ -1,79 +1,66 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=4 format=3 uid="uid://bjn8ydwp80y7q"]
 
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/components/parameter_vector2.gd" id="1"]
-[ext_resource type="Texture" uid="uid://bosx22dy64f11" path="res://addons/proton_scatter/icons/clear.svg" id="2"]
-
-[sub_resource type="StyleBoxFlat" id=1]
-bg_color = Color( 0, 0, 0, 0.392157 )
+[ext_resource type="Texture2D" uid="uid://bosx22dy64f11" path="res://addons/proton_scatter/icons/clear.svg" id="2"]
+[ext_resource type="Texture2D" uid="uid://dbn0ytoameq8f" path="res://addons/proton_scatter/icons/link.svg" id="3_u2lry"]
 
 [node name="ParameterVector2" type="HBoxContainer"]
 anchor_right = 1.0
-margin_bottom = 60.0
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+script = ExtResource("1")
 
 [node name="Label" type="Label" parent="."]
-margin_right = 1151.0
-margin_bottom = 60.0
+offset_right = 884.0
+offset_bottom = 66.0
 size_flags_horizontal = 3
 size_flags_vertical = 5
 text = "Parameter name"
-autowrap = true
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-margin_left = 1155.0
-margin_right = 1280.0
-margin_bottom = 60.0
-mouse_filter = 2
+offset_left = 888.0
+offset_right = 1024.0
+offset_bottom = 66.0
 size_flags_horizontal = 0
+mouse_filter = 2
 
 [node name="Panel" type="Panel" parent="MarginContainer"]
-margin_right = 125.0
-margin_bottom = 60.0
+offset_right = 136.0
+offset_bottom = 66.0
 mouse_filter = 2
-custom_styles/panel = SubResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer"]
-margin_right = 125.0
-margin_bottom = 60.0
-mouse_filter = 2
+offset_right = 136.0
+offset_bottom = 66.0
 size_flags_horizontal = 0
 size_flags_vertical = 4
-custom_constants/margin_right = 4
-custom_constants/margin_top = 4
-custom_constants/margin_left = 4
-custom_constants/margin_bottom = 4
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_right = 6
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/MarginContainer"]
-margin_left = 4.0
-margin_top = 4.0
-margin_right = 121.0
-margin_bottom = 56.0
+offset_left = 6.0
+offset_right = 130.0
+offset_bottom = 66.0
 
 [node name="GridContainer" type="GridContainer" parent="MarginContainer/MarginContainer/HBoxContainer"]
-margin_right = 85.0
-margin_bottom = 52.0
+offset_right = 96.0
+offset_bottom = 66.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer"]
-margin_right = 85.0
-margin_bottom = 24.0
+offset_right = 96.0
+offset_bottom = 31.0
 
 [node name="Label" type="Label" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer"]
-modulate = Color( 1, 0.447059, 0.368627, 1 )
-margin_top = 5.0
-margin_right = 7.0
-margin_bottom = 19.0
+modulate = Color(1, 0.447059, 0.368627, 1)
+offset_top = 2.0
+offset_right = 9.0
+offset_bottom = 28.0
 text = "x"
 
 [node name="X" type="SpinBox" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer"]
-margin_left = 11.0
-margin_right = 85.0
-margin_bottom = 24.0
+unique_name_in_owner = true
+offset_left = 13.0
+offset_right = 96.0
+offset_bottom = 31.0
 mouse_filter = 1
 min_value = -100.0
 step = 0.001
@@ -81,36 +68,69 @@ allow_greater = true
 allow_lesser = true
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer"]
-margin_top = 28.0
-margin_right = 85.0
-margin_bottom = 52.0
+offset_top = 35.0
+offset_right = 96.0
+offset_bottom = 66.0
 
 [node name="Label" type="Label" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer2"]
-modulate = Color( 0.564706, 0.992157, 0.298039, 1 )
-margin_top = 5.0
-margin_right = 7.0
-margin_bottom = 19.0
+modulate = Color(0.564706, 0.992157, 0.298039, 1)
+offset_top = 2.0
+offset_right = 9.0
+offset_bottom = 28.0
 text = "y"
 
 [node name="Y" type="SpinBox" parent="MarginContainer/MarginContainer/HBoxContainer/GridContainer/HBoxContainer2"]
-margin_left = 11.0
-margin_right = 85.0
-margin_bottom = 24.0
+unique_name_in_owner = true
+offset_left = 13.0
+offset_right = 96.0
+offset_bottom = 31.0
 mouse_filter = 1
 min_value = -100.0
 step = 0.001
 allow_greater = true
 allow_lesser = true
 
-[node name="ClearButton" type="Button" parent="MarginContainer/MarginContainer/HBoxContainer"]
-margin_left = 89.0
-margin_top = 15.0
-margin_right = 117.0
-margin_bottom = 37.0
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MarginContainer/HBoxContainer"]
+offset_left = 100.0
+offset_right = 124.0
+offset_bottom = 66.0
+
+[node name="Control" type="Control" parent="MarginContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+offset_right = 24.0
+size_flags_vertical = 3
+
+[node name="ClearButton" type="Button" parent="MarginContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+offset_top = 4.0
+offset_right = 24.0
+offset_bottom = 28.0
+size_flags_vertical = 4
 focus_mode = 0
 mouse_filter = 1
-size_flags_vertical = 4
-icon = ExtResource( 2 )
+icon = ExtResource("2")
 flat = true
 
-[connection signal="pressed" from="MarginContainer/MarginContainer/HBoxContainer/ClearButton" to="." method="_on_clear_pressed"]
+[node name="Control2" type="Control" parent="MarginContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+offset_top = 32.0
+offset_right = 24.0
+offset_bottom = 33.0
+size_flags_vertical = 3
+
+[node name="LinkButton" type="Button" parent="MarginContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+offset_top = 37.0
+offset_right = 24.0
+offset_bottom = 61.0
+size_flags_vertical = 4
+focus_mode = 0
+mouse_filter = 1
+toggle_mode = true
+icon = ExtResource("3_u2lry")
+flat = true
+
+[node name="Control3" type="Control" parent="MarginContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+offset_top = 65.0
+offset_right = 24.0
+offset_bottom = 66.0
+size_flags_vertical = 3
+
+[connection signal="pressed" from="MarginContainer/MarginContainer/HBoxContainer/VBoxContainer/ClearButton" to="." method="_on_clear_pressed"]

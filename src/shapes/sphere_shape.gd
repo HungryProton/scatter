@@ -17,24 +17,13 @@ func get_copy():
 	return copy
 
 
-func is_point_inside(point: Vector3) -> bool:
-	if not owner:
-		return false
-
-	var gt = owner.get_global_transform()
-	var shape_center = gt * Vector3.ZERO
-	#print("center ", shape_center, " point, ", point)
-
+func is_point_inside(point: Vector3, global_transform: Transform3D) -> bool:
+	var shape_center = global_transform * Vector3.ZERO
 	return shape_center.distance_squared_to(point) < _radius_squared
 
 
-func get_corners_global() -> Array:
+func get_corners_global(gt: Transform3D) -> Array:
 	var res := []
-
-	if not owner:
-		return res
-
-	var gt: Transform3D = owner.get_global_transform()
 
 	# We're only returning 6 points instead of the 8 corners of the actual
 	# bounding box but this is just a sphere so it should be fine.

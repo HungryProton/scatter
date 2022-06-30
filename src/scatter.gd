@@ -45,7 +45,7 @@ var _rebuilt_this_frame := false
 func _ready() -> void:
 	_perform_sanity_check()
 	set_notify_transform(true)
-	child_exited_tree.connect(_on_child_exited_tree)
+	child_exiting_tree.connect(_on_child_exiting_tree)
 	rebuild(true)
 
 
@@ -76,7 +76,7 @@ func _get_configuration_warning() -> String:
 func _notification(what):
 	match what:
 		NOTIFICATION_TRANSFORM_CHANGED:
-			domain.compute_bounds(self)
+			domain.compute_bounds()
 			rebuild()
 
 
@@ -128,7 +128,7 @@ func rebuild(force_discover := false) -> void:
 # DON'T call this function directly outside of the 'rebuild()' function above.
 func _rebuild(force_discover) -> void:
 	if force_discover:
-		ScatterUtil.discover_items(self)
+		_discover_items()
 		domain.discover_shapes(self)
 
 	if items.is_empty() or domain.is_empty():
@@ -139,6 +139,19 @@ func _rebuild(force_discover) -> void:
 		_update_multimeshes(transforms)
 	else:
 		_update_duplicates(transforms)
+
+
+func _discover_items() -> void:
+	items.clear()
+	total_item_proportion = 0
+
+	for c in get_children():
+		if c is ScatterItem:
+			items.push_back(c)
+			total_item_proportion += c.proportion
+
+	if is_inside_tree():
+		get_tree().node_configuration_warning_changed.emit(self)
 
 
 # Creates one MultimeshInstance3D for each ScatterItem node.
@@ -153,6 +166,8 @@ func _update_multimeshes(transforms: TransformList) -> void:
 		var mmi = ScatterUtil.get_or_create_multimesh(item, count)
 		if not mmi:
 			return
+		var c = 0.0
+		var c_increments = 1.0 / count
 
 		var t: Transform3D
 		for i in count:
@@ -163,6 +178,8 @@ func _update_multimeshes(transforms: TransformList) -> void:
 
 			t = item.process_transform(transforms.list[offset + i])
 			mmi.multimesh.set_instance_transform(i, inverse_transform * t)
+			mmi.multimesh.set_instance_color(i, Color(c, c, c))
+			c += c_increments
 
 		offset += count
 
@@ -192,6 +209,6 @@ func _on_node_duplicated() -> void:
 	full_rebuild() # Otherwise we get linked multimeshes or other unwanted side effects
 
 
-func _on_child_exited_tree(node: Node) -> void:
+func _on_child_exiting_tree(node: Node) -> void:
 	if node is ScatterShape or node is ScatterItem:
 		call_deferred("rebuild", true)
