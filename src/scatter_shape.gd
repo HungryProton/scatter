@@ -18,12 +18,17 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		match shape_type:
 			0:
 				shape = PathShape.new()
+				print("created a new path shape ", shape)
 			1:
 				shape = SphereShape.new()
 
 var shape: BaseShape:
 	set(val):
-		shape = val.get_copy() # Enfore uniqueness, TODO, check if
+		# Disconnect the previous shape if any
+		if shape and shape.changed.is_connected(_on_shape_changed):
+			shape.changed.disconnect(_on_shape_changed)
+
+		shape = val
 		shape.changed.connect(_on_shape_changed)
 
 
@@ -57,8 +62,7 @@ func _set(property, _value):
 
 	# Workaround to detect when the node was duplicated from the editor.
 	if property == "transform":
-		pass
-		#call_deferred("_on_node_duplicated")
+		call_deferred("_on_node_duplicated")
 
 	return false
 
@@ -80,3 +84,7 @@ func get_corners_global() -> Array:
 func _on_shape_changed() -> void:
 	update_gizmos()
 	ScatterUtil.request_parent_to_rebuild(self)
+
+
+func _on_node_duplicated() -> void:
+	shape = shape.get_copy() # Enfore uniqueness on duplicate, could be an option

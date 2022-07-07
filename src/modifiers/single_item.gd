@@ -5,7 +5,7 @@ extends "base_modifier.gd"
 
 @export var offset := Vector3.ZERO
 @export var rotation := Vector3.ZERO
-@export var scale := Vector3.ZERO
+@export var scale := Vector3.ONE
 
 
 func _init() -> void:
@@ -13,6 +13,9 @@ func _init() -> void:
 	category = "Create"
 	warning_ignore_no_shape = true
 	warning_ignore_no_transforms = true
+	can_restrict_height = false
+	can_use_global_and_local_space = true
+	use_local_space = true
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
@@ -22,4 +25,9 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	basis = basis.rotated(Vector3.FORWARD, deg2rad(rotation.z))
 	var transform := Transform3D(basis, offset)
 	transform = transform.scaled(scale)
+
+	if use_local_space:
+		var gt: Transform3D = domain.get_global_transform()
+		transform = gt * transform
+
 	transforms.list.push_back(transform)

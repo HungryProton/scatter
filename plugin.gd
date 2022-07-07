@@ -17,6 +17,7 @@ func get_name():
 func _enter_tree():
 	add_inspector_plugin(_modifier_stack_plugin)
 	add_spatial_gizmo_plugin(_shape_gizmo_plugin)
+	_shape_gizmo_plugin.set_undo_redo(get_undo_redo())
 
 	add_custom_type(
 		"ProtonScatter",

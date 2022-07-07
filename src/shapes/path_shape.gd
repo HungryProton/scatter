@@ -7,4 +7,4 @@ extends "base_shape.gd"
 		width = val
 		emit_changed()
 
-var curve: Curve3D
+@export var curve: Curve3D
