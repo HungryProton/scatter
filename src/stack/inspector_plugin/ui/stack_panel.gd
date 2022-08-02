@@ -117,7 +117,7 @@ func _on_save_preset(preset_name) -> void:
 		return
 
 	var preset_path = _get_root_folder() + "/presets/" + preset_name + ".tscn"
-	var _err= ResourceSaver.save(preset_path, packed_scene)
+	var _err = ResourceSaver.save(packed_scene, preset_path)
 
 
 func _on_load_preset(preset_name) -> void:

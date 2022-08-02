@@ -15,14 +15,16 @@ const SphereShape = preload("../sphere_shape.gd")
 const PathShape = preload("../path_shape.gd")
 const GizmoHandler = preload("./gizmo_handler.gd")
 
-
 var _handlers: Dictionary
 
 
 func _init():
+	var handle_icon = preload("./icons/main_handle.svg")
+
 	# TODO: Replace hardcoded colors by a setting fetch
 	create_material("line", Color(1, 0.7, 0))
-	create_handle_material("handle")
+	create_handle_material("main_handle", false, handle_icon)
+	create_handle_material("secondary_handle")
 
 	_handlers[SphereShape] = preload("./sphere_gizmo.gd").new()
 	_handlers[PathShape]  = preload("./path_gizmo.gd").new()
@@ -56,6 +58,23 @@ func _redraw(gizmo: EditorNode3DGizmo):
 	_get_handler(gizmo).redraw(self, gizmo)
 
 
+func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent):
+	for handler in _handlers.values():
+		if handler.forward_3d_gui_input(viewport_camera, event):
+			return true
+	return false
+
+
+func set_undo_redo(ur: UndoRedo) -> void:
+	for handler_name in _handlers:
+		_handlers[handler_name].set_undo_redo(ur)
+
+
+func set_path_gizmo_panel(panel: Control) -> void:
+	if PathShape in _handlers:
+		_handlers[PathShape].set_gizmo_panel(panel)
+
+
 func _get_handler(gizmo) -> GizmoHandler:
 	var null_handler = GizmoHandler.new() # Only so we don't have to check existence later
 
@@ -72,8 +91,3 @@ func _get_handler(gizmo) -> GizmoHandler:
 		return null_handler
 
 	return _handlers[shape_type]
-
-
-func set_undo_redo(ur: UndoRedo) -> void:
-	for handler_name in _handlers:
-		_handlers[handler_name].set_undo_redo(ur)

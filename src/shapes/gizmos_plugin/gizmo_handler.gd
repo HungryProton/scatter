@@ -29,3 +29,7 @@ func commit_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, re
 
 func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	pass
+
+
+func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> bool:
+	return false
