@@ -13,26 +13,23 @@
 
 [node name="MarginContainer" type="MarginContainer"]
 margin_right = 227.0
-margin_bottom = 116.0
+margin_bottom = 64.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 modifiers_popup = NodePath("PanelContainer/VBoxContainer/HBoxContainer/Add/ModifiersPopup")
 root = NodePath("PanelContainer/VBoxContainer/VBoxContainer2")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 margin_right = 227.0
-margin_bottom = 116.0
+margin_bottom = 64.0
 size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 220.0
-margin_bottom = 109.0
+margin_bottom = 57.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
 margin_right = 213.0
