@@ -43,6 +43,26 @@ func is_delete_mode_enabled() -> bool:
 	return $%Delete.button_pressed
 
 
+func is_lock_to_plane_enabled() -> bool:
+	return $%LockToPlane.button_pressed
+
+
+func is_snap_to_colliders_enabled() -> bool:
+	return $%SnapToColliders.button_pressed
+
+
+func is_closed_path_enabled() -> bool:
+	return $%ClosedPath.button_pressed
+
+
+func is_mirror_length_enabled() -> bool:
+	return $%MirrorLength.button_pressed
+
+
+func is_mirror_angle_enabled() -> bool:
+	return $%MirrorAngle.button_pressed
+
+
 func _on_options_button_toggled(enabled: bool) -> void:
 	if enabled:
 		var popup_position := Vector2i(get_global_transform().origin)

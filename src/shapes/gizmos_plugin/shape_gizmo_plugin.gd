@@ -20,11 +20,15 @@ var _handlers: Dictionary
 
 func _init():
 	var handle_icon = preload("./icons/main_handle.svg")
+	var secondary_handle_icon = preload("./icons/secondary_handle.svg")
 
 	# TODO: Replace hardcoded colors by a setting fetch
 	create_material("line", Color(1, 0.7, 0))
+	create_material("handle_line", Color(0.4, 0.7, 1.0))
+	create_handle_material("handle")
 	create_handle_material("main_handle", false, handle_icon)
-	create_handle_material("secondary_handle")
+	create_handle_material("secondary_handle", false, secondary_handle_icon)
+	create_material("mesh", Color(0.9, 0.7, 0.2, 0.25))
 
 	_handlers[SphereShape] = preload("./sphere_gizmo.gd").new()
 	_handlers[PathShape]  = preload("./path_gizmo.gd").new()

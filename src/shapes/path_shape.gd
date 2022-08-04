@@ -2,18 +2,65 @@
 extends "base_shape.gd"
 
 
+@export var closed := true
 @export var width := 0.0:
 	set(val):
 		width = val
+		_half_width_squared = pow(width * 0.5, 2)
 		emit_changed()
 
-@export var curve: Curve3D
+@export var curve: Curve3D:
+	set(val):
+		# Disconnect previous signal
+		if curve and curve.changed.is_connected(_on_curve_changed):
+			curve.changed.disconnect(_on_curve_changed)
+
+		curve = val
+		curve.changed.connect(_on_curve_changed)
+
+
+var _polygon: PolygonPathFinder
+var _half_width_squared: float
+
+
+func is_point_inside(point: Vector3, global_transform: Transform3D) -> bool:
+	if not _polygon:
+		_update_polygon_from_curve()
+
+	point = global_transform.affine_inverse() * point
+
+	if width > 0:
+		var closest_point_on_curve: Vector3 = curve.get_closest_point(point)
+		var dist2 = closest_point_on_curve.distance_squared_to(point)
+		if dist2 < _half_width_squared:
+			return true
+
+	if closed:
+		return _polygon.is_point_inside(Vector2(point.x, point.z))
+
+	return false
+
+
+func get_corners_global(gt: Transform3D) -> Array:
+	var res := []
+
+	var points = curve.tessellate(3, 10)
+	for i in points.size() - 1:
+		var p1 = points[i]
+		var p2 = points[i + 1]
+		var n = (p2 - p1).cross(Vector3.UP).normalized()
+		var offset = n * width * 0.5
+
+		res.push_back(gt * (p1 + offset))
+		res.push_back(gt * (p1 - offset))
+
+	return res
 
 
 func get_copy():
 	var copy = get_script().new()
 	copy.width = width
-	curve = curve.duplicate()
+	copy.curve = curve.duplicate()
 	return copy
 
 
@@ -56,3 +103,39 @@ func get_closest_to(position):
 		return -1
 
 	return closest
+
+
+func _update_polygon_from_curve() -> void:
+	var connections = PackedInt32Array()
+	var polygon_points = PackedVector2Array()
+
+	if not curve:
+		curve = Curve3D.new()
+		return
+
+	if curve.get_point_count() == 0:
+		return
+
+	if not _polygon:
+		_polygon = PolygonPathFinder.new()
+
+	var baked_points = curve.tessellate(4, 6)
+	var steps := baked_points.size()
+
+	for i in baked_points.size():
+		var point = baked_points[i]
+		var projected_point = Vector2(point.x, point.z)
+
+		polygon_points.push_back(projected_point)
+		connections.append(i)
+		if i == steps - 1:
+			connections.append(0)
+		else:
+			connections.append(i + 1)
+
+	_polygon.setup(polygon_points, connections)
+
+
+func _on_curve_changed() -> void:
+	_update_polygon_from_curve()
+	emit_changed()
