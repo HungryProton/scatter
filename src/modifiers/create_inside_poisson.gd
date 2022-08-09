@@ -37,6 +37,7 @@ func _init() -> void:
 	warning_ignore_no_shape = false
 	can_restrict_height = true
 	can_override_seed = true
+	restrict_height = true
 
 
 func _process_transforms(transforms, domain, seed) -> void:
@@ -105,6 +106,10 @@ func _init_grid() -> void:
 	_grid_size.x = ceil(_bounds.size.x / _cell_size)
 	_grid_size.y = ceil(_bounds.size.y / _cell_size)
 	_grid_size.z = ceil(_bounds.size.z / _cell_size)
+
+	_grid_size = _grid_size.clamp(Vector3.ONE, _grid_size)
+
+	print("grid size : " ,_grid_size)
 
 	_grid = []
 	if restrict_height:

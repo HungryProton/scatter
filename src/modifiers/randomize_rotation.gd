@@ -24,7 +24,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 	var gb: Basis = gt.basis
 	var global_x: Vector3 = (Vector3.RIGHT * gb).normalized()
 	var global_y: Vector3 = (Vector3.UP * gb).normalized()
-	var global_z: Vector3 = (Vector3.DOWN * gb).normalized()
+	var global_z: Vector3 = (Vector3.FORWARD * gb).normalized()
 
 	for i in transforms.list.size():
 		t = transforms.list[i]

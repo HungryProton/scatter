@@ -2,6 +2,9 @@
 extends "base_modifier.gd"
 
 
+const Util := preload("../common/util.gd")
+
+
 @export var interval := 1.0
 @export var offset := 0.0
 @export var align_to_path := false
@@ -12,48 +15,44 @@ extends "base_modifier.gd"
 
 
 func _init() -> void:
-	display_name = "Distribute Along Path (Even)"
-	category = "Distribute"
+	display_name = "Create Along Edge (Even)"
+	category = "Create"
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
-	var path = transforms.path
-	var length: float = path.curve.get_baked_length()
-	var total_count := int(round(length / interval))
-	var stepped_length: float = total_count * interval
+	var new_transforms: Array[Transform3D] = []
+	var curves: Array[Curve3D] = domain.get_edges()
+	for curve in curves:
+		var length: float = curve.get_baked_length()
+		var count := int(round(length / interval))
+		var stepped_length: float = count * interval
 
-	if total_count == 0:
-		warning += """
-		The interval is larger than the curve length.
-		No transforms could be placed."""
-		return
+		for i in count:
+			var curve_offset = i * interval + abs(offset)
+			while curve_offset > stepped_length:
+				curve_offset -= stepped_length
 
-	transforms.resize(total_count)
+			var data : Array = Util.get_position_and_normal_at(curve, curve_offset)
+			var pos: Vector3 = data[0]
+			var normal: Vector3 = data[1]
+			var t := Transform3D()
 
-	for i in transforms.list.size():
-		var curve_offset = i * interval + abs(offset)
-		while curve_offset > stepped_length:
-			curve_offset -= stepped_length
+			t.origin = pos
 
-		var data : Array = path.get_pos_and_normal(curve_offset)
-		var pos: Vector3 = data[0]
-		var normal: Vector3 = data[1]
-		var t : Transform3D = transforms.list[i]
+			if align_to_path:
+				#axis restrictions
+				normal.x *= int(!restrict_x)
+				normal.y *= int(!restrict_y)
+				normal.z *= int(!restrict_z)
+				#this does not like restricting both x and z simulatneously
 
-		t.origin = pos
+				t = t.looking_at(normal + pos, get_align_up_vector(align_up_axis))
 
-		if align_to_path:
-			#axis restrictions
-			normal.x *= int(!restrict_x)
-			normal.y *= int(!restrict_y)
-			normal.z *= int(!restrict_z)
-			#this does not like restricting both x and z simulatneously
+			new_transforms.push_back(t)
 
-			t = t.looking_at(normal + pos, get_align_up_vector(align_up_axis))
-
-		transforms.list[i] = t
+	transforms.append(new_transforms)
 
 
 static func get_align_up_vector(align : int) -> Vector3:

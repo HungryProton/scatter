@@ -8,7 +8,7 @@ extends "base_modifier.gd"
 @export var align_with_floor_normal := false
 @export var ray_direction := Vector3.DOWN
 @export_range(0.0, 1.0) var max_slope = 1.0
-@export_flags_3d_physics var mask = 1048575
+@export_flags_3d_physics var mask = 1
 
 
 func _init() -> void:
@@ -51,10 +51,11 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		i += 1
 
 	if transforms.list.is_empty():
-		warning += """All the transforms have been removed. Possible reasons: \n
-		+ There is no collider close enough to the path.
-		+ The ray length is not long enough.
-		+ The ray direction is incorrect.
+		warning += """Every points have been removed. Possible reasons include: \n
+		+ No collider is close enough to the domain.
+		+ Ray length is too short.
+		+ Ray direction is incorrect.
+		+ Collision mask is not set properly.
 		"""
 
 
@@ -72,7 +73,7 @@ func _project_on_floor(t: Transform3D, root: Node3D, physics_state: PhysicsDirec
 	var ray_query := PhysicsRayQueryParameters3D.new()
 	ray_query.from = start
 	ray_query.to = end
-	ray_query.collision_mask = int(mask)
+	ray_query.collision_mask = mask
 	return physics_state.intersect_ray(ray_query)
 
 

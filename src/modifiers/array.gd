@@ -92,5 +92,3 @@ func _process_transforms(transforms, domain, seed: int) -> void:
 
 	if randomize_indices:
 		transforms.shuffle(seed)
-
-

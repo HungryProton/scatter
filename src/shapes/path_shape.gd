@@ -2,10 +2,14 @@
 extends "base_shape.gd"
 
 
-@export var closed := true
+@export var closed := true:
+	set(val):
+		closed = val
+		emit_changed()
+
 @export var width := 0.0:
 	set(val):
-		width = val
+		width = max(0, val) # Width cannot be negative
 		_half_width_squared = pow(width * 0.5, 2)
 		emit_changed()
 
@@ -17,6 +21,7 @@ extends "base_shape.gd"
 
 		curve = val
 		curve.changed.connect(_on_curve_changed)
+		emit_changed()
 
 
 var _polygon: PolygonPathFinder

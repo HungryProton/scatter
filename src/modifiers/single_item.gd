@@ -24,10 +24,11 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	basis = basis.rotated(Vector3.UP, deg2rad(rotation.y))
 	basis = basis.rotated(Vector3.FORWARD, deg2rad(rotation.z))
 	var transform := Transform3D(basis, offset)
-	transform = transform.scaled(scale)
 
 	if use_local_space:
 		var gt: Transform3D = domain.get_global_transform()
-		transform = gt * transform
+		transform = gt * transform.scaled_local(scale)
+	else:
+		transform = transform.scaled(scale)
 
 	transforms.list.push_back(transform)

@@ -46,6 +46,10 @@ func get_local_transform() -> Transform3D:
 	return root.get_transform()
 
 
+func get_edges() -> Array[Curve3D]:
+	return [] #TODO
+
+
 # Recursively find all ScatterShape nodes under the provided root. In case of
 # nested Scatter nodes, shapes under these other Scatter nodes will be ignored
 func discover_shapes(root_node: Node3D) -> void:

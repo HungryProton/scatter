@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cf4lrr5tnlwnw" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/components/bitmask_button.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://n66mufjib4ds" path="res://addons/proton_scatter/icons/menu.svg" id="3"]
 [ext_resource type="Texture2D" uid="uid://bosx22dy64f11" path="res://addons/proton_scatter/icons/clear.svg" id="4"]
-[ext_resource type="Texture2D" uid="uid://b5ip0ugocre1l" path="res://addons/proton_scatter/icons/square_handle.svg" id="4_dia76"]
+[ext_resource type="Texture2D" uid="uid://bb6107shgmiaw" path="res://addons/proton_scatter/icons/select_all.svg" id="4_h30jm"]
 
 [node name="parameter_bitmask" type="VBoxContainer"]
 anchor_right = 1.0
@@ -19,295 +19,416 @@ text = "Parameter name"
 [node name="MarginContainer" type="MarginContainer" parent="."]
 offset_top = 30.0
 offset_right = 1024.0
-offset_bottom = 178.0
+offset_bottom = 130.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 offset_right = 1024.0
-offset_bottom = 148.0
+offset_bottom = 100.0
 alignment = 2
 
 [node name="MenuButton" type="MenuButton" parent="MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
-offset_left = 676.0
-offset_right = 700.0
-offset_bottom = 148.0
+offset_left = 772.0
+offset_right = 796.0
+offset_bottom = 100.0
 icon = ExtResource("3")
+item_count = 39
+popup/item_0/text = "Layer 1"
+popup/item_0/checkable = 1
+popup/item_0/id = 31
+popup/item_1/text = "Layer 2"
+popup/item_1/checkable = 1
+popup/item_1/id = 30
+popup/item_2/text = "Layer 3"
+popup/item_2/checkable = 1
+popup/item_2/id = 29
+popup/item_3/text = "Layer 4"
+popup/item_3/checkable = 1
+popup/item_3/id = 28
+popup/item_4/text = ""
+popup/item_4/id = 104
+popup/item_4/separator = true
+popup/item_5/text = "Layer 5"
+popup/item_5/checkable = 1
+popup/item_5/id = 27
+popup/item_6/text = "Layer 6"
+popup/item_6/checkable = 1
+popup/item_6/id = 26
+popup/item_7/text = "Layer 7"
+popup/item_7/checkable = 1
+popup/item_7/id = 25
+popup/item_8/text = "Layer 8"
+popup/item_8/checkable = 1
+popup/item_8/id = 24
+popup/item_9/text = ""
+popup/item_9/id = 108
+popup/item_9/separator = true
+popup/item_10/text = "Layer 9"
+popup/item_10/checkable = 1
+popup/item_10/id = 23
+popup/item_11/text = "Layer 10"
+popup/item_11/checkable = 1
+popup/item_11/id = 22
+popup/item_12/text = "Layer 11"
+popup/item_12/checkable = 1
+popup/item_12/id = 21
+popup/item_13/text = "Layer 12"
+popup/item_13/checkable = 1
+popup/item_13/id = 20
+popup/item_14/text = ""
+popup/item_14/id = 112
+popup/item_14/separator = true
+popup/item_15/text = "Layer 13"
+popup/item_15/checkable = 1
+popup/item_15/id = 19
+popup/item_16/text = "Layer 14"
+popup/item_16/checkable = 1
+popup/item_16/id = 18
+popup/item_17/text = "Layer 15"
+popup/item_17/checkable = 1
+popup/item_17/id = 17
+popup/item_18/text = "Layer 16"
+popup/item_18/checkable = 1
+popup/item_18/id = 16
+popup/item_19/text = ""
+popup/item_19/id = 116
+popup/item_19/separator = true
+popup/item_20/text = "Layer 17"
+popup/item_20/checkable = 1
+popup/item_20/id = 15
+popup/item_21/text = "Layer 18"
+popup/item_21/checkable = 1
+popup/item_21/id = 14
+popup/item_22/text = "Layer 19"
+popup/item_22/checkable = 1
+popup/item_22/id = 13
+popup/item_23/text = "Layer 20"
+popup/item_23/checkable = 1
+popup/item_23/id = 12
+popup/item_24/text = ""
+popup/item_24/id = 120
+popup/item_24/separator = true
+popup/item_25/text = "Layer 21"
+popup/item_25/checkable = 1
+popup/item_25/id = 11
+popup/item_26/text = "Layer 22"
+popup/item_26/checkable = 1
+popup/item_26/id = 10
+popup/item_27/text = "Layer 23"
+popup/item_27/checkable = 1
+popup/item_27/id = 9
+popup/item_28/text = "Layer 24"
+popup/item_28/checkable = 1
+popup/item_28/id = 8
+popup/item_29/text = ""
+popup/item_29/id = 124
+popup/item_29/separator = true
+popup/item_30/text = "Layer 25"
+popup/item_30/checkable = 1
+popup/item_30/id = 7
+popup/item_31/text = "Layer 26"
+popup/item_31/checkable = 1
+popup/item_31/id = 6
+popup/item_32/text = "Layer 27"
+popup/item_32/checkable = 1
+popup/item_32/id = 5
+popup/item_33/text = "Layer 28"
+popup/item_33/checkable = 1
+popup/item_33/id = 4
+popup/item_34/text = ""
+popup/item_34/id = 128
+popup/item_34/separator = true
+popup/item_35/text = "Layer 29"
+popup/item_35/checkable = 1
+popup/item_35/id = 3
+popup/item_36/text = "Layer 30"
+popup/item_36/checkable = 1
+popup/item_36/id = 2
+popup/item_37/text = "Layer 31"
+popup/item_37/checkable = 1
+popup/item_37/id = 1
+popup/item_38/text = "Layer 32"
+popup/item_38/checkable = 1
+popup/item_38/id = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
-offset_left = 704.0
+offset_left = 800.0
 offset_right = 996.0
-offset_bottom = 148.0
+offset_bottom = 100.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
-offset_right = 292.0
-offset_bottom = 68.0
+offset_right = 196.0
+offset_bottom = 44.0
 
 [node name="GridContainer1" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-offset_right = 140.0
-offset_bottom = 68.0
+offset_right = 92.0
+offset_bottom = 44.0
 columns = 4
 
 [node name="Button1" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_right = 32.0
-offset_bottom = 32.0
+offset_right = 20.0
+offset_bottom = 20.0
 text = "1"
 
 [node name="Button2" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 36.0
-offset_right = 68.0
-offset_bottom = 32.0
+offset_left = 24.0
+offset_right = 44.0
+offset_bottom = 20.0
 text = "2"
 
 [node name="Button3" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 72.0
-offset_right = 104.0
-offset_bottom = 32.0
+offset_left = 48.0
+offset_right = 68.0
+offset_bottom = 20.0
 text = "3"
 
 [node name="Button4" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 108.0
-offset_right = 140.0
-offset_bottom = 32.0
+offset_left = 72.0
+offset_right = 92.0
+offset_bottom = 20.0
 text = "4"
 
 [node name="Button5" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_top = 36.0
-offset_right = 32.0
-offset_bottom = 68.0
+offset_top = 24.0
+offset_right = 20.0
+offset_bottom = 44.0
 text = "5"
 
 [node name="Button6" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 36.0
-offset_top = 36.0
-offset_right = 68.0
-offset_bottom = 68.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 44.0
+offset_bottom = 44.0
 text = "6"
 
 [node name="Button7" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 72.0
-offset_top = 36.0
-offset_right = 104.0
-offset_bottom = 68.0
+offset_left = 48.0
+offset_top = 24.0
+offset_right = 68.0
+offset_bottom = 44.0
 text = "7"
 
 [node name="Button8" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 108.0
-offset_top = 36.0
-offset_right = 140.0
-offset_bottom = 68.0
+offset_left = 72.0
+offset_top = 24.0
+offset_right = 92.0
+offset_bottom = 44.0
 text = "8"
 
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
-offset_left = 144.0
-offset_right = 148.0
-offset_bottom = 68.0
+offset_left = 96.0
+offset_right = 100.0
+offset_bottom = 44.0
 
 [node name="GridContainer2" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-offset_left = 152.0
-offset_right = 292.0
-offset_bottom = 68.0
+offset_left = 104.0
+offset_right = 196.0
+offset_bottom = 44.0
 columns = 4
 
 [node name="Button9" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_right = 32.0
-offset_bottom = 32.0
+offset_right = 20.0
+offset_bottom = 20.0
 text = "9"
 
 [node name="Button10" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 36.0
-offset_right = 68.0
-offset_bottom = 32.0
+offset_left = 24.0
+offset_right = 44.0
+offset_bottom = 20.0
 text = "10"
 
 [node name="Button11" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 72.0
-offset_right = 104.0
-offset_bottom = 32.0
+offset_left = 48.0
+offset_right = 68.0
+offset_bottom = 20.0
 text = "11"
 
 [node name="Button12" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 108.0
-offset_right = 140.0
-offset_bottom = 32.0
+offset_left = 72.0
+offset_right = 92.0
+offset_bottom = 20.0
 text = "12"
 
 [node name="Button13" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_top = 36.0
-offset_right = 32.0
-offset_bottom = 68.0
+offset_top = 24.0
+offset_right = 20.0
+offset_bottom = 44.0
 text = "13"
 
 [node name="Button14" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 36.0
-offset_top = 36.0
-offset_right = 68.0
-offset_bottom = 68.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 44.0
+offset_bottom = 44.0
 text = "14"
 
 [node name="Button15" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 72.0
-offset_top = 36.0
-offset_right = 104.0
-offset_bottom = 68.0
+offset_left = 48.0
+offset_top = 24.0
+offset_right = 68.0
+offset_bottom = 44.0
 text = "15"
 
 [node name="Button16" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 108.0
-offset_top = 36.0
-offset_right = 140.0
-offset_bottom = 68.0
+offset_left = 72.0
+offset_top = 24.0
+offset_right = 92.0
+offset_bottom = 44.0
 text = "16"
 
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/HBoxContainer/VBoxContainer"]
-offset_top = 72.0
-offset_right = 292.0
-offset_bottom = 76.0
+offset_top = 48.0
+offset_right = 196.0
+offset_bottom = 52.0
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
-offset_top = 80.0
-offset_right = 292.0
-offset_bottom = 148.0
+offset_top = 56.0
+offset_right = 196.0
+offset_bottom = 100.0
 
 [node name="GridContainer3" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
-offset_right = 140.0
-offset_bottom = 68.0
+offset_right = 92.0
+offset_bottom = 44.0
 columns = 4
 
 [node name="Button17" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_right = 32.0
-offset_bottom = 32.0
+offset_right = 20.0
+offset_bottom = 20.0
 text = "17"
 
 [node name="Button18" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 36.0
-offset_right = 68.0
-offset_bottom = 32.0
+offset_left = 24.0
+offset_right = 44.0
+offset_bottom = 20.0
 text = "18"
 
 [node name="Button19" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 72.0
-offset_right = 104.0
-offset_bottom = 32.0
+offset_left = 48.0
+offset_right = 68.0
+offset_bottom = 20.0
 text = "19"
 
 [node name="Button20" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 108.0
-offset_right = 140.0
-offset_bottom = 32.0
+offset_left = 72.0
+offset_right = 92.0
+offset_bottom = 20.0
 text = "20"
 
 [node name="Button21" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_top = 36.0
-offset_right = 32.0
-offset_bottom = 68.0
+offset_top = 24.0
+offset_right = 20.0
+offset_bottom = 44.0
 text = "21"
 
 [node name="Button22" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 36.0
-offset_top = 36.0
-offset_right = 68.0
-offset_bottom = 68.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 44.0
+offset_bottom = 44.0
 text = "22"
 
 [node name="Button23" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 72.0
-offset_top = 36.0
-offset_right = 104.0
-offset_bottom = 68.0
+offset_left = 48.0
+offset_top = 24.0
+offset_right = 68.0
+offset_bottom = 44.0
 text = "23"
 
 [node name="Button24" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 108.0
-offset_top = 36.0
-offset_right = 140.0
-offset_bottom = 68.0
+offset_left = 72.0
+offset_top = 24.0
+offset_right = 92.0
+offset_bottom = 44.0
 text = "24"
 
 [node name="VSeparator2" type="VSeparator" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
-offset_left = 144.0
-offset_right = 148.0
-offset_bottom = 68.0
+offset_left = 96.0
+offset_right = 100.0
+offset_bottom = 44.0
 
 [node name="GridContainer4" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
-offset_left = 152.0
-offset_right = 292.0
-offset_bottom = 68.0
+offset_left = 104.0
+offset_right = 196.0
+offset_bottom = 44.0
 columns = 4
 
 [node name="Button25" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_right = 32.0
-offset_bottom = 32.0
+offset_right = 20.0
+offset_bottom = 20.0
 text = "25"
 
 [node name="Button26" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 36.0
-offset_right = 68.0
-offset_bottom = 32.0
+offset_left = 24.0
+offset_right = 44.0
+offset_bottom = 20.0
 text = "26"
 
 [node name="Button27" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 72.0
-offset_right = 104.0
-offset_bottom = 32.0
+offset_left = 48.0
+offset_right = 68.0
+offset_bottom = 20.0
 text = "27"
 
 [node name="Button28" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 108.0
-offset_right = 140.0
-offset_bottom = 32.0
+offset_left = 72.0
+offset_right = 92.0
+offset_bottom = 20.0
 text = "28"
 
 [node name="Button29" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_top = 36.0
-offset_right = 32.0
-offset_bottom = 68.0
+offset_top = 24.0
+offset_right = 20.0
+offset_bottom = 44.0
 text = "29"
 
 [node name="Button30" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 36.0
-offset_top = 36.0
-offset_right = 68.0
-offset_bottom = 68.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 44.0
+offset_bottom = 44.0
 text = "30"
 
 [node name="Button31" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 72.0
-offset_top = 36.0
-offset_right = 104.0
-offset_bottom = 68.0
+offset_left = 48.0
+offset_top = 24.0
+offset_right = 68.0
+offset_bottom = 44.0
 text = "31"
 
 [node name="Button32" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 108.0
-offset_top = 36.0
-offset_right = 140.0
-offset_bottom = 68.0
+offset_left = 72.0
+offset_top = 24.0
+offset_right = 92.0
+offset_bottom = 44.0
 text = "32"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 offset_left = 1000.0
 offset_right = 1024.0
-offset_bottom = 148.0
+offset_bottom = 100.0
 alignment = 1
 
 [node name="EnableAll" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
 offset_right = 24.0
-offset_bottom = 72.0
+offset_bottom = 48.0
 size_flags_vertical = 3
 hint_tooltip = "Enable all layers"
-icon = ExtResource("4_dia76")
+focus_mode = 0
+icon = ExtResource("4_h30jm")
 flat = true
+expand_icon = true
 
 [node name="ClearButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
-offset_top = 76.0
+offset_top = 52.0
 offset_right = 24.0
-offset_bottom = 148.0
+offset_bottom = 100.0
 size_flags_vertical = 3
 hint_tooltip = "Clear all layers"
+focus_mode = 0
 icon = ExtResource("4")
 flat = true
 

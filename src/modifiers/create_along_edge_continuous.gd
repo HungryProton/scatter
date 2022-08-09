@@ -9,8 +9,8 @@ var _current_offset = 0.0
 
 
 func _init() -> void:
-	display_name = "Distribute Along Path (Continuous)"
-	category = "Distribute"
+	display_name = "Create Along Edge (Continuous)"
+	category = "Create"
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 

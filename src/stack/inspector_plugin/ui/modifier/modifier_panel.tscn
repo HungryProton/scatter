@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://blpobpd0eweog"]
+[gd_scene load_steps=19 format=3 uid="uid://blpobpd0eweog"]
 
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/modifier_panel.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://hshxh8s6k677" path="res://addons/proton_scatter/icons/arrow_right.svg" id="2_2djuo"]
@@ -6,7 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://85r2q2fd8gyh" path="res://addons/proton_scatter/icons/arrow_down.svg" id="4_7nlfc"]
 [ext_resource type="Texture2D" uid="uid://dahwdjl2er75o" path="res://addons/proton_scatter/icons/close.svg" id="5"]
 [ext_resource type="Texture2D" uid="uid://n66mufjib4ds" path="res://addons/proton_scatter/icons/menu.svg" id="6_lmo8k"]
-[ext_resource type="Texture2D" uid="uid://d2q0ecpon840i" path="res://addons/proton_scatter/icons/rebuild.svg" id="7_ttdmv"]
+[ext_resource type="Texture2D" uid="uid://4ily4caa4der" path="res://addons/proton_scatter/icons/documentation.svg" id="7_8sn2y"]
+[ext_resource type="Texture2D" uid="uid://dpigmdo0x73yb" path="res://addons/proton_scatter/icons/duplicate.svg" id="7_f6nan"]
 [ext_resource type="Texture2D" uid="uid://dj0y6peid681t" path="res://addons/proton_scatter/icons/warning.svg" id="9"]
 [ext_resource type="Texture2D" uid="uid://lkb3k4nuipjn" path="res://addons/proton_scatter/icons/drag_area.svg" id="9_t6pse"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/override_seed_button.gd" id="10_ptukr"]
@@ -21,7 +22,7 @@
 [node name="ModifierPanel" type="MarginContainer"]
 anchor_right = 1.0
 theme_type_variation = &"fg"
-script = ExtResource( "1" )
+script = ExtResource("1")
 
 [node name="Panel" type="Panel" parent="."]
 offset_right = 1024.0
@@ -52,23 +53,22 @@ offset_bottom = 26.0
 size_flags_vertical = 0
 
 [node name="Expand" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-minimum_size = Vector2(30, 0)
-offset_right = 30.0
+offset_right = 20.0
 offset_bottom = 26.0
 focus_mode = 0
 mouse_filter = 1
 toggle_mode = true
-icon = ExtResource( "2_2djuo" )
+icon = ExtResource("2_2djuo")
 flat = true
 icon_alignment = 1
-script = ExtResource( "4" )
-default_icon = ExtResource( "2_2djuo" )
-pressed_icon = ExtResource( "4_7nlfc" )
+script = ExtResource("4")
+default_icon = ExtResource("2_2djuo")
+pressed_icon = ExtResource("4_7nlfc")
 
 [node name="ModifierName" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-offset_left = 34.0
-offset_right = 892.0
+offset_left = 24.0
+offset_right = 912.0
 offset_bottom = 26.0
 size_flags_horizontal = 3
 text = "ModifierPanel"
@@ -76,7 +76,7 @@ vertical_alignment = 1
 clip_text = true
 
 [node name="Buttons" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-offset_left = 896.0
+offset_left = 916.0
 offset_right = 1016.0
 offset_bottom = 26.0
 theme_override_constants/separation = 2
@@ -89,26 +89,27 @@ offset_right = 24.0
 offset_bottom = 31.0
 size_flags_horizontal = 0
 hint_tooltip = "There are issues with this modifier configuration, click this warning icon for more details."
+focus_mode = 0
 mouse_filter = 1
-icon = ExtResource( "9" )
+icon = ExtResource("9")
 flat = true
 
 [node name="MenuButton" type="MenuButton" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 offset_right = 24.0
 offset_bottom = 26.0
-icon = ExtResource( "6_lmo8k" )
+icon = ExtResource("6_lmo8k")
 item_count = 4
 popup/item_0/text = "Show documentation"
-popup/item_0/icon = ExtResource( "6_lmo8k" )
+popup/item_0/icon = ExtResource("7_8sn2y")
 popup/item_0/id = 0
 popup/item_1/text = ""
 popup/item_1/id = 1
 popup/item_1/separator = true
 popup/item_2/text = "Duplicate"
-popup/item_2/icon = ExtResource( "7_ttdmv" )
+popup/item_2/icon = ExtResource("7_f6nan")
 popup/item_2/id = 2
 popup/item_3/text = "Delete"
-popup/item_3/icon = ExtResource( "5" )
+popup/item_3/icon = ExtResource("5")
 popup/item_3/id = 3
 
 [node name="Enabled" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
@@ -122,32 +123,30 @@ mouse_filter = 1
 
 [node name="Remove" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 unique_name_in_owner = true
-minimum_size = Vector2(30, 0)
 offset_left = 52.0
 offset_top = 1.0
-offset_right = 82.0
+offset_right = 76.0
 offset_bottom = 25.0
 size_flags_vertical = 4
 focus_mode = 0
 mouse_filter = 1
-icon = ExtResource( "5" )
+icon = ExtResource("5")
 flat = true
 icon_alignment = 1
 
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 modulate = Color(1, 1, 1, 0.54902)
-offset_left = 84.0
-offset_right = 88.0
+offset_left = 78.0
+offset_right = 82.0
 offset_bottom = 26.0
 
 [node name="DragControl" type="TextureRect" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 unique_name_in_owner = true
-minimum_size = Vector2(30, 0)
-offset_left = 90.0
-offset_right = 120.0
+offset_left = 84.0
+offset_right = 100.0
 offset_bottom = 26.0
 mouse_default_cursor_shape = 6
-texture = ExtResource( "9_t6pse" )
+texture = ExtResource("9_t6pse")
 stretch_mode = 3
 
 [node name="ParametersContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
@@ -186,9 +185,9 @@ alignment = 1
 [node name="ExpandButton" type="MarginContainer" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader"]
 offset_right = 24.0
 offset_bottom = 24.0
-script = ExtResource( "10_ptukr" )
+script = ExtResource("10_ptukr")
 
-[node name="OverrideGlobalSeed" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton" instance=ExtResource( "11_y7srw" )]
+[node name="OverrideGlobalSeed" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton" instance=ExtResource("11_y7srw")]
 unique_name_in_owner = true
 offset_right = 24.0
 offset_bottom = 24.0
@@ -199,10 +198,10 @@ size_flags_vertical = 3
 offset_right = 24.0
 offset_bottom = 24.0
 hint_tooltip = "Override global seed"
-icon = ExtResource( "11_qwhro" )
+icon = ExtResource("11_qwhro")
 icon_alignment = 0
-default_icon = ExtResource( "11_qwhro" )
-pressed_icon = ExtResource( "11_qwhro" )
+default_icon = ExtResource("11_qwhro")
+pressed_icon = ExtResource("11_qwhro")
 
 [node name="SpinBoxRoot" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton"]
 visible = false
@@ -217,7 +216,7 @@ offset_bottom = 31.0
 mouse_filter = 2
 theme_override_constants/separation = 28
 
-[node name="CustomSeed" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton/SpinBoxRoot" instance=ExtResource( "13_vhfch" )]
+[node name="CustomSeed" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton/SpinBoxRoot" instance=ExtResource("13_vhfch")]
 unique_name_in_owner = true
 offset_left = 31.0
 offset_right = 114.062
@@ -228,7 +227,7 @@ offset_right = 954.0
 offset_bottom = 24.0
 size_flags_horizontal = 3
 
-[node name="RestrictHeight" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader" instance=ExtResource( "11_y7srw" )]
+[node name="RestrictHeight" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader" instance=ExtResource("11_y7srw")]
 unique_name_in_owner = true
 offset_left = 958.0
 offset_right = 982.0
@@ -240,11 +239,11 @@ size_flags_vertical = 3
 offset_right = 24.0
 offset_bottom = 24.0
 hint_tooltip = "Restrict height"
-icon = ExtResource( "12_lx60d" )
-default_icon = ExtResource( "12_lx60d" )
-pressed_icon = ExtResource( "15_0w0as" )
+icon = ExtResource("12_lx60d")
+default_icon = ExtResource("12_lx60d")
+pressed_icon = ExtResource("15_0w0as")
 
-[node name="TransformSpace" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader" instance=ExtResource( "11_y7srw" )]
+[node name="TransformSpace" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader" instance=ExtResource("11_y7srw")]
 unique_name_in_owner = true
 offset_left = 986.0
 offset_right = 1010.0
@@ -257,9 +256,9 @@ offset_right = 24.0
 offset_bottom = 24.0
 hint_tooltip = "Enabled: Use local space
 Disabled: Use global space"
-icon = ExtResource( "16_ocvvf" )
-default_icon = ExtResource( "16_ocvvf" )
-pressed_icon = ExtResource( "13_txjs8" )
+icon = ExtResource("16_ocvvf")
+default_icon = ExtResource("16_ocvvf")
+pressed_icon = ExtResource("13_txjs8")
 
 [node name="WarningDialog" type="AcceptDialog" parent="."]
 title = "Warning"

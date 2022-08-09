@@ -15,6 +15,7 @@ func _ready() -> void:
 	_options_button.toggled.connect(_on_options_button_toggled)
 	_options_panel.popup_hide.connect(_on_options_panel_hide)
 	$%SnapToColliders.toggled.connect(_on_snap_to_colliders_toggled)
+	$%ClosedPath.toggled.connect(_on_closed_path_toggled)
 
 
 # Called by the editor plugin when the node selection changes.
@@ -29,6 +30,7 @@ func selection_changed(selected: Array) -> void:
 	visible = node is ScatterShape and node.shape is PathShape
 	if visible:
 		shape_node = node
+		$%ClosedPath.button_pressed = node.shape.closed
 
 
 func is_select_mode_enabled() -> bool:
@@ -49,10 +51,6 @@ func is_lock_to_plane_enabled() -> bool:
 
 func is_snap_to_colliders_enabled() -> bool:
 	return $%SnapToColliders.button_pressed
-
-
-func is_closed_path_enabled() -> bool:
-	return $%ClosedPath.button_pressed
 
 
 func is_mirror_length_enabled() -> bool:
@@ -78,3 +76,8 @@ func _on_options_panel_hide() -> void:
 
 func _on_snap_to_colliders_toggled(enabled: bool) -> void:
 	$%LockToPlane.disabled = enabled
+
+
+func _on_closed_path_toggled(enabled: bool) -> void:
+	if shape_node and shape_node.shape is PathShape:
+		shape_node.shape.closed = enabled

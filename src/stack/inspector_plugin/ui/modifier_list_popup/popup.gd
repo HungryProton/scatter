@@ -90,6 +90,7 @@ func _get_all_modifier_scripts(path) -> Array:
 		res.append(path_root + file)
 
 	dir.list_dir_end()
+	res.sort()
 	return res
 
 

@@ -52,7 +52,7 @@ func process_transforms(transforms: TransformList, domain: Domain, global_seed: 
 
 	if transforms.is_empty() and not warning_ignore_no_transforms:
 		warning += """There's no transforms to act on.
-		Make sure you have a Distribute or Create modifier before this one.\n
+		Make sure you have a Create modifier before this one.\n
 		"""
 
 	var seed = global_seed

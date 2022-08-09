@@ -65,3 +65,7 @@ static func get_node_by_class_path(node: Node, class_path: Array) -> Node:
 				depths.push_back(d+1)
 
 	return res
+
+
+static func get_position_and_normal_at(curve: Curve3D, curve_offset: float) -> Array:
+	return []

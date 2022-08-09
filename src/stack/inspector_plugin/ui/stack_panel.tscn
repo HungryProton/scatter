@@ -18,7 +18,7 @@ theme_override_constants/margin_left = 4
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
-script = ExtResource( "1_ga4or" )
+script = ExtResource("1_ga4or")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 offset_left = 4.0
@@ -32,68 +32,66 @@ offset_right = 448.0
 offset_bottom = 31.0
 
 [node name="Add" type="Button" parent="VBoxContainer/HBoxContainer"]
-offset_right = 131.0
+offset_right = 129.0
 offset_bottom = 31.0
 size_flags_horizontal = 2
 focus_mode = 0
 toggle_mode = true
 text = " Add modifier"
-icon = ExtResource( "1_4vwtj" )
-script = ExtResource( "3_01ldn" )
+icon = ExtResource("1_4vwtj")
+script = ExtResource("3_01ldn")
 
-[node name="ModifiersPopup" parent="VBoxContainer/HBoxContainer/Add" instance=ExtResource( "3_pkswu" )]
+[node name="ModifiersPopup" parent="VBoxContainer/HBoxContainer/Add" instance=ExtResource("3_pkswu")]
 unique_name_in_owner = true
-size = Vector2i(755, 252)
+size = Vector2i(755, 322)
+visible = false
 
 [node name="Rebuild" type="Button" parent="VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-minimum_size = Vector2(30, 0)
-offset_left = 342.0
-offset_right = 372.0
+offset_left = 360.0
+offset_right = 384.0
 offset_bottom = 31.0
 size_flags_horizontal = 4
 hint_tooltip = "Force rebuild"
 focus_mode = 0
-icon = ExtResource( "2_svid4" )
+icon = ExtResource("2_svid4")
 icon_alignment = 1
 
 [node name="VSeparator" type="VSeparator" parent="VBoxContainer/HBoxContainer"]
 modulate = Color(1, 1, 1, 0.54902)
-offset_left = 376.0
-offset_right = 380.0
+offset_left = 388.0
+offset_right = 392.0
 offset_bottom = 31.0
 
 [node name="LoadPreset" type="Button" parent="VBoxContainer/HBoxContainer"]
-minimum_size = Vector2(30, 0)
-offset_left = 384.0
-offset_right = 414.0
+offset_left = 396.0
+offset_right = 420.0
 offset_bottom = 31.0
 hint_tooltip = "Load preset"
 focus_mode = 0
 text = "
 "
-icon = ExtResource( "3_w72lv" )
+icon = ExtResource("3_w72lv")
 icon_alignment = 1
 
 [node name="SavePreset" type="Button" parent="VBoxContainer/HBoxContainer"]
-minimum_size = Vector2(30, 0)
-offset_left = 418.0
+offset_left = 424.0
 offset_right = 448.0
 offset_bottom = 31.0
 hint_tooltip = "Save preset"
 focus_mode = 0
 text = "
 "
-icon = ExtResource( "4_5l2cx" )
+icon = ExtResource("4_5l2cx")
 icon_alignment = 1
 
 [node name="ModifiersContainer" type="Container" parent="VBoxContainer"]
 unique_name_in_owner = true
 clip_children = true
-minimum_size = Vector2(0, -4)
+custom_minimum_size = Vector2(0, -4)
 offset_top = 47.0
 offset_right = 448.0
 offset_bottom = 136.0
 size_flags_vertical = 3
 mouse_filter = 0
-script = ExtResource( "1_hg5ys" )
+script = ExtResource("1_hg5ys")

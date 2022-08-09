@@ -24,8 +24,20 @@ func set_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, camer
 	var shape_node: ScatterShape = gizmo.get_spatial_node()
 	var curve: Curve3D = shape_node.shape.curve
 	var point_count: int = curve.get_point_count()
+	var curve_index := handle_id
+	var previous_handle_position: Vector3
 
-	var click_world_position := _intersect_with(shape_node, camera, screen_pos)
+	if not secondary:
+		previous_handle_position = curve.get_point_position(curve_index)
+	else:
+		curve_index = int(handle_id / 2)
+		previous_handle_position = curve.get_point_position(curve_index)
+		if handle_id % 2 == 0:
+			previous_handle_position += curve.get_point_in(curve_index)
+		else:
+			previous_handle_position += curve.get_point_out(curve_index)
+
+	var click_world_position := _intersect_with(shape_node, camera, screen_pos, previous_handle_position)
 	var point_local_position: Vector3 = shape_node.get_global_transform().affine_inverse() * click_world_position
 
 	if not secondary:
@@ -34,18 +46,17 @@ func set_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, camer
 	else:
 		# In out handle moved
 		var align_handles = Input.is_key_pressed(KEY_SHIFT)
-		var index = int(handle_id / 2)
-		var point_origin = curve.get_point_position(index)
+		var point_origin = curve.get_point_position(curve_index)
 		var in_out_position = point_local_position - point_origin
 
 		if handle_id % 2 == 0:
-			curve.set_point_in(index, in_out_position)
+			curve.set_point_in(curve_index, in_out_position)
 			if align_handles:
-				curve.set_point_out(index, -in_out_position)
+				curve.set_point_out(curve_index, -in_out_position)
 		else:
-			curve.set_point_out(index, in_out_position)
+			curve.set_point_out(curve_index, in_out_position)
 			if align_handles:
-				curve.set_point_in(index, -in_out_position)
+				curve.set_point_in(curve_index, -in_out_position)
 
 	shape_node.update_gizmos()
 
@@ -115,8 +126,19 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 
 	# ----- Mesh representing the inside part of the path -----
 	if shape.closed:
-		pass
+		var points_2d := PackedVector2Array()
+		for p in points:
+			points_2d.push_back(Vector2(p.x, p.z))
 
+		var indices = Geometry2D.triangulate_delaunay(points_2d)
+		var st = SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		for index in indices:
+			var p = points_2d[index]
+			st.add_vertex(Vector3(p.x, 0.0, p.y))
+
+		var mesh = st.commit()
+		gizmo.add_mesh(mesh, plugin.get_material("mesh", gizmo))
 
 	# ------ Mesh representing path width ------
 	if shape.width <= 0:
@@ -149,7 +171,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	st.add_vertex(p1 + offset)
 
 	var mesh := st.commit()
-	gizmo.add_mesh(mesh, plugin.get_material("mesh", gizmo))
+	gizmo.add_mesh(mesh, plugin.get_material("mesh_secondary", gizmo))
 
 	## Rounded cap (start)
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -157,14 +179,14 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	var next = points[1]
 	normal = (center - next).cross(Vector3.UP).normalized()
 
-	for i in 16:
+	for i in 12:
 		st.add_vertex(center)
 		st.add_vertex(center + normal * shape.width * 0.5)
-		normal = normal.rotated(Vector3.UP, PI / 16)
+		normal = normal.rotated(Vector3.UP, PI / 12)
 		st.add_vertex(center + normal * shape.width * 0.5)
 
 	mesh = st.commit()
-	gizmo.add_mesh(mesh, plugin.get_material("mesh", gizmo))
+	gizmo.add_mesh(mesh, plugin.get_material("mesh_secondary", gizmo))
 
 	## Rounded cap (end)
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -172,14 +194,14 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	next = points[-2]
 	normal = (next - center).cross(Vector3.UP).normalized()
 
-	for i in 16:
+	for i in 12:
 		st.add_vertex(center)
 		st.add_vertex(center + normal * shape.width * 0.5)
-		normal = normal.rotated(Vector3.UP, -PI / 16)
+		normal = normal.rotated(Vector3.UP, -PI / 12)
 		st.add_vertex(center + normal * shape.width * 0.5)
 
 	mesh = st.commit()
-	gizmo.add_mesh(mesh, plugin.get_material("mesh", gizmo))
+	gizmo.add_mesh(mesh, plugin.get_material("mesh_secondary", gizmo))
 
 
 func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> bool:
@@ -234,10 +256,11 @@ func _edit_path(shape_node: ScatterShape, restore: PathShape) -> void:
 	shape_node.update_gizmos()
 
 
-func _intersect_with(path: ScatterShape, camera: Camera3D, screen_point: Vector2, handle_position = null) -> Vector3:
+func _intersect_with(path: ScatterShape, camera: Camera3D, screen_point: Vector2, handle_position_local = null) -> Vector3:
 	# Get the ray data
 	var from = camera.project_ray_origin(screen_point)
 	var dir = camera.project_ray_normal(screen_point)
+	var gt = path.get_global_transform()
 
 	# Snap to collider enabled
 	if _gizmo_panel.is_snap_to_colliders_enabled():
@@ -251,21 +274,27 @@ func _intersect_with(path: ScatterShape, camera: Camera3D, screen_point: Vector2
 
 	# Lock to plane enabled
 	if _gizmo_panel.is_lock_to_plane_enabled():
-		var t = path.get_global_transform()
+		var t = Transform3D(gt)
 		var a = t.basis.x
 		var b = t.basis.z
 		var c = a + b
 		var o = t.origin
 		var plane = Plane(a + o, b + o, c + o)
-		return plane.intersects_ray(from, dir)
+		var result = plane.intersects_ray(from, dir)
+		if result != null:
+			return result
 
 	# Default case (similar to the built in Path3D node)
 	var origin: Vector3
-	if handle_position:
-		origin = handle_position
+	if handle_position_local:
+		origin = gt * handle_position_local
 	else:
 		origin = path.get_global_transform().origin
 
 	var plane = Plane(dir, origin)
-	return plane.intersects_ray(from, dir)
+	var res = plane.intersects_ray(from, dir)
+	if res != null:
+		return res
+
+	return origin
 

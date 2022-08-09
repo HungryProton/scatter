@@ -37,9 +37,9 @@ func _ready() -> void:
 		if i != 0 and i % 4 == 0:
 			_popup.add_separator("", 100 + i)
 
-		layer_name = ProjectSettings.get_setting("layer_names/3d_physics/layer_" + String(i + 1))
+		layer_name = ProjectSettings.get_setting("layer_names/3d_physics/layer_" + str(i + 1))
 		if layer_name.is_empty():
-			layer_name = "Layer " + String(i + 1)
+			layer_name = "Layer " + str(i + 1)
 		_popup.add_check_item(layer_name, _layer_count - 1 - i)
 
 	_sync_popup_state()
@@ -50,8 +50,8 @@ func set_parameter_name(text: String) -> void:
 	_label.text = text
 
 
-func _set_value(val: String) -> void:
-	var binary_string: String = _dec2bin(val.to_int())
+func _set_value(val: int) -> void:
+	var binary_string: String = _dec2bin(val)
 	var length = binary_string.length()
 
 	if length < _layer_count:
@@ -65,13 +65,13 @@ func _set_value(val: String) -> void:
 	_sync_popup_state()
 
 
-func get_value() -> String:
+func get_value() -> int:
 	var binary_string = ""
 	for b in _buttons:
 		binary_string += "1" if b.button_pressed else "0"
 
 	var val = _bin2dec(binary_string)
-	return str(val)
+	return val
 
 
 func _dec2bin(value: int) -> String:
@@ -122,10 +122,10 @@ func _on_id_pressed(id: int) -> void:
 
 
 func _on_enable_all_pressed() -> void:
-	_set_value("4294967295")
+	_set_value(4294967295)
 	_on_value_changed(null)
 
 
 func _on_clear_pressed() -> void:
-	_set_value("0")
+	_set_value(0)
 	_on_value_changed(null)

@@ -18,7 +18,6 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		match shape_type:
 			0:
 				shape = PathShape.new()
-				print("created a new path shape ", shape)
 			1:
 				shape = SphereShape.new()
 

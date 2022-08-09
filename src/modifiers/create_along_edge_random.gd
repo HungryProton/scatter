@@ -13,8 +13,8 @@ var _rng: RandomNumberGenerator
 
 
 func _init() -> void:
-	display_name = "Distribute Along Path (Random)"
-	category = "Distribute"
+	display_name = "Create Along Edge (Random)"
+	category = "Create"
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 

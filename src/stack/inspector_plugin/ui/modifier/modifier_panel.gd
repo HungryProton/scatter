@@ -42,6 +42,7 @@ func _ready() -> void:
 	_name.text = name
 	_enabled.toggled.connect(_on_enable_toggled)
 	_remove.pressed.connect(_on_remove_pressed)
+	_warning.pressed.connect(_on_warning_icon_pressed)
 
 
 func _get_drag_data(at_position: Vector2):
@@ -100,8 +101,11 @@ func create_ui_for(modifier) -> void:
 			TYPE_FLOAT:
 				parameter_ui = ParameterScalar.instantiate()
 			TYPE_INT:
-				parameter_ui = ParameterScalar.instantiate()
-				parameter_ui.mark_as_int(true)
+				if property.hint == PROPERTY_HINT_LAYERS_3D_PHYSICS:
+					parameter_ui = ParameterBitmask.instantiate()
+				else:
+					parameter_ui = ParameterScalar.instantiate()
+					parameter_ui.mark_as_int(true)
 			TYPE_STRING:
 				if property.hint_string == "Node":
 					parameter_ui = ParameterNodeSelector.instantiate()
@@ -110,8 +114,6 @@ func create_ui_for(modifier) -> void:
 					parameter_ui = ParameterFile.instantiate()
 				elif property.hint_string == "Curve":
 					parameter_ui = ParameterCurve.instantiate()
-				elif property.hint_string == "bitmask":
-					parameter_ui = ParameterBitmask.instantiate()
 				else:
 					parameter_ui = ParameterString.instantiate()
 			TYPE_VECTOR3:
