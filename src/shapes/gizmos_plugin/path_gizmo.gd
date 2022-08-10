@@ -130,7 +130,10 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 		for p in points:
 			points_2d.push_back(Vector2(p.x, p.z))
 
-		var indices = Geometry2D.triangulate_delaunay(points_2d)
+		var indices = Geometry2D.triangulate_polygon(points_2d)
+		if indices.is_empty():
+			indices =  Geometry2D.triangulate_delaunay(points_2d)
+
 		var st = SurfaceTool.new()
 		st.begin(Mesh.PRIMITIVE_TRIANGLES)
 		for index in indices:

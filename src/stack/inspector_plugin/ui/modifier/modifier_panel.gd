@@ -27,6 +27,7 @@ var _modifier
 
 @onready var _parameters: Control = $%ParametersRoot
 @onready var _name: Label = $%ModifierName
+@onready var _expand: Button = $%Expand
 @onready var _enabled: Button = $%Enabled
 @onready var _remove: Button = $%Remove
 @onready var _warning: Button = $%Warning
@@ -43,7 +44,7 @@ func _ready() -> void:
 	_enabled.toggled.connect(_on_enable_toggled)
 	_remove.pressed.connect(_on_remove_pressed)
 	_warning.pressed.connect(_on_warning_icon_pressed)
-
+	_expand.toggled.connect(_on_expand_toggled)
 
 func _get_drag_data(at_position: Vector2):
 	var drag_control_position = _drag_control.global_position - global_position
@@ -128,7 +129,7 @@ func create_ui_for(modifier) -> void:
 			parameter_ui.set_hint_string(property.hint_string)
 			parameter_ui.value_changed.connect(_on_parameter_value_changed.bind(property.name, parameter_ui))
 
-	_on_expand_toggled(_modifier.expanded)
+	_expand.button_pressed = _modifier.expanded
 
 
 func _restore_value(name, val, ui) -> void:

@@ -35,7 +35,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		if hit != null and not hit.is_empty():
 			d = abs(Vector3.UP.dot(hit.normal))
 			if d < (1.0 - max_slope):
-				transforms.list.remove(i)
+				transforms.list.remove_at(i)
 				continue
 
 			if align_with_floor_normal:
@@ -56,6 +56,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		+ Ray length is too short.
 		+ Ray direction is incorrect.
 		+ Collision mask is not set properly.
+		+ Max slope is too low.
 		"""
 
 

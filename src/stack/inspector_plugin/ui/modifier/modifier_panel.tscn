@@ -53,6 +53,7 @@ offset_bottom = 26.0
 size_flags_vertical = 0
 
 [node name="Expand" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 offset_right = 20.0
 offset_bottom = 26.0
 focus_mode = 0
@@ -264,8 +265,6 @@ pressed_icon = ExtResource("13_txjs8")
 title = "Warning"
 unresizable = true
 popup_window = true
-
-[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Expand" to="." method="_on_expand_toggled"]
 
 [editable path="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton/OverrideGlobalSeed"]
 [editable path="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/RestrictHeight"]
