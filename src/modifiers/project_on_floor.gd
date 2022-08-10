@@ -22,7 +22,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	if transforms.list.is_empty():
 		return
 
-	var space_state = domain.root.get_world_3d().get_direct_space_state()
+	var space_state = domain.space_state
 	var hit
 	var d: float
 	var t: Transform3D

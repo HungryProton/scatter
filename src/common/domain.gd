@@ -13,7 +13,14 @@ extends RefCounted
 const ScatterShape := preload("../scatter_shape.gd")
 const Bounds := preload("../common/bounds.gd")
 
-var root: Node3D
+var root: Node3D:
+	set(val):
+		root = val
+		space_state = null
+		if root:
+			space_state = root.get_world_3d().get_direct_space_state()
+
+var space_state: PhysicsDirectSpaceState3D
 var inclusive_shapes: Array[ScatterShape]
 var exclusive_shapes: Array[ScatterShape]
 var bounds: Bounds = Bounds.new()
@@ -54,6 +61,8 @@ func get_edges() -> Array[Curve3D]:
 # nested Scatter nodes, shapes under these other Scatter nodes will be ignored
 func discover_shapes(root_node: Node3D) -> void:
 	root = root_node
+	inclusive_shapes.clear()
+	exclusive_shapes.clear()
 	var root_type = root.get_script() # Can't preload the scatter script here (cyclic dependency)
 	for c in root.get_children():
 		_discover_shapes_recursive(c, root_type)

@@ -3,7 +3,7 @@ extends Node3D
 
 
 signal shape_changed
-
+signal thread_completed
 
 const ScatterUtil := preload('./common/scatter_util.gd')
 const ModifierStack := preload("./stack/modifier_stack.gd")
@@ -39,7 +39,7 @@ var items: Array[ScatterItem]
 var total_item_proportion: int
 var output_root: Node3D
 
-var _rebuilt_this_frame := false
+var _thread := Thread.new()
 
 
 func _ready() -> void:
@@ -47,6 +47,11 @@ func _ready() -> void:
 	set_notify_transform(true)
 	child_exiting_tree.connect(_on_child_exiting_tree)
 	rebuild(true)
+
+
+func _process(delta: float) -> void:
+	if _thread and _thread.is_started() and not _thread.is_alive():
+		thread_completed.emit()
 
 
 func _get_property_list() -> Array:
@@ -98,6 +103,8 @@ func is_scatter_node() -> bool:
 
 
 func full_rebuild():
+	if _thread.is_alive():
+		_thread.wait_to_finish()
 	_clear_output()
 	_rebuild(true)
 
@@ -110,16 +117,11 @@ func rebuild(force_discover := false) -> void:
 	if not is_inside_tree():
 		return
 
-	if _rebuilt_this_frame:
+	if _thread.is_started(): # still running in the background
 		return
-
-	_rebuilt_this_frame = true
 
 	force_discover = true # TMP while we fix the other issues
 	_rebuild(force_discover)
-
-	await get_tree().process_frame
-	_rebuilt_this_frame = false
 
 
 # Re compute the desired output.
@@ -134,7 +136,10 @@ func _rebuild(force_discover) -> void:
 	if items.is_empty() or domain.is_empty():
 		return
 
-	var transforms: TransformList = modifier_stack.update()
+	var err = _thread.start(modifier_stack.update, Thread.PRIORITY_NORMAL)
+	await thread_completed
+	var transforms: TransformList = _thread.wait_to_finish()
+
 	if use_instancing:
 		_update_multimeshes(transforms)
 	else:

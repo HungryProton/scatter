@@ -35,14 +35,6 @@ func get_warning() -> String:
 	return warning
 
 
-func _clear_warning() -> void:
-	warning = ""
-
-
-func _notify_warning_changed() -> void:
-	warning_changed.emit()
-
-
 func process_transforms(transforms: TransformList, domain: Domain, global_seed: int) -> void:
 	_clear_warning()
 
@@ -59,9 +51,13 @@ func process_transforms(transforms: TransformList, domain: Domain, global_seed: 
 	if can_override_seed and override_global_seed:
 		seed = custom_seed
 	_process_transforms(transforms, domain, seed)
-	_notify_warning_changed()
+	warning_changed.emit()
 
 
 # Override in inherited class
 func _process_transforms(_transforms: TransformList, _domain: Domain, _seed: int) -> void:
 	pass
+
+
+func _clear_warning() -> void:
+	warning = ""
