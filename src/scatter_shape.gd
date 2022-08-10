@@ -66,20 +66,6 @@ func _set(property, _value):
 	return false
 
 
-func is_point_inside(point: Vector3) -> bool:
-	if not shape:
-		return false
-
-	return shape.is_point_inside(point, global_transform)
-
-
-func get_corners_global() -> Array:
-	if not shape:
-		return []
-
-	return shape.get_corners_global(global_transform)
-
-
 func _on_shape_changed() -> void:
 	update_gizmos()
 	ScatterUtil.request_parent_to_rebuild(self)

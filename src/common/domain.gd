@@ -10,8 +10,22 @@ extends RefCounted
 #
 # An instance of this class is passed to the modifiers during a rebuild.
 
+
 const ScatterShape := preload("../scatter_shape.gd")
+const BaseShape := preload("../shapes/base_shape.gd")
 const Bounds := preload("../common/bounds.gd")
+
+
+class DomainShapeInfo:
+	var transform: Transform3D
+	var shape: BaseShape
+
+	func is_point_inside(point: Vector3) -> bool:
+		return shape.is_point_inside(point, transform)
+
+	func get_corners_global() -> Array:
+		return shape.get_corners_global(transform)
+
 
 var root: Node3D:
 	set(val):
@@ -21,8 +35,8 @@ var root: Node3D:
 			space_state = root.get_world_3d().get_direct_space_state()
 
 var space_state: PhysicsDirectSpaceState3D
-var inclusive_shapes: Array[ScatterShape]
-var exclusive_shapes: Array[ScatterShape]
+var inclusive_shapes: Array[DomainShapeInfo]
+var exclusive_shapes: Array[DomainShapeInfo]
 var bounds: Bounds = Bounds.new()
 
 
@@ -44,19 +58,6 @@ func is_point_inside(point: Vector3) -> bool:
 
 	return false
 
-
-func get_global_transform() -> Transform3D:
-	return root.get_global_transform()
-
-
-func get_local_transform() -> Transform3D:
-	return root.get_transform()
-
-
-func get_edges() -> Array[Curve3D]:
-	return [] #TODO
-
-
 # Recursively find all ScatterShape nodes under the provided root. In case of
 # nested Scatter nodes, shapes under these other Scatter nodes will be ignored
 func discover_shapes(root_node: Node3D) -> void:
@@ -71,22 +72,60 @@ func discover_shapes(root_node: Node3D) -> void:
 
 func compute_bounds() -> void:
 	bounds.clear()
-	for node in inclusive_shapes:
-		for point in node.get_corners_global():
+	for info in inclusive_shapes:
+		for point in info.get_corners_global():
 			bounds.feed(point)
 
 	bounds.compute_bounds()
+
+
+func get_global_transform() -> Transform3D:
+	return root.get_global_transform()
+
+
+func get_local_transform() -> Transform3D:
+	return root.get_transform()
+
+
+func get_edges() -> Array[Curve3D]:
+	return [] #TODO
+
+
+func get_copy():
+	var copy = get_script().new()
+
+	copy.root = root
+	copy.space_state = space_state
+	copy.bounds = bounds
+
+	for s in inclusive_shapes:
+		var s_copy = DomainShapeInfo.new()
+		s_copy.transform = s.transform
+		s_copy.shape = s.shape.get_copy()
+		copy.inclusive_shapes.push_back(s_copy)
+
+	for s in exclusive_shapes:
+		var s_copy = DomainShapeInfo.new()
+		s_copy.transform = s.transform
+		s_copy.shape = s.shape.get_copy()
+		copy.exclusive_shapes.push_back(s_copy)
+
+	return copy
 
 
 func _discover_shapes_recursive(node: Node3D, type_to_ignore) -> void:
 	if node is type_to_ignore: # Ignore shapes under nested Scatter nodes
 		return
 
-	if node is ScatterShape:
+	if node is ScatterShape and node.shape != null:
+		var info := DomainShapeInfo.new()
+		info.transform = node.get_global_transform()
+		info.shape = node.shape
+
 		if node.exclusive:
-			exclusive_shapes.push_back(node)
+			exclusive_shapes.push_back(info)
 		else:
-			inclusive_shapes.push_back(node)
+			inclusive_shapes.push_back(info)
 
 	for c in node.get_children():
 		_discover_shapes_recursive(c, type_to_ignore)

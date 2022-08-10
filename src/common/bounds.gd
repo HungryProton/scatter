@@ -1,5 +1,5 @@
 @tool
-extends RefCounted
+extends Resource
 
 # Essentially a Rect3
 # Used by the Domain class

@@ -26,8 +26,13 @@ const Domain := preload("./common/domain.gd")
 var undo_redo: UndoRedo
 var modifier_stack: ModifierStack:
 	set(val):
+		if modifier_stack:
+			if modifier_stack.value_changed.is_connected(rebuild):
+				modifier_stack.value_changed.disconnect(rebuild)
+			if modifier_stack.stack_changed.is_connected(rebuild):
+				modifier_stack.stack_changed.disconnect(rebuild)
+
 		modifier_stack = val.get_copy() # Enfore uniqueness
-		modifier_stack.owner = self
 		modifier_stack.value_changed.connect(rebuild)
 		modifier_stack.stack_changed.connect(rebuild)
 
@@ -134,9 +139,11 @@ func _rebuild(force_discover) -> void:
 		domain.discover_shapes(self)
 
 	if items.is_empty() or domain.is_empty():
+		# TODO: clear output
 		return
 
-	var err = _thread.start(modifier_stack.update, Thread.PRIORITY_NORMAL)
+	var update_function := modifier_stack.update.bind(self, domain.get_copy())
+	var err = _thread.start(update_function, Thread.PRIORITY_NORMAL)
 	await thread_completed
 	var transforms: TransformList = _thread.wait_to_finish()
 

@@ -11,16 +11,15 @@ const TransformList = preload("../common/transform_list.gd")
 
 @export var stack: Array[Resource] = []
 
-var owner: Node
 var just_created := false
 var undo_redo: UndoRedo
 
 
-func update() -> TransformList:
+func update(scatter_node: Node3D, domain) -> TransformList:
 	var transforms = TransformList.new()
 	for modifier in stack:
 		if modifier.enabled:
-			modifier.process_transforms(transforms, owner.domain, owner.global_seed)
+			modifier.process_transforms(transforms, domain, scatter_node.global_seed)
 
 	return transforms
 
