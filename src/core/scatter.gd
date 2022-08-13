@@ -272,27 +272,64 @@ func _split_multimesh(set) -> bool:
 	split_multimesh = set
 	return set
 
-func _create_split_sibling(multimesh : MultiMeshInstance, parent : Spatial) -> void:
-	if !multimesh.multimesh:
+func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> void:
+	if !mmi.multimesh:
 		print("Cannot create split sibling, multimesh does not exist")
 		return
+	if mmi.multimesh.instance_count <= 0:
+		print("Cannot create split sibling, multimesh is empty")
+	
+	# Create the AABB from all instances
+	var aabb = AABB(mmi.multimesh.get_instance_transform(0).origin, Vector3.ZERO)
+	for i in mmi.multimesh.instance_count:
+		aabb = aabb.expand(mmi.multimesh.get_instance_transform(i).origin)
+	
+	# For every chunk
+	for zi in range(split_z_count):
+		for yi in range(split_y_count):
+			for xi in range(split_x_count):
+				# Create aabb of this specific chunk
+				var fract_x = float(xi)/split_x_count
+				var fract_y = float(yi)/split_y_count
+				var fract_z = float(zi)/split_z_count
+				var localorigin = aabb.position + aabb.size * Vector3(fract_x, fract_y, fract_z)
+				print("Origin: ",localorigin)
+				var local_aabb = AABB(localorigin,
+								aabb.size *	Vector3(1.0/float(split_x_count),
+													1.0/float(split_y_count),
+													1.0/float(split_z_count)))
+				#create sibling assigned to this chunk
+				var sibling = MultiMeshInstance.new()
+				sibling.multimesh = MultiMesh.new()
+				# copy properties to sibling
+				sibling.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
+				sibling.multimesh.mesh = mmi.multimesh.mesh
+				sibling.multimesh.transform_format = 1
+				sibling.material_override = mmi.material_override
+				
+				# Check all elements in multimesh
+				print(mmi.multimesh.instance_count)
+				var chunkTransforms = []
+				for i in mmi.multimesh.instance_count:
+					var t = mmi.multimesh.get_instance_transform(i)
+					if local_aabb.has_point(t.origin):
+						chunkTransforms.append(t)
+						print("Has: ", i)
+				
+				sibling.multimesh.instance_count = chunkTransforms.size()
+				for i in range(chunkTransforms.size()):
+					sibling.multimesh.set_instance_transform(i, chunkTransforms[i])
+					print(sibling.multimesh.get_instance_transform(i).origin)
+				
+				sibling.add_to_group("split_multimesh")
+				parent.add_child(sibling)
+				sibling.owner = get_tree().edited_scene_root
+				
 
-	var sibling = MultiMeshInstance.new()
-	sibling.multimesh = MultiMesh.new()
-	# copy properties to sibling
-	sibling.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
-	sibling.multimesh.mesh = multimesh.multimesh.mesh
-	sibling.multimesh.transform_format = 1
-	sibling.multimesh.instance_count = multimesh.multimesh.instance_count
-	sibling.material_override = multimesh.material_override
 
 	# copy transformations
-	for i in sibling.multimesh.instance_count:
-		sibling.multimesh.set_instance_transform(i, multimesh.multimesh.get_instance_transform(i))
+	
 
-	sibling.add_to_group("split_multimesh")
-	parent.add_child(sibling)
-	sibling.owner = get_tree().edited_scene_root
 
 # Create a multimesh for item if it does not exist yet
 # Copy the mesh and material data to multimesh
