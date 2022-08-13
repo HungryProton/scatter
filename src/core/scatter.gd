@@ -6,6 +6,10 @@ var Scatter = preload("namespace.gd").new()
 
 export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
+export var split_multimesh := false setget _split_multimesh
+export var split_x_count : = 1
+export var split_y_count : = 1
+export var split_z_count : = 1
 export var disable_updates_in_game := true
 export var force_update_when_loaded := true
 export var make_children_unselectable := true
@@ -74,7 +78,7 @@ func _get(property):
 func _set(property, _value):
 	if not Engine.editor_hint:
 		return false
-
+	
 	# This is to detect when the node was duplicated from the editor.
 	if property == "transform":
 		# Duplicate the curve item too. If someone want to share data, it has
@@ -82,7 +86,7 @@ func _set(property, _value):
 		call_deferred("_ensure_stack_exists")
 		call_deferred("_make_curve_unique")
 		call_deferred("clear")
-
+	
 	return false
 
 
@@ -245,7 +249,53 @@ func _create_multimesh() -> void:
 		offset += count
 
 
-# TODO: Move this to scatter_item.gd?
+func get_all_children(in_node,arr:=[]):
+	arr.push_back(in_node)
+	for child in in_node.get_children():
+		arr = get_all_children(child,arr)
+	return arr
+
+
+func _split_multimesh(set) -> bool:
+	var allchildren = get_all_children(self)
+	if set:
+		for child in allchildren:
+			if child is MultiMeshInstance and not child.is_in_group("split_multimesh"):
+				_create_split_sibling(child, self)
+				child.visible = false
+	else:
+		for child in allchildren:
+			# Remove split siblings
+			if child.is_in_group("split_multimesh"):
+				child.queue_free()
+				remove_child(child) # next loop must not find this
+	split_multimesh = set
+	return set
+
+func _create_split_sibling(multimesh : MultiMeshInstance, parent : Spatial) -> void:
+	if !multimesh.multimesh:
+		print("Cannot create split sibling, multimesh does not exist")
+		return
+
+	var sibling = MultiMeshInstance.new()
+	sibling.multimesh = MultiMesh.new()
+	# copy properties to sibling
+	sibling.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
+	sibling.multimesh.mesh = multimesh.multimesh.mesh
+	sibling.multimesh.transform_format = 1
+	sibling.multimesh.instance_count = multimesh.multimesh.instance_count
+	sibling.material_override = multimesh.material_override
+
+	# copy transformations
+	for i in sibling.multimesh.instance_count:
+		sibling.multimesh.set_instance_transform(i, multimesh.multimesh.get_instance_transform(i))
+
+	sibling.add_to_group("split_multimesh")
+	parent.add_child(sibling)
+	sibling.owner = get_tree().edited_scene_root
+
+# Create a multimesh for item if it does not exist yet
+# Copy the mesh and material data to multimesh
 func _setup_multi_mesh(item, count):
 	var instance: MultiMeshInstance = item.get_multimesh_instance()
 	if not instance:
