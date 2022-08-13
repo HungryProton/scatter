@@ -316,6 +316,9 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> void:
 						chunkTransforms.append(t)
 						print("Has: ", i)
 				
+				if chunkTransforms.size() == 0:
+					continue
+				
 				sibling.multimesh.instance_count = chunkTransforms.size()
 				for i in range(chunkTransforms.size()):
 					sibling.multimesh.set_instance_transform(i, chunkTransforms[i])
@@ -323,6 +326,7 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> void:
 				
 				sibling.add_to_group("split_multimesh")
 				parent.add_child(sibling)
+				sibling.global_transform = mmi.global_transform
 				sibling.owner = get_tree().edited_scene_root
 				
 
