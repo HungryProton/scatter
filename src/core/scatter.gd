@@ -260,21 +260,37 @@ func get_all_children(in_node,arr:=[]):
 func _split_multimesh(set) -> bool:
 	var allchildren = get_all_children(self)
 	if set:
+		# create split siblings from all multimesh
 		for child in allchildren:
-			if child is MultiMeshInstance and not child.is_in_group("split_multimesh"):
-				var is_ok = _create_split_sibling(child, self)
-				if not is_ok:
-					split_multimesh = false
-					return false
-				child.visible = false
+			if child is MultiMeshInstance:
+				if child.get_parent().name.match("SplitMultimesh*"):
+					# This is a split multimesh, should have been deleted
+					child.queue_free()
+					continue
+				# Create a container parent
+				var container = Spatial.new()
+				add_child(container)
+				container.global_transform = self.global_transform
+				container.owner = get_tree().edited_scene_root
+				container.name = "SplitMultimesh"
+				
+				var is_ok = _create_split_sibling(child, container)
+				if is_ok:
+					child.visible = false
+					
 	else:
-		for child in allchildren:
+		# Remove split siblings
+		var siblingContiner = find_node("SplitMultimesh*")
+		while(siblingContiner != null):
 			# Remove split siblings
-			if child.is_in_group("split_multimesh"):
-				child.queue_free()
-				remove_child(child) # next loop must not find this
-			elif child is MultiMeshInstance:
+			siblingContiner.queue_free()
+			remove_child(siblingContiner) # next loop must not find this
+			siblingContiner = find_node("SplitMultimesh*")
+		# Make original multimeshes visible again
+		for child in allchildren:
+			if child is MultiMeshInstance:
 				child.visible = true
+	
 	split_multimesh = set
 	return set
 
@@ -345,7 +361,6 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 					c_mmi.owner = get_tree().edited_scene_root
 					c_mmi.add_to_group("split_multimesh")
 					#TODO make group appear in editor
-	
 	return true
 
 # Create a multimesh for item if it does not exist yet
