@@ -249,6 +249,7 @@ func _create_multimesh() -> void:
 		offset += count
 
 
+# Find all children of a node recursively
 func get_all_children(in_node,arr:=[]):
 	arr.push_back(in_node)
 	for child in in_node.get_children():
@@ -261,7 +262,10 @@ func _split_multimesh(set) -> bool:
 	if set:
 		for child in allchildren:
 			if child is MultiMeshInstance and not child.is_in_group("split_multimesh"):
-				_create_split_sibling(child, self)
+				var is_ok = _create_split_sibling(child, self)
+				if not is_ok:
+					split_multimesh = false
+					return false
 				child.visible = false
 	else:
 		for child in allchildren:
@@ -269,37 +273,38 @@ func _split_multimesh(set) -> bool:
 			if child.is_in_group("split_multimesh"):
 				child.queue_free()
 				remove_child(child) # next loop must not find this
+			elif child is MultiMeshInstance:
+				child.visible = true
 	split_multimesh = set
 	return set
 
-func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> void:
+
+func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 	if !mmi.multimesh:
 		print("Cannot create split sibling, multimesh does not exist")
-		return
+		return false
 	if mmi.multimesh.instance_count <= 0:
 		print("Cannot create split sibling, multimesh is empty")
+		return false
+	if split_x_count <= 0 or split_y_count <= 0 or split_z_count <= 0:
+		print("Cannot create split sibling, invaild split counts")
+		return false
 	
-	# Create the AABB from all instances
-	var aabb = AABB(mmi.multimesh.get_instance_transform(0).origin, Vector3.ZERO)
-	for i in mmi.multimesh.instance_count:
-		aabb = aabb.expand(mmi.multimesh.get_instance_transform(i).origin)
-	
-	# For every chunk
-	for zi in range(split_z_count):
+	var mmi_siblings = []
+	var transforms = []
+	# Create mmis and multimeshes for all siblings
+	for xi in range(split_x_count):
+		mmi_siblings.append([])
+		transforms.append([])
 		for yi in range(split_y_count):
-			for xi in range(split_x_count):
-				# Create aabb of this specific chunk
-				var fract_x = float(xi)/split_x_count
-				var fract_y = float(yi)/split_y_count
-				var fract_z = float(zi)/split_z_count
-				var localorigin = aabb.position + aabb.size * Vector3(fract_x, fract_y, fract_z)
-				print("Origin: ",localorigin)
-				var local_aabb = AABB(localorigin,
-								aabb.size *	Vector3(1.0/float(split_x_count),
-													1.0/float(split_y_count),
-													1.0/float(split_z_count)))
-				#create sibling assigned to this chunk
+			mmi_siblings[xi].append([])
+			transforms[xi].append([])
+			for zi in range(split_z_count):
+				transforms[xi][yi].append([])
 				var sibling = MultiMeshInstance.new()
+				mmi_siblings[xi][yi].append(sibling)
+				
+				# Set up sibling
 				sibling.multimesh = MultiMesh.new()
 				# copy properties to sibling
 				sibling.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
@@ -307,33 +312,42 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> void:
 				sibling.multimesh.transform_format = 1
 				sibling.material_override = mmi.material_override
 				
-				# Check all elements in multimesh
-				print(mmi.multimesh.instance_count)
-				var chunkTransforms = []
-				for i in mmi.multimesh.instance_count:
-					var t = mmi.multimesh.get_instance_transform(i)
-					if local_aabb.has_point(t.origin):
-						chunkTransforms.append(t)
-						print("Has: ", i)
-				
-				if chunkTransforms.size() == 0:
-					continue
-				
-				sibling.multimesh.instance_count = chunkTransforms.size()
-				for i in range(chunkTransforms.size()):
-					sibling.multimesh.set_instance_transform(i, chunkTransforms[i])
-					print(sibling.multimesh.get_instance_transform(i).origin)
-				
 				sibling.add_to_group("split_multimesh")
 				parent.add_child(sibling)
 				sibling.global_transform = mmi.global_transform
 				sibling.owner = get_tree().edited_scene_root
-				
-
-
-	# copy transformations
+				property_list_changed_notify()
 	
-
+	# Create the AABB from all instances
+	var aabb = mmi.get_aabb()
+	# avoid degenerate case later while calculating indexes
+	aabb = aabb.grow(0.1)
+	
+	# Collect the transforms to transform arrays
+	# This step is necessary because mmi transforms reset when instance count changes
+	for i in mmi.multimesh.instance_count:
+		# both aabb and t are in mmi's local coordinates
+		var t = mmi.multimesh.get_instance_transform(i)
+		var p_rel = (t.origin - aabb.position) / aabb.size
+		# Chunk index
+		var ci = (p_rel * Vector3(split_x_count, split_y_count, split_z_count)).floor()
+		# Store the transform to the appropriate array
+		transforms[ci.x][ci.y][ci.z].append(t)
+	
+	# apply transforms and remove empty multimesh instances
+	for zi in range(split_z_count):
+		for yi in range(split_y_count):
+			for xi in range(split_x_count):
+				# reference to current mmi based on chunk index
+				var c_mmi : MultiMeshInstance = mmi_siblings[xi][yi][zi]
+				if transforms[xi][yi][zi].size() == 0:
+					c_mmi.queue_free()
+				else:
+					c_mmi.multimesh.instance_count = transforms[xi][yi][zi].size()
+					for i in range(transforms[xi][yi][zi].size()):
+						c_mmi.multimesh.set_instance_transform(i, transforms[xi][yi][zi][i])
+						
+	return true
 
 # Create a multimesh for item if it does not exist yet
 # Copy the mesh and material data to multimesh
