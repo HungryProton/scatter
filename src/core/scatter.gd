@@ -11,6 +11,7 @@ export var split_x_count : = 1
 export var split_y_count : = 1
 export var split_z_count : = 1
 export var disable_updates_in_game := true
+export var disable_automatic_updates = false
 export var force_update_when_loaded := true
 export var make_children_unselectable := true
 export var preview_count := -1
@@ -99,6 +100,8 @@ func clear() -> void:
 func update() -> void:
 	if disable_updates_in_game and not Engine.is_editor_hint():
 		return
+	if disable_automatic_updates:
+		return
 	_do_update()
 
 
@@ -147,7 +150,7 @@ func full_update() -> void:
 	_delete_duplicates()
 	_delete_multimeshes()
 	yield(get_tree(), "idle_frame")
-	update()
+	_do_update()
 
 
 # Loop through children to find all the ScatterItem nodes
