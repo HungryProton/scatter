@@ -311,12 +311,6 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 				sibling.multimesh.mesh = mmi.multimesh.mesh
 				sibling.multimesh.transform_format = 1
 				sibling.material_override = mmi.material_override
-				
-				sibling.add_to_group("split_multimesh")
-				parent.add_child(sibling)
-				sibling.global_transform = mmi.global_transform
-				sibling.owner = get_tree().edited_scene_root
-				property_list_changed_notify()
 	
 	# Create the AABB from all instances
 	var aabb = mmi.get_aabb()
@@ -324,7 +318,7 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 	aabb = aabb.grow(0.1)
 	
 	# Collect the transforms to transform arrays
-	# This step is necessary because mmi transforms reset when instance count changes
+	# This step is necessary to separate because mmi transforms reset when instance count changes
 	for i in mmi.multimesh.instance_count:
 		# both aabb and t are in mmi's local coordinates
 		var t = mmi.multimesh.get_instance_transform(i)
@@ -334,7 +328,7 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 		# Store the transform to the appropriate array
 		transforms[ci.x][ci.y][ci.z].append(t)
 	
-	# apply transforms and remove empty multimesh instances
+	# apply transforms, add to tree all non-empty multimesh instances
 	for zi in range(split_z_count):
 		for yi in range(split_y_count):
 			for xi in range(split_x_count):
@@ -346,7 +340,12 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 					c_mmi.multimesh.instance_count = transforms[xi][yi][zi].size()
 					for i in range(transforms[xi][yi][zi].size()):
 						c_mmi.multimesh.set_instance_transform(i, transforms[xi][yi][zi][i])
-						
+					parent.add_child(c_mmi)
+					c_mmi.global_transform = mmi.global_transform
+					c_mmi.owner = get_tree().edited_scene_root
+					c_mmi.add_to_group("split_multimesh")
+					#TODO make group appear in editor
+	
 	return true
 
 # Create a multimesh for item if it does not exist yet
