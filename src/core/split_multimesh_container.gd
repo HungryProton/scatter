@@ -24,21 +24,19 @@ func _process(delta):
 			var show = true
 			
 			if visible_range_begin != 0:
-				if d >= visible_range_begin + visible_range_begin_hysteresis:
-					pass
-				else:
-					show = false
-				
 				if d <= visible_range_begin - visible_range_begin_hysteresis:
+					# Too close, hide
 					hide = true
+				# if inside hysteresis band do not change visibility
+				if abs(d-visible_range_begin) < visible_range_begin_hysteresis:
+					show = false
 			
 			if visible_range_end != 0:
 				if d >= visible_range_end + visible_range_end_hysteresis:
+					# Too far, hide
 					hide = true
-				
-				if d <= visible_range_end - visible_range_end_hysteresis:
-					pass
-				else:
+				# if inside hysteresis band do not change visiblity
+				if abs(d-visible_range_end) < visible_range_end_hysteresis:
 					show = false
 			
 			if hide:
