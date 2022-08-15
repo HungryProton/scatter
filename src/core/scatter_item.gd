@@ -12,6 +12,11 @@ export var ignore_initial_position := true setget _set_ignore_pos
 export var ignore_initial_rotation := true setget _set_ignore_rot
 export var ignore_initial_scale := true setget _set_ignore_scale
 
+export var visible_range_begin : float = 0
+export var visible_range_begin_hysteresis : float = 0.1
+export var visible_range_end : float   = 0
+export var visible_range_end_hysteresis : float = 0.1
+
 var use_instancing := true setget _set_use_instancing
 var merge_target_meshes := false setget _set_merge_target_meshes
 var cast_shadow := 1 setget _set_cast_shadow

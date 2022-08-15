@@ -301,11 +301,18 @@ func _add_split_multimesh():
 	for child in _items:
 		var mmi = child.get_node("MultiMeshInstance")
 		# Create a parent container
-		var container = Spatial.new()
+		var container = SplitMultimeshContainer.new()
 		child.add_child(container)
 		container.global_transform = self.global_transform
 		container.owner = get_tree().edited_scene_root
 		container.name = "SplitMultimesh"
+
+		# Copy visible range settings to containers
+		if "visible_range_begin" in child: #sanity check
+			container.visible_range_begin = child.visible_range_begin
+			container.visible_range_begin_hysteresis = child.visible_range_begin_hysteresis
+			container.visible_range_end = child.visible_range_end
+			container.visible_range_end_hysteresis = child.visible_range_end_hysteresis
 
 		if _create_split_sibling(mmi, container):
 			mmi.visible = false
