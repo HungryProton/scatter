@@ -550,6 +550,9 @@ func _ensure_stack_exists() -> void:
 
 
 func _reset_all_colliders(node) -> void:
+	if ProjectSettings.get_setting("physics/3d/physics_engine") == "GodotPhysics":
+		# This workaround breaks things in godot physics, skip it
+		return
 	if node is CollisionShape and not node.disabled:
 		node.disabled = true
 		node.disabled = false
