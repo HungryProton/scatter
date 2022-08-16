@@ -3,9 +3,11 @@ extends "base_modifier.gd"
 
 export var override_global_seed := false
 export var custom_seed := 0
+export var width : float = 1.0
 export var distribution_radius := 1.0
 export var distribution_retries := 20
-export var width := 1
+export var align_to_path := false
+export var align_up_axis := 1
 
 var _sampler = preload("../common/poisson_disc_sampling.gd").new()
 
@@ -43,8 +45,40 @@ func _process_transforms(transforms, global_seed) -> void:
 		if matched_samples == transforms.list.size():
 			break
 		var s3 = Vector3(s.x, 0, s.y)
-		if (transforms.path.curve.get_closest_point(s3) - s3).length() < width:
+		var p = transforms.path.curve.get_closest_point(s3) #closest point
+		if (p - s3).length() < width:
 			transforms.list[matched_samples].origin = Vector3(s.x, transforms.list[matched_samples].origin.y, s.y)
+			if align_to_path:
+				var data = transforms.path.get_pos_and_normal(transforms.path.curve.get_closest_offset(p))
+				var pos: Vector3 = data[0]
+				print("Pos: ", pos)
+				var normal: Vector3 = data[1]
+				print("Normal: ", normal)
+				var t = transforms.list[matched_samples]
+				transforms.list[matched_samples] = transforms.list[matched_samples].looking_at(
+					transforms.list[matched_samples].origin + normal, 
+					get_align_up_vector(align_up_axis))
+			#transforms.list[matched_samples].basis = 
 			matched_samples += 1
 
 	transforms.list.resize(matched_samples)
+	shuffle(transforms.list, global_seed)
+	
+	
+static func get_align_up_vector(align : int) -> Vector3:
+	var axis : Vector3
+	match align:
+		#x
+		0:
+			axis = Vector3.RIGHT
+		#y
+		1:
+			axis = Vector3.UP
+		#z
+		2:
+			axis = Vector3.BACK
+		_:
+			#default return y axis
+			axis = Vector3.UP
+
+	return axis
