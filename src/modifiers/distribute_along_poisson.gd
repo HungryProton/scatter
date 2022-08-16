@@ -8,12 +8,15 @@ export var distribution_radius := 1.0
 export var distribution_retries := 20
 export var align_to_path := false
 export var align_up_axis := 1
+export var restrict_x := false
+export var restrict_y := false
+export var restrict_z := false
 
 var _sampler = preload("../common/poisson_disc_sampling.gd").new()
 
 
 func _init() -> void:
-	display_name = "Distribute Along (Poisson)"
+	display_name = "Distribute Along Path (Poisson)"
 	category = "Distribute"
 	warning_ignore_no_transforms = true
 	warning_ignore_no_path = false
@@ -51,10 +54,14 @@ func _process_transforms(transforms, global_seed) -> void:
 			if align_to_path:
 				var data = transforms.path.get_pos_and_normal(transforms.path.curve.get_closest_offset(p))
 				var pos: Vector3 = data[0]
-				print("Pos: ", pos)
 				var normal: Vector3 = data[1]
-				print("Normal: ", normal)
-				var t = transforms.list[matched_samples]
+				
+				#axis restrictions
+				normal.x *= int(!restrict_x)
+				normal.y *= int(!restrict_y)
+				normal.z *= int(!restrict_z)
+				#this does not like restricting both x and z simulatneously
+
 				transforms.list[matched_samples] = transforms.list[matched_samples].looking_at(
 					transforms.list[matched_samples].origin + normal, 
 					get_align_up_vector(align_up_axis))
