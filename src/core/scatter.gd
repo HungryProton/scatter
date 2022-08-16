@@ -6,10 +6,10 @@ var Scatter = preload("namespace.gd").new()
 
 export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
-export var split_multimesh := false setget _split_multimesh
-export var split_x_count : = 1
-export var split_y_count : = 1
-export var split_z_count : = 1
+var split_multimesh := false setget _split_multimesh
+var split_count_x : = 1
+var split_count_y : = 1
+var split_count_z : = 1
 export var disable_updates_in_game := true
 export var disable_automatic_updates = false
 export var force_update_when_loaded := true
@@ -59,9 +59,32 @@ func _get_configuration_warning() -> String:
 
 func _get_property_list() -> Array:
 	var list := []
-
+	
+	list.append({
+		name = "Split Multimesh",
+		type = TYPE_NIL,
+		hint_string = "split",
+		usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
+	})
+	list.append({
+		name = "split_multimesh",
+		type = TYPE_BOOL
+	})
+	list.append({
+		name = "split_count_x",
+		type = TYPE_INT
+	})
+	list.append({
+		name = "split_count_y",
+		type = TYPE_INT
+	})
+	list.append({
+		name = "split_count_z",
+		type = TYPE_INT
+	})
+	
 	# Used to display the modifier stack in an inspector plugin.
-	list.push_back({
+	list.append({
 		name = "modifier_stack",
 		type = TYPE_OBJECT,
 		hint_string =  "ScatterModifierStack",
@@ -305,20 +328,20 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 	if mmi.multimesh.instance_count <= 0:
 		print("Cannot create split sibling, multimesh is empty")
 		return false
-	if split_x_count <= 0 or split_y_count <= 0 or split_z_count <= 0:
+	if split_count_x <= 0 or split_count_y <= 0 or split_count_z <= 0:
 		print("Cannot create split sibling, invaild split counts")
 		return false
 	
 	var mmi_siblings = []
 	var transforms = []
 	# Create mmis and multimeshes for all siblings
-	for xi in range(split_x_count):
+	for xi in range(split_count_x):
 		mmi_siblings.append([])
 		transforms.append([])
-		for yi in range(split_y_count):
+		for yi in range(split_count_y):
 			mmi_siblings[xi].append([])
 			transforms[xi].append([])
-			for zi in range(split_z_count):
+			for zi in range(split_count_z):
 				transforms[xi][yi].append([])
 				var sibling = MultiMeshInstance.new()
 				mmi_siblings[xi][yi].append(sibling)
@@ -343,14 +366,14 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 		var t = mmi.multimesh.get_instance_transform(i)
 		var p_rel = (t.origin - aabb.position) / aabb.size
 		# Chunk index
-		var ci = (p_rel * Vector3(split_x_count, split_y_count, split_z_count)).floor()
+		var ci = (p_rel * Vector3(split_count_x, split_count_y, split_count_z)).floor()
 		# Store the transform to the appropriate array
 		transforms[ci.x][ci.y][ci.z].append(t)
 	
 	# apply transforms, add to tree all non-empty multimesh instances
-	for zi in range(split_z_count):
-		for yi in range(split_y_count):
-			for xi in range(split_x_count):
+	for zi in range(split_count_z):
+		for yi in range(split_count_y):
+			for xi in range(split_count_x):
 				# reference to current mmi based on chunk index
 				var c_mmi : MultiMeshInstance = mmi_siblings[xi][yi][zi]
 				if transforms[xi][yi][zi].size() == 0:
