@@ -6,10 +6,6 @@ var Scatter = preload("namespace.gd").new()
 
 export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
-var split_multimesh := false setget _split_multimesh_set, _split_multimesh_get
-var split_count_x : = 1
-var split_count_y : = 1
-var split_count_z : = 1
 export var disable_updates_in_game := true
 export var disable_automatic_updates = false
 export var force_update_when_loaded := true
@@ -17,16 +13,22 @@ export var make_children_unselectable := true
 export var preview_count := -1
 
 var modifier_stack setget _set_modifier_stack
+var split_enabled := false setget _split_multimesh_set
+var split_count_x : = 1
+var split_count_y : = 1
+var split_count_z : = 1
+
 var undo_redo setget _set_undo_redo
-var is_moving := false
+var is_moving := false setget _set_is_moving
 
 var _transforms
 var _items := []
 var _total_proportion: int
+var _rebuilt_this_frame := false
 
 
 func _ready() -> void:
-	var _err = self.connect("curve_updated", self, "update")
+	var _err = self.connect("curve_updated", self, "_on_curve_updated")
 	_ensure_stack_exists()
 	_discover_items()
 
@@ -59,7 +61,7 @@ func _get_configuration_warning() -> String:
 
 func _get_property_list() -> Array:
 	var list := []
-	
+
 	list.append({
 		name = "Split Multimesh",
 		type = TYPE_NIL,
@@ -67,7 +69,7 @@ func _get_property_list() -> Array:
 		usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
 	})
 	list.append({
-		name = "split_multimesh",
+		name = "split_enabled",
 		type = TYPE_BOOL
 	})
 	list.append({
@@ -82,7 +84,7 @@ func _get_property_list() -> Array:
 		name = "split_count_z",
 		type = TYPE_INT
 	})
-	
+
 	# Used to display the modifier stack in an inspector plugin.
 	list.append({
 		name = "modifier_stack",
@@ -102,7 +104,7 @@ func _get(property):
 func _set(property, _value):
 	if not Engine.editor_hint:
 		return false
-	
+
 	# This is to detect when the node was duplicated from the editor.
 	if property == "transform":
 		# Duplicate the curve item too. If someone want to share data, it has
@@ -110,7 +112,7 @@ func _set(property, _value):
 		call_deferred("_ensure_stack_exists")
 		call_deferred("_make_curve_unique")
 		call_deferred("clear")
-	
+
 	return false
 
 
@@ -123,9 +125,14 @@ func clear() -> void:
 func update() -> void:
 	if disable_updates_in_game and not Engine.is_editor_hint():
 		return
-	if disable_automatic_updates:
+
+	if not is_inside_tree() or _rebuilt_this_frame:
 		return
+
+	_rebuilt_this_frame = true
 	_do_update()
+	yield(get_tree(), "idle_frame")
+	_rebuilt_this_frame = false
 
 
 func _do_update() -> void:
@@ -133,6 +140,7 @@ func _do_update() -> void:
 		return
 
 	_discover_items()
+
 	if not _items.empty():
 		if not _transforms:
 			_transforms = Scatter.Transforms.new()
@@ -141,20 +149,24 @@ func _do_update() -> void:
 		_transforms.clear()
 		if is_moving:
 			_transforms.max_count = preview_count
+			_remove_split_multimesh()
 		else:
 			_transforms.max_count = -1
 
 		if use_instancing:
 			modifier_stack.update(_transforms, global_seed)
 			_create_multimesh()
+			if split_enabled and not is_moving:
+				_remove_split_multimesh()
+				_add_split_multimesh()
 		else:
 			_set_colliders_state(self, false)
 			modifier_stack.update(_transforms, global_seed)
 			_set_colliders_state(self, true)
 			_create_duplicates()
-	
+
 	_notify_parent()
-	
+
 
 
 func _notify_parent() -> void:
@@ -175,9 +187,6 @@ func full_update() -> void:
 	_delete_multimeshes()
 	yield(get_tree(), "idle_frame")
 	_do_update()
-	if split_multimesh:
-		_remove_split_multimesh()
-		_add_split_multimesh()
 
 
 # Loop through children to find all the ScatterItem nodes
@@ -284,44 +293,40 @@ func _split_multimesh_set(set):
 		_add_split_multimesh()
 	else:
 		_remove_split_multimesh()
-	split_multimesh = set
-
-
-func _split_multimesh_get() -> bool:
-	return split_multimesh
+	split_enabled = set
 
 
 func _add_split_multimesh():
 	# create split siblings from all multimesh
-	for child in get_children():
-		if child is Scatter.ScatterItem:
-			var mmi = child.get_node("MultiMeshInstance")
-			# Create a container parent
-			var container = Spatial.new()
-			child.add_child(container)
-			container.global_transform = self.global_transform
-			container.owner = get_tree().edited_scene_root
-			container.name = "SplitMultimesh"
-			
-			var is_ok = _create_split_sibling(mmi, container)
-			if is_ok:
-				mmi.visible = false
+	for child in _items:
+		var mmi = child.get_node("MultiMeshInstance")
+		# Create a parent container
+		var container = Spatial.new()
+		child.add_child(container)
+		container.global_transform = self.global_transform
+		container.owner = get_tree().edited_scene_root
+		container.name = "SplitMultimesh"
+
+		if _create_split_sibling(mmi, container):
+			mmi.visible = false
 
 
 func _remove_split_multimesh():
+	if _items.empty():
+		_discover_items()
+
 	# Remove split siblings
-	for child in get_children():
-		if child is Scatter.ScatterItem:
-			var siblingContiner = child.find_node("SplitMultimesh*")
-			while(siblingContiner != null):
-				# Remove split siblings
-				siblingContiner.queue_free()
-				child.remove_child(siblingContiner) # next loop must not find this
-				siblingContiner = child.find_node("SplitMultimesh*")
-			# Make original multimeshes visible again
-	for child in get_children():
-		if child is Scatter.ScatterItem:
-			child.get_node("MultiMeshInstance").visible = true
+	for child in _items:
+		var siblingContainer = child.find_node("SplitMultimesh*")
+		while siblingContainer != null:
+			# Remove split siblings
+			child.remove_child(siblingContainer) # next loop must not find this
+			siblingContainer.queue_free()
+			siblingContainer = child.find_node("SplitMultimesh*")
+
+	# Make original multimeshes visible again
+	for child in _items:
+		child.get_node("MultiMeshInstance").visible = true
 
 
 func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
@@ -334,21 +339,23 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 	if split_count_x <= 0 or split_count_y <= 0 or split_count_z <= 0:
 		print("Cannot create split sibling, invaild split counts")
 		return false
-	
+
 	var mmi_siblings = []
 	var transforms = []
 	# Create mmis and multimeshes for all siblings
-	for xi in range(split_count_x):
+	for xi in split_count_x:
 		mmi_siblings.append([])
 		transforms.append([])
-		for yi in range(split_count_y):
+
+		for yi in split_count_y:
 			mmi_siblings[xi].append([])
 			transforms[xi].append([])
-			for zi in range(split_count_z):
+
+			for zi in split_count_z:
 				transforms[xi][yi].append([])
 				var sibling = MultiMeshInstance.new()
 				mmi_siblings[xi][yi].append(sibling)
-				
+
 				# Set up sibling
 				sibling.multimesh = MultiMesh.new()
 				# copy properties to sibling
@@ -356,12 +363,12 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 				sibling.multimesh.mesh = mmi.multimesh.mesh
 				sibling.multimesh.transform_format = 1
 				sibling.material_override = mmi.material_override
-	
+
 	# Create the AABB from all instances
 	var aabb = mmi.get_aabb()
 	# avoid degenerate case later while calculating indexes
 	aabb = aabb.grow(0.1)
-	
+
 	# Collect the transforms to transform arrays
 	# This step is necessary to separate because mmi transforms reset when instance count changes
 	for i in mmi.multimesh.instance_count:
@@ -372,18 +379,18 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 		var ci = (p_rel * Vector3(split_count_x, split_count_y, split_count_z)).floor()
 		# Store the transform to the appropriate array
 		transforms[ci.x][ci.y][ci.z].append(t)
-	
+
 	# apply transforms, add to tree all non-empty multimesh instances
-	for zi in range(split_count_z):
-		for yi in range(split_count_y):
-			for xi in range(split_count_x):
+	for zi in split_count_z:
+		for yi in split_count_y:
+			for xi in split_count_x:
 				# reference to current mmi based on chunk index
 				var c_mmi : MultiMeshInstance = mmi_siblings[xi][yi][zi]
 				if transforms[xi][yi][zi].size() == 0:
 					c_mmi.queue_free()
 				else:
 					c_mmi.multimesh.instance_count = transforms[xi][yi][zi].size()
-					for i in range(transforms[xi][yi][zi].size()):
+					for i in transforms[xi][yi][zi].size():
 						c_mmi.multimesh.set_instance_transform(i, transforms[xi][yi][zi][i])
 					parent.add_child(c_mmi)
 					c_mmi.global_transform = mmi.global_transform
@@ -391,6 +398,7 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 					c_mmi.add_to_group("split_multimesh")
 					#TODO make group appear in editor
 	return true
+
 
 # Create a multimesh for item if it does not exist yet
 # Copy the mesh and material data to multimesh
@@ -491,6 +499,12 @@ func _set_undo_redo(val) -> void:
 	modifier_stack.undo_redo = val
 
 
+func _set_is_moving(val) -> void:
+	is_moving = val
+	if not is_moving:
+		_do_update()
+
+
 func _set_modifier_stack(val) -> void:
 	if not val or not is_instance_valid(val):
 		return
@@ -550,3 +564,7 @@ func _set_colliders_state(node, enabled: bool) -> void:
 
 	for c in node.get_children():
 		_set_colliders_state(c, enabled)
+
+
+func _on_curve_updated() -> void:
+	update()
