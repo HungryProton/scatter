@@ -275,47 +275,37 @@ func _create_multimesh() -> void:
 		offset += count
 
 
-# Find all children of a node recursively
-func get_all_children(in_node,arr:=[]):
-	arr.push_back(in_node)
-	for child in in_node.get_children():
-		arr = get_all_children(child,arr)
-	return arr
-
-
 func _split_multimesh(set) -> bool:
-	var allchildren = get_all_children(self)
 	if set:
 		# create split siblings from all multimesh
-		for child in allchildren:
-			if child is MultiMeshInstance:
-				if child.get_parent().name.match("SplitMultimesh*"):
-					# This is a split multimesh, should have been deleted
-					child.queue_free()
-					continue
+		for child in get_children():
+			if child is Scatter.ScatterItem:
+				var mmi = child.get_node("MultiMeshInstance")
 				# Create a container parent
 				var container = Spatial.new()
-				add_child(container)
+				child.add_child(container)
 				container.global_transform = self.global_transform
 				container.owner = get_tree().edited_scene_root
 				container.name = "SplitMultimesh"
 				
-				var is_ok = _create_split_sibling(child, container)
+				var is_ok = _create_split_sibling(mmi, container)
 				if is_ok:
-					child.visible = false
+					mmi.visible = false
 					
 	else:
 		# Remove split siblings
-		var siblingContiner = find_node("SplitMultimesh*")
-		while(siblingContiner != null):
-			# Remove split siblings
-			siblingContiner.queue_free()
-			remove_child(siblingContiner) # next loop must not find this
-			siblingContiner = find_node("SplitMultimesh*")
-		# Make original multimeshes visible again
-		for child in allchildren:
-			if child is MultiMeshInstance:
-				child.visible = true
+		for child in get_children():
+			if child is Scatter.ScatterItem:
+				var siblingContiner = child.find_node("SplitMultimesh*")
+				while(siblingContiner != null):
+					# Remove split siblings
+					siblingContiner.queue_free()
+					child.remove_child(siblingContiner) # next loop must not find this
+					siblingContiner = child.find_node("SplitMultimesh*")
+				# Make original multimeshes visible again
+		for child in get_children():
+			if child is Scatter.ScatterItem:
+				child.get_node("MultiMeshInstance").visible = true
 	
 	split_multimesh = set
 	return set
