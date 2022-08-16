@@ -91,6 +91,6 @@ func _process_transforms(transforms, global_seed: int) -> void:
 			new_transforms.push_back(transform)
 
 	if randomize_indices:
-		shuffle(new_transforms, global_seed)
+		shuffle(new_transforms, _rng.get_seed())
 
 	transforms.list = new_transforms
