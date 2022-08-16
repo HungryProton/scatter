@@ -47,3 +47,4 @@ func _process_transforms(transforms, global_seed) -> void:
 			matched_samples += 1
 
 	transforms.list.resize(matched_samples)
+	shuffle(transforms.list, global_seed)
