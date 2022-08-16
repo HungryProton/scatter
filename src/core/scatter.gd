@@ -6,7 +6,7 @@ var Scatter = preload("namespace.gd").new()
 
 export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
-var split_multimesh := false setget _split_multimesh
+var split_multimesh := false setget _split_multimesh_set, _split_multimesh_get
 var split_count_x : = 1
 var split_count_y : = 1
 var split_count_z : = 1
@@ -152,8 +152,9 @@ func _do_update() -> void:
 			modifier_stack.update(_transforms, global_seed)
 			_set_colliders_state(self, true)
 			_create_duplicates()
-
+	
 	_notify_parent()
+	
 
 
 func _notify_parent() -> void:
@@ -174,6 +175,9 @@ func full_update() -> void:
 	_delete_multimeshes()
 	yield(get_tree(), "idle_frame")
 	_do_update()
+	if split_multimesh:
+		_remove_split_multimesh()
+		_add_split_multimesh()
 
 
 # Loop through children to find all the ScatterItem nodes
@@ -275,40 +279,49 @@ func _create_multimesh() -> void:
 		offset += count
 
 
-func _split_multimesh(set) -> bool:
+func _split_multimesh_set(set):
 	if set:
-		# create split siblings from all multimesh
-		for child in get_children():
-			if child is Scatter.ScatterItem:
-				var mmi = child.get_node("MultiMeshInstance")
-				# Create a container parent
-				var container = Spatial.new()
-				child.add_child(container)
-				container.global_transform = self.global_transform
-				container.owner = get_tree().edited_scene_root
-				container.name = "SplitMultimesh"
-				
-				var is_ok = _create_split_sibling(mmi, container)
-				if is_ok:
-					mmi.visible = false
-					
+		_add_split_multimesh()
 	else:
-		# Remove split siblings
-		for child in get_children():
-			if child is Scatter.ScatterItem:
-				var siblingContiner = child.find_node("SplitMultimesh*")
-				while(siblingContiner != null):
-					# Remove split siblings
-					siblingContiner.queue_free()
-					child.remove_child(siblingContiner) # next loop must not find this
-					siblingContiner = child.find_node("SplitMultimesh*")
-				# Make original multimeshes visible again
-		for child in get_children():
-			if child is Scatter.ScatterItem:
-				child.get_node("MultiMeshInstance").visible = true
-	
+		_remove_split_multimesh()
 	split_multimesh = set
-	return set
+
+
+func _split_multimesh_get() -> bool:
+	return split_multimesh
+
+
+func _add_split_multimesh():
+	# create split siblings from all multimesh
+	for child in get_children():
+		if child is Scatter.ScatterItem:
+			var mmi = child.get_node("MultiMeshInstance")
+			# Create a container parent
+			var container = Spatial.new()
+			child.add_child(container)
+			container.global_transform = self.global_transform
+			container.owner = get_tree().edited_scene_root
+			container.name = "SplitMultimesh"
+			
+			var is_ok = _create_split_sibling(mmi, container)
+			if is_ok:
+				mmi.visible = false
+
+
+func _remove_split_multimesh():
+	# Remove split siblings
+	for child in get_children():
+		if child is Scatter.ScatterItem:
+			var siblingContiner = child.find_node("SplitMultimesh*")
+			while(siblingContiner != null):
+				# Remove split siblings
+				siblingContiner.queue_free()
+				child.remove_child(siblingContiner) # next loop must not find this
+				siblingContiner = child.find_node("SplitMultimesh*")
+			# Make original multimeshes visible again
+	for child in get_children():
+		if child is Scatter.ScatterItem:
+			child.get_node("MultiMeshInstance").visible = true
 
 
 func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
