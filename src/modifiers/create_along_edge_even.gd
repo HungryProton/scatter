@@ -38,8 +38,10 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			var pos: Vector3 = data[0]
 			var normal: Vector3 = data[1]
 			var t := Transform3D()
-
 			t.origin = pos
+
+			if domain.is_point_excluded(pos):
+				continue
 
 			if align_to_path:
 				#axis restrictions

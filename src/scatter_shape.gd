@@ -8,7 +8,12 @@ const SphereShape := preload("./shapes/sphere_shape.gd")
 const ScatterUtil := preload('./common/scatter_util.gd')
 
 
-@export var exclusive = false
+@export var exclusive = false:
+	set(val):
+		exclusive = val
+		update_gizmos()
+		ScatterUtil.request_parent_to_rebuild(self)
+
 @export_enum("Path", "Sphere") var shape_type: #TODO: Remove this once the custom resource export works
 	set(val):
 		if val == shape_type:

@@ -22,7 +22,7 @@ func set_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, cam
 	var origin = shape_node.get_global_transform().origin
 	var ray_from = camera.project_ray_origin(screen_pos)
 	var ray_to = ray_from + camera.project_ray_normal(screen_pos) * 4096
-	var points = Geometry3D.get_closest_points_between_segments(origin, Vector3.RIGHT * 4096, ray_from, ray_to)
+	var points = Geometry3D.get_closest_points_between_segments(origin, Vector3.LEFT * 4096, ray_from, ray_to)
 	shape_node.shape.radius = origin.distance_to(points[0])
 
 
@@ -40,7 +40,8 @@ func commit_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, 
 
 func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.clear()
-	var shape: SphereShape = gizmo.get_spatial_node().shape
+	var scatter_shape = gizmo.get_spatial_node()
+	var shape: SphereShape = scatter_shape.shape
 
 	### Draw the 3 circles on each axis to represent the sphere
 	var lines = PackedVector3Array()
@@ -69,10 +70,21 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	var handles_ids := PackedInt32Array()
 	var handles_material := plugin.get_material("handle", gizmo)
 
-	var handle_position: Vector3 = Vector3.RIGHT * radius
+	var handle_position: Vector3 = Vector3.LEFT * radius
 	handles.push_back(handle_position)
 
 	gizmo.add_handles(handles, handles_material, handles_ids)
+
+	### Fills the sphere inside
+	var mesh = SphereMesh.new()
+	mesh.height = shape.radius * 2.0
+	mesh.radius = shape.radius
+	var mesh_material: StandardMaterial3D
+	if scatter_shape.exclusive:
+		mesh_material = plugin.get_material("exclusive", gizmo)
+	else:
+		mesh_material = plugin.get_material("inclusive", gizmo)
+	gizmo.add_mesh(mesh, mesh_material)
 
 
 func _set_radius(sphere: SphereShape, radius: float) -> void:

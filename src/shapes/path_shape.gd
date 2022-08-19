@@ -66,6 +66,7 @@ func get_copy():
 	var copy = get_script().new()
 	copy.width = width
 	copy.curve = curve.duplicate()
+	copy.closed = closed
 	return copy
 
 

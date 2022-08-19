@@ -23,7 +23,7 @@ func _rebuild_ui():
 		if instance.enabled:
 			var category = _get_or_create_category(instance.category)
 			var button = _create_button(instance.display_name)
-			category.add_child(button)
+			category.add_child(button, true)
 			button.pressed.connect(_on_pressed.bind(modifier))
 
 	for category in _category_root.get_children():
@@ -41,14 +41,18 @@ func _create_button(display_name) -> Button:
 
 
 func _sort_children_by_name(node: Node) -> void:
-	var children = node.get_children()
-	var total_passes = len(children) - 1
-	for i in range(total_passes):
-		for j in range(total_passes - i):
-			var k = j + 1
-			if children[j].name > children[k].name:
-				node.move_child(children[j], k)
-				children = node.get_children()
+	var dict := {}
+	var names := []
+
+	for child in node.get_children():
+		names.push_back(child.name)
+		dict[child.name] = child
+
+	names.sort_custom(func(a, b): return String(a) < String(b))
+
+	for i in names.size():
+		var n = names[i]
+		node.move_child(dict[n], i)
 
 
 func _get_or_create_category(text: String) -> Control:

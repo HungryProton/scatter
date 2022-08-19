@@ -85,6 +85,17 @@ func is_point_inside(point: Vector3) -> bool:
 
 	return false
 
+
+# If a point is inside an exclusion shape, returns true
+# Returns false in every other case
+func is_point_excluded(point: Vector3) -> bool:
+	for s in exclusive_shapes:
+		if s.is_point_inside(point):
+			return true
+
+	return false
+
+
 # Recursively find all ScatterShape nodes under the provided root. In case of
 # nested Scatter nodes, shapes under these other Scatter nodes will be ignored
 func discover_shapes(root_node: Node3D) -> void:

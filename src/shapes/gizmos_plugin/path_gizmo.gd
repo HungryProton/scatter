@@ -77,8 +77,8 @@ func commit_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, 
 
 func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.clear()
-
-	var shape: PathShape = gizmo.get_spatial_node().shape
+	var shape_node: ScatterShape = gizmo.get_spatial_node()
+	var shape: PathShape = shape_node.shape
 	if not shape:
 		return
 
@@ -154,6 +154,12 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	# Geometry2D.expand_polyline, or an extruded capsule along the path
 	# with front faces culled.
 
+	var mesh_material: StandardMaterial3D
+	if shape_node.exclusive:
+		mesh_material = plugin.get_material("exclusive", gizmo)
+	else:
+		mesh_material = plugin.get_material("inclusive", gizmo)
+
 	## Main path mesh
 	var st = SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
@@ -178,7 +184,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	st.add_vertex(p1 + offset)
 
 	var mesh := st.commit()
-	gizmo.add_mesh(mesh, plugin.get_material("mesh_secondary", gizmo))
+	gizmo.add_mesh(mesh, mesh_material)
 
 	## Rounded cap (start)
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -193,7 +199,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 		st.add_vertex(center + normal * shape.width * 0.5)
 
 	mesh = st.commit()
-	gizmo.add_mesh(mesh, plugin.get_material("mesh_secondary", gizmo))
+	gizmo.add_mesh(mesh, mesh_material)
 
 	## Rounded cap (end)
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -208,7 +214,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 		st.add_vertex(center + normal * shape.width * 0.5)
 
 	mesh = st.commit()
-	gizmo.add_mesh(mesh, plugin.get_material("mesh_secondary", gizmo))
+	gizmo.add_mesh(mesh, mesh_material)
 
 
 func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> bool:

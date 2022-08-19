@@ -25,8 +25,8 @@ func _init():
 	# TODO: Replace hardcoded colors by a setting fetch
 	create_material("line", Color(1, 0.7, 0))
 	create_material("handle_line", Color(0.4, 0.7, 1.0))
-	create_material("mesh", Color(0.9, 0.7, 0.2, 0.20))
-	create_material("mesh_secondary", Color(0.9, 0.1, 0.2, 0.20))
+	create_material("inclusive", Color(0.9, 0.7, 0.2, 0.15))
+	create_material("exclusive", Color(0.9, 0.1, 0.2, 0.15))
 	create_handle_material("handle")
 	create_handle_material("main_handle", false, handle_icon)
 	create_handle_material("secondary_handle", false, secondary_handle_icon)
