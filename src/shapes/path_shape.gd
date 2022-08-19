@@ -110,6 +110,33 @@ func get_closest_to(position):
 	return closest
 
 
+func get_closed_edges(transform: Transform3D) -> Array[PackedVector2Array]:
+	if not closed and width <= 0:
+		return []
+
+	var polyline := PackedVector2Array()
+	var points := curve.tessellate(5, 5) # TODO: find optimal values
+	var origin = Vector2(transform.origin.x, transform.origin.z)
+	for p in points:
+		polyline.push_back(origin + Vector2(p.x, p.z))
+
+	if width > 0:
+		var delta = width / 2.0
+		return Geometry2D.offset_polyline(polyline, delta, Geometry2D.JOIN_SQUARE, Geometry2D.END_ROUND)
+	else:
+		return [polyline]
+
+
+func get_open_edges(transform: Transform3D) -> Array[Curve3D]:
+	if closed or width > 0:
+		return []
+
+	if curve == null:
+		return []
+
+	return [curve.duplicate()]
+
+
 func _update_polygon_from_curve() -> void:
 	var connections = PackedInt32Array()
 	var polygon_points = PackedVector2Array()

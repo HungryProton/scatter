@@ -23,6 +23,8 @@ const Domain := preload("./common/domain.gd")
 		use_instancing = val
 		rebuild(true)
 
+@export var dbg_disable_thread := false
+
 var undo_redo: UndoRedo
 var modifier_stack: ModifierStack:
 	set(val):
@@ -142,10 +144,15 @@ func _rebuild(force_discover) -> void:
 		# TODO: clear output
 		return
 
-	var update_function := modifier_stack.update.bind(self, domain.get_copy())
-	var err = _thread.start(update_function, Thread.PRIORITY_NORMAL)
-	await thread_completed
-	var transforms: TransformList = _thread.wait_to_finish()
+	var transforms: TransformList
+
+	if dbg_disable_thread:
+		transforms = modifier_stack.update(self, domain)
+	else:
+		var update_function := modifier_stack.update.bind(self, domain.get_copy())
+		var err = _thread.start(update_function, Thread.PRIORITY_NORMAL)
+		await thread_completed
+		transforms = _thread.wait_to_finish()
 
 	if use_instancing:
 		_update_multimeshes(transforms)

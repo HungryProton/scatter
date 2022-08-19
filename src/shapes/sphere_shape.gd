@@ -42,3 +42,19 @@ func get_corners_global(gt: Transform3D) -> Array:
 	res.push_back(gt * back)
 
 	return res
+
+
+func get_closed_edges(transform: Transform3D) -> Array[PackedVector2Array]:
+	var edge := PackedVector2Array()
+
+	var origin := Vector2(transform.origin.x, transform.origin.z)
+	var radius_at_ground_level: float = radius # TODO
+	var steps: int = max(16, radius_at_ground_level * 1.414)
+	var angle: float = TAU / steps
+
+	for i in steps + 1:
+		var a = angle * i
+		var point := origin + Vector2(cos(a), sin(a)) * radius_at_ground_level
+		edge.push_back(point)
+
+	return [edge]

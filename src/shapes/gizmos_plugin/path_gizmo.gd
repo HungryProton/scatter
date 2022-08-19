@@ -150,6 +150,10 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	if points.size() < 2:
 		return
 
+	# ____ TODO ____ : check if this whole section could be replaced by
+	# Geometry2D.expand_polyline, or an extruded capsule along the path
+	# with front faces culled.
+
 	## Main path mesh
 	var st = SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)

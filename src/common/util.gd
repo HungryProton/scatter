@@ -67,5 +67,19 @@ static func get_node_by_class_path(node: Node, class_path: Array) -> Node:
 	return res
 
 
-static func get_position_and_normal_at(curve: Curve3D, curve_offset: float) -> Array:
-	return []
+static func get_position_and_normal_at(curve: Curve3D, offset: float) -> Array:
+	if not curve:
+		return []
+
+	var pos: Vector3 = curve.interpolate_baked(offset)
+	var normal := Vector3.ZERO
+
+	var pos1
+	if offset + curve.get_bake_interval() < curve.get_baked_length():
+		pos1 = curve.interpolate_baked(offset + curve.get_bake_interval())
+		normal = (pos1 - pos)
+	else:
+		pos1 = curve.interpolate_baked(offset - curve.get_bake_interval())
+		normal = (pos - pos1)
+
+	return [pos, normal]
