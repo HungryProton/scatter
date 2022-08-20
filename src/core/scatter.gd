@@ -18,6 +18,11 @@ var split_count_x : = 1
 var split_count_y : = 1
 var split_count_z : = 1
 
+var split_visible_range_begin : float = 0
+var split_visible_range_begin_hysteresis : float = 0.1
+var split_visible_range_end : float   = 0
+var split_visible_range_end_hysteresis : float = 0.1
+
 var undo_redo setget _set_undo_redo
 var is_moving := false setget _set_is_moving
 
@@ -83,6 +88,23 @@ func _get_property_list() -> Array:
 	list.append({
 		name = "split_count_z",
 		type = TYPE_INT
+	})
+	
+	list.append({
+		name = "split_visible_range_begin",
+		type = TYPE_REAL
+	})
+	list.append({
+		name = "split_visible_range_begin_hysteresis",
+		type = TYPE_REAL
+	})
+	list.append({
+		name = "split_visible_range_end",
+		type = TYPE_REAL
+	})
+	list.append({
+		name = "split_visible_range_end_hysteresis",
+		type = TYPE_REAL
 	})
 
 	# Used to display the modifier stack in an inspector plugin.
@@ -308,11 +330,10 @@ func _add_split_multimesh():
 		container.name = "SplitMultimesh"
 
 		# Copy visible range settings to containers
-		if "visible_range_begin" in child: #sanity check
-			container.visible_range_begin = child.visible_range_begin
-			container.visible_range_begin_hysteresis = child.visible_range_begin_hysteresis
-			container.visible_range_end = child.visible_range_end
-			container.visible_range_end_hysteresis = child.visible_range_end_hysteresis
+		container.visible_range_begin = split_visible_range_begin
+		container.visible_range_begin_hysteresis = split_visible_range_begin_hysteresis
+		container.visible_range_end = split_visible_range_end
+		container.visible_range_end_hysteresis = split_visible_range_end_hysteresis
 
 		if _create_split_sibling(mmi, container):
 			mmi.visible = false
