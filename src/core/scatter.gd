@@ -1,6 +1,7 @@
 tool
 extends "scatter_path.gd"
 
+const SplitMultimeshContainer = preload("./split_multimesh_container.gd")
 
 var Scatter = preload("namespace.gd").new()
 

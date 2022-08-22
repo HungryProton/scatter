@@ -1,4 +1,3 @@
-class_name SplitMultimeshContainer
 extends Spatial
 
 var visible_range_begin : float = 0
@@ -10,6 +9,8 @@ func _ready():
 	pass
 
 func _process(delta):
+	if visible_range_end == 0 and visible_range_end == 0:
+		return
 	var cam = get_viewport().get_camera()
 	if cam != null:
 		for child in get_children():
@@ -43,5 +44,3 @@ func _process(delta):
 				child.visible = false
 			elif show:
 				child.visible = true
-		pass
-	pass
