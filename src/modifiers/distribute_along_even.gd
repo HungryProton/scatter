@@ -55,7 +55,7 @@ func _process_transforms(transforms, _seed) -> void:
 
 		transforms.list[i] = t
 	
-	shuffle(transforms.list, global_seed)
+	shuffle(transforms.list, _seed)
 
 
 static func get_align_up_vector(align : int) -> Vector3:
