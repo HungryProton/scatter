@@ -81,7 +81,7 @@ static func get_or_create_multimesh(item: ScatterItem, count: int) -> MultiMeshI
 # this method.
 static func request_parent_to_rebuild(node: Node, deferred := false) -> void:
 	var parent = node.get_parent()
-	if not parent.is_inside_tree():
+	if not parent or not parent.is_inside_tree():
 		return
 
 	# Can't include the Scatter script here because of cyclic references so we
@@ -122,6 +122,7 @@ static func get_merged_meshes_from(node) -> MeshInstance3D:
 	for mi in instances:
 		var mesh: Mesh = mi.mesh
 		var surface_count = mesh.get_surface_count()
+		var material_override = mi.get_material_override()
 
 		for i in surface_count:
 			var arrays = mesh.surface_get_arrays(i)
@@ -136,12 +137,17 @@ static func get_merged_meshes_from(node) -> MeshInstance3D:
 
 			# Retrieve the material on the MeshInstance first, if none is defined,
 			# use the one from the mesh resource.
-			var material = mi.get_surface_override_material(i)
+			var material: Material
+			if material_override:
+				material = material_override
+			else:
+				material = mi.get_surface_override_material(i)
 			if not material:
 				material = mesh.surface_get_material(i)
 			array_mesh.surface_set_material(total_surfaces, material)
 
 			total_surfaces += 1
+		mesh.mater
 
 	var res := MeshInstance3D.new()
 	res.mesh = array_mesh

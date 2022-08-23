@@ -85,8 +85,9 @@ func _process_transforms(transforms, domain, seed: int) -> void:
 			# offset
 			transform.origin += (float(!local_offset) * offset * a) + (float(local_offset) * (basis * offset) * a)
 
-			# store the final result
-			new_transforms.push_back(transform)
+			# store the final result if the position is valid
+			if not domain.is_point_excluded(transform.origin):
+				new_transforms.push_back(transform)
 
 	transforms.list = new_transforms
 

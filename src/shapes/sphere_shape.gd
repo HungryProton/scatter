@@ -49,7 +49,7 @@ func get_closed_edges(transform: Transform3D) -> Array[PackedVector2Array]:
 
 	var origin := Vector2(transform.origin.x, transform.origin.z)
 	var radius_at_ground_level: float = radius # TODO
-	var steps: int = max(16, radius_at_ground_level * 1.414)
+	var steps: int = max(16, radius_at_ground_level * 4.0)
 	var angle: float = TAU / steps
 
 	for i in steps + 1:

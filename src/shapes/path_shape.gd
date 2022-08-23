@@ -121,21 +121,23 @@ func get_closed_edges(transform: Transform3D) -> Array[PackedVector2Array]:
 	for p in points:
 		polyline.push_back(origin + Vector2(p.x, p.z))
 
+	var edges: Array[PackedVector2Array] = []
 	if width > 0:
 		var delta = width / 2.0
-		return Geometry2D.offset_polyline(polyline, delta, Geometry2D.JOIN_SQUARE, Geometry2D.END_ROUND)
-	else:
-		return [polyline]
+		edges.append_array(Geometry2D.offset_polyline(polyline, delta, Geometry2D.JOIN_SQUARE, Geometry2D.END_ROUND))
+
+	if closed:
+		edges.push_back(polyline)
+
+	return edges
 
 
 func get_open_edges(transform: Transform3D) -> Array[Curve3D]:
-	if closed or width > 0:
+	if not curve or closed or width > 0:
 		return []
 
-	if curve == null:
-		return []
-
-	return [curve.duplicate()]
+	var duplicate: Curve3D = curve.duplicate()
+	return [duplicate]
 
 
 func _update_polygon_from_curve() -> void:

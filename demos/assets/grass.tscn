@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://bfgwe8uetcdwg"]
+
+[ext_resource type="PackedScene" uid="uid://bmmxbxaq5u6c8" path="res://addons/proton_scatter/demos/assets/grass.glb" id="1_203fe"]
+[ext_resource type="Material" uid="uid://b7m2no0o8kx1p" path="res://addons/proton_scatter/demos/assets/grass.tres" id="2_sv1ar"]
+
+[node name="grass" instance=ExtResource("1_203fe")]
+
+[node name="Plane011" parent="." index="0"]
+surface_material_override/0 = ExtResource("2_sv1ar")

@@ -79,6 +79,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.clear()
 	var shape_node: ScatterShape = gizmo.get_spatial_node()
 	var shape: PathShape = shape_node.shape
+
 	if not shape:
 		return
 
@@ -86,10 +87,18 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	if not curve or curve.get_point_count() == 0:
 		return
 
-	# ------ Main line along the path curve ------
-
-	var lines := PackedVector3Array()
+	# ------ Common stuff ------
 	var points := curve.tessellate(4, 8)
+	var points_2d := PackedVector2Array()
+	for p in points:
+		points_2d.push_back(Vector2(p.x, p.z))
+
+	var mesh_material: StandardMaterial3D = plugin.get_material("inclusive", gizmo)
+	if shape_node.exclusive:
+		mesh_material = plugin.get_material("exclusive", gizmo)
+
+	# ------ Main line along the path curve ------
+	var lines := PackedVector3Array()
 	var lines_count := points.size() - 1
 
 	for i in lines_count:
@@ -100,7 +109,6 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.add_collision_segments(lines)
 
 	# ------ Draw handles ------
-
 	var main_handles := PackedVector3Array()
 	var in_out_handles := PackedVector3Array()
 	var handle_lines := PackedVector3Array()
@@ -126,10 +134,6 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 
 	# ----- Mesh representing the inside part of the path -----
 	if shape.closed:
-		var points_2d := PackedVector2Array()
-		for p in points:
-			points_2d.push_back(Vector2(p.x, p.z))
-
 		var indices = Geometry2D.triangulate_polygon(points_2d)
 		if indices.is_empty():
 			indices =  Geometry2D.triangulate_delaunay(points_2d)
@@ -141,7 +145,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 			st.add_vertex(Vector3(p.x, 0.0, p.y))
 
 		var mesh = st.commit()
-		gizmo.add_mesh(mesh, plugin.get_material("mesh", gizmo))
+		gizmo.add_mesh(mesh, mesh_material)
 
 	# ------ Mesh representing path width ------
 	if shape.width <= 0:
@@ -152,13 +156,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 
 	# ____ TODO ____ : check if this whole section could be replaced by
 	# Geometry2D.expand_polyline, or an extruded capsule along the path
-	# with front faces culled.
 
-	var mesh_material: StandardMaterial3D
-	if shape_node.exclusive:
-		mesh_material = plugin.get_material("exclusive", gizmo)
-	else:
-		mesh_material = plugin.get_material("inclusive", gizmo)
 
 	## Main path mesh
 	var st = SurfaceTool.new()
