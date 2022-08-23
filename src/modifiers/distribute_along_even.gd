@@ -54,6 +54,8 @@ func _process_transforms(transforms, _seed) -> void:
 			t = t.looking_at(normal + pos, get_align_up_vector(align_up_axis))
 
 		transforms.list[i] = t
+	
+	shuffle(transforms.list, global_seed)
 
 
 static func get_align_up_vector(align : int) -> Vector3:

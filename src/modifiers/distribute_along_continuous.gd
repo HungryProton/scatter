@@ -39,6 +39,8 @@ func _process_transforms(transforms, _seed) -> void:
 		t = transforms.list[i]
 		t.origin = p1 + ((p2 - p1) / 2.0)
 		transforms.list[i] = t.looking_at(p2, Vector3.UP)
+	
+	shuffle(transforms.list, global_seed)
 
 
 func get_projected_curve(curve: Curve3D) -> Curve3D:

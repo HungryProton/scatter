@@ -69,7 +69,7 @@ func _process_transforms(transforms, global_seed) -> void:
 			matched_samples += 1
 
 	transforms.list.resize(matched_samples)
-	shuffle(transforms.list, global_seed)
+	shuffle(transforms.list, _sampler.rng.get_seed())
 	
 	
 static func get_align_up_vector(align : int) -> Vector3:
