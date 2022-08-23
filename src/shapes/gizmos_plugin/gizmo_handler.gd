@@ -4,10 +4,10 @@ extends RefCounted
 # Abstract class.
 
 
-var _undo_redo: UndoRedo
+var _undo_redo: EditorUndoRedoManager
 
 
-func set_undo_redo(ur: UndoRedo) -> void:
+func set_undo_redo(ur: EditorUndoRedoManager) -> void:
 	_undo_redo = ur
 
 

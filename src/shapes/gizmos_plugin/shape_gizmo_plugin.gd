@@ -70,7 +70,7 @@ func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent):
 	return false
 
 
-func set_undo_redo(ur: UndoRedo) -> void:
+func set_undo_redo(ur: EditorUndoRedoManager) -> void:
 	for handler_name in _handlers:
 		_handlers[handler_name].set_undo_redo(ur)
 
