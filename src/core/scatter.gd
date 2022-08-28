@@ -151,6 +151,9 @@ func update() -> void:
 
 	if not is_inside_tree() or _rebuilt_this_frame:
 		return
+	
+	if disable_automatic_updates:
+		return
 
 	_rebuilt_this_frame = true
 	_do_update()
@@ -531,7 +534,8 @@ func _set_undo_redo(val) -> void:
 func _set_is_moving(val) -> void:
 	is_moving = val
 	if not is_moving:
-		_do_update()
+		yield(get_tree(), "idle_frame")
+		update()
 
 
 func _set_modifier_stack(val) -> void:
