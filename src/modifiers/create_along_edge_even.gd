@@ -5,6 +5,9 @@ extends "base_modifier.gd"
 const Util := preload("../common/util.gd")
 
 
+# TODO :
+# + change alignement parameters to something more usable and intuitive
+# + Use the curve up vector, default to local Y+ when not available
 @export var interval := 1.0
 @export var offset := 0.0
 @export var align_to_path := false
@@ -19,6 +22,8 @@ func _init() -> void:
 	category = "Create"
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
+	can_restrict_height = false
+	can_use_global_and_local_space = false
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
@@ -37,6 +42,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			var data : Array = Util.get_position_and_normal_at(curve, curve_offset)
 			var pos: Vector3 = data[0]
 			var normal: Vector3 = data[1]
+			var up: Vector3 = Vector3.UP * domain.get_global_transform().affine_inverse().basis
 			var t := Transform3D()
 			t.origin = pos
 
@@ -50,7 +56,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 				normal.z *= int(!restrict_z)
 				#this does not like restricting both x and z simulatneously
 
-				t = t.looking_at(normal + pos, get_align_up_vector(align_up_axis))
+				t = t.looking_at(normal + pos, up)
 
 			new_transforms.push_back(t)
 

@@ -64,9 +64,9 @@ func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[P
 		return []
 
 	var sphere_center_local = scatter_gt.affine_inverse() * sphere_center
-	#print("sphere global:", sphere_center, " local: ", sphere_center_local)
+
 	var origin := Vector2(sphere_center_local.x, sphere_center_local.z)
-	var steps: int = max(16, radius_at_ground_level * 4.0)
+	var steps: int = max(16, radius_at_ground_level * 12.0)
 	var angle: float = TAU / steps
 
 	for i in steps + 1:

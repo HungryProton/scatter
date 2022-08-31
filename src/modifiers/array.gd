@@ -3,6 +3,8 @@ extends "base_modifier.gd"
 
 # Takes existing objects and duplicates them recursively with given transforms
 
+# TODO: Completely broken, to fix
+
 @export var amount := 1
 @export var min_amount := -1
 @export var local_offset := false

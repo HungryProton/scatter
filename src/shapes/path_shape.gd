@@ -115,6 +115,7 @@ func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[P
 	if not closed and width <= 0:
 		return []
 
+	var edges: Array[PackedVector2Array] = []
 	var polyline := PackedVector2Array()
 	var shape_gt_inverse := shape_gt.affine_inverse()
 	var scatter_gt_inverse := scatter_gt.affine_inverse()
@@ -125,13 +126,24 @@ func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[P
 		p = scatter_gt_inverse * p # convert to scatter local coords
 		polyline.push_back(Vector2(p.x, p.z))
 
+	# Prevents the polyline to be considered as a hole later.
 	if Geometry2D.is_polygon_clockwise(polyline):
 		polyline.reverse()
 
-	var edges: Array[PackedVector2Array] = []
+	# Expand the polyline to get the outer edge of the path.
 	if width > 0:
-		var delta = width / 2.0
-		edges.append_array(Geometry2D.offset_polyline(polyline, delta, Geometry2D.JOIN_ROUND, Geometry2D.END_ROUND))
+		# WORKAROUND. We cant specify the round end caps resolution, but it's tied to the polyline
+		# size. So we scale everything up before calling offset_polyline(), then scale the result
+		# down so we get rounder caps.
+		var scale = 5.0 * width
+		var delta = (width / 2.0) * scale
+
+		var t2 = Transform2D().scaled(Vector2.ONE * scale)
+		var result := Geometry2D.offset_polyline(polyline * t2, delta, Geometry2D.JOIN_ROUND, Geometry2D.END_ROUND)
+
+		t2 = Transform2D().scaled(Vector2.ONE * (1.0 / scale))
+		for polygon in result:
+			edges.push_back(polygon * t2)
 
 	if closed:
 		edges.push_back(polyline)
@@ -143,8 +155,16 @@ func get_open_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[Cur
 	if not curve or closed or width > 0:
 		return []
 
-	var duplicate: Curve3D = curve.duplicate()
-	return [duplicate]
+	var res := Curve3D.new()
+	var shape_gt_inverse := shape_gt.affine_inverse()
+
+	for i in curve.get_point_count():
+		var p_in = curve.get_point_in(i) * shape_gt_inverse
+		var p_out = curve.get_point_out(i) * shape_gt_inverse
+		var pos = curve.get_point_position(i) * shape_gt_inverse
+		res.add_point(pos, p_in, p_out)
+
+	return [res]
 
 
 func _update_polygon_from_curve() -> void:
