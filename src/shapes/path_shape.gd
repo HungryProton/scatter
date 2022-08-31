@@ -111,20 +111,27 @@ func get_closest_to(position):
 	return closest
 
 
-func get_closed_edges(transform: Transform3D) -> Array[PackedVector2Array]:
+func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[PackedVector2Array]:
 	if not closed and width <= 0:
 		return []
 
 	var polyline := PackedVector2Array()
+	var shape_gt_inverse := shape_gt.affine_inverse()
+	var scatter_gt_inverse := scatter_gt.affine_inverse()
 	var points := curve.tessellate(5, 5) # TODO: find optimal values
-	var origin = Vector2(transform.origin.x, transform.origin.z)
+
 	for p in points:
-		polyline.push_back(origin + Vector2(p.x, p.z))
+		p = p * shape_gt_inverse # Convert to global coords
+		p = scatter_gt_inverse * p # convert to scatter local coords
+		polyline.push_back(Vector2(p.x, p.z))
+
+	if Geometry2D.is_polygon_clockwise(polyline):
+		polyline.reverse()
 
 	var edges: Array[PackedVector2Array] = []
 	if width > 0:
 		var delta = width / 2.0
-		edges.append_array(Geometry2D.offset_polyline(polyline, delta, Geometry2D.JOIN_SQUARE, Geometry2D.END_ROUND))
+		edges.append_array(Geometry2D.offset_polyline(polyline, delta, Geometry2D.JOIN_ROUND, Geometry2D.END_ROUND))
 
 	if closed:
 		edges.push_back(polyline)
@@ -132,7 +139,7 @@ func get_closed_edges(transform: Transform3D) -> Array[PackedVector2Array]:
 	return edges
 
 
-func get_open_edges(transform: Transform3D) -> Array[Curve3D]:
+func get_open_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[Curve3D]:
 	if not curve or closed or width > 0:
 		return []
 

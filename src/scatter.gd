@@ -133,7 +133,7 @@ func rebuild(force_discover := false) -> void:
 
 # Re compute the desired output.
 # This is the main function, scattering the objects in the scene.
-# Scattered objects are stored under a Position3D node called "ScatterOutput"
+# Scattered objects are stored under a Marker3D node called "ScatterOutput"
 # DON'T call this function directly outside of the 'rebuild()' function above.
 func _rebuild(force_discover) -> void:
 	if force_discover:
@@ -175,6 +175,9 @@ func _discover_items() -> void:
 
 # Creates one MultimeshInstance3D for each ScatterItem node.
 func _update_multimeshes(transforms: TransformList) -> void:
+	if not transforms or transforms.size() == 0:
+		return
+
 	var offset := 0
 	var transforms_count: int = transforms.size()
 	var inverse_transform := global_transform.affine_inverse()

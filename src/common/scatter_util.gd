@@ -19,7 +19,7 @@ static func ensure_output_root_exists(s) -> void:
 		s.output_root = s.get_node_or_null("./ScatterOutput")
 
 	if not s.output_root:
-		s.output_root = Position3D.new()
+		s.output_root = Marker3D.new()
 		s.output_root.name = "ScatterOutput"
 		s.add_child(s.output_root)
 		s.output_root.owner = s.get_tree().get_edited_scene_root()

@@ -52,6 +52,13 @@ class ComplexPolygon:
 		res.push_back(outer)
 		return res
 
+	func _to_string() -> String:
+		var res =  "o: " + var2str(outer.size()) + ", i: ["
+		for i in inner:
+			res += var2str(i.size()) + ", "
+		res += "]"
+		return res
+
 
 var root: Node3D:
 	set(val):
@@ -121,12 +128,13 @@ func compute_bounds() -> void:
 func compute_edges() -> void:
 	edges.clear()
 	var source_polygons: Array[ComplexPolygon] = []
+	var root_gt: Transform3D = root.get_global_transform()
 
 	## Retrieve all polygons
 	for info in inclusive_shapes:
 		# Store all closed polygons in a specific array
 		var polygon := ComplexPolygon.new()
-		polygon.add_array(info.shape.get_closed_edges(info.transform))
+		polygon.add_array(info.shape.get_closed_edges(root_gt, info.transform))
 
 		# Polygons with holes must be merged together first
 		if not polygon.inner.is_empty():
@@ -136,7 +144,7 @@ func compute_edges() -> void:
 
 		# Store open edges directly since they are already Curve3D and we
 		# don't apply boolean operations to them.
-		var open_edges = info.shape.get_open_edges(info.transform)
+		var open_edges = info.shape.get_open_edges(root_gt, info.transform)
 		edges.append_array(open_edges)
 
 	if source_polygons.is_empty():
@@ -152,11 +160,34 @@ func compute_edges() -> void:
 		var i = 0
 
 		# Test p1 against every other polygon from source_polygon until a
-		# successful merge. If no merges happened, put it in the final array.
+		# successful merge. If no merge happened, put it in the final array.
 		while i < max_steps and not merged:
 			i += 1
 
+			# Get the next polygon in the list
 			var p2: ComplexPolygon = source_polygons.pop_back()
+
+			# If the outer boundary of any of the two polygons is completely
+			# enclosed in one of the other polygon's hole, we don't try to
+			# merge them and go the next iteration.
+			var full_overlap = false
+			for ip1 in p1.inner:
+				var res = Geometry2D.clip_polygons(p2.outer, ip1)
+				if res.is_empty():
+					full_overlap = true
+					break
+
+			for ip2 in p2.inner:
+				var res = Geometry2D.clip_polygons(p1.outer, ip2)
+				if res.is_empty():
+					full_overlap = true
+					break
+
+			if full_overlap:
+				source_polygons.push_front(p2)
+				continue
+
+			# Try to merge the two polygons p1 and p2
 			var res = Geometry2D.merge_polygons(p1.outer, p2.outer)
 			var outer_polygons := 0
 			for p in res:
@@ -190,6 +221,8 @@ func compute_edges() -> void:
 		if not merged:
 			merged_polygons.push_back(p1)
 
+	var gt_inverse := root_gt.affine_inverse()
+
 	## For each polygons from the previous step, create a corresponding Curve3D
 	for cp in merged_polygons:
 		for polygon in cp.get_all():
@@ -198,7 +231,8 @@ func compute_edges() -> void:
 
 			var curve := Curve3D.new()
 			for point in polygon:
-				curve.add_point(Vector3(point.x, 0.0, point.y)) # TODO: find ground height
+				var p = Vector3(point.x, 0.0, point.y)
+				curve.add_point(root_gt * p)
 
 			curve.add_point(curve.get_point_position(0)) # Close the loop
 			edges.push_back(curve)
