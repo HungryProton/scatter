@@ -13,16 +13,21 @@ const ScatterShape := preload("./scatter_shape.gd")
 const Domain := preload("./common/domain.gd")
 
 
+@export_category("ProtonScatter")
+
+@export_group("Random")
 @export var global_seed := 0:
 	set(val):
 		global_seed = val
 		rebuild()
 
+@export_group("Performance")
 @export var use_instancing := true:
 	set(val):
 		use_instancing = val
-		rebuild(true)
+		full_rebuild()
 
+@export_group("Debug", "dbg_")
 @export var dbg_disable_thread := false
 
 var undo_redo: UndoRedo
@@ -63,11 +68,11 @@ func _process(delta: float) -> void:
 
 func _get_property_list() -> Array:
 	var list := []
-	list.push_back({
-		name = "ProtonScatter",
-		type = TYPE_NIL,
-		usage = PROPERTY_USAGE_CATEGORY | PROPERTY_USAGE_SCRIPT_VARIABLE,
-	})
+#	list.push_back({
+#		name = "ProtonScatter",
+#		type = TYPE_NIL,
+#		usage = PROPERTY_USAGE_CATEGORY | PROPERTY_USAGE_SCRIPT_VARIABLE,
+#	})
 	list.push_back({
 		name = "modifier_stack",
 		type = TYPE_OBJECT,
@@ -105,6 +110,7 @@ func _set(property, _value):
 
 # Only used for type checking.
 # Useful to other scripts which can't preload this due to cyclic references.
+# TODO: Old workaround from alpha 2, check if this is still needed
 func is_scatter_node() -> bool:
 	return true
 
@@ -154,6 +160,9 @@ func _rebuild(force_discover) -> void:
 		await thread_completed
 		transforms = _thread.wait_to_finish()
 
+	if not transforms or transforms.size() == 0:
+		return
+
 	if use_instancing:
 		_update_multimeshes(transforms)
 	else:
@@ -175,9 +184,6 @@ func _discover_items() -> void:
 
 # Creates one MultimeshInstance3D for each ScatterItem node.
 func _update_multimeshes(transforms: TransformList) -> void:
-	if not transforms or transforms.size() == 0:
-		return
-
 	var offset := 0
 	var transforms_count: int = transforms.size()
 	var inverse_transform := global_transform.affine_inverse()
@@ -203,11 +209,54 @@ func _update_multimeshes(transforms: TransformList) -> void:
 
 
 func _update_duplicates(transforms: TransformList) -> void:
-	pass
+	var offset := 0
+	var transforms_count: int = transforms.size()
+	var inverse_transform := global_transform.affine_inverse()
+
+	for item in items:
+		print("éitem ", item)
+		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
+		var root = ScatterUtil.get_or_create_item_root(item)
+		var child_count = root.get_child_count()
+
+		for i in count:
+			if (offset + i) >= transforms_count:
+				return
+			var instance
+			if i < child_count:
+				# Grab an instance from the pool if there's one available
+				instance = root.get_child(i)
+			else:
+				# If not, create one
+				instance = _create_instance(item, root)
+
+			var t: Transform3D = item.process_transform(transforms.list[offset + i])
+			instance.transform = inverse_transform * t
+
+		# Delete the unused instances left in the pool if any
+		if count < child_count:
+			for i in (child_count - count):
+				root.get_child(-1).queue_free()
+
+		offset += count
+
+
+func _create_instance(item: ScatterItem, root: Node3D):
+	var instance = item.get_item().duplicate()
+	root.add_child(instance, true)
+	instance.set_owner(get_tree().get_edited_scene_root())
+	instance.visible = true
+#	if item.is_local():
+#		ScatterUtil.set_owner_recursive(instance, get_tree().get_edited_scene_root())
+#	else:
+#		instance.set_owner(get_tree().get_edited_scene_root())
+
+	return instance
 
 
 # Deletes what the Scatter node generated.
 func _clear_output() -> void:
+	print("in clear output")
 	ScatterUtil.ensure_output_root_exists(self)
 	for c in output_root.get_children():
 		c.queue_free()

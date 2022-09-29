@@ -159,10 +159,11 @@ func get_open_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[Cur
 	var shape_gt_inverse := shape_gt.affine_inverse()
 
 	for i in curve.get_point_count():
-		var p_in = curve.get_point_in(i) * shape_gt_inverse
-		var p_out = curve.get_point_out(i) * shape_gt_inverse
-		var pos = curve.get_point_position(i) * shape_gt_inverse
-		res.add_point(pos, p_in, p_out)
+		var pos = curve.get_point_position(i)
+		var pos_t = pos * shape_gt_inverse
+		var p_in = (curve.get_point_in(i) + pos) * shape_gt_inverse - pos_t
+		var p_out = (curve.get_point_out(i) + pos) * shape_gt_inverse - pos_t
+		res.add_point(pos_t, p_in, p_out)
 
 	return [res]
 

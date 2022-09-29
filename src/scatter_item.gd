@@ -2,16 +2,18 @@
 extends Node3D
 
 
+@export_category("ScatterItem")
 @export var proportion := 100
-@export var scale_modifier := 1.0
-@export var ignore_source_position := true
-@export var ignore_source_rotation := true
-@export var ignore_source_scale := true
 @export_enum("From current scene", "From disk") var source:
 	set(val):
 		source = val
 		property_list_changed.emit()
 
+@export_group("Source options", "source_")
+@export var source_scale_multiplier := 1.0
+@export var source_ignore_position := false
+@export var source_ignore_rotation := false
+@export var source_ignore_scale := false
 
 var path: String
 var source_position: Vector3
@@ -21,12 +23,6 @@ var source_scale: Vector3
 
 func _get_property_list() -> Array:
 	var list := []
-
-	list.push_back({
-		name = "ScatterItem",
-		type = TYPE_NIL,
-		usage = PROPERTY_USAGE_CATEGORY | PROPERTY_USAGE_SCRIPT_VARIABLE,
-	})
 
 	if source == 0:
 		list.push_back({
@@ -63,23 +59,26 @@ func get_item() -> Node3D:
 	return null
 
 
+# Takes a transform in input, scale it based on the local scale multiplier
+# If the source transform is not ignored, also copy the source position, rotation and scale.
+# Returns the processed transform
 func process_transform(t: Transform3D) -> Transform3D:
 	var origin = t.origin
 	t.origin = Vector3.ZERO
 
-	t = t.scaled(Vector3.ONE * scale_modifier)
+	t = t.scaled(Vector3.ONE * source_scale_multiplier)
 
-	if not ignore_source_scale:
+	if not source_ignore_scale:
 		t = t.scaled(source_scale)
 
-	if not ignore_source_rotation:
+	if not source_ignore_rotation:
 		t = t.rotated(t.basis.x.normalized(), source_rotation.x)
 		t = t.rotated(t.basis.y.normalized(), source_rotation.y)
 		t = t.rotated(t.basis.z.normalized(), source_rotation.z)
 
 	t.origin = origin
 
-	if not ignore_source_position:
+	if not source_ignore_position:
 		t.origin += source_position
 
 	return t
