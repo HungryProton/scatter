@@ -1,8 +1,7 @@
 extends Resource
 
 
-# point must be in global space
-func is_point_inside(point: Vector3, global_transform: Transform3D) -> bool:
+func is_point_inside(point_global: Vector3, global_transform: Transform3D) -> bool:
 	return false
 
 

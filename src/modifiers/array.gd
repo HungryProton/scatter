@@ -36,9 +36,9 @@ func _process_transforms(transforms, domain, seed: int) -> void:
 	var new_transforms := []
 	var rotation_rad := Vector3.ZERO
 
-	rotation_rad.x = deg2rad(rotation.x)
-	rotation_rad.y = deg2rad(rotation.y)
-	rotation_rad.z = deg2rad(rotation.z)
+	rotation_rad.x = deg_to_rad(rotation.x)
+	rotation_rad.y = deg_to_rad(rotation.y)
+	rotation_rad.z = deg_to_rad(rotation.z)
 
 	# for each existing object
 	for t in transforms.list.size():

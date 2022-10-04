@@ -38,6 +38,9 @@ func get_warning() -> String:
 func process_transforms(transforms: TransformList, domain: Domain, global_seed: int) -> void:
 	_clear_warning()
 
+	if not enabled:
+		return
+
 	if domain.is_empty() and not warning_ignore_no_shape:
 		warning += """The Scatter node does not have a shape.
 		Add at least one ScatterShape node as a child.\n"""
@@ -61,3 +64,4 @@ func _process_transforms(_transforms: TransformList, _domain: Domain, _seed: int
 
 func _clear_warning() -> void:
 	warning = ""
+	warning_changed.emit()

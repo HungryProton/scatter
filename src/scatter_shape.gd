@@ -8,6 +8,7 @@ const SphereShape := preload("./shapes/sphere_shape.gd")
 const ScatterUtil := preload('./common/scatter_util.gd')
 
 
+@export_category("ScatterShape")
 @export var exclusive = false:
 	set(val):
 		exclusive = val
@@ -42,11 +43,6 @@ func _ready() -> void:
 
 func _get_property_list() -> Array:
 	var list := []
-	list.push_back({
-		name = "ScatterShape",
-		type = TYPE_NIL,
-		usage = PROPERTY_USAGE_CATEGORY | PROPERTY_USAGE_SCRIPT_VARIABLE,
-	})
 	list.push_back({
 		name = "shape",
 		type = TYPE_OBJECT,

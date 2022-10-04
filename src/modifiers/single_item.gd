@@ -20,9 +20,9 @@ func _init() -> void:
 
 func _process_transforms(transforms, domain, _seed) -> void:
 	var basis := Basis()
-	basis = basis.rotated(Vector3.RIGHT, deg2rad(rotation.x))
-	basis = basis.rotated(Vector3.UP, deg2rad(rotation.y))
-	basis = basis.rotated(Vector3.FORWARD, deg2rad(rotation.z))
+	basis = basis.rotated(Vector3.RIGHT, deg_to_rad(rotation.x))
+	basis = basis.rotated(Vector3.UP, deg_to_rad(rotation.y))
+	basis = basis.rotated(Vector3.FORWARD, deg_to_rad(rotation.z))
 	var transform := Transform3D(basis, offset)
 
 	if use_local_space:

@@ -11,9 +11,9 @@ extends Node3D
 
 @export_group("Source options", "source_")
 @export var source_scale_multiplier := 1.0
-@export var source_ignore_position := false
-@export var source_ignore_rotation := false
-@export var source_ignore_scale := false
+@export var source_ignore_position := true
+@export var source_ignore_rotation := true
+@export var source_ignore_scale := true
 
 var path: String
 var source_position: Vector3

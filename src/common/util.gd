@@ -71,15 +71,15 @@ static func get_position_and_normal_at(curve: Curve3D, offset: float) -> Array:
 	if not curve:
 		return []
 
-	var pos: Vector3 = curve.interpolate_baked(offset)
+	var pos: Vector3 = curve.sample_baked(offset)
 	var normal := Vector3.ZERO
 
 	var pos1
 	if offset + curve.get_bake_interval() < curve.get_baked_length():
-		pos1 = curve.interpolate_baked(offset + curve.get_bake_interval())
+		pos1 = curve.sample_baked(offset + curve.get_bake_interval())
 		normal = (pos1 - pos)
 	else:
-		pos1 = curve.interpolate_baked(offset - curve.get_bake_interval())
+		pos1 = curve.sample_baked(offset - curve.get_bake_interval())
 		normal = (pos - pos1)
 
 	return [pos, normal]

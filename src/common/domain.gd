@@ -53,9 +53,9 @@ class ComplexPolygon:
 		return res
 
 	func _to_string() -> String:
-		var res =  "o: " + var2str(outer.size()) + ", i: ["
+		var res =  "o: " + var_to_str(outer.size()) + ", i: ["
 		for i in inner:
-			res += var2str(i.size()) + ", "
+			res += var_to_str(i.size()) + ", "
 		res += "]"
 		return res
 

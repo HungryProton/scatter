@@ -31,18 +31,18 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		t.origin = Vector3.ZERO
 
 		if use_local_space:
-			t = t.rotated(t.basis.x.normalized(), deg2rad(rotation.x))
-			t = t.rotated(t.basis.y.normalized(), deg2rad(rotation.y))
-			t = t.rotated(t.basis.z.normalized(), deg2rad(rotation.z))
+			t = t.rotated(t.basis.x.normalized(), deg_to_rad(rotation.x))
+			t = t.rotated(t.basis.y.normalized(), deg_to_rad(rotation.y))
+			t = t.rotated(t.basis.z.normalized(), deg_to_rad(rotation.z))
 			t.basis.x *= scale.x
 			t.basis.y *= scale.y
 			t.basis.z *= scale.z
 			t.origin = origin + (t * position)
 
 		else:
-			t = t.rotated(global_x, deg2rad(rotation.x))
-			t = t.rotated(global_y, deg2rad(rotation.y))
-			t = t.rotated(global_z, deg2rad(rotation.z))
+			t = t.rotated(global_x, deg_to_rad(rotation.x))
+			t = t.rotated(global_y, deg_to_rad(rotation.y))
+			t = t.rotated(global_z, deg_to_rad(rotation.z))
 			t.basis = t.basis.scaled(scale)
 			t.origin = origin + position
 

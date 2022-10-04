@@ -26,7 +26,16 @@ static func ensure_output_root_exists(s) -> void:
 		s.output_root = Marker3D.new()
 		s.output_root.name = "ScatterOutput"
 		s.add_child(s.output_root)
-		s.output_root.owner = s.get_tree().get_edited_scene_root()
+
+	if s.output_root and s.is_inside_tree():
+		if s.show_output_in_tree:
+			set_owner_recursive(s.output_root, s.get_tree().get_edited_scene_root())
+		else:
+			set_owner_recursive(s.output_root, null)
+
+		# TMP: Workaround to force the scene tree to update and take in account
+		# the owner changes. Otherwise it doesn't show until much later.
+		s.output_root.update_configuration_warnings()
 
 
 # Item root is a Node3D placed as a child of the ScatterOutput node.
@@ -116,6 +125,10 @@ static func get_all_mesh_instances_from(node: Node3D) -> Array[MeshInstance3D]:
 # Find all the meshes below node and create a new single mesh with multiple
 # surfaces from all of them.
 static func get_merged_meshes_from(node) -> MeshInstance3D:
+	# Reset node transform for this step, overwise they'll stack
+	var transform_backup = node.global_transform
+	node.global_transform = Transform3D()
+
 	var instances := get_all_mesh_instances_from(node)
 	if instances.is_empty():
 		return null
@@ -123,19 +136,20 @@ static func get_merged_meshes_from(node) -> MeshInstance3D:
 	var total_surfaces = 0
 	var array_mesh = ArrayMesh.new()
 
-	for mi in instances:
+	for i in instances.size():
+		var mi: MeshInstance3D = instances[i]
 		var mesh: Mesh = mi.mesh
 		var surface_count = mesh.get_surface_count()
 		var material_override = mi.get_material_override()
 
-		for i in surface_count:
-			var arrays = mesh.surface_get_arrays(i)
+		for j in surface_count:
+			var arrays = mesh.surface_get_arrays(j)
 			var length = arrays[ArrayMesh.ARRAY_VERTEX].size()
 
-			for j in length:
-				var pos: Vector3 = arrays[ArrayMesh.ARRAY_VERTEX][j]
-				pos = pos * mi.transform
-				arrays[ArrayMesh.ARRAY_VERTEX][j] = pos
+			for k in length:
+				var pos: Vector3 = arrays[ArrayMesh.ARRAY_VERTEX][k]
+				pos = pos * mi.global_transform.affine_inverse()
+				arrays[ArrayMesh.ARRAY_VERTEX][k] = pos
 
 			array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 
@@ -145,14 +159,17 @@ static func get_merged_meshes_from(node) -> MeshInstance3D:
 			if material_override:
 				material = material_override
 			else:
-				material = mi.get_surface_override_material(i)
+				material = mi.get_surface_override_material(j)
 			if not material:
-				material = mesh.surface_get_material(i)
+				material = mesh.surface_get_material(j)
 			array_mesh.surface_set_material(total_surfaces, material)
 
 			total_surfaces += 1
-		mesh.mater
 
+	# Restore node initial transform
+	node.global_transform = transform_backup
+
+	# Return merged mesh
 	var res := MeshInstance3D.new()
 	res.mesh = array_mesh
 	return res

@@ -15,17 +15,21 @@ const Domain := preload("./common/domain.gd")
 
 @export_category("ProtonScatter")
 
-@export_group("Random")
+@export_group("General")
 @export var global_seed := 0:
 	set(val):
 		global_seed = val
 		rebuild()
+@export var show_output_in_tree := false:
+	set(val):
+		show_output_in_tree = val
+		ScatterUtil.ensure_output_root_exists(self)
 
 @export_group("Performance")
 @export var use_instancing := true:
 	set(val):
 		use_instancing = val
-		full_rebuild()
+		full_rebuild(true)
 
 @export_group("Debug", "dbg_")
 @export var dbg_disable_thread := false
@@ -115,9 +119,14 @@ func is_scatter_node() -> bool:
 	return true
 
 
-func full_rebuild():
+func full_rebuild(delayed := false):
+	print("in full rebuild")
+	if delayed:
+		await get_tree().process_frame
+
 	if _thread.is_alive():
 		_thread.wait_to_finish()
+
 	_clear_output()
 	_rebuild(true)
 
@@ -127,10 +136,12 @@ func full_rebuild():
 # TRANSFORM_CHANGED notification in every children, which in turn notify the
 # parent Scatter node back about the changes.
 func rebuild(force_discover := false) -> void:
+	print("in rebuild")
 	if not is_inside_tree():
 		return
 
 	if _thread.is_started(): # still running in the background
+		print("thread already started, abort")
 		return
 
 	force_discover = true # TMP while we fix the other issues
@@ -147,7 +158,8 @@ func _rebuild(force_discover) -> void:
 		domain.discover_shapes(self)
 
 	if items.is_empty() or domain.is_empty():
-		# TODO: clear output
+		_clear_output()
+		print("Scatter warning: No items or domain, abort")
 		return
 
 	var transforms: TransformList
@@ -161,6 +173,7 @@ func _rebuild(force_discover) -> void:
 		transforms = _thread.wait_to_finish()
 
 	if not transforms or transforms.size() == 0:
+		print("No transforms generated")
 		return
 
 	if use_instancing:
@@ -214,7 +227,7 @@ func _update_duplicates(transforms: TransformList) -> void:
 	var inverse_transform := global_transform.affine_inverse()
 
 	for item in items:
-		print("éitem ", item)
+		print("item ", item)
 		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
 		var root = ScatterUtil.get_or_create_item_root(item)
 		var child_count = root.get_child_count()
@@ -222,13 +235,15 @@ func _update_duplicates(transforms: TransformList) -> void:
 		for i in count:
 			if (offset + i) >= transforms_count:
 				return
+
 			var instance
-			if i < child_count:
-				# Grab an instance from the pool if there's one available
+			if i < child_count: # Grab an instance from the pool if there's one available
 				instance = root.get_child(i)
 			else:
-				# If not, create one
 				instance = _create_instance(item, root)
+
+			if not instance:
+				break
 
 			var t: Transform3D = item.process_transform(transforms.list[offset + i])
 			instance.transform = inverse_transform * t
@@ -242,24 +257,26 @@ func _update_duplicates(transforms: TransformList) -> void:
 
 
 func _create_instance(item: ScatterItem, root: Node3D):
+	if not item or not item.get_item():
+		return null
+
 	var instance = item.get_item().duplicate()
 	root.add_child(instance, true)
 	instance.set_owner(get_tree().get_edited_scene_root())
 	instance.visible = true
-#	if item.is_local():
-#		ScatterUtil.set_owner_recursive(instance, get_tree().get_edited_scene_root())
-#	else:
-#		instance.set_owner(get_tree().get_edited_scene_root())
+	ScatterUtil.set_owner_recursive(instance, get_tree().get_edited_scene_root())
 
 	return instance
 
 
 # Deletes what the Scatter node generated.
 func _clear_output() -> void:
-	print("in clear output")
+	if output_root:
+		remove_child(output_root)
+		output_root.queue_free()
+		output_root = null
+
 	ScatterUtil.ensure_output_root_exists(self)
-	for c in output_root.get_children():
-		c.queue_free()
 
 
 # Enforce the Scatter node has its required variables set.
@@ -278,4 +295,4 @@ func _on_node_duplicated() -> void:
 
 func _on_child_exiting_tree(node: Node) -> void:
 	if node is ScatterShape or node is ScatterItem:
-		call_deferred("rebuild", true)
+		rebuild.call_deferred(true)

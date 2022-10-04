@@ -46,9 +46,9 @@ func _process_transforms(transforms, domain, seed) -> void:
 			axis_y = t.basis.y.normalized()
 			axis_z = t.basis.z.normalized()
 
-		t = t.rotated(axis_x, deg2rad(_random_float() * rotation.x))
-		t = t.rotated(axis_y, deg2rad(_random_float() * rotation.y))
-		t = t.rotated(axis_z, deg2rad(_random_float() * rotation.z))
+		t = t.rotated(axis_x, deg_to_rad(_random_float() * rotation.x))
+		t = t.rotated(axis_y, deg_to_rad(_random_float() * rotation.y))
+		t = t.rotated(axis_z, deg_to_rad(_random_float() * rotation.z))
 		t.origin = origin + _random_vec3() * position
 
 		transforms.list[i] = t

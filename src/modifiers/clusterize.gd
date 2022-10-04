@@ -33,7 +33,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	var height = image.get_height()
 	var i = 0
 	var count = transforms.list.size()
-	var angle = deg2rad(rotation)
+	var angle = deg_to_rad(rotation)
 
 	while i < count:
 		var t = transforms.list[i]

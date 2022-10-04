@@ -53,7 +53,7 @@ func _random_vec3() -> Vector3:
 
 
 func _random_angle(rot: float, snap: float) -> float:
-	return deg2rad(snapped(_rng.randf_range(-1.0, 1.0) * rot, snap))
+	return deg_to_rad(snapped(_rng.randf_range(-1.0, 1.0) * rot, snap))
 
 
 func _clamp_vector(vec3, vmin, vmax) -> Vector3:
