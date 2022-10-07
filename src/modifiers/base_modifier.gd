@@ -11,17 +11,17 @@ signal warning_changed
 
 const TransformList = preload("../common/transform_list.gd")
 const Domain = preload("../common/domain.gd")
-const Documentation = preload("../common/documentation.gd")
+const DocumentationInfo = preload("../documentation/documentation_info.gd")
 
 @export var enabled := true
 @export var override_global_seed := false
 @export var custom_seed := 0
-@export var restrict_height := false # Tells the modifier to constrain new transforms to a plane or not
+@export var restrict_height := false # Tells the modifier whether to constrain transforms to the local XY plane or not
 @export var use_local_space := false
 
 var display_name: String = "Base Modifier Name"
 var category: String = "None"
-var documentation := Documentation.new()
+var documentation := DocumentationInfo.new()
 var warning: String = ""
 var warning_ignore_no_transforms := false
 var warning_ignore_no_shape := false
@@ -57,11 +57,11 @@ func process_transforms(transforms: TransformList, domain: Domain, global_seed: 
 	warning_changed.emit()
 
 
-# Override in inherited class
-func _process_transforms(_transforms: TransformList, _domain: Domain, _seed: int) -> void:
-	pass
-
-
 func _clear_warning() -> void:
 	warning = ""
 	warning_changed.emit()
+
+
+# Override in inherited class
+func _process_transforms(_transforms: TransformList, _domain: Domain, _seed: int) -> void:
+	pass

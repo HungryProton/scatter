@@ -20,17 +20,20 @@
 [ext_resource type="Texture2D" uid="uid://bpygylbuxdu0f" path="res://addons/proton_scatter/icons/global.svg" id="16_ocvvf"]
 
 [node name="ModifierPanel" type="MarginContainer"]
+anchors_preset = 10
 anchor_right = 1.0
 theme_type_variation = &"fg"
 script = ExtResource("1")
 
 [node name="Panel" type="Panel" parent="."]
-offset_right = 1024.0
+layout_mode = 2
+offset_right = 1152.0
 offset_bottom = 34.0
 mouse_filter = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-offset_right = 1024.0
+layout_mode = 2
+offset_right = 1152.0
 offset_bottom = 34.0
 grow_horizontal = 2
 mouse_filter = 2
@@ -42,18 +45,21 @@ metadata/_edit_layout_mode = 1
 metadata/_edit_use_custom_anchors = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 1020.0
+offset_right = 1148.0
 offset_bottom = 30.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-offset_right = 1016.0
+layout_mode = 2
+offset_right = 1144.0
 offset_bottom = 26.0
 size_flags_vertical = 0
 
 [node name="Expand" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
+layout_mode = 2
 offset_right = 20.0
 offset_bottom = 26.0
 focus_mode = 0
@@ -68,8 +74,9 @@ pressed_icon = ExtResource("4_7nlfc")
 
 [node name="ModifierName" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
+layout_mode = 2
 offset_left = 24.0
-offset_right = 912.0
+offset_right = 1040.0
 offset_bottom = 26.0
 size_flags_horizontal = 3
 text = "ModifierPanel"
@@ -77,8 +84,9 @@ vertical_alignment = 1
 clip_text = true
 
 [node name="Buttons" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-offset_left = 916.0
-offset_right = 1016.0
+layout_mode = 2
+offset_left = 1044.0
+offset_right = 1144.0
 offset_bottom = 26.0
 theme_override_constants/separation = 2
 alignment = 1
@@ -86,16 +94,18 @@ alignment = 1
 [node name="Warning" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 unique_name_in_owner = true
 visible = false
+layout_mode = 2
 offset_right = 24.0
 offset_bottom = 31.0
 size_flags_horizontal = 0
-hint_tooltip = "There are issues with this modifier configuration, click this warning icon for more details."
 focus_mode = 0
 mouse_filter = 1
 icon = ExtResource("9")
 flat = true
 
 [node name="MenuButton" type="MenuButton" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
 offset_right = 24.0
 offset_bottom = 26.0
 icon = ExtResource("6_lmo8k")
@@ -115,15 +125,16 @@ popup/item_3/id = 3
 
 [node name="Enabled" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 unique_name_in_owner = true
+layout_mode = 2
 offset_left = 26.0
 offset_right = 50.0
 offset_bottom = 26.0
-hint_tooltip = "Enable modifier. Disabled modifier still appear in the stack but won't contribute to the final result."
 focus_mode = 0
 mouse_filter = 1
 
 [node name="Remove" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 unique_name_in_owner = true
+layout_mode = 2
 offset_left = 52.0
 offset_top = 1.0
 offset_right = 76.0
@@ -137,12 +148,14 @@ icon_alignment = 1
 
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 modulate = Color(1, 1, 1, 0.54902)
+layout_mode = 2
 offset_left = 78.0
 offset_right = 82.0
 offset_bottom = 26.0
 
 [node name="DragControl" type="TextureRect" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 unique_name_in_owner = true
+layout_mode = 2
 offset_left = 84.0
 offset_right = 100.0
 offset_bottom = 26.0
@@ -153,8 +166,9 @@ stretch_mode = 3
 [node name="ParametersContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 visible = false
+layout_mode = 2
 offset_top = 30.0
-offset_right = 1016.0
+offset_right = 1144.0
 offset_bottom = 72.0
 theme_override_constants/margin_left = 3
 theme_override_constants/margin_top = 3
@@ -162,43 +176,49 @@ theme_override_constants/margin_right = 3
 theme_override_constants/margin_bottom = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ParametersContainer"]
+layout_mode = 2
 offset_left = 3.0
 offset_top = 3.0
-offset_right = 1013.0
+offset_right = 1141.0
 offset_bottom = 39.0
 
 [node name="ParametersRoot" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer"]
 unique_name_in_owner = true
-offset_right = 1010.0
+layout_mode = 2
+offset_right = 1138.0
 
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer"]
+layout_mode = 2
 offset_top = 4.0
-offset_right = 1010.0
+offset_right = 1138.0
 offset_bottom = 8.0
 
 [node name="CommonHeader" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer"]
+layout_mode = 2
 offset_top = 12.0
-offset_right = 1010.0
+offset_right = 1138.0
 offset_bottom = 36.0
 size_flags_vertical = 4
 alignment = 1
 
 [node name="ExpandButton" type="MarginContainer" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader"]
+layout_mode = 2
 offset_right = 24.0
 offset_bottom = 24.0
 script = ExtResource("10_ptukr")
 
 [node name="OverrideGlobalSeed" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton" instance=ExtResource("11_y7srw")]
 unique_name_in_owner = true
+layout_mode = 2
 offset_right = 24.0
 offset_bottom = 24.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Button" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton/OverrideGlobalSeed" index="0"]
+layout_mode = 2
 offset_right = 24.0
 offset_bottom = 24.0
-hint_tooltip = "Override global seed"
 icon = ExtResource("11_qwhro")
 icon_alignment = 0
 default_icon = ExtResource("11_qwhro")
@@ -206,12 +226,14 @@ pressed_icon = ExtResource("11_qwhro")
 
 [node name="SpinBoxRoot" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton"]
 visible = false
+layout_mode = 2
 offset_right = 24.0
 offset_bottom = 24.0
 mouse_filter = 2
 
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton/SpinBoxRoot"]
 modulate = Color(1, 1, 1, 0)
+layout_mode = 2
 offset_right = 28.0
 offset_bottom = 31.0
 mouse_filter = 2
@@ -219,44 +241,48 @@ theme_override_constants/separation = 28
 
 [node name="CustomSeed" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/ExpandButton/SpinBoxRoot" instance=ExtResource("13_vhfch")]
 unique_name_in_owner = true
+layout_mode = 2
 offset_left = 31.0
 offset_right = 114.062
 
 [node name="Control" type="Control" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader"]
+layout_mode = 2
+anchors_preset = 0
 offset_left = 28.0
-offset_right = 954.0
+offset_right = 1082.0
 offset_bottom = 24.0
 size_flags_horizontal = 3
 
 [node name="RestrictHeight" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader" instance=ExtResource("11_y7srw")]
 unique_name_in_owner = true
-offset_left = 958.0
-offset_right = 982.0
+layout_mode = 2
+offset_left = 1086.0
+offset_right = 1110.0
 offset_bottom = 24.0
 size_flags_horizontal = 1
 size_flags_vertical = 3
 
 [node name="Button" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/RestrictHeight" index="0"]
+layout_mode = 2
 offset_right = 24.0
 offset_bottom = 24.0
-hint_tooltip = "Restrict height"
 icon = ExtResource("12_lx60d")
 default_icon = ExtResource("12_lx60d")
 pressed_icon = ExtResource("15_0w0as")
 
 [node name="TransformSpace" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader" instance=ExtResource("11_y7srw")]
 unique_name_in_owner = true
-offset_left = 986.0
-offset_right = 1010.0
+layout_mode = 2
+offset_left = 1114.0
+offset_right = 1138.0
 offset_bottom = 24.0
 size_flags_horizontal = 1
 size_flags_vertical = 3
 
 [node name="Button" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/TransformSpace" index="0"]
+layout_mode = 2
 offset_right = 24.0
 offset_bottom = 24.0
-hint_tooltip = "Enabled: Use local space
-Disabled: Use global space"
 icon = ExtResource("16_ocvvf")
 default_icon = ExtResource("16_ocvvf")
 pressed_icon = ExtResource("13_txjs8")

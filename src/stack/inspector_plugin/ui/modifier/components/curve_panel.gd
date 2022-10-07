@@ -40,13 +40,13 @@ func _ready() -> void:
 	_font = theme.get_font("Main", "EditorFonts")
 	plugin.queue_free()
 
-	update()
+	queue_redraw()
 	connect("resized", _on_resized)
 
 
 func set_curve(c: Curve) -> void:
 	curve = c
-	update()
+	queue_redraw()
 
 
 func get_curve() -> Curve:
@@ -134,7 +134,7 @@ func _gui_input(event) -> void:
 
 					if link and _selected_point != 0 and curve.get_point_left_mode(_selected_point) != Curve.TANGENT_LINEAR:
 						curve.set_point_left_tangent(_selected_point, tangent)
-			update()
+			queue_redraw()
 		else:
 			set_hover(get_point_at(event.position))
 
@@ -145,7 +145,7 @@ func add_point(pos: Vector2) -> void:
 
 	pos.y = clamp(pos.y, 0.0, 1.0)
 	curve.add_point(pos)
-	update()
+	queue_redraw()
 	emit_signal("curve_updated")
 
 
@@ -160,7 +160,7 @@ func remove_point(idx: int) -> void:
 		set_hover(-1)
 
 	curve.remove_point(idx)
-	update()
+	queue_redraw()
 	emit_signal("curve_updated")
 
 
@@ -245,12 +245,12 @@ func _draw() -> void:
 	var b: float
 	var b_y: float
 
-	a = curve.interpolate_baked(0.0)
-	a_y = range_lerp(a, curve_min, curve_max, min_inner.y, max_inner.y)
+	a = curve.sample_baked(0.0)
+	a_y = remap(a, curve_min, curve_max, min_inner.y, max_inner.y)
 
 	for i in steps - 1:
-		b = curve.interpolate_baked((i + 1) * offset)
-		b_y = range_lerp(b, curve_min, curve_max, min_inner.y, max_inner.y)
+		b = curve.sample_baked((i + 1) * offset)
+		b_y = remap(b, curve_min, curve_max, min_inner.y, max_inner.y)
 		draw_line(Vector2(min_inner.x + x_offset * i, a_y), Vector2(min_inner.x + x_offset * (i + 1), b_y), curve_color)
 		a_y = b_y
 
@@ -283,15 +283,15 @@ func _draw() -> void:
 
 func _to_view_space(pos: Vector2) -> Vector2:
 	var h = _font.get_height()
-	pos.x = range_lerp(pos.x, 0.0, 1.0, h, size.x - h)
-	pos.y = range_lerp(pos.y, curve.get_min_value(), curve.get_max_value(), size.y - h, h)
+	pos.x = remap(pos.x, 0.0, 1.0, h, size.x - h)
+	pos.y = remap(pos.y, curve.get_min_value(), curve.get_max_value(), size.y - h, h)
 	return pos
 
 
 func _to_curve_space(pos: Vector2) -> Vector2:
 	var h = _font.get_height()
-	pos.x = range_lerp(pos.x, h, size.x - h, 0.0, 1.0)
-	pos.y = range_lerp(pos.y, size.y - h, h, curve.get_min_value(), curve.get_max_value())
+	pos.x = remap(pos.x, h, size.x - h, 0.0, 1.0)
+	pos.y = remap(pos.y, size.y - h, h, curve.get_min_value(), curve.get_max_value())
 	return pos
 
 
@@ -312,19 +312,19 @@ func _get_tangent_view_pos(i: int, tangent: int) -> Vector2:
 func set_hover(val: int) -> void:
 	if val != _hover_point:
 		_hover_point = val
-		update()
+		queue_redraw()
 
 
 func set_selected_point(val: int) -> void:
 	if val != _selected_point:
 		_selected_point = val
-		update()
+		queue_redraw()
 
 
 func set_selected_tangent(val: int) -> void:
 	if val != _selected_tangent:
 		_selected_tangent = val
-		update()
+		queue_redraw()
 
 
 func _on_resized() -> void:

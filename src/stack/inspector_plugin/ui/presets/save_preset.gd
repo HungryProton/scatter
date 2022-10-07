@@ -51,8 +51,10 @@ func _save_preset() -> void:
 
 
 func _exists(preset: String) -> bool:
-	var dir = Directory.new()
-	dir.open(_get_root_folder() + "/presets/")
+	var dir = DirAccess.open(_get_root_folder() + "/presets/")
+	if not dir:
+		return false
+
 	dir.list_dir_begin()
 
 	while true:

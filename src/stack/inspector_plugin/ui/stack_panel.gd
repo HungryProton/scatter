@@ -3,16 +3,22 @@ extends Control
 
 
 const ModifierPanel := preload("./modifier/modifier_panel.tscn")
+const Documentation = preload("../../../documentation/documentation.tscn")
+
 
 @onready var _modifiers_container: Control = $%ModifiersContainer
 @onready var _modifiers_popup: PopupPanel = $%ModifiersPopup
 
 var _scatter
 var _modifier_stack
+var _documentation
 var _is_ready := false
 
 
 func _ready():
+	_documentation = Documentation.instantiate()
+	add_child(_documentation)
+
 	_modifiers_popup.add_modifier.connect(_on_modifier_added)
 	_modifiers_container.child_moved.connect(_on_modifier_moved)
 	$%Rebuild.pressed.connect(_on_rebuild_pressed)
@@ -42,6 +48,7 @@ func rebuild_ui() -> void:
 		ui.create_ui_for(m)
 		ui.removed.connect(_on_modifier_removed.bind(m))
 		ui.value_changed.connect(_on_value_changed)
+		ui.documentation_requested.connect(_on_documentation_requested.bind(m))
 
 
 func _clear() -> void:
@@ -135,5 +142,9 @@ func _on_load_preset(preset_name) -> void:
 
 
 func _on_delete_preset(preset_name) -> void:
-	var dir = Directory.new()
-	dir.remove(_get_root_folder() + "/presets/" + preset_name + ".tscn")
+	DirAccess.remove_absolute(_get_root_folder() + "/presets/" + preset_name + ".tscn")
+
+
+func _on_documentation_requested(modifier) -> void:
+	if _documentation:
+		_documentation.show_page(modifier.display_name)

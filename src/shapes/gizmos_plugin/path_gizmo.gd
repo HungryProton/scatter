@@ -16,12 +16,12 @@ func get_handle_name(_gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: boo
 
 
 func get_handle_value(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool) -> Variant:
-	var shape: PathShape = gizmo.get_spatial_node().shape
+	var shape: PathShape = gizmo.get_node_3d().shape
 	return shape.get_copy()
 
 
 func set_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, camera: Camera3D, screen_pos: Vector2) -> void:
-	var shape_node: ScatterShape = gizmo.get_spatial_node()
+	var shape_node: ScatterShape = gizmo.get_node_3d()
 	var curve: Curve3D = shape_node.shape.curve
 	var point_count: int = curve.get_point_count()
 	var curve_index := handle_id
@@ -62,7 +62,7 @@ func set_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, camer
 
 
 func commit_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, restore: Variant, cancel: bool) -> void:
-	var shape_node: ScatterShape = gizmo.get_spatial_node()
+	var shape_node: ScatterShape = gizmo.get_node_3d()
 
 	if cancel:
 		_edit_path(shape_node, restore)
@@ -77,7 +77,7 @@ func commit_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, 
 
 func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.clear()
-	var shape_node: ScatterShape = gizmo.get_spatial_node()
+	var shape_node: ScatterShape = gizmo.get_node_3d()
 	var shape: PathShape = shape_node.shape
 
 	if not shape:

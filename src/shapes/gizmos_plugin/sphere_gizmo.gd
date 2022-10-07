@@ -14,11 +14,11 @@ func get_handle_name(_gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: boo
 
 
 func get_handle_value(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool) -> Variant:
-	return gizmo.get_spatial_node().shape.radius
+	return gizmo.get_node_3d().shape.radius
 
 
 func set_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, camera: Camera3D, screen_pos: Vector2) -> void:
-	var shape_node = gizmo.get_spatial_node()
+	var shape_node = gizmo.get_node_3d()
 	var origin = shape_node.get_global_transform().origin
 	var ray_from = camera.project_ray_origin(screen_pos)
 	var ray_to = ray_from + camera.project_ray_normal(screen_pos) * 4096
@@ -27,7 +27,7 @@ func set_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, cam
 
 
 func commit_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, restore: Variant, cancel: bool) -> void:
-	var shape: SphereShape = gizmo.get_spatial_node().shape
+	var shape: SphereShape = gizmo.get_node_3d().shape
 	if cancel:
 		shape.radius = restore
 		return
@@ -40,7 +40,7 @@ func commit_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, 
 
 func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.clear()
-	var scatter_shape = gizmo.get_spatial_node()
+	var scatter_shape = gizmo.get_node_3d()
 	var shape: SphereShape = scatter_shape.shape
 
 	### Draw the 3 circles on each axis to represent the sphere

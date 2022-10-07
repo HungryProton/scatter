@@ -42,10 +42,11 @@ func _rebuild_ui():
 func _find_all_presets() -> Array:
 	var root := _get_root_folder() + "/presets/"
 	var res := []
-	var dir = Directory.new()
-	dir.open(root)
-	dir.list_dir_begin()
+	var dir = DirAccess.open(root)
+	if not dir:
+		return res
 
+	dir.list_dir_begin()
 	while true:
 		var file = dir.get_next()
 		if file == "":
@@ -78,8 +79,7 @@ func _on_delete_preset(preset_name, ui) -> void:
 
 
 func _on_delete_preset_confirmed():
-	var dir = Directory.new()
-	dir.remove(_get_root_folder() + "/presets/" + _selected + ".tscn")
+	DirAccess.remove_absolute(_get_root_folder() + "/presets/" + _selected + ".tscn")
 	_selected_ui.queue_free()
 
 

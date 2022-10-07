@@ -4,6 +4,7 @@ extends Control
 
 signal value_changed
 signal removed
+signal documentation_requested
 
 const ParameterBool := preload("./components/parameter_bool.tscn")
 const ParameterScalar := preload("./components/parameter_scalar.tscn")
@@ -45,6 +46,8 @@ func _ready() -> void:
 	_remove.pressed.connect(_on_remove_pressed)
 	_warning.pressed.connect(_on_warning_icon_pressed)
 	_expand.toggled.connect(_on_expand_toggled)
+	$%MenuButton.get_popup().id_pressed.connect(_on_menu_item_pressed)
+
 
 func _get_drag_data(at_position: Vector2):
 	var drag_control_position = _drag_control.global_position - global_position
@@ -175,3 +178,15 @@ func _on_warning_changed() -> void:
 
 func _on_warning_icon_pressed() -> void:
 	_warning_dialog.popup_centered()
+
+
+func _on_menu_item_pressed(id) -> void:
+	match id:
+		0:
+			documentation_requested.emit()
+		2:
+			pass # Duplicate
+		3:
+			_on_remove_pressed()
+		_:
+			pass

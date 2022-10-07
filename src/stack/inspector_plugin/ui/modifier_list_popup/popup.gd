@@ -4,6 +4,7 @@ extends PopupPanel
 
 signal add_modifier
 
+var _modifiers := []
 
 @onready var _category_root: Control = $MarginContainer/CategoryRoot
 
@@ -16,9 +17,8 @@ func _rebuild_ui():
 	for c in _category_root.get_children():
 		c.queue_free()
 
-	var folder = _get_root_folder() + "/src/modifiers/"
-	for script in _get_all_modifier_scripts(folder):
-		var modifier = load(script)
+	_discover_modifiers()
+	for modifier in _modifiers:
 		var instance = modifier.new()
 		if instance.enabled:
 			var category = _get_or_create_category(instance.category)
@@ -66,10 +66,14 @@ func _get_or_create_category(text: String) -> Control:
 	return c
 
 
-func _get_all_modifier_scripts(path) -> Array:
-	var res := []
-	var dir = Directory.new()
-	dir.open(path)
+func _discover_modifiers() -> void:
+	if _modifiers.is_empty():
+		var path = _get_root_folder() + "/src/modifiers/"
+		_discover_modifiers_recursive(path)
+
+
+func _discover_modifiers_recursive(path) -> void:
+	var dir = DirAccess.open(path)
 	dir.list_dir_begin()
 	var path_root = dir.get_current_dir() + "/"
 
@@ -80,7 +84,7 @@ func _get_all_modifier_scripts(path) -> Array:
 		if file == "base_modifier.gd":
 			continue
 		if dir.current_is_dir():
-			_get_all_modifier_scripts(path_root + file)
+			_discover_modifiers_recursive(path_root + file)
 			continue
 		if not file.ends_with(".gd") and not file.ends_with(".gdc"):
 			continue
@@ -91,11 +95,9 @@ func _get_all_modifier_scripts(path) -> Array:
 			print("Error: Failed to load script ", file)
 			continue
 
-		res.append(path_root + file)
+		_modifiers.push_back(script)
 
 	dir.list_dir_end()
-	res.sort()
-	return res
 
 
 func _get_root_folder() -> String:

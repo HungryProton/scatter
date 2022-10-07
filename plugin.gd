@@ -11,7 +11,7 @@ const PathPanel = preload("./src/shapes/gizmos_plugin/components/path_panel.tscn
 
 var _modifier_stack_plugin: EditorInspectorPlugin = ModifierStackPlugin.new()
 var _shape_gizmo_plugin: EditorNode3DGizmoPlugin = ShapeGizmoPlugin.new()
-var _path_panel = PathPanel.instantiate()
+var _path_panel
 
 
 func get_name():
@@ -21,10 +21,11 @@ func get_name():
 func _enter_tree():
 	add_inspector_plugin(_modifier_stack_plugin)
 
+	_path_panel = PathPanel.instantiate()
 	add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_MENU, _path_panel)
 	_path_panel.visible = false
 
-	add_spatial_gizmo_plugin(_shape_gizmo_plugin)
+	add_node_3d_gizmo_plugin(_shape_gizmo_plugin)
 	_shape_gizmo_plugin.set_undo_redo(get_undo_redo())
 	_shape_gizmo_plugin.set_path_gizmo_panel(_path_panel)
 
@@ -58,8 +59,11 @@ func _exit_tree():
 	remove_custom_type("ScatterItem")
 	remove_custom_type("ScatterShape")
 	remove_inspector_plugin(_modifier_stack_plugin)
-	remove_spatial_gizmo_plugin(_shape_gizmo_plugin)
-	remove_control_from_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_MENU, _path_panel)
+	remove_node_3d_gizmo_plugin(_shape_gizmo_plugin)
+	if _path_panel:
+		remove_control_from_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_MENU, _path_panel)
+		_path_panel.queue_free()
+		_path_panel = null
 
 
 func _handles(node) -> bool:
@@ -77,8 +81,9 @@ func _on_selection_changed() -> void:
 	if selected.is_empty():
 		return
 
-	if selected[0] is Scatter:
-		selected[0].undo_redo = get_undo_redo()
+	var selected_node = selected[0]
+	if selected_node is Scatter:
+		selected_node.undo_redo = get_undo_redo()
 
 
 func _on_scene_changed(_scene_root) -> void:

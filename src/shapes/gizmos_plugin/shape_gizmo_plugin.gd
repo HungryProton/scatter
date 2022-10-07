@@ -83,7 +83,7 @@ func set_path_gizmo_panel(panel: Control) -> void:
 func _get_handler(gizmo) -> GizmoHandler:
 	var null_handler = GizmoHandler.new() # Only so we don't have to check existence later
 
-	var shape_node = gizmo.get_spatial_node()
+	var shape_node = gizmo.get_node_3d()
 	if not shape_node or not shape_node is ScatterShape:
 		return null_handler
 

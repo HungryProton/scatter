@@ -23,7 +23,8 @@ const Domain := preload("./common/domain.gd")
 @export var show_output_in_tree := false:
 	set(val):
 		show_output_in_tree = val
-		ScatterUtil.ensure_output_root_exists(self)
+		if output_root:
+			ScatterUtil.enforce_output_root_owner(self)
 
 @export_group("Performance")
 @export var use_instancing := true:
@@ -54,11 +55,13 @@ var domain: Domain:
 var items: Array[ScatterItem]
 var total_item_proportion: int
 var output_root: Node3D
+var documentation
 
 var _thread := Thread.new()
 
 
 func _ready() -> void:
+	print("in ready")
 	_perform_sanity_check()
 	set_notify_transform(true)
 	child_exiting_tree.connect(_on_child_exiting_tree)
@@ -72,11 +75,6 @@ func _process(delta: float) -> void:
 
 func _get_property_list() -> Array:
 	var list := []
-#	list.push_back({
-#		name = "ProtonScatter",
-#		type = TYPE_NIL,
-#		usage = PROPERTY_USAGE_CATEGORY | PROPERTY_USAGE_SCRIPT_VARIABLE,
-#	})
 	list.push_back({
 		name = "modifier_stack",
 		type = TYPE_OBJECT,

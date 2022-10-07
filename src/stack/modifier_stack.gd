@@ -13,6 +13,7 @@ const TransformList = preload("../common/transform_list.gd")
 
 var just_created := false
 var undo_redo: UndoRedo
+var documentation
 
 
 func update(scatter_node: Node3D, domain) -> TransformList:
