@@ -16,18 +16,24 @@ func _init() -> void:
 
 	documentation.add_paragraph(
 		"""Randomly place new transforms inside the area defined by
-		the ScatterShape nodes""")
+		the ScatterShape nodes."""
+	)
 	documentation.add_parameter(
 		"Amount",
 		"How many transforms will be created.",
-		2)
+		2
+	)
 	documentation.add_warning(
 		"""In some cases, the amount of transforms created by this modifier
-		might be lower than the requested amount (but never higher). This is to
-		prevent an infinite loop if the provided ScatterShape has a huge
-		bounding box but a tiny valid space, like a curved path.""")
+		might be lower than the requested amount (but never higher). This may
+		happen if the provided ScatterShape has a huge bounding box but a tiny
+		valid space, like a narrow path."""
+	)
 
 
+# TODO:
+# + Multithreading
+# + Spatial partionning to discard areas outside the domain earlier
 func _process_transforms(transforms, domain, seed) -> void:
 	_rng = RandomNumberGenerator.new()
 	_rng.set_seed(seed)

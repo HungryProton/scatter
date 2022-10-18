@@ -5,6 +5,7 @@
 
 [node name="Documentation" type="PopupPanel"]
 title = "ProtonScatter documentation"
+visible = true
 exclusive = true
 unresizable = false
 borderless = false
@@ -21,13 +22,9 @@ offset_right = 80.0
 offset_bottom = 92.0
 hide_root = true
 
-[node name="PanelContainer" parent="HSplitContainer" index="1"]
+[node name="RichTextLabel" parent="HSplitContainer" index="1"]
 offset_left = 92.0
 offset_right = 92.0
-offset_bottom = 92.0
-
-[node name="RichTextLabel" parent="HSplitContainer/PanelContainer" index="0"]
-offset_right = 0.0
 offset_bottom = 92.0
 
 [editable path="HSplitContainer"]

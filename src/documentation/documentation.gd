@@ -3,6 +3,7 @@ extends PopupPanel
 
 
 # Formats and displays the DocumentationData provided by other parts of the addon
+# TODO: Adjust title font size based on the editor font size / scaling
 
 
 const DocumentationInfo = preload("./documentation_info.gd")
@@ -13,6 +14,9 @@ var _items := {}
 var _roots := {}
 var _modifiers = []
 
+var _accent_color := "Cornflowerblue"
+var _edited_text: String
+
 @onready var tree: Tree = $HSplitContainer/Tree
 @onready var label: RichTextLabel = $HSplitContainer/RichTextLabel
 
@@ -21,6 +25,7 @@ func _ready() -> void:
 	tree.create_item() # Create tree root
 	tree.hide_root = true
 	tree.item_selected.connect(_on_item_selected)
+	_accent_color = label.get_theme_color("font_pressed_color", "CheckBox").to_html(false)
 	_populate()
 
 
@@ -41,23 +46,34 @@ func add_page(info: DocumentationInfo) -> void:
 	var item: TreeItem = tree.create_item(root)
 	item.set_text(0, info.get_title())
 
-	var formatted_text := ""
+	_begin_formatting()
 
 	# Page title
-	formatted_text += "[center][b]" + info.get_title() + "[/b][/center]\n\n"
+	_format_title(info.get_title())
 
 	# Paragraphs
 	for p in info.get_paragraphs():
-		formatted_text += p + "\n\n"
+		_format_paragraph(p)
 
 	# Parameters
-	for p in info.get_parameters():
-		formatted_text += "[b]" + p.name + "[/b]\n"
-		formatted_text += p.description + "\n"
-		formatted_text += "[yellow]" + p.warning.text + "[/yellow]"
+	_format_subtitle("Parameters")
 
-	_pages[item] = formatted_text
+	for p in info.get_parameters():
+		_format_parameter(p)
+
+	# Warnings
+	if not info.get_warnings().is_empty():
+		_format_subtitle("Warnings")
+
+		for w in info.get_warnings():
+			_format_warning(w)
+
+	_pages[item] = _get_formatted_text()
 	_items[info.get_title()] = item
+
+
+func set_accent_color(color: String) -> void:
+	_accent_color = color
 
 
 func _populate():
@@ -118,8 +134,84 @@ func _get_or_create_tree_root(root_name: String) -> TreeItem:
 	return root
 
 
+func _begin_formatting() -> void:
+	_edited_text = ""
+
+
+func _get_formatted_text() -> String:
+	return _edited_text
+
+
+func _format_title(text: String) -> void:
+	_edited_text += "[font_size=20]"
+	_edited_text += "[color=" + _accent_color + "]"
+	_edited_text += "[center][b]"
+	_edited_text += text
+	_edited_text += "[/b][/center]"
+	_edited_text += "[/color]"
+	_edited_text += "[/font_size]"
+	_format_line_break(2)
+
+
+func _format_subtitle(text: String) -> void:
+	_edited_text += "[font_size=16]"
+	_edited_text += "[color=" + _accent_color + "]"
+	_edited_text += "[b]" + text + "[/b]"
+	_edited_text += "[/color]"
+	_edited_text += "[/font_size]"
+	_format_line_break(2)
+
+
+func _format_line_break(count := 1) -> void:
+	for i in count:
+		_edited_text += "\n"
+
+
+func _format_paragraph(text: String) -> void:
+	_edited_text += "[p]" + text + "[/p]"
+	_format_line_break(2)
+
+
+func _format_parameter(p) -> void:
+	_edited_text += "[indent]"
+	_edited_text += "[b]" + p.name + "[/b]  "
+	match p.cost:
+		1:
+			_edited_text += "[img]res://addons/proton_scatter/icons/arrow_log.svg[/img]"
+		2:
+			_edited_text += "[img]res://addons/proton_scatter/icons/arrow_linear.svg[/img]"
+		3:
+			_edited_text += "[img]res://addons/proton_scatter/icons/arrow_exp.svg[/img]"
+
+	_format_line_break(2)
+	_edited_text += "[indent]" + p.description + "[/indent]"
+	_format_line_break(2)
+
+	if not p.warning.text.is_empty():
+		_format_warning(p.warning)
+		_format_line_break()
+
+	_edited_text += "[/indent]"
+
+
+func _format_warning(w, indent := true) -> void:
+	if indent:
+		_edited_text += "[indent]"
+
+	var color := "Darkgray"
+	match w.importance:
+		1:
+			color = "yellow"
+		2:
+			color = "red"
+
+	_edited_text += "[color=" + color + "][i]" + w.text + "[/i][/color]\n"
+
+	if indent:
+		_edited_text += "[/indent]"
+
+
 func _on_item_selected() -> void:
-	print("on item selected")
 	var selected: TreeItem = tree.get_selected()
 	var text: String = _pages[selected]
 	label.set_text(text)

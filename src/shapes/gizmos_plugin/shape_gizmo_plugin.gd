@@ -23,7 +23,9 @@ func _init():
 	var secondary_handle_icon = preload("./icons/secondary_handle.svg")
 
 	# TODO: Replace hardcoded colors by a setting fetch
-	create_material("line", Color(1, 0.7, 0))
+	create_custom_material("line_main_top", Color(1, 0.4, 0))
+	create_custom_material("handle_line_top", Color(0.4, 0.7, 1.0))
+	create_material("line_main", Color(1, 0.4, 0))
 	create_material("handle_line", Color(0.4, 0.7, 1.0))
 	create_material("inclusive", Color(0.9, 0.7, 0.2, 0.15))
 	create_material("exclusive", Color(0.9, 0.1, 0.2, 0.15))
@@ -78,6 +80,24 @@ func set_undo_redo(ur: EditorUndoRedoManager) -> void:
 func set_path_gizmo_panel(panel: Control) -> void:
 	if PathShape in _handlers:
 		_handlers[PathShape].set_gizmo_panel(panel)
+
+
+func set_editor_plugin(plugin: EditorPlugin) -> void:
+	for handler_name in _handlers:
+		_handlers[handler_name].set_editor_plugin(plugin)
+
+
+# Creates a standard material displayed on top of everything.
+# Only exists because 'create_material() on_top' parameter doesn't seem to work.
+func create_custom_material(name, color := Color.WHITE):
+	var material := StandardMaterial3D.new()
+	material.set_blend_mode(StandardMaterial3D.BLEND_MODE_ADD)
+	material.set_shading_mode(StandardMaterial3D.SHADING_MODE_UNSHADED)
+	material.set_flag(StandardMaterial3D.FLAG_DISABLE_DEPTH_TEST, true)
+	material.set_albedo(color)
+	material.render_priority = 100
+
+	add_material(name, material)
 
 
 func _get_handler(gizmo) -> GizmoHandler:

@@ -38,7 +38,7 @@ func set_title(text: String) -> void:
 
 
 func add_paragraph(text: String) -> void:
-	_paragraphs.push_back(text)
+	_paragraphs.push_back(_remove_line_breaks(text))
 
 
 # Warning importance:
@@ -49,6 +49,8 @@ func add_warning(text: String, importance: int = 0) -> void:
 	var w = Warning.new()
 	w.text = _remove_line_breaks(text)
 	w.importance = importance
+
+	_warnings.push_back(w)
 
 
 # Add documentation for a user exposed parameter.
@@ -92,6 +94,8 @@ func get_parameters() -> Array[Parameter]:
 
 
 func _remove_line_breaks(text: String) -> String:
+	# Remove tabs
+	text = text.replace("\t", "")
 	# Remove line breaks
 	text = text.replace("\n", " ")
 	# Remove occasional double space caused by the line above

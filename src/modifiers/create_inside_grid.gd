@@ -13,6 +13,21 @@ func _init() -> void:
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 
+	documentation.add_paragraph(
+		"Place transforms along an uniform grid."
+	)
+	documentation.add_parameter(
+		"Spacing",
+		"""Defines the grid size along the 3 axes. A spacing of 1 means 1 unit
+		of space between each transform on this axis.""",
+		3,
+		"""The smaller the value, the denser the resulting transforms list.
+		Use with care as the performance impact will go up quickly. A value
+		of 0 would result in infinite transforms, so it's capped to 0.05
+		at least.""",
+		0
+	)
+
 
 func _process_transforms(transforms, domain, seed) -> void:
 	spacing.x = max(_min_spacing, spacing.x)

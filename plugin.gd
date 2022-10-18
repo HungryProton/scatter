@@ -28,6 +28,7 @@ func _enter_tree():
 	add_node_3d_gizmo_plugin(_shape_gizmo_plugin)
 	_shape_gizmo_plugin.set_undo_redo(get_undo_redo())
 	_shape_gizmo_plugin.set_path_gizmo_panel(_path_panel)
+	_shape_gizmo_plugin.set_editor_plugin(self)
 
 	add_custom_type(
 		"ProtonScatter",

@@ -105,7 +105,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 		lines.append(points[i])
 		lines.append(points[i + 1])
 
-	gizmo.add_lines(lines, plugin.get_material("line", gizmo))
+	gizmo.add_lines(lines, plugin.get_material("line_main_top", gizmo))
 	gizmo.add_collision_segments(lines)
 
 	# ------ Draw handles ------
@@ -130,7 +130,11 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 
 	gizmo.add_handles(main_handles, plugin.get_material("main_handle", gizmo), ids)
 	gizmo.add_handles(in_out_handles, plugin.get_material("secondary_handle", gizmo), ids, false, true)
-	gizmo.add_lines(handle_lines, plugin.get_material("handle_line", gizmo))
+
+	if is_selected(gizmo):
+		gizmo.add_lines(handle_lines, plugin.get_material("handle_line_top", gizmo))
+	else:
+		gizmo.add_lines(handle_lines, plugin.get_material("handle_line", gizmo))
 
 	# ----- Mesh representing the inside part of the path -----
 	if shape.closed:

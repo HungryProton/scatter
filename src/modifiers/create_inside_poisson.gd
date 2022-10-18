@@ -39,6 +39,31 @@ func _init() -> void:
 	can_override_seed = true
 	restrict_height = true
 
+	documentation.add_paragraph(
+		"""Place transforms without overlaps. Transforms are assumed to have a
+		spherical shape."""
+	)
+	documentation.add_parameter(
+		"Radius",
+		"Transform size.",
+		0,
+		"""The larger the radius, the harder it will be to place the transform.
+		On the other hand, smaller radius means more room for more points,
+		meaning it will take longer to complete."""
+	)
+	documentation.add_parameter(
+		"Samples before rejection",
+		"The algorithm tries a point at random until it finds a valid one. This
+		parameter controls how many attempts before moving to the next
+		iteration. Lower values are faster but gives poor coverage. Higher
+		values generates better coverage but are slower.",
+		2
+	)
+	documentation.add_warning(
+		"""This modifier uses a poisson disk sampling algorithm which can be
+		quite slow."""
+	)
+
 
 func _process_transforms(transforms, domain, seed) -> void:
 	_rng = RandomNumberGenerator.new()
