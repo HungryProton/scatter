@@ -23,14 +23,18 @@ func _init():
 	var secondary_handle_icon = preload("./icons/secondary_handle.svg")
 
 	# TODO: Replace hardcoded colors by a setting fetch
-	create_custom_material("line_main_top", Color(1, 0.4, 0))
-	create_custom_material("handle_line_top", Color(0.4, 0.7, 1.0))
-	create_material("line_main", Color(1, 0.4, 0))
-	create_material("handle_line", Color(0.4, 0.7, 1.0))
+	create_material("primary", Color(1, 0.4, 0))
+	create_material("secondary", Color(0.4, 0.7, 1.0))
+	create_material("tertiary", Color(Color.STEEL_BLUE, 0.2))
+	create_custom_material("primary_top", Color(1, 0.4, 0))
+	create_custom_material("secondary_top", Color(0.4, 0.7, 1.0))
+	create_custom_material("tertiary_top", Color(Color.STEEL_BLUE, 0.1))
+
 	create_material("inclusive", Color(0.9, 0.7, 0.2, 0.15))
 	create_material("exclusive", Color(0.9, 0.1, 0.2, 0.15))
-	create_handle_material("handle")
-	create_handle_material("main_handle", false, handle_icon)
+
+	create_handle_material("default_handle")
+	create_handle_material("primary_handle", false, handle_icon)
 	create_handle_material("secondary_handle", false, secondary_handle_icon)
 
 	_handlers[SphereShape] = preload("./sphere_gizmo.gd").new()

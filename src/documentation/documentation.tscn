@@ -5,7 +5,6 @@
 
 [node name="Documentation" type="PopupPanel"]
 title = "ProtonScatter documentation"
-visible = true
 exclusive = true
 unresizable = false
 borderless = false

@@ -45,7 +45,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 
 	### Draw the 3 circles on each axis to represent the sphere
 	var lines = PackedVector3Array()
-	var lines_material := plugin.get_material("line_main_top", gizmo)
+	var lines_material := plugin.get_material("primary_top", gizmo)
 	var steps = 32 # TODO: Update based on sphere radius maybe ?
 	var step_angle = 2 * PI / steps
 	var radius = shape.radius
@@ -68,7 +68,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	### Draw the handle
 	var handles := PackedVector3Array()
 	var handles_ids := PackedInt32Array()
-	var handles_material := plugin.get_material("handle", gizmo)
+	var handles_material := plugin.get_material("default_handle", gizmo)
 
 	var handle_position: Vector3 = Vector3.LEFT * radius
 	handles.push_back(handle_position)

@@ -17,6 +17,9 @@ func _ready() -> void:
 	$%SnapToColliders.toggled.connect(_on_snap_to_colliders_toggled)
 	$%ClosedPath.toggled.connect(_on_closed_path_toggled)
 
+	for button in [$%LockToPlane, $%SnapToColliders, $%ClosedPath]:
+		button.pressed.connect(_on_button_pressed)
+
 
 # Called by the editor plugin when the node selection changes.
 # Hides the panel when the selected node is not a path shape.
@@ -46,7 +49,7 @@ func is_delete_mode_enabled() -> bool:
 
 
 func is_lock_to_plane_enabled() -> bool:
-	return $%LockToPlane.button_pressed
+	return $%LockToPlane.button_pressed and not is_snap_to_colliders_enabled()
 
 
 func is_snap_to_colliders_enabled() -> bool:
@@ -81,3 +84,8 @@ func _on_snap_to_colliders_toggled(enabled: bool) -> void:
 func _on_closed_path_toggled(enabled: bool) -> void:
 	if shape_node and shape_node.shape is PathShape:
 		shape_node.shape.closed = enabled
+
+
+func _on_button_pressed() -> void:
+	if shape_node:
+		shape_node.update_gizmos()

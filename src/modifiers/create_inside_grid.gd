@@ -47,7 +47,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 		height = 1
 		baseline = domain.bounds.max.y
 	else:
-		height = max(1, height) # Make sure this never gets to 0 or else nothing happens
+		height = max(1, height) # Make sure height never gets below 1 or else nothing happens
 
 	var max_count: int = width * length * height
 	var new_transforms: Array[Transform3D] = []

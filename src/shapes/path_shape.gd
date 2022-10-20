@@ -2,15 +2,18 @@
 extends "base_shape.gd"
 
 
+const Bounds := preload("../common/bounds.gd")
+
+
 @export var closed := true:
 	set(val):
 		closed = val
 		emit_changed()
 
-@export var width := 0.0:
+@export var thickness := 0.0:
 	set(val):
-		width = max(0, val) # Width cannot be negative
-		_half_width_squared = pow(width * 0.5, 2)
+		thickness = max(0, val) # Width cannot be negative
+		_half_thickness_squared = pow(thickness * 0.5, 2)
 		emit_changed()
 
 @export var curve: Curve3D:
@@ -25,7 +28,8 @@ extends "base_shape.gd"
 
 
 var _polygon: PolygonPathFinder
-var _half_width_squared: float
+var _half_thickness_squared: float
+var _bounds: Bounds
 
 
 func is_point_inside(point: Vector3, global_transform: Transform3D) -> bool:
@@ -34,10 +38,10 @@ func is_point_inside(point: Vector3, global_transform: Transform3D) -> bool:
 
 	point = global_transform.affine_inverse() * point
 
-	if width > 0:
+	if thickness > 0:
 		var closest_point_on_curve: Vector3 = curve.get_closest_point(point)
 		var dist2 = closest_point_on_curve.distance_squared_to(point)
-		if dist2 < _half_width_squared:
+		if dist2 < _half_thickness_squared:
 			return true
 
 	if closed:
@@ -49,29 +53,45 @@ func is_point_inside(point: Vector3, global_transform: Transform3D) -> bool:
 func get_corners_global(gt: Transform3D) -> Array:
 	var res := []
 
-	var points = curve.tessellate(3, 10)
-	for i in points.size() - 1:
-		var p1 = points[i]
-		var p2 = points[i + 1]
-		var n = (p2 - p1).cross(Vector3.UP).normalized()
-		var offset = n * width * 0.5
+	var half_thickness = thickness * 0.5
+	var corners = [
+		Vector3(-1, -1, -1),
+		Vector3(1, -1, -1),
+		Vector3(1, -1, 1),
+		Vector3(-1, -1, 1),
+		Vector3(-1, 1, -1),
+		Vector3(1, 1, -1),
+		Vector3(1, 1, 1),
+		Vector3(-1, 1, 1),
+	]
 
-		res.push_back(gt * (p1 + offset))
-		res.push_back(gt * (p1 - offset))
+	var points = curve.tessellate(3, 10)
+	for p in points:
+		res.push_back(gt * p)
+
+		if thickness > 0:
+			for offset in corners:
+				res.push_back(gt * (p + offset * half_thickness))
 
 	return res
 
 
+func get_bounds() -> Bounds:
+	if not _bounds:
+		_update_polygon_from_curve()
+	return _bounds
+
+
 func get_copy():
 	var copy = get_script().new()
-	copy.width = width
+	copy.thickness = thickness
 	copy.curve = curve.duplicate()
 	copy.closed = closed
 	return copy
 
 
 func copy_from(source) -> void:
-	width = source.width
+	thickness = source.thickness
 	if source.curve:
 		curve = source.curve.duplicate() # TODO, update signals
 
@@ -112,7 +132,7 @@ func get_closest_to(position):
 
 
 func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[PackedVector2Array]:
-	if not closed and width <= 0:
+	if not closed and thickness <= 0:
 		return []
 
 	var edges: Array[PackedVector2Array] = []
@@ -131,12 +151,12 @@ func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[P
 		polyline.reverse()
 
 	# Expand the polyline to get the outer edge of the path.
-	if width > 0:
+	if thickness > 0:
 		# WORKAROUND. We cant specify the round end caps resolution, but it's tied to the polyline
 		# size. So we scale everything up before calling offset_polyline(), then scale the result
 		# down so we get rounder caps.
-		var scale = 5.0 * width
-		var delta = (width / 2.0) * scale
+		var scale = 5.0 * thickness
+		var delta = (thickness / 2.0) * scale
 
 		var t2 = Transform2D().scaled(Vector2.ONE * scale)
 		var result := Geometry2D.offset_polyline(polyline * t2, delta, Geometry2D.JOIN_ROUND, Geometry2D.END_ROUND)
@@ -152,7 +172,7 @@ func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[P
 
 
 func get_open_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[Curve3D]:
-	if not curve or closed or width > 0:
+	if not curve or closed or thickness > 0:
 		return []
 
 	var res := Curve3D.new()
@@ -171,6 +191,9 @@ func get_open_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[Cur
 func _update_polygon_from_curve() -> void:
 	var connections = PackedInt32Array()
 	var polygon_points = PackedVector2Array()
+	if not _bounds:
+		_bounds = Bounds.new()
+	_bounds.clear()
 
 	if not curve:
 		curve = Curve3D.new()
@@ -188,6 +211,7 @@ func _update_polygon_from_curve() -> void:
 	for i in baked_points.size():
 		var point = baked_points[i]
 		var projected_point = Vector2(point.x, point.z)
+		_bounds.feed(point)
 
 		polygon_points.push_back(projected_point)
 		connections.append(i)
@@ -196,6 +220,7 @@ func _update_polygon_from_curve() -> void:
 		else:
 			connections.append(i + 1)
 
+	_bounds.compute_bounds()
 	_polygon.setup(polygon_points, connections)
 
 

@@ -135,10 +135,15 @@ static func get_all_mesh_instances_from(node: Node3D) -> Array[MeshInstance3D]:
 
 # Find all the meshes below node and create a new single mesh with multiple
 # surfaces from all of them.
-static func get_merged_meshes_from(node) -> MeshInstance3D:
+static func get_merged_meshes_from(node: Node) -> MeshInstance3D:
 	# Reset node transform for this step, overwise they'll stack
-	var transform_backup = node.global_transform
-	node.global_transform = Transform3D()
+	var transform_backup: Transform3D
+	if node.is_inside_tree():
+		transform_backup = node.get_global_transform()
+		node.global_transform = Transform3D()
+	else:
+		transform_backup = node.transform
+		node.transform = Transform3D()
 
 	var instances := get_all_mesh_instances_from(node)
 	if instances.is_empty():
@@ -152,6 +157,11 @@ static func get_merged_meshes_from(node) -> MeshInstance3D:
 		var mesh: Mesh = mi.mesh
 		var surface_count = mesh.get_surface_count()
 		var material_override = mi.get_material_override()
+		var inverse_transform: Transform3D
+		if mi.is_inside_tree():
+			inverse_transform = mi.global_transform.affine_inverse()
+		else:
+			inverse_transform = mi.transform.affine_inverse()
 
 		for j in surface_count:
 			var arrays = mesh.surface_get_arrays(j)
@@ -159,7 +169,7 @@ static func get_merged_meshes_from(node) -> MeshInstance3D:
 
 			for k in length:
 				var pos: Vector3 = arrays[ArrayMesh.ARRAY_VERTEX][k]
-				pos = pos * mi.global_transform.affine_inverse()
+				pos = pos * inverse_transform
 				arrays[ArrayMesh.ARRAY_VERTEX][k] = pos
 
 			array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
@@ -178,7 +188,10 @@ static func get_merged_meshes_from(node) -> MeshInstance3D:
 			total_surfaces += 1
 
 	# Restore node initial transform
-	node.global_transform = transform_backup
+	if node.is_inside_tree():
+		node.global_transform = transform_backup
+	else:
+		node.transform = transform_backup
 
 	# Return merged mesh
 	var res := MeshInstance3D.new()

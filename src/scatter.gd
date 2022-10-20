@@ -225,7 +225,6 @@ func _update_duplicates(transforms: TransformList) -> void:
 	var inverse_transform := global_transform.affine_inverse()
 
 	for item in items:
-		print("item ", item)
 		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
 		var root = ScatterUtil.get_or_create_item_root(item)
 		var child_count = root.get_child_count()

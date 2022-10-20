@@ -93,6 +93,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	for p in points:
 		points_2d.push_back(Vector2(p.x, p.z))
 
+	var line_material: StandardMaterial3D = plugin.get_material("primary_top", gizmo)
 	var mesh_material: StandardMaterial3D = plugin.get_material("inclusive", gizmo)
 	if shape_node.exclusive:
 		mesh_material = plugin.get_material("exclusive", gizmo)
@@ -105,7 +106,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 		lines.append(points[i])
 		lines.append(points[i + 1])
 
-	gizmo.add_lines(lines, plugin.get_material("line_main_top", gizmo))
+	gizmo.add_lines(lines, line_material)
 	gizmo.add_collision_segments(lines)
 
 	# ------ Draw handles ------
@@ -128,13 +129,25 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 		in_out_handles.push_back(point_out)
 		main_handles.push_back(point_pos)
 
-	gizmo.add_handles(main_handles, plugin.get_material("main_handle", gizmo), ids)
+	gizmo.add_handles(main_handles, plugin.get_material("primary_handle", gizmo), ids)
 	gizmo.add_handles(in_out_handles, plugin.get_material("secondary_handle", gizmo), ids, false, true)
 
 	if is_selected(gizmo):
-		gizmo.add_lines(handle_lines, plugin.get_material("handle_line_top", gizmo))
-	else:
-		gizmo.add_lines(handle_lines, plugin.get_material("handle_line", gizmo))
+		gizmo.add_lines(handle_lines, plugin.get_material("secondary_top", gizmo))
+
+	# -------- Visual when lock to plane is enabled --------
+	if _gizmo_panel.is_lock_to_plane_enabled() and is_selected(gizmo):
+		var bounds = shape.get_bounds()
+		var aabb = AABB(bounds.min, bounds.size).grow(shape.thickness / 2.0)
+
+		var width: float = aabb.size.x
+		var length: float = aabb.size.z
+
+		var plane_mesh := PlaneMesh.new()
+		plane_mesh.set_size(Vector2(width, length))
+		plane_mesh.set_center_offset(bounds.center)
+
+		gizmo.add_mesh(plane_mesh, plugin.get_material("tertiary", gizmo))
 
 	# ----- Mesh representing the inside part of the path -----
 	if shape.closed:
@@ -151,72 +164,67 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 		var mesh = st.commit()
 		gizmo.add_mesh(mesh, mesh_material)
 
-	# ------ Mesh representing path width ------
-	if shape.width <= 0:
-		return
+	# ------ Mesh representing path thickness ------
+	if shape.thickness > 0 and points.size() > 1:
 
-	if points.size() < 2:
-		return
+		# ____ TODO ____ : check if this whole section could be replaced by
+		# Geometry2D.expand_polyline, or an extruded capsule along the path
 
-	# ____ TODO ____ : check if this whole section could be replaced by
-	# Geometry2D.expand_polyline, or an extruded capsule along the path
+		## Main path mesh
+		var st = SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
 
+		for i in points.size() - 1:
+			var p1: Vector3 = points[i]
+			var p2: Vector3 = points[i + 1]
 
-	## Main path mesh
-	var st = SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
+			var normal = (p2 - p1).cross(Vector3.UP).normalized()
+			var offset = normal * shape.thickness * 0.5
 
-	for i in points.size() - 1:
-		var p1: Vector3 = points[i]
-		var p2: Vector3 = points[i + 1]
+			st.add_vertex(p1 - offset)
+			st.add_vertex(p1 + offset)
 
-		var normal = (p2 - p1).cross(Vector3.UP).normalized()
-		var offset = normal * shape.width * 0.5
+		## Add the last missing two triangles from the loop above
+		var p1: Vector3 = points[-1]
+		var p2: Vector3 = points[-2]
+		var normal = (p1 - p2).cross(Vector3.UP).normalized()
+		var offset = normal * shape.thickness * 0.5
 
 		st.add_vertex(p1 - offset)
 		st.add_vertex(p1 + offset)
 
-	## Add the last missing two triangles from the loop above
-	var p1: Vector3 = points[-1]
-	var p2: Vector3 = points[-2]
-	var normal = (p1 - p2).cross(Vector3.UP).normalized()
-	var offset = normal * shape.width * 0.5
+		var mesh := st.commit()
+		gizmo.add_mesh(mesh, mesh_material)
 
-	st.add_vertex(p1 - offset)
-	st.add_vertex(p1 + offset)
+		## Rounded cap (start)
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		var center = points[0]
+		var next = points[1]
+		normal = (center - next).cross(Vector3.UP).normalized()
 
-	var mesh := st.commit()
-	gizmo.add_mesh(mesh, mesh_material)
+		for i in 12:
+			st.add_vertex(center)
+			st.add_vertex(center + normal * shape.thickness * 0.5)
+			normal = normal.rotated(Vector3.UP, PI / 12)
+			st.add_vertex(center + normal * shape.thickness * 0.5)
 
-	## Rounded cap (start)
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var center = points[0]
-	var next = points[1]
-	normal = (center - next).cross(Vector3.UP).normalized()
+		mesh = st.commit()
+		gizmo.add_mesh(mesh, mesh_material)
 
-	for i in 12:
-		st.add_vertex(center)
-		st.add_vertex(center + normal * shape.width * 0.5)
-		normal = normal.rotated(Vector3.UP, PI / 12)
-		st.add_vertex(center + normal * shape.width * 0.5)
+		## Rounded cap (end)
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		center = points[-1]
+		next = points[-2]
+		normal = (next - center).cross(Vector3.UP).normalized()
 
-	mesh = st.commit()
-	gizmo.add_mesh(mesh, mesh_material)
+		for i in 12:
+			st.add_vertex(center)
+			st.add_vertex(center + normal * shape.thickness * 0.5)
+			normal = normal.rotated(Vector3.UP, -PI / 12)
+			st.add_vertex(center + normal * shape.thickness * 0.5)
 
-	## Rounded cap (end)
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	center = points[-1]
-	next = points[-2]
-	normal = (next - center).cross(Vector3.UP).normalized()
-
-	for i in 12:
-		st.add_vertex(center)
-		st.add_vertex(center + normal * shape.width * 0.5)
-		normal = normal.rotated(Vector3.UP, -PI / 12)
-		st.add_vertex(center + normal * shape.width * 0.5)
-
-	mesh = st.commit()
-	gizmo.add_mesh(mesh, mesh_material)
+		mesh = st.commit()
+		gizmo.add_mesh(mesh, mesh_material)
 
 
 func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> bool:
@@ -267,7 +275,7 @@ func set_gizmo_panel(panel: PathPanel) -> void:
 
 func _edit_path(shape_node: ScatterShape, restore: PathShape) -> void:
 	shape_node.shape.curve = restore.curve.duplicate()
-	shape_node.shape.width = restore.width
+	shape_node.shape.thickness = restore.thickness
 	shape_node.update_gizmos()
 
 

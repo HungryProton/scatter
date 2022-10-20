@@ -15,7 +15,7 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		update_gizmos()
 		ScatterUtil.request_parent_to_rebuild(self)
 
-@export_enum("Path", "Sphere") var shape_type: #TODO: Remove this once the custom resource export works
+@export_enum("Path", "Sphere") var shape_type = 0: #TODO: Remove this once the custom resource export works
 	set(val):
 		if val == shape_type:
 			return
