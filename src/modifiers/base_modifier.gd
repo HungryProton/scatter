@@ -57,6 +57,16 @@ func process_transforms(transforms: TransformList, domain: Domain, global_seed: 
 	warning_changed.emit()
 
 
+func get_copy():
+	var script = get_script()
+	var copy = script.new()
+	for p in get_property_list():
+		var value = get(p.name)
+		copy.set(p.name, value)
+
+	return copy
+
+
 func _clear_warning() -> void:
 	warning = ""
 	warning_changed.emit()

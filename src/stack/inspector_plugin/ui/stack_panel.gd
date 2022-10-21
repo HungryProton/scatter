@@ -49,6 +49,7 @@ func rebuild_ui() -> void:
 		ui.removed.connect(_on_modifier_removed.bind(m))
 		ui.value_changed.connect(_on_value_changed)
 		ui.documentation_requested.connect(_on_documentation_requested.bind(m))
+		ui.duplication_requested.connect(_on_duplication_requested.bind(m))
 
 
 func _clear() -> void:
@@ -143,6 +144,10 @@ func _on_load_preset(preset_name) -> void:
 
 func _on_delete_preset(preset_name) -> void:
 	DirAccess.remove_absolute(_get_root_folder() + "/presets/" + preset_name + ".tscn")
+
+
+func _on_duplication_requested(modifier) -> void:
+	_modifier_stack.duplicate_modifier(modifier)
 
 
 func _on_documentation_requested(modifier) -> void:

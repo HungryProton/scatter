@@ -22,6 +22,7 @@
 [node name="ModifierPanel" type="MarginContainer"]
 anchors_preset = 10
 anchor_right = 1.0
+grow_horizontal = 2
 theme_type_variation = &"fg"
 script = ExtResource("1")
 

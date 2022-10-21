@@ -5,6 +5,8 @@ extends Control
 signal value_changed
 signal removed
 signal documentation_requested
+signal duplication_requested
+
 
 const ParameterBool := preload("./components/parameter_bool.tscn")
 const ParameterScalar := preload("./components/parameter_scalar.tscn")
@@ -185,7 +187,7 @@ func _on_menu_item_pressed(id) -> void:
 		0:
 			documentation_requested.emit()
 		2:
-			pass # Duplicate
+			duplication_requested.emit()
 		3:
 			_on_remove_pressed()
 		_:

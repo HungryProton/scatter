@@ -41,6 +41,14 @@ func remove(modifier) -> void:
 		stack_changed.emit()
 
 
+func duplicate_modifier(modifier) -> void:
+	var index: int = stack.find(modifier)
+	if index != -1:
+		var duplicate = modifier.get_copy()
+		add(duplicate)
+		move(stack.size() - 1, index + 1)
+
+
 func get_copy():
 	var copy = get_script().new()
 	for modifier in stack:

@@ -12,6 +12,25 @@ func _init() -> void:
 	category = "Offset"
 	can_restrict_height = false
 
+	documentation.add_paragraph(
+		"Offsets position, rotation and scale in a single modifier. Every
+		transforms generated before will see the same transformation applied."
+	)
+	documentation.add_parameter(
+		"Position",
+		"How far each transforms are moved.",
+		0
+	)
+	documentation.add_parameter(
+		"Rotation",
+		"Rotation angle (in degrees) along each axes (X, Y, Z)",
+		0
+	)
+	documentation.add_parameter(
+		"Scale",
+		"How much to scale the transform along each axes (X, Y, Z)",
+		0
+	)
 
 func _process_transforms(transforms, domain, _seed) -> void:
 	var t: Transform3D

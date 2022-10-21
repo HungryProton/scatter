@@ -1,21 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://cojoo2c73fpsb"]
-
-[sub_resource type="SystemFont" id="SystemFont_pxoe0"]
-font_style = 1
-
-[sub_resource type="FontVariation" id="FontVariation_bfour"]
-base_font = SubResource("SystemFont_pxoe0")
-variation_embolden = 0.5
-spacing_glyph = 1
-
-[sub_resource type="SystemFont" id="SystemFont_y5haq"]
-font_style = 2
-
-[sub_resource type="FontVariation" id="FontVariation_vm5br"]
-base_font = SubResource("SystemFont_y5haq")
-
-[sub_resource type="SystemFont" id="SystemFont_na240"]
-font_style = 3
+[gd_scene format=3 uid="uid://cojoo2c73fpsb"]
 
 [node name="HSplitContainer" type="HSplitContainer"]
 anchors_preset = 15
@@ -35,8 +18,5 @@ layout_mode = 2
 offset_left = 262.0
 offset_right = 1152.0
 offset_bottom = 648.0
-theme_override_fonts/bold_font = SubResource("FontVariation_bfour")
-theme_override_fonts/italics_font = SubResource("FontVariation_vm5br")
-theme_override_fonts/bold_italics_font = SubResource("SystemFont_na240")
 bbcode_enabled = true
-text = "[center] [b] Documentation page [/b] [/center]"
+text = "[center] [b] [i] Documentation page [/i] [/b] [/center]"

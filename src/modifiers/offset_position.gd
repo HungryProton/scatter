@@ -11,6 +11,14 @@ func _init() -> void:
 	can_use_global_and_local_space = true
 	can_restrict_height = false
 
+	documentation.add_paragraph(
+		"Moves every transform the same way."
+	)
+	documentation.add_parameter(
+		"Position",
+		"How far each transforms are moved.",
+		0
+	)
 
 func _process_transforms(transforms, domain, _seed) -> void:
 	var t: Transform3D

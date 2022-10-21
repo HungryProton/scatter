@@ -11,6 +11,28 @@ var _rng: RandomNumberGenerator
 func _init() -> void:
 	display_name = "Randomize Rotation"
 	category = "Edit"
+	can_restrict_height = false
+	can_use_global_and_local_space = true
+	use_local_space = true
+
+	documentation.add_paragraph(
+		"Randomly rotate every transforms individually."
+	)
+	documentation.add_parameter(
+		"Rotation",
+		"Rotation angle (in degrees) along each axes (X, Y, Z)",
+		0
+	)
+	documentation.add_parameter(
+		"Snap angle",
+		"When set to any value above 0, the rotation will be done by increments
+		of the snap angle.",
+		0,
+		"Example: When Snap Angle is set to 90, the possible random rotation
+		offsets around an axis will be among [0, 90, 180, 360].",
+		0
+	)
+
 
 
 func _process_transforms(transforms, domain, seed) -> void:
