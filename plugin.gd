@@ -5,11 +5,13 @@ extends EditorPlugin
 const Scatter = preload("./src/scatter.gd")
 const ScatterShape = preload("./src/scatter_shape.gd")
 const ModifierStackPlugin = preload("./src/stack/inspector_plugin/modifier_stack_plugin.gd")
+const ScatterGizmoPlugin = preload("./src/scatter_gizmo_plugin.gd")
 const ShapeGizmoPlugin = preload("./src/shapes/gizmos_plugin/shape_gizmo_plugin.gd")
 const PathPanel = preload("./src/shapes/gizmos_plugin/components/path_panel.tscn")
 
 
 var _modifier_stack_plugin: EditorInspectorPlugin = ModifierStackPlugin.new()
+var _scatter_gizmo_plugin: ScatterGizmoPlugin = ScatterGizmoPlugin.new()
 var _shape_gizmo_plugin: EditorNode3DGizmoPlugin = ShapeGizmoPlugin.new()
 var _path_panel
 
@@ -24,6 +26,8 @@ func _enter_tree():
 	_path_panel = PathPanel.instantiate()
 	add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_MENU, _path_panel)
 	_path_panel.visible = false
+
+	add_node_3d_gizmo_plugin(_scatter_gizmo_plugin)
 
 	add_node_3d_gizmo_plugin(_shape_gizmo_plugin)
 	_shape_gizmo_plugin.set_undo_redo(get_undo_redo())
@@ -61,6 +65,7 @@ func _exit_tree():
 	remove_custom_type("ScatterShape")
 	remove_inspector_plugin(_modifier_stack_plugin)
 	remove_node_3d_gizmo_plugin(_shape_gizmo_plugin)
+	remove_node_3d_gizmo_plugin(_scatter_gizmo_plugin)
 	if _path_panel:
 		remove_control_from_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_MENU, _path_panel)
 		_path_panel.queue_free()

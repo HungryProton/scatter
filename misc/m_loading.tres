@@ -1,0 +1,20 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://dpq4invfoieiv"]
+
+[ext_resource type="Texture2D" uid="uid://il8i8280eew6" path="res://addons/proton_scatter/misc/t_loading.tres" id="1_7rsk1"]
+
+[resource]
+render_priority = 120
+transparency = 1
+blend_mode = 1
+depth_draw_mode = 2
+no_depth_test = true
+disable_ambient_light = true
+albedo_color = Color(1, 0.498039, 0, 1)
+albedo_texture = ExtResource("1_7rsk1")
+emission_enabled = true
+emission = Color(1, 0.411765, 0, 1)
+emission_energy_multiplier = 3.5
+disable_receive_shadows = true
+billboard_mode = 1
+fixed_size = true
+point_size = 24.8

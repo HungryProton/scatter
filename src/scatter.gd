@@ -58,10 +58,10 @@ var output_root: Node3D
 var documentation
 
 var _thread := Thread.new()
+var _rebuild_queued := false
 
 
 func _ready() -> void:
-	print("in ready")
 	_perform_sanity_check()
 	set_notify_transform(true)
 	child_exiting_tree.connect(_on_child_exiting_tree)
@@ -117,12 +117,17 @@ func is_scatter_node() -> bool:
 	return true
 
 
+func is_thread_running() -> bool:
+	return _thread.is_alive()
+
+
 func full_rebuild(delayed := false):
-	print("in full rebuild")
+	update_gizmos()
+
 	if delayed:
 		await get_tree().process_frame
 
-	if _thread.is_alive():
+	if is_thread_running():
 		_thread.wait_to_finish()
 
 	_clear_output()
@@ -134,12 +139,13 @@ func full_rebuild(delayed := false):
 # TRANSFORM_CHANGED notification in every children, which in turn notify the
 # parent Scatter node back about the changes.
 func rebuild(force_discover := false) -> void:
-	print("in rebuild")
+	update_gizmos()
+
 	if not is_inside_tree():
 		return
 
 	if _thread.is_started(): # still running in the background
-		print("thread already started, abort")
+		_rebuild_queued = true
 		return
 
 	force_discover = true # TMP while we fix the other issues
@@ -170,6 +176,10 @@ func _rebuild(force_discover) -> void:
 		await thread_completed
 		transforms = _thread.wait_to_finish()
 
+	if _rebuild_queued:
+		_rebuild_queued = false
+		_rebuild(true)
+
 	if not transforms or transforms.size() == 0:
 		print("No transforms generated")
 		return
@@ -178,6 +188,8 @@ func _rebuild(force_discover) -> void:
 		_update_multimeshes(transforms)
 	else:
 		_update_duplicates(transforms)
+
+	update_gizmos()
 
 
 func _discover_items() -> void:
