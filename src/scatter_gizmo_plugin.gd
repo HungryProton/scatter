@@ -16,7 +16,7 @@ func _init():
 	add_material("loading", preload("../misc/m_loading.tres"))
 
 	_loading_mesh = QuadMesh.new()
-	_loading_mesh.set_size(Vector2.ONE * 0.2)
+	_loading_mesh.set_size(Vector2.ONE * 0.15)
 
 
 func _get_gizmo_name() -> String:

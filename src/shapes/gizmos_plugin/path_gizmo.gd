@@ -21,6 +21,9 @@ func get_handle_value(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: boo
 
 
 func set_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, camera: Camera3D, screen_pos: Vector2) -> void:
+	if not _gizmo_panel.is_select_mode_enabled():
+		return
+
 	var shape_node: ScatterShape = gizmo.get_node_3d()
 	var curve: Curve3D = shape_node.shape.curve
 	var point_count: int = curve.get_point_count()
@@ -45,18 +48,25 @@ func set_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, camer
 		curve.set_point_position(handle_id, point_local_position)
 	else:
 		# In out handle moved
-		var align_handles = Input.is_key_pressed(KEY_SHIFT)
+		var mirror_angle := _gizmo_panel.is_mirror_angle_enabled()
+		var mirror_length := _gizmo_panel.is_mirror_length_enabled()
+
 		var point_origin = curve.get_point_position(curve_index)
 		var in_out_position = point_local_position - point_origin
+		var mirror_position = -in_out_position
 
 		if handle_id % 2 == 0:
 			curve.set_point_in(curve_index, in_out_position)
-			if align_handles:
-				curve.set_point_out(curve_index, -in_out_position)
+			if mirror_angle:
+				if not mirror_length:
+					mirror_position = curve.get_point_out(curve_index).length() * -in_out_position.normalized()
+				curve.set_point_out(curve_index, mirror_position)
 		else:
 			curve.set_point_out(curve_index, in_out_position)
-			if align_handles:
-				curve.set_point_in(curve_index, -in_out_position)
+			if mirror_angle:
+				if not mirror_length:
+					mirror_position = curve.get_point_in(curve_index).length() * -in_out_position.normalized()
+				curve.set_point_in(curve_index, mirror_position)
 
 	shape_node.update_gizmos()
 
@@ -236,7 +246,7 @@ func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> bool:
 	if not event is InputEventMouseButton:
 		return false
 
-	if not _event_util.is_key_just_released(MOUSE_BUTTON_LEFT):
+	if not _event_util.is_key_just_pressed(MOUSE_BUTTON_LEFT): # Can't use just_released here
 		return false
 
 	var shape_node: ScatterShape = _gizmo_panel.shape_node
@@ -255,8 +265,8 @@ func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> bool:
 	var point_local_position: Vector3 = shape_node.get_global_transform().affine_inverse() * click_world_position
 
 	if _gizmo_panel.is_create_mode_enabled():
-		shape.create_point(point_local_position)
-		shape_node.update_gizmos() # TODO: add undo redo
+		shape.create_point(point_local_position) # TODO: add undo redo
+		shape_node.update_gizmos()
 		return true
 
 	elif _gizmo_panel.is_delete_mode_enabled():

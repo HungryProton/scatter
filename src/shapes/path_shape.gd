@@ -96,6 +96,7 @@ func copy_from(source) -> void:
 		curve = source.curve.duplicate() # TODO, update signals
 
 
+# TODO: create points in the middle of the path
 func create_point(position: Vector3) -> void:
 	if not curve:
 		curve = Curve3D.new()

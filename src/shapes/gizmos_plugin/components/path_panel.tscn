@@ -33,6 +33,7 @@ offset_right = 24.0
 offset_bottom = 24.0
 focus_mode = 0
 toggle_mode = true
+button_pressed = true
 button_group = ExtResource("2_sl6yo")
 icon = ExtResource("2_d7o1n")
 flat = true
@@ -79,7 +80,7 @@ icon_alignment = 1
 
 [node name="OptionsPanel" type="PopupPanel" parent="."]
 unique_name_in_owner = true
-size = Vector2i(229, 144)
+size = Vector2i(229, 179)
 
 [node name="AdvancedOptionsPanel" type="MarginContainer" parent="OptionsPanel"]
 offset_left = 4.0
@@ -99,39 +100,42 @@ offset_bottom = 171.0
 [node name="VBoxContainer" type="VBoxContainer" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer"]
 layout_mode = 2
 offset_right = 217.0
-offset_bottom = 136.0
-
-[node name="ClosedPath" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-offset_right = 217.0
-offset_bottom = 31.0
-focus_mode = 0
-text = "Closed path"
-
-[node name="MirrorLength" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-offset_right = 217.0
-offset_bottom = 31.0
-focus_mode = 0
-text = "Mirror handles length"
+offset_bottom = 171.0
 
 [node name="MirrorAngle" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_right = 217.0
+offset_bottom = 31.0
+focus_mode = 0
+button_pressed = true
+text = "Mirror handles angle"
+
+[node name="MirrorLength" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 offset_top = 35.0
 offset_right = 217.0
 offset_bottom = 66.0
 focus_mode = 0
-text = "Mirror handles angle"
+button_pressed = true
+text = "Mirror handles length"
 
-[node name="LockToPlane" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
+[node name="ClosedPath" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 offset_top = 70.0
 offset_right = 217.0
 offset_bottom = 101.0
+focus_mode = 0
+text = "Closed path"
+
+[node name="LockToPlane" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 105.0
+offset_right = 217.0
+offset_bottom = 136.0
 focus_mode = 0
 button_pressed = true
 text = "Lock to plane"
@@ -139,9 +143,9 @@ text = "Lock to plane"
 [node name="SnapToColliders" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_top = 105.0
+offset_top = 140.0
 offset_right = 217.0
-offset_bottom = 136.0
+offset_bottom = 171.0
 focus_mode = 0
 text = "Snap to colliders"
 
@@ -156,4 +160,4 @@ offset_bottom = 136.0
 layout_mode = 2
 offset_left = 221.0
 offset_right = 221.0
-offset_bottom = 136.0
+offset_bottom = 171.0

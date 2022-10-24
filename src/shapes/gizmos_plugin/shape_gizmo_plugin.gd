@@ -69,11 +69,12 @@ func _redraw(gizmo: EditorNode3DGizmo):
 	_get_handler(gizmo).redraw(self, gizmo)
 
 
-func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent):
+func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> int:
 	for handler in _handlers.values():
 		if handler.forward_3d_gui_input(viewport_camera, event):
-			return true
-	return false
+			return EditorPlugin.AFTER_GUI_INPUT_STOP
+
+	return EditorPlugin.AFTER_GUI_INPUT_PASS
 
 
 func set_undo_redo(ur: EditorUndoRedoManager) -> void:

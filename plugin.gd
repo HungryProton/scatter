@@ -76,7 +76,7 @@ func _handles(node) -> bool:
 	return node is ScatterShape
 
 
-func _forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent):
+func _forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> int:
 	return _shape_gizmo_plugin.forward_3d_gui_input(viewport_camera, event)
 
 

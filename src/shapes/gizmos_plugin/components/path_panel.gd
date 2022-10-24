@@ -16,6 +16,7 @@ func _ready() -> void:
 	_options_panel.popup_hide.connect(_on_options_panel_hide)
 	$%SnapToColliders.toggled.connect(_on_snap_to_colliders_toggled)
 	$%ClosedPath.toggled.connect(_on_closed_path_toggled)
+	$%MirrorAngle.toggled.connect(_on_mirror_angle_toggled)
 
 	for button in [$%LockToPlane, $%SnapToColliders, $%ClosedPath]:
 		button.pressed.connect(_on_button_pressed)
@@ -75,6 +76,10 @@ func _on_options_button_toggled(enabled: bool) -> void:
 
 func _on_options_panel_hide() -> void:
 	_options_button.button_pressed = false
+
+
+func _on_mirror_angle_toggled(enabled: bool) -> void:
+	$%MirrorLength.disabled = not enabled
 
 
 func _on_snap_to_colliders_toggled(enabled: bool) -> void:
