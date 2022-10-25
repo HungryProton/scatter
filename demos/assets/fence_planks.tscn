@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://c06elk0jpdy2j"]
+
+[ext_resource type="PackedScene" uid="uid://8l6upkpeb1rr" path="res://addons/proton_scatter/demos/assets/fence_planks.glb" id="1"]
+[ext_resource type="Material" path="res://addons/proton_scatter/demos/assets/m_fence.tres" id="2"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fesk1"]
+size = Vector3(1, 0.5, 0.1)
+
+[node name="fence_planks" instance=ExtResource("1")]
+
+[node name="fence_planks2" parent="." index="0"]
+surface_material_override/0 = ExtResource("2")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." index="1"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.197684, 0.0236663)
+shape = SubResource("BoxShape3D_fesk1")

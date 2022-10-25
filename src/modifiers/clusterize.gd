@@ -5,13 +5,52 @@ extends "base_modifier.gd"
 @export_file("Texture") var mask
 @export var mask_scale := Vector2.ONE
 @export var mask_offset := Vector2.ZERO
-@export var rotation := 0.0
+@export var mask_rotation := 0.0
 @export_range(0.0, 1.0) var remove_below = 0.1
 
 
 func _init() -> void:
 	display_name = "Clusterize"
 	category = "Edit"
+
+	documentation.add_paragraph(
+		"Clump transforms together based on a mask.
+		Sampling the mask returns values between 0 and 1. The transforms are
+		scaled against these values which means, bright areas don't affect their
+		scale while dark area scales them down. Transforms are then removed
+		below a threshold, leaving clumps behind."
+	)
+	documentation.add_parameter(
+		"Mask",
+		"The texture used as a mask.",
+		0,
+		"The amount of texture fetch depends on the amount of transforms
+		generated in the previous modifiers (4 reads for each transform).
+		In theory, the texture size shouldn't affect performances in a
+		noticeable way.",
+		0
+	)
+	documentation.add_parameter(
+		"Mask scale",
+		"Depending on the mask resolution, the perceived scale will change.
+		Use this parameter to increase or decrease the area covered by the mask.",
+		0
+	)
+	documentation.add_parameter(
+		"Mask offset",
+		"Moves the mask XZ position in 3D space",
+		0
+	)
+	documentation.add_parameter(
+		"Mask rotation",
+		"Rotates the mask around the Y axis. (Angle in degrees)",
+		0
+	)
+	documentation.add_parameter(
+		"Remove below",
+		"Threshold below which the transforms are removed.",
+		0
+	)
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
@@ -33,7 +72,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	var height = image.get_height()
 	var i = 0
 	var count = transforms.list.size()
-	var angle = deg_to_rad(rotation)
+	var angle = deg_to_rad(mask_rotation)
 
 	while i < count:
 		var t = transforms.list[i]
@@ -61,6 +100,8 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	image.unlock()
 
 
+# x and y don't always match an exact pixel, so we sample the neighboring
+# pixels as well and return a weighted value based on the input coords.
 func _get_pixel(image: Image, x: float, y: float) -> float:
 	var ix = int(x)
 	var iy = int(y)

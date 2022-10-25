@@ -122,6 +122,9 @@ func is_thread_running() -> bool:
 
 
 func full_rebuild(delayed := false):
+	if not is_inside_tree():
+		return
+
 	update_gizmos()
 
 	if delayed:
@@ -181,7 +184,7 @@ func _rebuild(force_discover) -> void:
 		_rebuild(true)
 
 	if not transforms or transforms.size() == 0:
-		print("No transforms generated")
+		_clear_output()
 		return
 
 	if use_instancing:
@@ -280,6 +283,9 @@ func _create_instance(item: ScatterItem, root: Node3D):
 
 # Deletes what the Scatter node generated.
 func _clear_output() -> void:
+	if not output_root:
+		output_root = get_node_or_null("ScatterOutput")
+
 	if output_root:
 		remove_child(output_root)
 		output_root.queue_free()
@@ -298,8 +304,8 @@ func _perform_sanity_check() -> void:
 
 
 func _on_node_duplicated() -> void:
+	_clear_output() # Otherwise we get linked multimeshes or other unwanted side effects
 	_perform_sanity_check()
-	full_rebuild() # Otherwise we get linked multimeshes or other unwanted side effects
 
 
 func _on_child_exiting_tree(node: Node) -> void:

@@ -24,6 +24,7 @@ func _init() -> void:
 	warning_ignore_no_shape = false
 	can_restrict_height = false
 	can_use_global_and_local_space = false
+	use_edge_data = true
 
 
 func _process_transforms(transforms, domain, _seed) -> void:

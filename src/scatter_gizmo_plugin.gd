@@ -12,7 +12,7 @@ var _loading_mesh: Mesh
 
 func _init():
 	# TODO: Replace hardcoded colors by a setting fetch
-	create_custom_material("line", Color(1, 0.4, 0))
+	create_custom_material("line", Color(0.2, 0.4, 0.8))
 	add_material("loading", preload("../misc/m_loading.tres"))
 
 	_loading_mesh = QuadMesh.new()
@@ -30,8 +30,27 @@ func _has_gizmo(node) -> bool:
 func _redraw(gizmo: EditorNode3DGizmo):
 	gizmo.clear()
 	var node = gizmo.get_node_3d()
+
+	if not node.modifier_stack:
+		return
+
 	if node.is_thread_running():
 		gizmo.add_mesh(_loading_mesh, get_material("loading"))
+
+	if node.modifier_stack.is_using_edge_data():
+		var curves: Array[Curve3D] = node.domain.get_edges()
+		var inverse_transform := node.get_global_transform().affine_inverse()
+
+		for curve in curves:
+			var lines := PackedVector3Array()
+			var points: PackedVector3Array = curve.tessellate(4, 8)
+			var lines_count := points.size() - 1
+
+			for i in lines_count:
+				lines.append(inverse_transform * points[i])
+				lines.append(inverse_transform * points[i + 1])
+
+			gizmo.add_lines(lines, get_material("line"))
 
 
 func set_path_gizmo_panel(panel: Control) -> void:

@@ -54,3 +54,11 @@ func get_copy():
 	for modifier in stack:
 		copy.stack.push_back(modifier.duplicate())
 	return copy
+
+
+func is_using_edge_data() -> bool:
+	for modifier in stack:
+		if modifier.use_edge_data:
+			return true
+
+	return false

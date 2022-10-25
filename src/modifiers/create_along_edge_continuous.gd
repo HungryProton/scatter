@@ -13,32 +13,34 @@ func _init() -> void:
 	category = "Create"
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
+	use_edge_data = true
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
-	var path: Path3D = transforms.path
-	var curve: Curve3D
-	if not ignore_slopes:
-		curve = path.curve.duplicate()
-	else:
-		curve = get_projected_curve(path.curve)
+	var new_transforms: Array[Transform3D] = []
+	var curves: Array[Curve3D] = domain.get_edges()
+	for curve in curves:
+		if not ignore_slopes:
+			curve = curve.duplicate()
+		else:
+			curve = get_projected_curve(curve)
 
-	curve.bake_interval = item_length
-	var points = curve.get_baked_points()
-	var count = points.size()
+		curve.bake_interval = item_length
+		var points = curve.get_baked_points()
+		var count = points.size()
 
-	# Last segment will always have the wrong size. so we ignore it.
-	transforms.resize(count - 2)
-	var p1: Vector3
-	var p2: Vector3
-	var t: Transform3D
+		var p1: Vector3
+		var p2: Vector3
+		var t: Transform3D
 
-	for i in transforms.list.size():
-		p1 = points[i]
-		p2 = points[i + 1]
-		t = transforms.list[i]
-		t.origin = p1 + ((p2 - p1) / 2.0)
-		transforms.list[i] = t.looking_at(p2, Vector3.UP)
+		for i in count - 1:
+			p1 = points[i]
+			p2 = points[i + 1]
+			t = Transform3D()
+			t.origin = p1 + ((p2 - p1) / 2.0)
+			new_transforms.push_back(t.looking_at(p2, Vector3.UP))
+
+	transforms.append(new_transforms)
 
 
 func get_projected_curve(curve: Curve3D) -> Curve3D:

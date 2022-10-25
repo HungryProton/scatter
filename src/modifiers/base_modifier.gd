@@ -29,6 +29,7 @@ var expanded := false
 var can_override_seed := false
 var can_restrict_height := true
 var can_use_global_and_local_space := true
+var use_edge_data := false
 
 
 func get_warning() -> String:
