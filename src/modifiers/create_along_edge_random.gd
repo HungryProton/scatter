@@ -23,10 +23,17 @@ func _process_transforms(transforms, domain, seed) -> void:
 
 	var new_transforms: Array[Transform3D] = []
 	var curves: Array[Curve3D] = domain.get_edges()
+	var total_curve_length := 0.0
 
 	for curve in curves:
 		var length: float = curve.get_baked_length()
-		for i in instance_count:
+		total_curve_length += length
+
+	for curve in curves:
+		var length: float = curve.get_baked_length()
+		var local_instance_count: int = round((length / total_curve_length) * instance_count)
+
+		for i in local_instance_count:
 			var data = get_pos_and_normal(curve, _rng.randf() * length)
 			var pos: Vector3 = data[0]
 			var normal: Vector3 = data[1]
