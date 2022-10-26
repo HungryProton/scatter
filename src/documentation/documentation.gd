@@ -85,6 +85,16 @@ func _populate():
 		var info: DocumentationInfo = instance.documentation
 		info.set_title(instance.display_name)
 		info.set_category(instance.category)
+
+		if instance.use_edge_data:
+			info.add_warning("The domain edge is represented by the blue lines
+				on the Scatter node. These edges are usually locked to the
+				Scatter local XZ plane, (except for the Path shape when they are
+				NOT closed). If you can't see any result, make sure to have at
+				least a Shape crossing the local XZ plane.",
+				1
+			)
+
 		add_page(info)
 
 
