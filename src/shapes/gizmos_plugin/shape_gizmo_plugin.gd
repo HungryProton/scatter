@@ -13,6 +13,7 @@ extends EditorNode3DGizmoPlugin
 const ScatterShape = preload("../../scatter_shape.gd")
 const SphereShape = preload("../sphere_shape.gd")
 const PathShape = preload("../path_shape.gd")
+const BoxShape = preload("../box_shape.gd")
 const GizmoHandler = preload("./gizmo_handler.gd")
 
 var _handlers: Dictionary
@@ -38,7 +39,8 @@ func _init():
 	create_handle_material("secondary_handle", false, secondary_handle_icon)
 
 	_handlers[SphereShape] = preload("./sphere_gizmo.gd").new()
-	_handlers[PathShape]  = preload("./path_gizmo.gd").new()
+	_handlers[PathShape] = preload("./path_gizmo.gd").new()
+	_handlers[BoxShape] = preload("./box_gizmo.gd").new()
 
 
 func _get_gizmo_name() -> String:

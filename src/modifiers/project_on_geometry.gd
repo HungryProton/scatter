@@ -8,7 +8,7 @@ extends "base_modifier.gd"
 @export var remove_points_on_miss := true
 @export var align_with_collision_normal := false
 @export_range(0.0, 90.0) var max_slope = 90.0
-@export_flags_3d_physics var mask = 1
+@export_flags_3d_physics var collision_mask = 1
 
 
 func _init() -> void:
@@ -137,7 +137,7 @@ func _project_on_floor(t: Transform3D, root: Node3D, physics_state: PhysicsDirec
 	var ray_query := PhysicsRayQueryParameters3D.new()
 	ray_query.from = start
 	ray_query.to = end
-	ray_query.collision_mask = mask
+	ray_query.collision_mask = collision_mask
 	return physics_state.intersect_ray(ray_query)
 
 

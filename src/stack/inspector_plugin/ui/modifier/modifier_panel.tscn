@@ -284,6 +284,8 @@ size_flags_vertical = 3
 layout_mode = 2
 offset_right = 24.0
 offset_bottom = 24.0
+tooltip_text = "Enabled: Use local space
+Disabled: Use global space"
 icon = ExtResource("16_ocvvf")
 default_icon = ExtResource("16_ocvvf")
 pressed_icon = ExtResource("13_txjs8")

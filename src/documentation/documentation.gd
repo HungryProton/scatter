@@ -15,9 +15,10 @@ var _items := {}
 var _categories_roots := {}
 var _modifiers = []
 
-var _modifiers_root: TreeItem
 var _scatter_root: TreeItem
+var _item_root: TreeItem
 var _shapes_root: TreeItem
+var _modifiers_root: TreeItem
 
 var _edited_text: String
 var _accent_color := Color.CORNFLOWER_BLUE
@@ -37,10 +38,13 @@ func _ready() -> void:
 
 	_scatter_root = tree.create_item()
 	_scatter_root.set_text(0, "ProtonScatter")
+	_item_root = tree.create_item()
+	_item_root.set_text(0, "ScatterItem")
 	_shapes_root = tree.create_item()
 	_shapes_root.set_text(0, "Shapes")
 	_modifiers_root = tree.create_item()
 	_modifiers_root.set_text(0, "Modifiers")
+	_modifiers_root.set_selectable(0, false)
 
 	_accent_color = Util.get_accent_color()
 	_editor_scale = Util.get_editor_scale()

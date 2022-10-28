@@ -5,6 +5,7 @@ extends Node3D
 const BaseShape := preload("./shapes/base_shape.gd")
 const PathShape := preload("./shapes/path_shape.gd")
 const SphereShape := preload("./shapes/sphere_shape.gd")
+const BoxShape := preload("./shapes/box_shape.gd")
 const ScatterUtil := preload('./common/scatter_util.gd')
 
 
@@ -15,7 +16,7 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		update_gizmos()
 		ScatterUtil.request_parent_to_rebuild(self)
 
-@export_enum("Path", "Sphere") var shape_type = 0: #TODO: Remove this once the custom resource export works
+@export_enum("Path", "Sphere", "Box") var shape_type = 0: #TODO: Remove this once the custom resource export works
 	set(val):
 		if val == shape_type:
 			return
@@ -26,6 +27,8 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 				shape = PathShape.new()
 			1:
 				shape = SphereShape.new()
+			2:
+				shape = BoxShape.new()
 
 var shape: BaseShape:
 	set(val):
@@ -35,6 +38,7 @@ var shape: BaseShape:
 
 		shape = val
 		shape.changed.connect(_on_shape_changed)
+		update_gizmos()
 
 
 func _ready() -> void:

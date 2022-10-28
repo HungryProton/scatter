@@ -59,12 +59,12 @@ func _process_transforms(transforms, domain, seed) -> void:
 			pos.y = height
 
 		if use_local_space:
-			pos = (pos * gt_inverse) - gt.origin
 			t.basis = gt.basis
 
 		if domain.is_point_inside(pos):
 			t.origin = pos
 			new_transforms.push_back(t)
+			continue
 
 		# Prevents an infinite loop
 		tries += 1

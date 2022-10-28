@@ -19,10 +19,13 @@ func get_handle_value(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: boo
 
 func set_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, camera: Camera3D, screen_pos: Vector2) -> void:
 	var shape_node = gizmo.get_node_3d()
-	var origin = shape_node.get_global_transform().origin
+	var gt := shape_node.get_global_transform()
+	var gt_inverse := gt.affine_inverse()
+	var origin := gt.origin
+
 	var ray_from = camera.project_ray_origin(screen_pos)
 	var ray_to = ray_from + camera.project_ray_normal(screen_pos) * 4096
-	var points = Geometry3D.get_closest_points_between_segments(origin, Vector3.LEFT * 4096, ray_from, ray_to)
+	var points = Geometry3D.get_closest_points_between_segments(origin, (Vector3.LEFT * 4096) * gt_inverse, ray_from, ray_to)
 	shape_node.shape.radius = origin.distance_to(points[0])
 
 

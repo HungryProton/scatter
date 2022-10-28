@@ -12,6 +12,8 @@ func _init() -> void:
 	category = "Create"
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
+	can_restrict_height = true
+	can_use_global_and_local_space = false # TODO: find a way to align the grid with the domain transform
 
 	documentation.add_paragraph(
 		"Place transforms along the edges of the ScatterShapes")

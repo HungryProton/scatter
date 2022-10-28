@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://d3tr4h2x4w1cm"]
+[gd_scene load_steps=36 format=3]
 
 [ext_resource type="Texture2D" uid="uid://furk0ykipkax" path="res://addons/proton_scatter/demos/assets/textures/sky_2.png" id="1_bp1wy"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/scatter.gd" id="1_odnwj"]
@@ -12,7 +12,7 @@
 [ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/randomize_transforms.gd" id="5_h0430"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/offset_scale.gd" id="7_5qjh2"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/shapes/sphere_shape.gd" id="9_mhcwm"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/project_on_floor.gd" id="13_s5uny"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/project_on_geometry.gd" id="13_s5uny"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_bxgb5"]
 panorama = ExtResource("1_bp1wy")
