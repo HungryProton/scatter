@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dllpt2dven8vw"]
+[gd_scene load_steps=10 format=3 uid="uid://dllpt2dven8vw"]
 
 [ext_resource type="Texture2D" uid="uid://cun73k8jdmr4e" path="res://addons/proton_scatter/icons/add.svg" id="1_4vwtj"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/stack_panel.gd" id="1_ga4or"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://belutr5odecw2" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier_list_popup/popup.tscn" id="3_pkswu"]
 [ext_resource type="Texture2D" uid="uid://ddjrq1h4mkn6a" path="res://addons/proton_scatter/icons/load.svg" id="3_w72lv"]
 [ext_resource type="Texture2D" uid="uid://b2omj2e03x72e" path="res://addons/proton_scatter/icons/save.svg" id="4_5l2cx"]
+[ext_resource type="PackedScene" uid="uid://cfg8iqtuion8b" path="res://addons/proton_scatter/src/documentation/documentation.tscn" id="9_y57kc"]
 
 [node name="StackPanel" type="MarginContainer"]
 clip_children = true
@@ -92,7 +93,7 @@ icon_alignment = 1
 [node name="ModifiersContainer" type="Container" parent="VBoxContainer"]
 unique_name_in_owner = true
 clip_children = true
-custom_minimum_size = Vector2i(0, -4)
+custom_minimum_size = Vector2(0, -4)
 layout_mode = 2
 offset_top = 47.0
 offset_right = 448.0
@@ -100,3 +101,6 @@ offset_bottom = 136.0
 size_flags_vertical = 3
 mouse_filter = 0
 script = ExtResource("1_hg5ys")
+
+[node name="Documentation" parent="." instance=ExtResource("9_y57kc")]
+unique_name_in_owner = true

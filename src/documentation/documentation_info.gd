@@ -10,6 +10,8 @@ extends RefCounted
 
 # Formatting is handled by the main Documentation class.
 
+const Util := preload("../common/util.gd")
+
 
 class Warning:
 	var text: String
@@ -18,8 +20,32 @@ class Warning:
 class Parameter:
 	var name: String
 	var cost: int
+	var type: String
 	var description: String
-	var warning: Warning
+	var warnings: Array[Warning] = []
+
+	func set_name(text: String) -> Parameter:
+		name = Util.remove_line_breaks(text)
+		return self
+
+	func set_description(text: String) -> Parameter:
+		description = Util.remove_line_breaks(text)
+		return self
+
+	func set_cost(val: int) -> Parameter:
+		cost = val
+		return self
+
+	func set_type(val: String) -> Parameter:
+		type = Util.remove_line_breaks(val)
+		return self
+
+	func add_warning(warning: String, warning_importance := -1) -> Parameter:
+		var w = Warning.new()
+		w.text = Util.remove_line_breaks(warning)
+		w.importance = warning_importance
+		warnings.push_back(w)
+		return self
 
 
 var _category: String
@@ -38,7 +64,7 @@ func set_title(text: String) -> void:
 
 
 func add_paragraph(text: String) -> void:
-	_paragraphs.push_back(_remove_line_breaks(text))
+	_paragraphs.push_back(Util.remove_line_breaks(text))
 
 
 # Warning importance:
@@ -47,7 +73,7 @@ func add_paragraph(text: String) -> void:
 #	2: Critical (Red)
 func add_warning(text: String, importance: int = 0) -> void:
 	var w = Warning.new()
-	w.text = _remove_line_breaks(text)
+	w.text = Util.remove_line_breaks(text)
 	w.importance = importance
 
 	_warnings.push_back(w)
@@ -59,19 +85,16 @@ func add_warning(text: String, importance: int = 0) -> void:
 # 	1: Log
 # 	2: Linear
 # 	3: Exponential
-func add_parameter(name: String, description: String, cost := 0, warning: String = "", warning_importance := -1) -> void:
+func add_parameter(name := "") -> Parameter:
 	var p = Parameter.new()
 	p.name = name
-	p.cost = cost
-	p.description = _remove_line_breaks(description)
-
-	var w = Warning.new()
-	w.text = _remove_line_breaks(warning)
-	w.importance = warning_importance
-	p.warning = w
-
+	p.cost = 0
 	_parameters.push_back(p)
+	return p
 
+func add_parameter_old(p1, p2, p3, p4, p5) -> Parameter:
+	var p = Parameter.new()
+	return p
 
 func get_title() -> String:
 	return _page_title
@@ -91,12 +114,3 @@ func get_warnings() -> Array[Warning]:
 
 func get_parameters() -> Array[Parameter]:
 	return _parameters
-
-
-func _remove_line_breaks(text: String) -> String:
-	# Remove tabs
-	text = text.replace("\t", "")
-	# Remove line breaks
-	text = text.replace("\n", " ")
-	# Remove occasional double space caused by the line above
-	return text.replace("  ", " ")

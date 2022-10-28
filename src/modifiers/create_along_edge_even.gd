@@ -26,6 +26,23 @@ func _init() -> void:
 	can_use_global_and_local_space = false
 	use_edge_data = true
 
+	var p
+	documentation.add_paragraph(
+		"Place transforms along the edges of the ScatterShapes")
+
+	p = documentation.add_parameter("Spacing")
+	p.set_type("vector3")
+	p.set_description(
+		"Defines the grid size along the 3 axes. A spacing of 1 means 1 unit
+		of space between each transform on this axis.")
+	p.set_cost(3)
+	p.add_warning(
+		"The smaller the value, the denser the resulting transforms list.
+		Use with care as the performance impact will go up quickly.", 1)
+	p.add_warning(
+		"A value of 0 would result in infinite transforms, so it's capped to 0.05
+		at least.")
+
 
 func _process_transforms(transforms, domain, _seed) -> void:
 	var new_transforms: Array[Transform3D] = []
@@ -50,7 +67,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			if domain.is_point_excluded(pos):
 				continue
 
-			if align_to_path:
+			if align_to_path: # TODO; change this
 				#axis restrictions
 				normal.x *= int(!restrict_x)
 				normal.y *= int(!restrict_y)

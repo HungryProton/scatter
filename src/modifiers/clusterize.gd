@@ -13,44 +13,40 @@ func _init() -> void:
 	display_name = "Clusterize"
 	category = "Edit"
 
+	var p
 	documentation.add_paragraph(
 		"Clump transforms together based on a mask.
 		Sampling the mask returns values between 0 and 1. The transforms are
 		scaled against these values which means, bright areas don't affect their
 		scale while dark area scales them down. Transforms are then removed
-		below a threshold, leaving clumps behind."
-	)
-	documentation.add_parameter(
-		"Mask",
-		"The texture used as a mask.",
-		0,
+		below a threshold, leaving clumps behind.")
+
+	p = documentation.add_parameter("Mask")
+	p.set_type("Texture")
+	p.set_description("The texture used as a mask.")
+	p.add_warning(
 		"The amount of texture fetch depends on the amount of transforms
 		generated in the previous modifiers (4 reads for each transform).
 		In theory, the texture size shouldn't affect performances in a
-		noticeable way.",
-		0
-	)
-	documentation.add_parameter(
-		"Mask scale",
+		noticeable way.")
+
+	p = documentation.add_parameter("Mask scale")
+	p.set_type("Vector2")
+	p.set_description(
 		"Depending on the mask resolution, the perceived scale will change.
-		Use this parameter to increase or decrease the area covered by the mask.",
-		0
-	)
-	documentation.add_parameter(
-		"Mask offset",
-		"Moves the mask XZ position in 3D space",
-		0
-	)
-	documentation.add_parameter(
-		"Mask rotation",
-		"Rotates the mask around the Y axis. (Angle in degrees)",
-		0
-	)
-	documentation.add_parameter(
-		"Remove below",
-		"Threshold below which the transforms are removed.",
-		0
-	)
+		Use this parameter to increase or decrease the area covered by the mask.")
+
+	p = documentation.add_parameter("Mask offset")
+	p.set_type("Vector2")
+	p.set_description("Moves the mask XZ position in 3D space")
+
+	p = documentation.add_parameter("Mask rotation")
+	p.set_type("Float")
+	p.set_description("Rotates the mask around the Y axis. (Angle in degrees)")
+
+	p = documentation.add_parameter("Remove below")
+	p.set_type("Float")
+	p.set_description("Threshold below which the transforms are removed.")
 
 
 func _process_transforms(transforms, domain, _seed) -> void:

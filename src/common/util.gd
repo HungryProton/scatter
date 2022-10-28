@@ -83,3 +83,32 @@ static func get_position_and_normal_at(curve: Curve3D, offset: float) -> Array:
 		normal = (pos - pos1)
 
 	return [pos, normal]
+
+
+static func remove_line_breaks(text: String) -> String:
+	# Remove tabs
+	text = text.replace("\t", "")
+	# Remove line breaks
+	text = text.replace("\n", " ")
+	# Remove occasional double space caused by the line above
+	return text.replace("  ", " ")
+
+
+# Workaround. No need to inject the actual EditorPlugin all the way from the top,
+# creating a new one returns the actual EditorSettings too.
+# (Creating the EditorSettings class directly doesn't work though)
+static func get_editor_interface() -> EditorInterface:
+	var tmp_plugin = EditorPlugin.new()
+	return tmp_plugin.get_editor_interface()
+
+
+static func get_editor_settings() -> EditorSettings:
+	return get_editor_interface().get_editor_settings()
+
+
+static func get_accent_color() -> Color:
+	return get_editor_settings().get("interface/theme/accent_color")
+
+
+static func get_editor_scale() -> float:
+	return get_editor_interface().get_editor_scale()

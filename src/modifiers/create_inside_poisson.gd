@@ -40,29 +40,30 @@ func _init() -> void:
 	restrict_height = true
 
 	documentation.add_paragraph(
-		"""Place transforms without overlaps. Transforms are assumed to have a
-		spherical shape."""
-	)
-	documentation.add_parameter(
-		"Radius",
-		"Transform size.",
-		0,
-		"""The larger the radius, the harder it will be to place the transform.
+		"Place transforms without overlaps. Transforms are assumed to have a
+		spherical shape.")
+
+	var p := documentation.add_parameter("Radius")
+	p.set_type("float")
+	p.set_description("Transform size.")
+	p.add_warning(
+		"The larger the radius, the harder it will be to place the transform,
+		resulting in a faster early exit.
 		On the other hand, smaller radius means more room for more points,
-		meaning it will take longer to complete."""
-	)
-	documentation.add_parameter(
-		"Samples before rejection",
+		meaning more transforms to generate so it will take longer to complete.")
+
+	p = documentation.add_parameter("Samples before rejection")
+	p.set_type("int")
+	p.set_description(
 		"The algorithm tries a point at random until it finds a valid one. This
 		parameter controls how many attempts before moving to the next
 		iteration. Lower values are faster but gives poor coverage. Higher
-		values generates better coverage but are slower.",
-		2
-	)
+		values generates better coverage but are slower.")
+	p.set_cost(2)
+
 	documentation.add_warning(
-		"""This modifier uses a poisson disk sampling algorithm which can be
-		quite slow."""
-	)
+		"This modifier uses a poisson disk sampling algorithm which can be
+		quite slow.")
 
 
 func _process_transforms(transforms, domain, seed) -> void:

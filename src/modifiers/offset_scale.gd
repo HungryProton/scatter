@@ -12,14 +12,11 @@ func _init() -> void:
 	can_restrict_height = false
 	use_local_space = true
 
-	documentation.add_paragraph(
-		"Scales every transform."
-	)
-	documentation.add_parameter(
-		"Scale",
-		"How much to scale the transform along each axes (X, Y, Z)",
-		0
-	)
+	documentation.add_paragraph("Scales every transform.")
+
+	documentation.add_parameter("Scale").set_type("Vector3").set_description(
+		"How much to scale the transform along each axes (X, Y, Z)")
+
 
 func _process_transforms(transforms, domain, _seed) -> void:
 	var basis: Basis

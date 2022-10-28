@@ -3,7 +3,6 @@ extends Control
 
 
 const ModifierPanel := preload("./modifier/modifier_panel.tscn")
-const Documentation = preload("../../../documentation/documentation.tscn")
 
 
 @onready var _modifiers_container: Control = $%ModifiersContainer
@@ -16,9 +15,6 @@ var _is_ready := false
 
 
 func _ready():
-	_documentation = Documentation.instantiate()
-	add_child(_documentation)
-
 	_modifiers_popup.add_modifier.connect(_on_modifier_added)
 	_modifiers_container.child_moved.connect(_on_modifier_moved)
 	$%Rebuild.pressed.connect(_on_rebuild_pressed)
@@ -151,5 +147,4 @@ func _on_duplication_requested(modifier) -> void:
 
 
 func _on_documentation_requested(modifier) -> void:
-	if _documentation:
-		_documentation.show_page(modifier.display_name)
+	$%Documentation.show_page(modifier.display_name)

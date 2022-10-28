@@ -15,20 +15,19 @@ func _init() -> void:
 	can_override_seed = true
 
 	documentation.add_paragraph(
-		"""Randomly place new transforms inside the area defined by
-		the ScatterShape nodes."""
-	)
-	documentation.add_parameter(
-		"Amount",
-		"How many transforms will be created.",
-		2
-	)
+		"Randomly place new transforms inside the area defined by
+		the ScatterShape nodes.")
+
+	var p := documentation.add_parameter("Amount")
+	p.set_type("int")
+	p.set_description("How many transforms will be created.")
+	p.set_cost(2)
+
 	documentation.add_warning(
-		"""In some cases, the amount of transforms created by this modifier
+		"In some cases, the amount of transforms created by this modifier
 		might be lower than the requested amount (but never higher). This may
 		happen if the provided ScatterShape has a huge bounding box but a tiny
-		valid space, like a narrow path."""
-	)
+		valid space, like a narrow path.")
 
 
 # TODO:

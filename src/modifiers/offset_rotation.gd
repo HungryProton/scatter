@@ -11,14 +11,11 @@ func _init() -> void:
 	can_use_global_and_local_space = true
 	can_restrict_height = false
 
-	documentation.add_paragraph(
-		"Rotates every transform."
-	)
-	documentation.add_parameter(
-		"Rotation",
-		"Rotation angle (in degrees) along each axes (X, Y, Z)",
-		0
-	)
+	documentation.add_paragraph("Rotates every transform.")
+
+	documentation.add_parameter("Rotation").set_type("Vector3").set_description(
+		"Rotation angle (in degrees) along each axes (X, Y, Z)")
+
 
 func _process_transforms(transforms, domain, _seed : int) -> void:
 	var rotation_rad := Vector3.ZERO

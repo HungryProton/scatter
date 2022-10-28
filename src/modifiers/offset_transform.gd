@@ -14,23 +14,20 @@ func _init() -> void:
 
 	documentation.add_paragraph(
 		"Offsets position, rotation and scale in a single modifier. Every
-		transforms generated before will see the same transformation applied."
-	)
-	documentation.add_parameter(
-		"Position",
-		"How far each transforms are moved.",
-		0
-	)
-	documentation.add_parameter(
-		"Rotation",
-		"Rotation angle (in degrees) along each axes (X, Y, Z)",
-		0
-	)
-	documentation.add_parameter(
-		"Scale",
-		"How much to scale the transform along each axes (X, Y, Z)",
-		0
-	)
+		transforms generated before will see the same transformation applied.")
+
+	var p := documentation.add_parameter("Position")
+	p.set_type("Vector3")
+	p.set_description("How far each transforms are moved.")
+
+	p = documentation.add_parameter("Rotation")
+	p.set_type("Vector3")
+	p.set_description("Rotation angle (in degrees) along each axes (X, Y, Z)")
+
+	p = documentation.add_parameter("Scale")
+	p.set_type("Vector3")
+	p.set_description("How much to scale the transform along each axes (X, Y, Z)")
+
 
 func _process_transforms(transforms, domain, _seed) -> void:
 	var t: Transform3D
