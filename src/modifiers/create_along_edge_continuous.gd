@@ -47,6 +47,7 @@ func _init() -> void:
 		before creating the new transforms.")
 
 
+# TODO: Use dichotomic search instead of fixed step length?
 func _process_transforms(transforms, domain, _seed) -> void:
 	var new_transforms: Array[Transform3D] = []
 	var curves: Array[Curve3D] = domain.get_edges()
@@ -55,7 +56,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		if not ignore_slopes:
 			curve = curve.duplicate()
 		else:
-			curve = get_projected_curve(curve)
+			curve = get_projected_curve(curve, domain.get_global_transform())
 
 		var length_squared = pow(item_length, 2)
 		var offset_max = curve.get_baked_length()
@@ -83,11 +84,11 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	transforms.append(new_transforms)
 
 
-func get_projected_curve(curve: Curve3D) -> Curve3D:
+func get_projected_curve(curve: Curve3D, t: Transform3D) -> Curve3D:
 	var points = curve.tessellate()
 	var new_curve = Curve3D.new()
 	for p in points:
-		p.y = 0.0
+		p.y = t.origin.y
 		new_curve.add_point(p)
 
 	return new_curve

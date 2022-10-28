@@ -152,12 +152,28 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 
 		var width: float = aabb.size.x
 		var length: float = aabb.size.z
+		var plane_center: Vector3 = bounds.center
+		plane_center.y = 0.0
 
 		var plane_mesh := PlaneMesh.new()
 		plane_mesh.set_size(Vector2(width, length))
-		plane_mesh.set_center_offset(bounds.center)
+		plane_mesh.set_center_offset(plane_center)
 
 		gizmo.add_mesh(plane_mesh, plugin.get_material("tertiary", gizmo))
+
+		var plane_lines := PackedVector3Array()
+		var corners = [
+			Vector3(-width, 0, -length),
+			Vector3(-width, 0, length),
+			Vector3(width, 0, length),
+			Vector3(width, 0, -length),
+			Vector3(-width, 0, -length),
+		]
+		for i in corners.size() - 1:
+			plane_lines.push_back(corners[i] * 0.5 + plane_center)
+			plane_lines.push_back(corners[i + 1] * 0.5 + plane_center)
+
+		gizmo.add_lines(plane_lines, plugin.get_material("secondary_top", gizmo))
 
 	# ----- Mesh representing the inside part of the path -----
 	if shape.closed:
