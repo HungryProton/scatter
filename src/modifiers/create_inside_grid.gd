@@ -13,10 +13,16 @@ func _init() -> void:
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 	can_restrict_height = true
-	can_use_global_and_local_space = false # TODO: find a way to align the grid with the domain transform
+	can_use_global_and_local_space = true
 
 	documentation.add_paragraph(
 		"Place transforms along the edges of the ScatterShapes")
+
+	documentation.add_paragraph(
+		"When [b]Local Space[/b] is enabled, the grid is aligned with the
+		Scatter root node. Otherwise, the grid is aligned with the global
+		axes."
+	)
 
 	var p = documentation.add_parameter("Spacing")
 	p.set_type("vector3")
@@ -37,9 +43,19 @@ func _process_transforms(transforms, domain, seed) -> void:
 	spacing.y = max(_min_spacing, spacing.y)
 	spacing.z = max(_min_spacing, spacing.z)
 
-	var center = domain.bounds.center
-	var size = domain.bounds.size
-	var half_size = size * 0.5
+	var gt: Transform3D = domain.get_global_transform()
+	var center: Vector3 = domain.bounds.center
+	var size: Vector3 = domain.bounds.size
+
+	if use_local_space:
+		center = domain.bounds_local.center
+		size = domain.bounds_local.size
+
+#	print("center: ", center)
+#	print("size: ", size)
+
+	var half_size := size * 0.5
+	var start_corner := center - half_size
 	var baseline: float = 0.0
 
 	var width := int(ceil(size.x / spacing.x))
@@ -57,17 +73,23 @@ func _process_transforms(transforms, domain, seed) -> void:
 	new_transforms.resize(max_count)
 
 	var t: Transform3D
+	var pos: Vector3
 	var t_index := 0
+
 	for i in width * length:
 		for j in height:
-			var pos = Vector3.ZERO
+			t = Transform3D()
+			pos = Vector3.ZERO
 			pos.x = (i % width) * spacing.x
 			pos.y = (j * spacing.y) + baseline
 			pos.z = (i / width) * spacing.z
-			pos += (center - half_size)
+			pos += start_corner
+
+			if use_local_space:
+				pos = gt * pos
+				t.basis = gt.basis
 
 			if domain.is_point_inside(pos):
-				t = Transform3D()
 				t.origin = pos
 				new_transforms[t_index] = t
 				t_index += 1

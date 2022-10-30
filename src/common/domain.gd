@@ -71,6 +71,7 @@ var space_state: PhysicsDirectSpaceState3D
 var inclusive_shapes: Array[DomainShapeInfo]
 var exclusive_shapes: Array[DomainShapeInfo]
 var bounds: Bounds = Bounds.new()
+var bounds_local: Bounds = Bounds.new()
 var edges: Array[Curve3D] = []
 
 
@@ -118,11 +119,19 @@ func discover_shapes(root_node: Node3D) -> void:
 
 func compute_bounds() -> void:
 	bounds.clear()
+	bounds_local.clear()
+
+	var gt: Transform3D = root.get_global_transform().affine_inverse()
+
 	for info in inclusive_shapes:
 		for point in info.get_corners_global():
 			bounds.feed(point)
+			bounds_local.feed(gt * point)
 
 	bounds.compute_bounds()
+	bounds_local.compute_bounds()
+#	print("gsize: ", bounds.size, " lsize: ", bounds_local.size)
+#	print("center: ", bounds_local.center)
 
 
 func compute_edges() -> void:
@@ -237,15 +246,6 @@ func compute_edges() -> void:
 			curve.add_point(curve.get_point_position(0)) # Close the loop
 			edges.push_back(curve)
 
-#			var tmp_path := Path3D.new()
-#			tmp_path.curve = curve
-#			root.add_child(tmp_path)
-#			tmp_path.owner = root.get_tree().get_edited_scene_root()
-#			if Geometry2D.is_polygon_clockwise(polygon):
-#				tmp_path.name = "hole"
-#			else:
-#				tmp_path.name = "outer"
-
 
 func get_global_transform() -> Transform3D:
 	return root.get_global_transform()
@@ -267,6 +267,7 @@ func get_copy():
 	copy.root = root
 	copy.space_state = space_state
 	copy.bounds = bounds
+	copy.bounds_local = bounds_local
 
 	for s in inclusive_shapes:
 		var s_copy = DomainShapeInfo.new()
