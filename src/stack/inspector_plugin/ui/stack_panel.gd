@@ -10,7 +10,6 @@ const ModifierPanel := preload("./modifier/modifier_panel.tscn")
 
 var _scatter
 var _modifier_stack
-var _documentation
 var _is_ready := false
 
 
@@ -28,6 +27,7 @@ func set_node(node) -> void:
 		return
 
 	_scatter = node
+	$%Documentation.set_editor_options(_scatter.editor_options)
 	rebuild_ui()
 
 

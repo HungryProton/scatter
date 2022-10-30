@@ -14,6 +14,7 @@ var _modifier_stack_plugin: EditorInspectorPlugin = ModifierStackPlugin.new()
 var _scatter_gizmo_plugin: ScatterGizmoPlugin = ScatterGizmoPlugin.new()
 var _shape_gizmo_plugin: EditorNode3DGizmoPlugin = ShapeGizmoPlugin.new()
 var _path_panel
+var _editor_options := {}
 
 
 func get_name():
@@ -58,6 +59,12 @@ func _enter_tree():
 
 	scene_changed.connect(_on_scene_changed)
 
+	var editor_interface := get_editor_interface()
+	var editor_settings := editor_interface.get_editor_settings()
+
+	_editor_options["accent_color"] = editor_settings.get("interface/theme/accent_color")
+	_editor_options["editor_scale"] = editor_interface.get_editor_scale()
+
 
 func _exit_tree():
 	remove_custom_type("ProtonScatter")
@@ -90,6 +97,7 @@ func _on_selection_changed() -> void:
 	var selected_node = selected[0]
 	if selected_node is Scatter:
 		selected_node.undo_redo = get_undo_redo()
+		selected_node.editor_options = _editor_options
 
 
 func _on_scene_changed(_scene_root) -> void:

@@ -11,7 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://cfg8iqtuion8b" path="res://addons/proton_scatter/src/documentation/documentation.tscn" id="9_y57kc"]
 
 [node name="StackPanel" type="MarginContainer"]
-clip_children = true
+clip_children = 1
 clip_contents = true
 offset_right = 456.0
 offset_bottom = 144.0
@@ -92,7 +92,7 @@ icon_alignment = 1
 
 [node name="ModifiersContainer" type="Container" parent="VBoxContainer"]
 unique_name_in_owner = true
-clip_children = true
+clip_children = 1
 custom_minimum_size = Vector2(0, -4)
 layout_mode = 2
 offset_top = 47.0

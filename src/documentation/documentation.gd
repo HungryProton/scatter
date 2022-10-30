@@ -26,6 +26,8 @@ var _editor_scale := 1.0
 var _header_size := 20
 var _sub_header_size := 16
 
+var _populated := false
+
 
 @onready var tree: Tree = $HSplitContainer/Tree
 @onready var label: RichTextLabel = $HSplitContainer/RichTextLabel
@@ -46,10 +48,16 @@ func _ready() -> void:
 	_modifiers_root.set_text(0, "Modifiers")
 	_modifiers_root.set_selectable(0, false)
 
-	_accent_color = Util.get_accent_color()
-	_editor_scale = Util.get_editor_scale()
-
 	_populate()
+
+
+# Fed from the StackPanel scene, before the ready function
+func set_editor_options(opts: Dictionary) -> void:
+	if "accent_color" in opts:
+		_accent_color = opts["accent_color"]
+
+	if "editor_scale" in opts:
+		_editor_scale = opts["editor_scale"]
 
 
 func show_page(page_name: String) -> void:
@@ -100,6 +108,9 @@ func set_accent_color(color: String) -> void:
 
 
 func _populate():
+	if _populated: # Already generated the documentation pages
+		return
+
 	var path = _get_root_folder() + "/src/modifiers/"
 	_discover_modifiers(path)
 
@@ -119,6 +130,8 @@ func _populate():
 			)
 
 		add_page(info)
+
+	_populated = true
 
 
 func _discover_modifiers(path) -> void:

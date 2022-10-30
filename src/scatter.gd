@@ -55,7 +55,7 @@ var domain: Domain:
 var items: Array[ScatterItem]
 var total_item_proportion: int
 var output_root: Node3D
-var documentation
+var editor_options := {} # Holds data relative to the editor itself, used by other parts
 
 var _thread := Thread.new()
 var _rebuild_queued := false
