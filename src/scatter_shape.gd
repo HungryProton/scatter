@@ -39,6 +39,7 @@ var shape: BaseShape:
 		shape = val
 		shape.changed.connect(_on_shape_changed)
 		update_gizmos()
+		ScatterUtil.request_parent_to_rebuild(self)
 
 
 func _ready() -> void:

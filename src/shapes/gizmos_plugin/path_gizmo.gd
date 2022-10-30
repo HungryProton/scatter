@@ -87,6 +87,12 @@ func commit_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, 
 
 func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.clear()
+
+	# Force the path panel to appear when the scatter shape type is changed
+	# from the inspector.
+	if is_selected(gizmo):
+		_gizmo_panel.selection_changed([gizmo.get_node_3d()])
+
 	var shape_node: ScatterShape = gizmo.get_node_3d()
 	var shape: PathShape = shape_node.shape
 

@@ -53,6 +53,9 @@ func is_point_inside(point: Vector3, global_transform: Transform3D) -> bool:
 func get_corners_global(gt: Transform3D) -> Array:
 	var res := []
 
+	if not curve:
+		return res
+
 	var half_thickness = thickness * 0.5
 	var corners = [
 		Vector3(-1, -1, -1),
@@ -84,9 +87,12 @@ func get_bounds() -> Bounds:
 
 func get_copy():
 	var copy = get_script().new()
+
 	copy.thickness = thickness
-	copy.curve = curve.duplicate()
 	copy.closed = closed
+	if curve:
+		copy.curve = curve.duplicate()
+
 	return copy
 
 
@@ -134,6 +140,9 @@ func get_closest_to(position):
 
 func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[PackedVector2Array]:
 	if not closed and thickness <= 0:
+		return []
+
+	if not curve:
 		return []
 
 	var edges: Array[PackedVector2Array] = []
