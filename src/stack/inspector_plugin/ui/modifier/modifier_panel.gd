@@ -154,7 +154,7 @@ func _on_remove_pressed() -> void:
 
 func _on_parameter_value_changed(value, previous, name, ui) -> void:
 	if _scatter.undo_redo:
-		_scatter.undo_redo.create_action("Changed Value " + name.capitalize())
+		_scatter.undo_redo.create_action("Change value " + name.capitalize())
 		_scatter.undo_redo.add_undo_method(self, "_restore_value", name, previous, ui)
 		_scatter.undo_redo.add_do_method(self, "_restore_value", name, value, ui)
 		_scatter.undo_redo.commit_action()

@@ -12,8 +12,6 @@ const TransformList = preload("../common/transform_list.gd")
 @export var stack: Array[Resource] = []
 
 var just_created := false
-var undo_redo: UndoRedo
-var documentation
 
 
 func update(scatter_node: Node3D, domain) -> TransformList:
@@ -41,6 +39,12 @@ func remove(modifier) -> void:
 		stack_changed.emit()
 
 
+func remove_at(index: int) -> void:
+	if stack.size() > index:
+		stack.remove_at(index)
+		stack_changed.emit()
+
+
 func duplicate_modifier(modifier) -> void:
 	var index: int = stack.find(modifier)
 	if index != -1:
@@ -54,6 +58,10 @@ func get_copy():
 	for modifier in stack:
 		copy.stack.push_back(modifier.duplicate())
 	return copy
+
+
+func get_index(modifier) -> int:
+	return stack.find(modifier)
 
 
 func is_using_edge_data() -> bool:

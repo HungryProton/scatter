@@ -35,7 +35,7 @@ const Domain := preload("./common/domain.gd")
 @export_group("Debug", "dbg_")
 @export var dbg_disable_thread := false
 
-var undo_redo: UndoRedo
+var undo_redo: EditorUndoRedoManager
 var modifier_stack: ModifierStack:
 	set(val):
 		if modifier_stack:

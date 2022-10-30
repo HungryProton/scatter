@@ -10,6 +10,7 @@ const ModifierPanel := preload("./modifier/modifier_panel.tscn")
 
 var _scatter
 var _modifier_stack
+var _undo_redo
 var _is_ready := false
 
 
@@ -27,6 +28,7 @@ func set_node(node) -> void:
 		return
 
 	_scatter = node
+	_undo_redo = _scatter.undo_redo
 	$%Documentation.set_editor_options(_scatter.editor_options)
 	rebuild_ui()
 
@@ -45,7 +47,7 @@ func rebuild_ui() -> void:
 		ui.removed.connect(_on_modifier_removed.bind(m))
 		ui.value_changed.connect(_on_value_changed)
 		ui.documentation_requested.connect(_on_documentation_requested.bind(m))
-		ui.duplication_requested.connect(_on_duplication_requested.bind(m))
+		ui.duplication_requested.connect(_on_modifier_duplicated.bind(m))
 
 
 func _clear() -> void:
@@ -83,15 +85,47 @@ func _get_root_folder() -> String:
 
 
 func _on_modifier_added(modifier) -> void:
-	_modifier_stack.add(modifier)
+	if _undo_redo:
+		_undo_redo.create_action("Create modifier " + modifier.display_name)
+		_undo_redo.add_undo_method(_modifier_stack, "remove", modifier)
+		_undo_redo.add_do_method(_modifier_stack, "add", modifier)
+		_undo_redo.commit_action()
+	else:
+		_modifier_stack.add(modifier)
 
 
 func _on_modifier_moved(old_index: int, new_index: int) -> void:
-	_modifier_stack.move(old_index, new_index)
+	if _undo_redo:
+		_undo_redo.create_action("Move modifier")
+		_undo_redo.add_undo_method(_modifier_stack, "move", new_index, old_index)
+		_undo_redo.add_do_method(_modifier_stack, "move", old_index, new_index)
+		_undo_redo.commit_action()
+	else:
+		_modifier_stack.move(old_index, new_index)
 
 
-func _on_modifier_removed(m) -> void:
-	_modifier_stack.remove(m)
+func _on_modifier_removed(modifier) -> void:
+	if _undo_redo:
+		_undo_redo.create_action("Remove modifier " + modifier.display_name)
+		_undo_redo.add_undo_method(_modifier_stack, "add", modifier)
+		_undo_redo.add_do_method(_modifier_stack, "remove", modifier)
+		_undo_redo.commit_action()
+	else:
+		_modifier_stack.remove(modifier)
+
+
+func _on_modifier_duplicated(modifier) -> void:
+	var index = _modifier_stack.get_index(modifier)
+	if index == -1:
+		return
+
+	if _undo_redo:
+		_undo_redo.create_action("Duplicate modifier " + modifier.display_name)
+		_undo_redo.add_undo_method(_modifier_stack, "remove_at", index + 1)
+		_undo_redo.add_do_method(_modifier_stack, "duplicate_modifier", modifier)
+		_undo_redo.commit_action()
+	else:
+		_modifier_stack.duplicate_modifier(modifier)
 
 
 func _on_stack_changed() -> void:
@@ -140,10 +174,6 @@ func _on_load_preset(preset_name) -> void:
 
 func _on_delete_preset(preset_name) -> void:
 	DirAccess.remove_absolute(_get_root_folder() + "/presets/" + preset_name + ".tscn")
-
-
-func _on_duplication_requested(modifier) -> void:
-	_modifier_stack.duplicate_modifier(modifier)
 
 
 func _on_documentation_requested(modifier) -> void:

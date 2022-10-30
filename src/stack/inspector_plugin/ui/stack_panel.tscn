@@ -104,3 +104,4 @@ script = ExtResource("1_hg5ys")
 
 [node name="Documentation" parent="." instance=ExtResource("9_y57kc")]
 unique_name_in_owner = true
+visible = false

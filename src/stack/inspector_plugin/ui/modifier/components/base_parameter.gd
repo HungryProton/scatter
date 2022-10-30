@@ -36,3 +36,4 @@ func _on_value_changed(_val) -> void:
 		var value = get_value()
 		if value != _previous:
 			value_changed.emit(value, _previous)
+		_previous = value
