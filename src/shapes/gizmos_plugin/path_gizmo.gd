@@ -3,7 +3,6 @@ extends "gizmo_handler.gd"
 
 
 const ScatterShape = preload("../../scatter_shape.gd")
-const PathShape = preload("../path_shape.gd")
 const PathPanel = preload("./components/path_panel.gd")
 const EventUtil = preload("../../common/event_util.gd")
 
@@ -16,7 +15,7 @@ func get_handle_name(_gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: boo
 
 
 func get_handle_value(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool) -> Variant:
-	var shape: PathShape = gizmo.get_node_3d().shape
+	var shape: ProtonScatterPathShape = gizmo.get_node_3d().shape
 	return shape.get_copy()
 
 
@@ -94,7 +93,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 		_gizmo_panel.selection_changed([gizmo.get_node_3d()])
 
 	var shape_node: ScatterShape = gizmo.get_node_3d()
-	var shape: PathShape = shape_node.shape
+	var shape: ProtonScatterPathShape = shape_node.shape
 
 	if not shape:
 		return
@@ -275,9 +274,10 @@ func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> bool:
 	if not shape_node:
 		return false
 
-	var shape: PathShape = shape_node.shape
-	if not shape:
+	if not shape_node.shape or not shape_node.shape is ProtonScatterPathShape:
 		return false
+
+	var shape: ProtonScatterPathShape = shape_node.shape
 
 	# In select mode, the set_handle and commit_handle functions take over.
 	if _gizmo_panel.is_select_mode_enabled():
@@ -305,7 +305,7 @@ func set_gizmo_panel(panel: PathPanel) -> void:
 	_gizmo_panel = panel
 
 
-func _edit_path(shape_node: ScatterShape, restore: PathShape) -> void:
+func _edit_path(shape_node: ScatterShape, restore: ProtonScatterPathShape) -> void:
 	shape_node.shape.curve = restore.curve.duplicate()
 	shape_node.shape.thickness = restore.thickness
 	shape_node.update_gizmos()

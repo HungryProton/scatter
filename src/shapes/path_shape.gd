@@ -1,5 +1,6 @@
 @tool
-extends "base_shape.gd"
+class_name ProtonScatterPathShape
+extends ProtonScatterBaseShape
 
 
 const Bounds := preload("../common/bounds.gd")

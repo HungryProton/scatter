@@ -1,3 +1,5 @@
+@tool
+class_name ProtonScatterBaseShape
 extends Resource
 
 

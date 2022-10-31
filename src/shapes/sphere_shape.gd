@@ -1,5 +1,6 @@
 @tool
-extends "base_shape.gd"
+class_name ProtonScatterSphereShape
+extends ProtonScatterBaseShape
 
 
 @export var radius := 5.0:

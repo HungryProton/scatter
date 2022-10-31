@@ -11,9 +11,6 @@ extends EditorNode3DGizmoPlugin
 
 
 const ScatterShape = preload("../../scatter_shape.gd")
-const SphereShape = preload("../sphere_shape.gd")
-const PathShape = preload("../path_shape.gd")
-const BoxShape = preload("../box_shape.gd")
 const GizmoHandler = preload("./gizmo_handler.gd")
 
 var _handlers: Dictionary
@@ -38,9 +35,9 @@ func _init():
 	create_handle_material("primary_handle", false, handle_icon)
 	create_handle_material("secondary_handle", false, secondary_handle_icon)
 
-	_handlers[SphereShape] = preload("./sphere_gizmo.gd").new()
-	_handlers[PathShape] = preload("./path_gizmo.gd").new()
-	_handlers[BoxShape] = preload("./box_gizmo.gd").new()
+	_handlers[ProtonScatterSphereShape] = preload("./sphere_gizmo.gd").new()
+	_handlers[ProtonScatterPathShape] = preload("./path_gizmo.gd").new()
+	_handlers[ProtonScatterBoxShape] = preload("./box_gizmo.gd").new()
 
 
 func _get_gizmo_name() -> String:
@@ -80,18 +77,18 @@ func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> int:
 
 
 func set_undo_redo(ur: EditorUndoRedoManager) -> void:
-	for handler_name in _handlers:
-		_handlers[handler_name].set_undo_redo(ur)
+	for handler_type in _handlers:
+		_handlers[handler_type].set_undo_redo(ur)
 
 
 func set_path_gizmo_panel(panel: Control) -> void:
-	if PathShape in _handlers:
-		_handlers[PathShape].set_gizmo_panel(panel)
+	if ProtonScatterPathShape in _handlers:
+		_handlers[ProtonScatterPathShape].set_gizmo_panel(panel)
 
 
 func set_editor_plugin(plugin: EditorPlugin) -> void:
-	for handler_name in _handlers:
-		_handlers[handler_name].set_editor_plugin(plugin)
+	for handler_type in _handlers:
+		_handlers[handler_type].set_editor_plugin(plugin)
 
 
 # Creates a standard material displayed on top of everything.

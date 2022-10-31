@@ -4,9 +4,6 @@ extends "gizmo_handler.gd"
 # 3D Gizmo for the Box shape.
 
 
-const BoxShape = preload("../box_shape.gd")
-
-
 func get_handle_name(_gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool) -> String:
 	return "Box Size"
 
@@ -42,7 +39,7 @@ func set_handle(gizmo: EditorNode3DGizmo, handle_id: int, _secondary: bool, came
 
 
 func commit_handle(gizmo: EditorNode3DGizmo, handle_id: int, _secondary: bool, restore: Variant, cancel: bool) -> void:
-	var shape: BoxShape = gizmo.get_node_3d().shape
+	var shape: ProtonScatterBoxShape = gizmo.get_node_3d().shape
 	if cancel:
 		shape.size = restore
 		return
@@ -56,7 +53,7 @@ func commit_handle(gizmo: EditorNode3DGizmo, handle_id: int, _secondary: bool, r
 func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.clear()
 	var scatter_shape = gizmo.get_node_3d()
-	var shape: BoxShape = scatter_shape.shape
+	var shape: ProtonScatterBoxShape = scatter_shape.shape
 
 	### Draw the Box lines
 	var lines = PackedVector3Array()
@@ -128,6 +125,6 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.add_handles(handles, handles_material, handles_ids)
 
 
-func _set_size(box: BoxShape, size: Vector3) -> void:
+func _set_size(box: ProtonScatterBoxShape, size: Vector3) -> void:
 	if box:
 		box.size = size

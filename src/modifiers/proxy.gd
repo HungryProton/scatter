@@ -12,7 +12,7 @@ var _reference_node
 
 
 func _init() -> void:
-	display_name = "Stack Proxy"
+	display_name = "Proxy"
 	category = "Misc"
 	can_restrict_height = false
 	can_override_seed = false

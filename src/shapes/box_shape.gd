@@ -1,5 +1,6 @@
 @tool
-extends "base_shape.gd"
+class_name ProtonScatterBoxShape
+extends ProtonScatterBaseShape
 
 
 @export var size := Vector3.ONE:
