@@ -32,10 +32,13 @@ const Domain := preload("./common/domain.gd")
 		use_instancing = val
 		full_rebuild(true)
 
+@export_group("Proxy")
+@export var copy_scatter_domain := false
+
 @export_group("Debug", "dbg_")
 @export var dbg_disable_thread := false
 
-var undo_redo: EditorUndoRedoManager
+var undo_redo # : EditorUndoRedoManager # Can't type this
 var modifier_stack: ModifierStack:
 	set(val):
 		if modifier_stack:

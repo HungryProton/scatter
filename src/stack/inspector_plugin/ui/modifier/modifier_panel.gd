@@ -113,10 +113,7 @@ func create_ui_for(modifier) -> void:
 					parameter_ui = ParameterScalar.instantiate()
 					parameter_ui.mark_as_int(true)
 			TYPE_STRING:
-				if property.hint_string == "Node":
-					parameter_ui = ParameterNodeSelector.instantiate()
-					parameter_ui.set_root(_scatter)
-				elif property.hint_string == "File" or property.hint_string == "Texture":
+				if property.hint_string == "File" or property.hint_string == "Texture":
 					parameter_ui = ParameterFile.instantiate()
 				elif property.hint_string == "Curve":
 					parameter_ui = ParameterCurve.instantiate()
@@ -126,6 +123,9 @@ func create_ui_for(modifier) -> void:
 				parameter_ui = ParameterVector3.instantiate()
 			TYPE_VECTOR2:
 				parameter_ui = ParameterVector2.instantiate()
+			TYPE_NODE_PATH:
+				parameter_ui = ParameterNodeSelector.instantiate()
+				parameter_ui.set_root(_scatter)
 
 		if parameter_ui:
 			_parameters.add_child(parameter_ui)

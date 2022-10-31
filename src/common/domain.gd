@@ -247,6 +247,10 @@ func compute_edges() -> void:
 			edges.push_back(curve)
 
 
+func get_root() -> Node3D:
+	return root
+
+
 func get_global_transform() -> Transform3D:
 	return root.get_global_transform()
 
