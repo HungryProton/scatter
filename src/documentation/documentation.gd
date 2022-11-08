@@ -7,17 +7,12 @@ extends PopupPanel
 
 
 const DocumentationInfo = preload("./documentation_info.gd")
-const Util = preload("../common/util.gd")
-
+const SpecialPages = preload("./pages/special_pages.gd")
 
 var _pages := {}
 var _items := {}
 var _categories_roots := {}
-var _modifiers = []
 
-var _scatter_root: TreeItem
-var _item_root: TreeItem
-var _shapes_root: TreeItem
 var _modifiers_root: TreeItem
 
 var _edited_text: String
@@ -38,15 +33,12 @@ func _ready() -> void:
 	tree.hide_root = true
 	tree.item_selected.connect(_on_item_selected)
 
-	_scatter_root = tree.create_item()
-	_scatter_root.set_text(0, "ProtonScatter")
-	_item_root = tree.create_item()
-	_item_root.set_text(0, "ScatterItem")
-	_shapes_root = tree.create_item()
-	_shapes_root.set_text(0, "Shapes")
+	add_page(SpecialPages.get_scatter_documentation(), tree.create_item())
+	add_page(SpecialPages.get_item_documentation(), tree.create_item())
+	add_page(SpecialPages.get_shape_documentation(), tree.create_item())
+
 	_modifiers_root = tree.create_item()
-	_modifiers_root.set_text(0, "Modifiers")
-	_modifiers_root.set_selectable(0, false)
+	add_page(SpecialPages.get_modifiers_documentation(), _modifiers_root)
 
 	_populate()
 
@@ -72,9 +64,11 @@ func show_page(page_name: String) -> void:
 # Generate a formatted string from the DocumentationInfo input.
 # This string will be stored and later displayed in the RichTextLabel so we
 # we don't have to regenerate it everytime we look at another page.
-func add_page(info: DocumentationInfo) -> void:
-	var root: TreeItem = _get_or_create_tree_root(info.get_category())
-	var item: TreeItem = tree.create_item(root)
+func add_page(info: DocumentationInfo, item: TreeItem = null) -> void:
+	if not item:
+		var root: TreeItem = _get_or_create_tree_root(info.get_category())
+		item = tree.create_item(root)
+
 	item.set_text(0, info.get_title())
 
 	_begin_formatting()
@@ -87,10 +81,11 @@ func add_page(info: DocumentationInfo) -> void:
 		_format_paragraph(p)
 
 	# Parameters
-	_format_subtitle("Parameters")
+	if not info.get_parameters().is_empty():
+		_format_subtitle("Parameters")
 
-	for p in info.get_parameters():
-		_format_parameter(p)
+		for p in info.get_parameters():
+			_format_parameter(p)
 
 	# Warnings
 	if not info.get_warnings().is_empty():
@@ -103,38 +98,25 @@ func add_page(info: DocumentationInfo) -> void:
 	_items[info.get_title()] = item
 
 
-func set_accent_color(color: String) -> void:
-	_accent_color = color
-
-
 func _populate():
 	if _populated: # Already generated the documentation pages
 		return
 
 	var path = _get_root_folder() + "/src/modifiers/"
-	_discover_modifiers(path)
+	var result := {}
+	_discover_modifiers_recursive(path, result)
 
-	for modifier in _modifiers:
-		var instance = modifier.new()
-		var info: DocumentationInfo = instance.documentation
-		info.set_title(instance.display_name)
-		info.set_category(instance.category)
+	var names := result.keys()
+	names.sort()
 
-		if instance.use_edge_data:
-			info.add_warning("The domain edge is represented by the blue lines
-				on the Scatter node. These edges are usually locked to the
-				Scatter local XZ plane, (except for the Path shape when they are
-				NOT closed). If you can't see any result, make sure to have at
-				least a Shape crossing the local XZ plane.",
-				1
-			)
-
+	for n in names:
+		var info = result[n]
 		add_page(info)
 
 	_populated = true
 
 
-func _discover_modifiers(path) -> void:
+func _discover_modifiers_recursive(path, result) -> void:
 	var dir = DirAccess.open(path)
 	dir.list_dir_begin()
 	var path_root = dir.get_current_dir() + "/"
@@ -146,7 +128,7 @@ func _discover_modifiers(path) -> void:
 		if file == "base_modifier.gd":
 			continue
 		if dir.current_is_dir():
-			_discover_modifiers(path_root + file)
+			_discover_modifiers_recursive(path_root + file, result)
 			continue
 		if not file.ends_with(".gd") and not file.ends_with(".gdc"):
 			continue
@@ -157,7 +139,21 @@ func _discover_modifiers(path) -> void:
 			print("Error: Failed to load script ", file)
 			continue
 
-		_modifiers.push_back(script)
+		var modifier = script.new()
+
+		var info: DocumentationInfo = modifier.documentation
+		info.set_title(modifier.display_name)
+		info.set_category(modifier.category)
+		if modifier.use_edge_data:
+			info.add_warning(
+				"This modifier uses edge data (represented by the blue lines
+				on the Scatter node). These edges are usually locked to the
+				local XZ plane, (except for the Path shape when they are
+				NOT closed). If you can't see these lines, make sure to have at
+				least one Shape crossing the ProtonScatter local XZ plane.",
+				1)
+
+		result[modifier.display_name] = info
 
 	dir.list_dir_end()
 
@@ -265,6 +261,8 @@ func _format_warning(w, indent := true) -> void:
 
 	if indent:
 		_edited_text += "[/indent]"
+
+	_format_line_break(1)
 
 
 func _on_item_selected() -> void:

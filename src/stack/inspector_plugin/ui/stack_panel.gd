@@ -18,6 +18,7 @@ func _ready():
 	_modifiers_popup.add_modifier.connect(_on_modifier_added)
 	_modifiers_container.child_moved.connect(_on_modifier_moved)
 	$%Rebuild.pressed.connect(_on_rebuild_pressed)
+	$%DocumentationButton.pressed.connect(_on_documentation_requested.bind("ProtonScatter"))
 
 	_is_ready = true
 	rebuild_ui()
@@ -46,7 +47,7 @@ func rebuild_ui() -> void:
 		ui.create_ui_for(m)
 		ui.removed.connect(_on_modifier_removed.bind(m))
 		ui.value_changed.connect(_on_value_changed)
-		ui.documentation_requested.connect(_on_documentation_requested.bind(m))
+		ui.documentation_requested.connect(_on_documentation_requested.bind(m.display_name))
 		ui.duplication_requested.connect(_on_modifier_duplicated.bind(m))
 
 
@@ -176,5 +177,5 @@ func _on_delete_preset(preset_name) -> void:
 	DirAccess.remove_absolute(_get_root_folder() + "/presets/" + preset_name + ".tscn")
 
 
-func _on_documentation_requested(modifier) -> void:
-	$%Documentation.show_page(modifier.display_name)
+func _on_documentation_requested(page_name) -> void:
+	$%Documentation.show_page(page_name)

@@ -14,6 +14,7 @@ func _init() -> void:
 	warning_ignore_no_shape = false
 	can_restrict_height = true
 	can_use_global_and_local_space = true
+	restrict_height = true
 
 	documentation.add_paragraph(
 		"Place transforms along the edges of the ScatterShapes")

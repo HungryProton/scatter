@@ -92,9 +92,6 @@ func add_parameter(name := "") -> Parameter:
 	_parameters.push_back(p)
 	return p
 
-func add_parameter_old(p1, p2, p3, p4, p5) -> Parameter:
-	var p = Parameter.new()
-	return p
 
 func get_title() -> String:
 	return _page_title

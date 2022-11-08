@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dllpt2dven8vw"]
+[gd_scene load_steps=11 format=3 uid="uid://dllpt2dven8vw"]
 
 [ext_resource type="Texture2D" uid="uid://cun73k8jdmr4e" path="res://addons/proton_scatter/icons/add.svg" id="1_4vwtj"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/stack_panel.gd" id="1_ga4or"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://belutr5odecw2" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier_list_popup/popup.tscn" id="3_pkswu"]
 [ext_resource type="Texture2D" uid="uid://ddjrq1h4mkn6a" path="res://addons/proton_scatter/icons/load.svg" id="3_w72lv"]
 [ext_resource type="Texture2D" uid="uid://b2omj2e03x72e" path="res://addons/proton_scatter/icons/save.svg" id="4_5l2cx"]
+[ext_resource type="Texture2D" uid="uid://cnwg3p2m4lbf3" path="res://addons/proton_scatter/icons/doc.svg" id="8_fgqhd"]
 [ext_resource type="PackedScene" uid="uid://cfg8iqtuion8b" path="res://addons/proton_scatter/src/documentation/documentation.tscn" id="9_y57kc"]
 
 [node name="StackPanel" type="MarginContainer"]
@@ -53,10 +54,15 @@ visible = false
 [node name="Rebuild" type="Button" parent="VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_left = 360.0
-offset_right = 384.0
+offset_left = 324.0
+offset_right = 348.0
 offset_bottom = 31.0
 size_flags_horizontal = 4
+tooltip_text = "Force rebuild.
+
+If the placed items does not look as expected, you can press this button to force it to regenerate the result. 
+
+Usually, you shouldn't have to use it so please report it on Github if you found a case where it's necessary to click this. "
 focus_mode = 0
 icon = ExtResource("2_svid4")
 icon_alignment = 1
@@ -64,15 +70,16 @@ icon_alignment = 1
 [node name="VSeparator" type="VSeparator" parent="VBoxContainer/HBoxContainer"]
 modulate = Color(1, 1, 1, 0.54902)
 layout_mode = 2
-offset_left = 388.0
-offset_right = 392.0
+offset_left = 352.0
+offset_right = 356.0
 offset_bottom = 31.0
 
 [node name="LoadPreset" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
-offset_left = 396.0
-offset_right = 420.0
+offset_left = 360.0
+offset_right = 384.0
 offset_bottom = 31.0
+tooltip_text = "Load a preset."
 focus_mode = 0
 text = "
 "
@@ -81,13 +88,34 @@ icon_alignment = 1
 
 [node name="SavePreset" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
-offset_left = 424.0
-offset_right = 448.0
+offset_left = 388.0
+offset_right = 412.0
 offset_bottom = 31.0
+tooltip_text = "Save a preset."
 focus_mode = 0
 text = "
 "
 icon = ExtResource("4_5l2cx")
+icon_alignment = 1
+
+[node name="VSeparator2" type="VSeparator" parent="VBoxContainer/HBoxContainer"]
+modulate = Color(1, 1, 1, 0.54902)
+layout_mode = 2
+offset_left = 416.0
+offset_right = 420.0
+offset_bottom = 31.0
+
+[node name="DocumentationButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 424.0
+offset_right = 448.0
+offset_bottom = 31.0
+tooltip_text = "Open documentation"
+focus_mode = 0
+text = "
+"
+icon = ExtResource("8_fgqhd")
 icon_alignment = 1
 
 [node name="ModifiersContainer" type="Container" parent="VBoxContainer"]

@@ -35,6 +35,7 @@ func _init() -> void:
 		with the global axis if local space is disabled.")
 
 	p = documentation.add_parameter("Ray length")
+	p.set_type("float")
 	p.set_description("How far we look for other physics objects.")
 	p.set_cost(2)
 

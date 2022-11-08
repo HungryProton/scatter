@@ -3,7 +3,6 @@ extends "base_modifier.gd"
 
 # Takes existing objects and duplicates them recursively with given transforms
 
-# TODO: Completely broken, to fix
 
 @export var amount := 1
 @export var min_amount := -1
@@ -27,6 +26,78 @@ func _init() -> void:
 	can_restrict_height = false
 	can_use_global_and_local_space = false
 
+	documentation.add_paragraph(
+		"Recursively creates copies of the existing transforms, with each copy
+		being offset from the previous one in any of a number of possible ways.")
+
+	var p := documentation.add_parameter("Amount")
+	p.set_type("int")
+	p.set_cost(2)
+	p.set_description(
+		"The iteration count. If set to 1, each existing transforms are copied
+		once.")
+	p.add_warning("If set to 0, no copies are created.")
+
+	p = documentation.add_parameter("Minimum amount")
+	p.set_type("int")
+	p.set_description(
+		"Creates a random amount of copies for each transforms, between this
+		value and the amount value.")
+	p.add_warning("Ignored if set to a negative value.")
+
+	p = documentation.add_parameter("Offset")
+	p.set_type("Vector3")
+	p.set_description(
+		"Adds a constant offset between each copies and the previous one.")
+
+	p = documentation.add_parameter("Local offset")
+	p.set_type("bool")
+	p.set_description(
+		"If enabled, offset is relative to the previous copy orientation.
+		Otherwise, the offset is in global space.")
+
+	p = documentation.add_parameter("Rotation")
+	p.set_type("Vector3")
+	p.set_description(
+		"The rotation offset (on each axes) to add on each copy.")
+
+	p = documentation.add_parameter("Local rotation")
+	p.set_type("bool")
+	p.set_description(
+		"If enabled, the rotation is applied in local space relative to each
+		individual transforms. Otherwise, the rotation is applied in global
+		space.")
+
+	p = documentation.add_parameter("Rotation Pivot")
+	p.set_type("Vector3")
+	p.set_description(
+		"The point around which each copies are rotated. By default, each
+		transforms are rotated around their individual centers.")
+
+	p = documentation.add_parameter("Individual Rotation Pivots")
+	p.set_type("bool")
+	p.set_description(
+		"If enabled, each copies will use their own pivot relative to the
+		previous copy. Otherwise, a single pivot point (defined in global space)
+		will be used for the rotation of [b]all[/b] the copies.")
+
+	p = documentation.add_parameter("Scale")
+	p.set_type("Vector3")
+	p.set_description(
+		"Scales the copies relative to the transforms they are from.")
+
+	p = documentation.add_parameter("Local Scale")
+	p.set_type("bool")
+	p.set_description(
+		"If enabled, scaling is applied in local space relative to each
+		individual transforms. Otherwise, global axes are used, resulting
+		in skewed transforms in most cases.")
+
+	p = documentation.add_parameter("Randomize Indices")
+	p.set_type("bool")
+	p.set_description(
+		"Randomize the transform list order. This is only useful to break up the
+		repetitive patterns if you're using multiple ScatterItem nodes.")
 
 
 func _process_transforms(transforms, domain, seed: int) -> void:

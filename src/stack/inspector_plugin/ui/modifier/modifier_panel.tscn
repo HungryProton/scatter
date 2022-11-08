@@ -6,8 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://85r2q2fd8gyh" path="res://addons/proton_scatter/icons/arrow_down.svg" id="4_7nlfc"]
 [ext_resource type="Texture2D" uid="uid://dahwdjl2er75o" path="res://addons/proton_scatter/icons/close.svg" id="5"]
 [ext_resource type="Texture2D" uid="uid://n66mufjib4ds" path="res://addons/proton_scatter/icons/menu.svg" id="6_lmo8k"]
-[ext_resource type="Texture2D" uid="uid://4ily4caa4der" path="res://addons/proton_scatter/icons/documentation.svg" id="7_8sn2y"]
 [ext_resource type="Texture2D" uid="uid://dpigmdo0x73yb" path="res://addons/proton_scatter/icons/duplicate.svg" id="7_f6nan"]
+[ext_resource type="Texture2D" uid="uid://cnwg3p2m4lbf3" path="res://addons/proton_scatter/icons/doc.svg" id="7_owhij"]
 [ext_resource type="Texture2D" uid="uid://dj0y6peid681t" path="res://addons/proton_scatter/icons/warning.svg" id="9"]
 [ext_resource type="Texture2D" uid="uid://lkb3k4nuipjn" path="res://addons/proton_scatter/icons/drag_area.svg" id="9_t6pse"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/override_seed_button.gd" id="10_ptukr"]
@@ -63,6 +63,7 @@ unique_name_in_owner = true
 layout_mode = 2
 offset_right = 20.0
 offset_bottom = 26.0
+tooltip_text = "Toggle the parameters view"
 focus_mode = 0
 mouse_filter = 1
 toggle_mode = true
@@ -109,10 +110,11 @@ unique_name_in_owner = true
 layout_mode = 2
 offset_right = 24.0
 offset_bottom = 26.0
+tooltip_text = "Show options"
 icon = ExtResource("6_lmo8k")
 item_count = 4
 popup/item_0/text = "Show documentation"
-popup/item_0/icon = ExtResource("7_8sn2y")
+popup/item_0/icon = ExtResource("7_owhij")
 popup/item_0/id = 0
 popup/item_1/text = ""
 popup/item_1/id = 1
@@ -130,6 +132,11 @@ layout_mode = 2
 offset_left = 26.0
 offset_right = 50.0
 offset_bottom = 26.0
+tooltip_text = "Toggle the modifier.
+
+If the modifier is disabled, it will not contribute to the final result but will still remain in the stack.
+
+Use this feature to quickly see how the modifier affects the overall stack."
 focus_mode = 0
 mouse_filter = 1
 
@@ -141,6 +148,8 @@ offset_top = 1.0
 offset_right = 76.0
 offset_bottom = 25.0
 size_flags_vertical = 4
+tooltip_text = "Delete the modifier.
+This will remove it from the stack."
 focus_mode = 0
 mouse_filter = 1
 icon = ExtResource("5")
@@ -160,6 +169,9 @@ layout_mode = 2
 offset_left = 84.0
 offset_right = 100.0
 offset_bottom = 26.0
+tooltip_text = "Drag and move this button to change the stack order. 
+
+Modifiers are processed from top to bottom."
 mouse_default_cursor_shape = 6
 texture = ExtResource("9_t6pse")
 stretch_mode = 3
@@ -220,7 +232,9 @@ size_flags_vertical = 3
 layout_mode = 2
 offset_right = 24.0
 offset_bottom = 24.0
-tooltip_text = "Local random seed"
+tooltip_text = "Random seed.
+
+Enable to force a custom seed on this modifier only. If this option is disabled, the Global Seed from the ProtonScatter node will be used instead."
 icon = ExtResource("11_qwhro")
 icon_alignment = 0
 default_icon = ExtResource("11_qwhro")
@@ -268,7 +282,9 @@ size_flags_vertical = 3
 layout_mode = 2
 offset_right = 24.0
 offset_bottom = 24.0
-tooltip_text = "Restrict height"
+tooltip_text = "Restrict height.
+
+If enabled, the modifier will try to remain in the local XZ plane instead of using the full volume defined by the ScatterShapes."
 icon = ExtResource("12_lx60d")
 default_icon = ExtResource("12_lx60d")
 pressed_icon = ExtResource("15_0w0as")
