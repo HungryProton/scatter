@@ -1,0 +1,38 @@
+[gd_resource type="ShaderMaterial" load_steps=7 format=3 uid="uid://djo80ucamk643"]
+
+[ext_resource type="Shader" path="res://addons/proton_scatter/demos/assets/materials/grass.gdshader" id="1_8py1k"]
+[ext_resource type="Texture2D" uid="uid://cgenco43aneod" path="res://addons/proton_scatter/demos/assets/textures/t_leaves_1.png" id="2_l2uea"]
+
+[sub_resource type="Gradient" id="Gradient_yy7fg"]
+offsets = PackedFloat32Array(0, 0.751174, 0.934272)
+colors = PackedColorArray(0.334, 0.4, 0.22, 1, 0.496467, 0.55, 0.1485, 1, 0.898039, 0.670588, 0.0196078, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_rwvaq"]
+gradient = SubResource("Gradient_yy7fg")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_wpihy"]
+seed = 1
+frequency = 0.002
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture_tgrrr"]
+in_3d_space = true
+seamless = true
+seamless_blend_skirt = 0.65
+noise = SubResource("FastNoiseLite_wpihy")
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_8py1k")
+shader_parameter/alpha_scissor_threshold = 0.5
+shader_parameter/camera_bend_strength = 0.0
+shader_parameter/grass_height = 40.0
+shader_parameter/noise_scale = 12.0
+shader_parameter/secondary_attenuation = 0.2
+shader_parameter/secondary_color = Color(0, 0.305882, 0.211765, 1)
+shader_parameter/texture_albedo = ExtResource("2_l2uea")
+shader_parameter/texture_gradient = SubResource("GradientTexture1D_rwvaq")
+shader_parameter/texture_noise = SubResource("NoiseTexture_tgrrr")
+shader_parameter/transmission = Color(1, 0.975296, 0.943663, 1)
+shader_parameter/wind_direction = Vector2(1, -0.5)
+shader_parameter/wind_speed = 0.5
+shader_parameter/wind_strength = 0.05

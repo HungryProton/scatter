@@ -1,7 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://c06elk0jpdy2j"]
+[gd_scene load_steps=4 format=3]
 
-[ext_resource type="PackedScene" uid="uid://8l6upkpeb1rr" path="res://addons/proton_scatter/demos/assets/fence_planks.glb" id="1"]
-[ext_resource type="Material" path="res://addons/proton_scatter/demos/assets/m_fence.tres" id="2"]
+[ext_resource type="PackedScene" uid="uid://8l6upkpeb1rr" path="res://addons/proton_scatter/demos/assets/models/fence_planks.glb" id="1"]
+[ext_resource type="Material" path="res://addons/proton_scatter/demos/assets/materials/m_fence.tres" id="2"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_fesk1"]
 size = Vector3(1, 0.5, 0.1)

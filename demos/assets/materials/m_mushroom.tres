@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://ds2hjlo70hglg"]
+
+[ext_resource type="Texture2D" uid="uid://bay670hln3ji5" path="res://addons/proton_scatter/demos/assets/textures/mushroom.png" id="1_y0tuv"]
+
+[resource]
+albedo_texture = ExtResource("1_y0tuv")
