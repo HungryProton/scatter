@@ -67,6 +67,18 @@ func _ready() -> void:
 	child_exiting_tree.connect(_on_child_exiting_tree)
 	rebuild(true)
 
+	if items.is_empty():
+		var item = ScatterItem.new()
+		add_child(item, true)
+		item.set_owner(get_tree().get_edited_scene_root())
+		item.set_name("ScatterItem")
+
+	if domain.is_empty():
+		var shape = ScatterShape.new()
+		add_child(shape, true)
+		shape.set_owner(get_tree().get_edited_scene_root())
+		shape.set_name("ScatterShape")
+
 
 func _process(delta: float) -> void:
 	if _thread and _thread.is_started() and not _thread.is_alive():

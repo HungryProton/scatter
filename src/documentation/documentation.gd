@@ -241,7 +241,6 @@ func _format_parameter(p) -> void:
 	for warning in p.warnings:
 		if not warning.text.is_empty():
 			_format_warning(warning)
-			_format_line_break()
 
 	_edited_text += "[/indent]"
 

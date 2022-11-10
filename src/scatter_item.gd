@@ -2,18 +2,40 @@
 extends Node3D
 
 
+const ScatterUtil := preload('./common/scatter_util.gd')
+
+
 @export_category("ScatterItem")
-@export var proportion := 100
-@export_enum("From current scene", "From disk") var source:
+@export var proportion := 100:
+	set(val):
+		proportion = val
+		ScatterUtil.request_parent_to_rebuild(self)
+
+@export_enum("From current scene", "From disk") var source = 1:
 	set(val):
 		source = val
 		property_list_changed.emit()
 
 @export_group("Source options", "source_")
-@export var source_scale_multiplier := 1.0
-@export var source_ignore_position := true
-@export var source_ignore_rotation := true
-@export var source_ignore_scale := true
+@export var source_scale_multiplier := 1.0:
+	set(val):
+		source_scale_multiplier = val
+		ScatterUtil.request_parent_to_rebuild(self)
+
+@export var source_ignore_position := true:
+	set(val):
+		source_ignore_position = val
+		ScatterUtil.request_parent_to_rebuild(self)
+
+@export var source_ignore_rotation := true:
+	set(val):
+		source_ignore_rotation = val
+		ScatterUtil.request_parent_to_rebuild(self)
+
+@export var source_ignore_scale := true:
+	set(val):
+		source_ignore_scale = val
+		ScatterUtil.request_parent_to_rebuild(self)
 
 var path: String
 var source_position: Vector3

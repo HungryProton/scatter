@@ -3,17 +3,17 @@ class_name ProtonScatterSphereShape
 extends ProtonScatterBaseShape
 
 
-@export var radius := 5.0:
+@export var radius := 2.0:
 	set(val):
 		radius = val
 		_radius_squared = val * val
 		emit_changed()
 
-var _radius_squared := 0
+var _radius_squared := 0.0
 
 
 func get_copy():
-	var copy = get_script().new()
+	var copy = ProtonScatterSphereShape.new()
 	copy.radius = radius
 	return copy
 
