@@ -54,16 +54,17 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	var radius = shape.radius
 
 	for i in steps:
-		lines.append(Vector3(cos(i * step_angle), sin(i * step_angle), 0.0) * radius)
-		lines.append(Vector3(cos((i + 1) * step_angle), sin((i + 1) * step_angle), 0.0) * radius)
-
-	for i in steps:
 		lines.append(Vector3(cos(i * step_angle), 0.0, sin(i * step_angle)) * radius)
 		lines.append(Vector3(cos((i + 1) * step_angle), 0.0, sin((i + 1) * step_angle)) * radius)
 
-	for i in steps:
-		lines.append(Vector3(0.0, cos(i * step_angle), sin(i * step_angle)) * radius)
-		lines.append(Vector3(0.0, cos((i + 1) * step_angle), sin((i + 1) * step_angle)) * radius)
+	if is_selected(gizmo):
+		for i in steps:
+			lines.append(Vector3(cos(i * step_angle), sin(i * step_angle), 0.0) * radius)
+			lines.append(Vector3(cos((i + 1) * step_angle), sin((i + 1) * step_angle), 0.0) * radius)
+
+		for i in steps:
+			lines.append(Vector3(0.0, cos(i * step_angle), sin(i * step_angle)) * radius)
+			lines.append(Vector3(0.0, cos((i + 1) * step_angle), sin((i + 1) * step_angle)) * radius)
 
 	gizmo.add_lines(lines, lines_material)
 	gizmo.add_collision_segments(lines)

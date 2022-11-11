@@ -96,7 +96,9 @@ func _ready() -> void:
 	_perform_sanity_check()
 	set_notify_transform(true)
 	child_exiting_tree.connect(_on_child_exiting_tree)
-	rebuild.call_deferred()
+
+	if scatter_parent.is_empty():
+		rebuild.call_deferred()
 
 	# Check if the required nodes exists, if not, create them.
 	_discover_items()
@@ -233,6 +235,7 @@ func _rebuild(force_discover) -> void:
 	if _rebuild_queued:
 		_rebuild_queued = false
 		_rebuild(true)
+		return
 
 	if not transforms or transforms.size() == 0:
 		_clear_output()
@@ -244,7 +247,10 @@ func _rebuild(force_discover) -> void:
 		_update_duplicates(transforms)
 
 	update_gizmos()
-	build_completed.emit()
+
+	if not _rebuild_queued:
+		await get_tree().process_frame
+		build_completed.emit()
 
 
 func _discover_items() -> void:

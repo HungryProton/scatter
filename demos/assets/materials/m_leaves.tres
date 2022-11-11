@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://cgenco43aneod" path="res://addons/proton_scatter/demos/assets/textures/t_leaves_1.png" id="2_l2uea"]
 
 [sub_resource type="Gradient" id="Gradient_yy7fg"]
-offsets = PackedFloat32Array(0, 0.751174, 0.934272)
-colors = PackedColorArray(0.334, 0.4, 0.22, 1, 0.496467, 0.55, 0.1485, 1, 0.898039, 0.670588, 0.0196078, 1)
+offsets = PackedFloat32Array(0, 0.726872, 0.934272)
+colors = PackedColorArray(0.333333, 0.486275, 0.556863, 1, 0.496467, 0.55, 0.1485, 1, 0.898039, 0.670588, 0.0196078, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_rwvaq"]
 gradient = SubResource("Gradient_yy7fg")
@@ -25,7 +25,7 @@ render_priority = 0
 shader = ExtResource("1_8py1k")
 shader_parameter/alpha_scissor_threshold = 0.5
 shader_parameter/camera_bend_strength = 0.0
-shader_parameter/grass_height = 40.0
+shader_parameter/grass_height = 1.0
 shader_parameter/noise_scale = 12.0
 shader_parameter/secondary_attenuation = 0.2
 shader_parameter/secondary_color = Color(0, 0.305882, 0.211765, 1)

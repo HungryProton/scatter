@@ -93,10 +93,15 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 		]
 	]
 
-	for block in corners:
-		for i in block.size() - 1:
-			lines.push_back(block[i] * half_size)
-			lines.push_back(block[i + 1] * half_size)
+	var block_count = corners.size()
+	if not is_selected(gizmo):
+		block_count = 1
+
+	for i in block_count:
+		var block = corners[i]
+		for j in block.size() - 1:
+			lines.push_back(block[j] * half_size)
+			lines.push_back(block[j + 1] * half_size)
 
 	gizmo.add_lines(lines, lines_material)
 	gizmo.add_collision_segments(lines)
