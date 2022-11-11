@@ -38,7 +38,7 @@ static func ensure_output_root_exists(s: Node) -> void:
 
 
 static func enforce_output_root_owner(s) -> void:
-	if s.output_root and s.is_inside_tree():
+	if is_instance_valid(s.output_root) and s.is_inside_tree():
 		if s.show_output_in_tree:
 			set_owner_recursive(s.output_root, s.get_tree().get_edited_scene_root())
 		else:
@@ -136,6 +136,9 @@ static func get_all_mesh_instances_from(node: Node3D) -> Array[MeshInstance3D]:
 # Find all the meshes below node and create a new single mesh with multiple
 # surfaces from all of them.
 static func get_merged_meshes_from(node: Node) -> MeshInstance3D:
+	if not node:
+		return null
+
 	# Reset node transform for this step, overwise they'll stack
 	var transform_backup: Transform3D
 	if node.is_inside_tree():

@@ -1,0 +1,57 @@
+[gd_resource type="ShaderMaterial" load_steps=8 format=3 uid="uid://cxiau3to57i18"]
+
+[ext_resource type="Shader" path="res://addons/proton_scatter/demos/assets/materials/water.gdshader" id="1_tgef2"]
+
+[sub_resource type="Gradient" id="Gradient_ogl8k"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_tfwnq"]
+gradient = SubResource("Gradient_ogl8k")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_hdw1o"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_tcldk"]
+noise = SubResource("FastNoiseLite_hdw1o")
+
+[sub_resource type="Gradient" id="Gradient_l0ivq"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_00i8k"]
+gradient = SubResource("Gradient_l0ivq")
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_tgef2")
+shader_parameter/depth_gradient = SubResource("GradientTexture1D_tfwnq")
+shader_parameter/depth_multiplier = 0.1
+shader_parameter/depth_ramp = 1.0
+shader_parameter/foam_color = Color(0.901961, 0.901961, 0.901961, 1)
+shader_parameter/foam_noise_multiplier = 8.0
+shader_parameter/foam_noise_tiling = 8.0
+shader_parameter/foam_ramp = 0.2
+shader_parameter/foam_speed = 0.2
+shader_parameter/foam_threshold = 0.2
+shader_parameter/glare = 3.0
+shader_parameter/glare_ramp = 0.5
+shader_parameter/glare_width = 150.0
+shader_parameter/refraction = 0.0
+shader_parameter/refraction_map = SubResource("NoiseTexture2D_tcldk")
+shader_parameter/refraction_map_scale = 1.0
+shader_parameter/refraction_speed = 0.25
+shader_parameter/refraction_tolerance = 0.1
+shader_parameter/roughness = 0.285
+shader_parameter/specular = 0.285
+shader_parameter/specular_mutliplier = 1.0
+shader_parameter/specular_width = 0.5
+shader_parameter/sss_strength = 0.2
+shader_parameter/surface_gradient = SubResource("GradientTexture1D_00i8k")
+shader_parameter/surface_gradient_offset = 0.062
+shader_parameter/surface_gradient_scale = 1.786
+shader_parameter/wave_1_height = 1.0
+shader_parameter/wave_1_scale = 1.0
+shader_parameter/wave_1_speed = Vector2(1, 1)
+shader_parameter/wave_1_stretch = 1.0
+shader_parameter/wave_2_height = 1.0
+shader_parameter/wave_2_normal_strength = 0.1
+shader_parameter/wave_2_scale = 1.0
+shader_parameter/wave_2_speed = Vector2(1, 1)
+shader_parameter/wave_2_stretch = null
+shader_parameter/wave_offset = null

@@ -3,7 +3,7 @@ class_name ProtonScatterSphereShape
 extends ProtonScatterBaseShape
 
 
-@export var radius := 2.0:
+@export var radius := 1.0:
 	set(val):
 		radius = val
 		_radius_squared = val * val

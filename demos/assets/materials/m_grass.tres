@@ -34,5 +34,5 @@ shader_parameter/texture_gradient = SubResource("GradientTexture1D_rwvaq")
 shader_parameter/texture_noise = SubResource("NoiseTexture_tgrrr")
 shader_parameter/transmission = Color(1, 1, 1, 1)
 shader_parameter/wind_direction = Vector2(1, -0.5)
-shader_parameter/wind_speed = 0.5
-shader_parameter/wind_strength = 0.3
+shader_parameter/wind_speed = 0.2
+shader_parameter/wind_strength = 0.05

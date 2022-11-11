@@ -4,6 +4,7 @@ extends Node3D
 
 signal shape_changed
 signal thread_completed
+signal build_completed
 
 const ScatterUtil := preload('./common/scatter_util.gd')
 const ModifierStack := preload("./stack/modifier_stack.gd")
@@ -32,6 +33,35 @@ const Domain := preload("./common/domain.gd")
 		use_instancing = val
 		full_rebuild(true)
 
+@export_group("Dependency")
+@export var scatter_parent: NodePath:
+	set(val):
+		if not is_inside_tree():
+			scatter_parent = val
+			return
+
+		scatter_parent = NodePath()
+		if is_instance_valid(_dependency_parent):
+			_dependency_parent.build_completed.disconnect(rebuild)
+			_dependency_parent = null
+
+		var node = get_node_or_null(val)
+		if not node:
+			return
+
+		var type = node.get_script()
+		var scatter_type = get_script()
+		if type != scatter_type:
+			push_warning("ProtonScatter warning: Please select a ProtonScatter node as a parent dependency.")
+			return
+
+		# TODO: Check for cyclic dependency
+
+		scatter_parent = val
+		_dependency_parent = node
+		_dependency_parent.build_completed.connect(rebuild_deferred)
+
+
 @export_group("Debug", "dbg_")
 @export var dbg_disable_thread := false
 
@@ -59,13 +89,18 @@ var editor_options := {} # Holds data relative to the editor itself, used by oth
 
 var _thread := Thread.new()
 var _rebuild_queued := false
+var _dependency_parent
 
 
 func _ready() -> void:
 	_perform_sanity_check()
 	set_notify_transform(true)
 	child_exiting_tree.connect(_on_child_exiting_tree)
-	rebuild(true)
+	rebuild.call_deferred()
+
+	# Check if the required nodes exists, if not, create them.
+	_discover_items()
+	domain.discover_shapes(self)
 
 	if items.is_empty():
 		var item = ScatterItem.new()
@@ -149,6 +184,10 @@ func full_rebuild(delayed := false):
 	_rebuild(true)
 
 
+func rebuild_deferred(force_discover := false):
+	rebuild.bind(force_discover).call_deferred()
+
+
 # A wrapper around the _rebuild function. Ensure it's not called more than once
 # per frame. (Happens when the Scatter node is moved, which triggers the
 # TRANSFORM_CHANGED notification in every children, which in turn notify the
@@ -205,6 +244,7 @@ func _rebuild(force_discover) -> void:
 		_update_duplicates(transforms)
 
 	update_gizmos()
+	build_completed.emit()
 
 
 func _discover_items() -> void:
@@ -313,6 +353,8 @@ func _perform_sanity_check() -> void:
 
 	if not domain:
 		domain = Domain.new()
+
+	scatter_parent = scatter_parent
 
 
 func _on_node_duplicated() -> void:

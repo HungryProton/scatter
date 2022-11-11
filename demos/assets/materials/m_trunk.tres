@@ -5,6 +5,3 @@
 [resource]
 albedo_color = Color(0.470588, 0.376471, 0.309804, 1)
 albedo_texture = ExtResource("1_g4son")
-uv1_scale = Vector3(0.5, 0.5, 0.5)
-uv1_triplanar = true
-uv1_triplanar_sharpness = 6.0

@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://i0jgjmbbl2m5"]
+
+[ext_resource type="Texture2D" uid="uid://fdcwowhvwiia" path="res://addons/proton_scatter/demos/assets/textures/t_rock_dirty.png" id="1_hx37f"]
+
+[resource]
+albedo_color = Color(0.439216, 0.407843, 0.388235, 1)
+albedo_texture = ExtResource("1_hx37f")
+metallic_specular = 0.3
+uv1_triplanar = true
+uv1_world_triplanar = true

@@ -1,0 +1,35 @@
+[gd_resource type="ShaderMaterial" load_steps=7 format=3 uid="uid://d28lq2qtgdyie"]
+
+[ext_resource type="Shader" path="res://addons/proton_scatter/demos/assets/materials/leaves.gdshader" id="1_hlncd"]
+[ext_resource type="Texture2D" uid="uid://76y7tjgrs712" path="res://addons/proton_scatter/demos/assets/textures/t_pine_branch.png" id="2_yef44"]
+
+[sub_resource type="Gradient" id="Gradient_06jh8"]
+offsets = PackedFloat32Array(0.38342, 0.694301, 1)
+colors = PackedColorArray(0.059375, 0.078125, 0.07, 1, 0.628287, 0.73, 0.1752, 1, 0.897921, 1, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_rwvaq"]
+gradient = SubResource("Gradient_06jh8")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_wpihy"]
+seed = 1
+frequency = 0.002
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture_tgrrr"]
+in_3d_space = true
+seamless = true
+seamless_blend_skirt = 0.65
+noise = SubResource("FastNoiseLite_wpihy")
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_hlncd")
+shader_parameter/alpha_scissor_threshold = 0.3
+shader_parameter/noise_scale = 12.0
+shader_parameter/texture_albedo = ExtResource("2_yef44")
+shader_parameter/texture_gradient = SubResource("GradientTexture1D_rwvaq")
+shader_parameter/texture_noise = SubResource("NoiseTexture_tgrrr")
+shader_parameter/total_height = 4.046
+shader_parameter/transmission = Color(1, 1, 1, 1)
+shader_parameter/wind_direction = Vector2(1, -0.5)
+shader_parameter/wind_speed = 0.2
+shader_parameter/wind_strength = 0.05

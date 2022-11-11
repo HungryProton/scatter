@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://caqxfqurbp3ku"]
+
+[ext_resource type="PackedScene" uid="uid://c0yn1mujs4ma" path="res://addons/proton_scatter/demos/assets/models/pine_tree.glb" id="1_hw1e5"]
+[ext_resource type="Material" uid="uid://d01d0h08lqqn6" path="res://addons/proton_scatter/demos/assets/materials/m_trunk.tres" id="2_cgtpc"]
+[ext_resource type="Material" uid="uid://d28lq2qtgdyie" path="res://addons/proton_scatter/demos/assets/materials/m_pine_leaves.tres" id="2_xnytt"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2xqpo"]
+radius = 0.0472427
+height = 1.3553
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_uhp33"]
+radius = 0.0680144
+height = 0.393304
+
+[node name="pine_tree" instance=ExtResource("1_hw1e5")]
+
+[node name="Trunk" parent="." index="0"]
+surface_material_override/0 = ExtResource("2_cgtpc")
+
+[node name="Leaves" parent="." index="1"]
+surface_material_override/0 = ExtResource("2_xnytt")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." index="2"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.661681, 0)
+shape = SubResource("CapsuleShape3D_2xqpo")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="StaticBody3D" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.015189, 0)
+shape = SubResource("CapsuleShape3D_uhp33")
