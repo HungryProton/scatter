@@ -3,8 +3,8 @@ shader_type spatial;
 render_mode depth_draw_opaque, cull_disabled;
 
 // Texture settings
-uniform sampler2D texture_albedo : hint_default_white;
-uniform sampler2D texture_gradient : hint_default_white;
+uniform sampler2D texture_albedo : hint_default_white, repeat_disable;
+uniform sampler2D texture_gradient : hint_default_white, repeat_disable;
 uniform sampler2D texture_noise : hint_default_white;
 uniform float alpha_scissor_threshold : hint_range(0.0, 1.0);
 uniform vec4 transmission : source_color;
@@ -46,8 +46,6 @@ void vertex() {
 	
 	VERTEX = local_pos.xyz;
 	//NORMAL = vec3(0.0, 1.0, 0.0);
-	
-	
 }
 
 void fragment() {
@@ -60,5 +58,5 @@ void fragment() {
 	vec4 gradient = texture(texture_gradient, vec2(height / grass_height, 0.0));
 	float secondary_weight = smoothstep(0.0, 1.0, color - secondary_attenuation);
 	ALBEDO = tex.rbg * gradient.rgb;
-	ALBEDO = mix(ALBEDO, secondary_color.rgb, secondary_weight);
+	//ALBEDO = mix(ALBEDO, secondary_color.rgb, secondary_weight);
 }

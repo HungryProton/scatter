@@ -1,0 +1,29 @@
+[gd_resource type="AnimatedTexture" load_steps=9 format=3]
+
+[ext_resource type="Texture2D" uid="uid://bkdk5ka8f2eyn" path="res://addons/proton_scatter/icons/loading/progress1.svg" id="1_n051c"]
+[ext_resource type="Texture2D" uid="uid://yinrmiasphf0" path="res://addons/proton_scatter/icons/loading/progress2.svg" id="2_huiva"]
+[ext_resource type="Texture2D" uid="uid://cddfi3mmjlhfa" path="res://addons/proton_scatter/icons/loading/progress3.svg" id="3_5gmad"]
+[ext_resource type="Texture2D" uid="uid://bgrh6kl71mjxp" path="res://addons/proton_scatter/icons/loading/progress4.svg" id="4_ypilv"]
+[ext_resource type="Texture2D" uid="uid://cu5lshwm0g08o" path="res://addons/proton_scatter/icons/loading/progress5.svg" id="5_o3w57"]
+[ext_resource type="Texture2D" uid="uid://cwfbjg2q2j1b1" path="res://addons/proton_scatter/icons/loading/progress6.svg" id="6_475ws"]
+[ext_resource type="Texture2D" uid="uid://d0f2b7boq8n1j" path="res://addons/proton_scatter/icons/loading/progress7.svg" id="7_kuufk"]
+[ext_resource type="Texture2D" uid="uid://c0cn8qjmctb2n" path="res://addons/proton_scatter/icons/loading/progress8.svg" id="8_spub1"]
+
+[resource]
+frames = 8
+speed_scale = 8.0
+frame_0/texture = ExtResource("1_n051c")
+frame_1/texture = ExtResource("2_huiva")
+frame_1/duration = 1.0
+frame_2/texture = ExtResource("3_5gmad")
+frame_2/duration = 1.0
+frame_3/texture = ExtResource("4_ypilv")
+frame_3/duration = 1.0
+frame_4/texture = ExtResource("5_o3w57")
+frame_4/duration = 1.0
+frame_5/texture = ExtResource("6_475ws")
+frame_5/duration = 1.0
+frame_6/texture = ExtResource("7_kuufk")
+frame_6/duration = 1.0
+frame_7/texture = ExtResource("8_spub1")
+frame_7/duration = 1.0

@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://ggrp2p321bbe" path="res://addons/proton_scatter/demos/assets/textures/t_grass_2.png" id="2_1odx0"]
 
 [sub_resource type="Gradient" id="Gradient_l4jy0"]
-offsets = PackedFloat32Array(0, 0.513274, 1)
-colors = PackedColorArray(0.139531, 0.183594, 0.1645, 1, 0.251693, 0.390625, 0.0117187, 1, 1, 0.964706, 0.129412, 1)
+offsets = PackedFloat32Array(0, 0.473451, 1)
+colors = PackedColorArray(0.179688, 0.0855483, 0.00322032, 1, 0.251693, 0.390625, 0.0117187, 1, 1, 0.964706, 0.129412, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_rwvaq"]
 gradient = SubResource("Gradient_l4jy0")
@@ -23,16 +23,16 @@ noise = SubResource("FastNoiseLite_wpihy")
 [resource]
 render_priority = 0
 shader = ExtResource("1_fntgl")
-shader_parameter/alpha_scissor_threshold = 0.7
+shader_parameter/alpha_scissor_threshold = 0.4
 shader_parameter/camera_bend_strength = 0.2
-shader_parameter/grass_height = 1.533
-shader_parameter/noise_scale = 12.0
+shader_parameter/grass_height = 0.6
+shader_parameter/noise_scale = 6.0
 shader_parameter/secondary_attenuation = 0.2
-shader_parameter/secondary_color = Color(0.211765, 0.258824, 0.0627451, 1)
+shader_parameter/secondary_color = Color(0, 0, 0, 1)
 shader_parameter/texture_albedo = ExtResource("2_1odx0")
 shader_parameter/texture_gradient = SubResource("GradientTexture1D_rwvaq")
 shader_parameter/texture_noise = SubResource("NoiseTexture_tgrrr")
-shader_parameter/transmission = Color(0.717647, 0.745098, 0, 1)
+shader_parameter/transmission = Color(0.737255, 0.72549, 0, 1)
 shader_parameter/wind_direction = Vector2(1, -0.5)
-shader_parameter/wind_speed = 0.2
-shader_parameter/wind_strength = 0.05
+shader_parameter/wind_speed = 0.5
+shader_parameter/wind_strength = 0.15

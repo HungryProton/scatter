@@ -13,7 +13,7 @@ var _loading_mesh: Mesh
 func _init():
 	# TODO: Replace hardcoded colors by a setting fetch
 	create_custom_material("line", Color(0.2, 0.4, 0.8))
-	add_material("loading", preload("../misc/m_loading.tres"))
+	add_material("loading", preload("../icons/loading/m_loading.tres"))
 
 	_loading_mesh = QuadMesh.new()
 	_loading_mesh.set_size(Vector2.ONE * 0.15)
