@@ -160,6 +160,15 @@ func get_multimesh_instance() -> MultiMeshInstance:
 	return null
 
 
+func get_split_multimesh_container() -> Spatial:
+	var c_mmi = null
+	for child in get_children():
+		if "is_split_multimesh_container" in child:
+			c_mmi = child
+			break
+	return c_mmi
+
+
 func delete_multimesh() -> void:
 	for c in get_children():
 		if c is MultiMeshInstance:
@@ -174,10 +183,14 @@ func delete_duplicates() -> void:
 
 func update_shadows() -> void:
 	var mmi: MultiMeshInstance = get_multimesh_instance()
-	if not mmi:
-		return
-
-	mmi.cast_shadow = cast_shadow
+	if mmi != null:
+		mmi.cast_shadow = cast_shadow
+	
+	var c_mmi = get_split_multimesh_container()
+	if c_mmi != null:
+		for child in c_mmi.get_children():
+			if child is MultiMeshInstance:
+				child.cast_shadow = cast_shadow
 
 
 func _get_mesh_from_scene(node):
