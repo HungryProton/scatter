@@ -5,6 +5,8 @@ var visible_range_begin_hysteresis : float = 0.1
 var visible_range_end : float   = 0
 var visible_range_end_hysteresis : float = 0.1
 
+var is_split_multimesh_container = true
+
 func _ready():
 	pass
 

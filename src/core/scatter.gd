@@ -212,6 +212,7 @@ func full_update() -> void:
 	_reset_all_colliders(get_tree().root)
 	_delete_duplicates()
 	_delete_multimeshes()
+	_remove_split_multimesh()
 	yield(get_tree(), "idle_frame")
 	_do_update()
 
@@ -362,13 +363,11 @@ func _remove_split_multimesh():
 		_discover_items()
 
 	# Remove split siblings
-	for child in _items:
-		var siblingContainer = child.find_node("SplitMultimesh*")
-		while siblingContainer != null:
-			# Remove split siblings
-			child.remove_child(siblingContainer) # next loop must not find this
-			siblingContainer.queue_free()
-			siblingContainer = child.find_node("SplitMultimesh*")
+	for item in _items:
+		for child in item.get_children():
+			if "is_split_multimesh_container" in child:
+				item.remove_child(child)
+				child.queue_free()
 
 	# Make original multimeshes visible again
 	for child in _items:
