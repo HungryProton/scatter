@@ -7,6 +7,7 @@ var Scatter = preload("namespace.gd").new()
 
 export var global_seed := 0 setget _set_global_seed
 export var use_instancing := true setget _set_instancing
+export var store_instaces := true
 export var disable_updates_in_game := true
 export var disable_automatic_updates = false
 export var force_update_when_loaded := true
@@ -211,6 +212,7 @@ func full_update() -> void:
 	_reset_all_colliders(get_tree().root)
 	_delete_duplicates()
 	_delete_multimeshes()
+	_remove_split_multimesh()
 	yield(get_tree(), "idle_frame")
 	_do_update()
 
@@ -322,15 +324,28 @@ func _split_multimesh_set(set):
 	split_enabled = set
 
 
+func _get_multimesh_from_item(item):
+	var mmi = null
+	for child in item.get_children():
+		# find first multimesh, should be only one
+		if child is MultiMeshInstance:
+			mmi = child
+			break
+	return mmi
+
+
 func _add_split_multimesh():
 	# create split siblings from all multimesh
 	for child in _items:
-		var mmi = child.get_node("MultiMeshInstance")
+		var mmi = _get_multimesh_from_item(child)
+		if not mmi:
+			return
 		# Create a parent container
 		var container = SplitMultimeshContainer.new()
 		child.add_child(container)
 		container.global_transform = self.global_transform
-		container.owner = get_tree().edited_scene_root
+		if store_instaces:
+			container.owner = get_tree().edited_scene_root
 		container.name = "SplitMultimesh"
 
 		# Copy visible range settings to containers
@@ -348,17 +363,18 @@ func _remove_split_multimesh():
 		_discover_items()
 
 	# Remove split siblings
-	for child in _items:
-		var siblingContainer = child.find_node("SplitMultimesh*")
-		while siblingContainer != null:
-			# Remove split siblings
-			child.remove_child(siblingContainer) # next loop must not find this
-			siblingContainer.queue_free()
-			siblingContainer = child.find_node("SplitMultimesh*")
+	for item in _items:
+		for child in item.get_children():
+			if "is_split_multimesh_container" in child:
+				item.remove_child(child)
+				child.queue_free()
 
 	# Make original multimeshes visible again
 	for child in _items:
-		child.get_node("MultiMeshInstance").visible = true
+		var mmi = _get_multimesh_from_item(child)
+		if not mmi:
+			continue
+		mmi.visible = true
 
 
 func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
@@ -426,7 +442,8 @@ func _create_split_sibling(mmi : MultiMeshInstance, parent : Spatial) -> bool:
 						c_mmi.multimesh.set_instance_transform(i, transforms[xi][yi][zi][i])
 					parent.add_child(c_mmi)
 					c_mmi.global_transform = mmi.global_transform
-					c_mmi.owner = get_tree().edited_scene_root
+					if store_instaces:
+						c_mmi.owner = get_tree().edited_scene_root
 					c_mmi.add_to_group("split_multimesh")
 					#TODO make group appear in editor
 	return true
@@ -439,7 +456,8 @@ func _setup_multi_mesh(item, count):
 	if not instance:
 		instance = MultiMeshInstance.new()
 		item.add_child(instance)
-		instance.set_owner(get_tree().get_edited_scene_root())
+		if store_instaces:
+			instance.set_owner(get_tree().get_edited_scene_root())
 
 	if not instance.multimesh:
 		instance.multimesh = MultiMesh.new()
