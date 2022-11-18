@@ -356,6 +356,7 @@ func _add_split_multimesh():
 
 		if _create_split_sibling(mmi, container):
 			mmi.visible = false
+		child.update_shadows()
 
 
 func _remove_split_multimesh():
