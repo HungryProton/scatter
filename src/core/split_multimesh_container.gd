@@ -1,11 +1,13 @@
 extends Spatial
 
-var visible_range_begin : float = 0
-var visible_range_begin_hysteresis : float = 0.1
-var visible_range_end : float   = 0
-var visible_range_end_hysteresis : float = 0.1
+# These variables need to be exported to be able to save them to the scene
+# Do not modify them directly, modify the options in the scatter instance
+export var visible_range_begin : float = 0
+export var visible_range_begin_hysteresis : float = 0.1
+export var visible_range_end : float   = 0
+export var visible_range_end_hysteresis : float = 0.1
 
-var is_split_multimesh_container = true
+export var is_split_multimesh_container = true
 
 func _ready():
 	pass
@@ -18,10 +20,12 @@ func _process(delta):
 		for child in get_children():
 			if not child is MultiMeshInstance:
 				continue
-			var aabb : AABB = child.get_aabb()
-			var center = aabb.position + aabb.size / 2.0
-			center = child.global_transform * center
-			var d = (cam.global_transform.origin - center).length()
+			var mmi_aabb : AABB = child.get_aabb()
+			var center = child.global_transform * mmi_aabb.get_center()
+			var d = cam.global_transform.origin.distance_to(center)
+			# subtract the half size of the aabb to get the distance to the edge of the mmi
+			d -= mmi_aabb.size.length() / 2.0
+			d = max(0, d) # if inside sphere make distance 0
 			
 			var hide = false
 			var show = true

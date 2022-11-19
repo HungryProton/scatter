@@ -324,20 +324,11 @@ func _split_multimesh_set(set):
 	split_enabled = set
 
 
-func _get_multimesh_from_item(item):
-	var mmi = null
-	for child in item.get_children():
-		# find first multimesh, should be only one
-		if child is MultiMeshInstance:
-			mmi = child
-			break
-	return mmi
-
 
 func _add_split_multimesh():
 	# create split siblings from all multimesh
 	for child in _items:
-		var mmi = _get_multimesh_from_item(child)
+		var mmi = child.get_multimesh_instance()
 		if not mmi:
 			return
 		# Create a parent container
@@ -365,14 +356,15 @@ func _remove_split_multimesh():
 
 	# Remove split siblings
 	for item in _items:
-		for child in item.get_children():
-			if "is_split_multimesh_container" in child:
-				item.remove_child(child)
-				child.queue_free()
+		var c_mmi = item.get_split_multimesh_container()
+		while c_mmi != null:
+			item.remove_child(c_mmi)
+			c_mmi.queue_free()
+			c_mmi = item.get_split_multimesh_container()
 
 	# Make original multimeshes visible again
 	for child in _items:
-		var mmi = _get_multimesh_from_item(child)
+		var mmi = child.get_multimesh_instance()
 		if not mmi:
 			continue
 		mmi.visible = true
