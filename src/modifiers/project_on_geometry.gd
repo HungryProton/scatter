@@ -2,6 +2,9 @@
 extends "base_modifier.gd"
 
 
+signal projection_completed
+
+
 @export var ray_direction := Vector3.DOWN
 @export var ray_length := 10.0
 @export var ray_offset := 1.0
@@ -9,6 +12,8 @@ extends "base_modifier.gd"
 @export var align_with_collision_normal := false
 @export_range(0.0, 90.0) var max_slope = 90.0
 @export_flags_3d_physics var collision_mask = 1
+
+var _last_hit: Dictionary
 
 
 func _init() -> void:
@@ -93,7 +98,9 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	while i < transforms.size():
 		t = transforms.list[i]
 		is_point_valid = true
-		hit = _project_on_floor(t, domain.root, space_state)
+		_project_on_floor.bind(t, domain.root, space_state).call_deferred()
+		await projection_completed
+		hit = _last_hit
 
 		if hit.is_empty():
 			is_point_valid = false
@@ -124,7 +131,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		"""
 
 
-func _project_on_floor(t: Transform3D, root: Node3D, physics_state: PhysicsDirectSpaceState3D) -> Dictionary:
+func _project_on_floor(t: Transform3D, root: Node3D, physics_state: PhysicsDirectSpaceState3D) -> void:
 	var start = t.origin
 	var end = t.origin
 	var dir = ray_direction.normalized()
@@ -139,7 +146,8 @@ func _project_on_floor(t: Transform3D, root: Node3D, physics_state: PhysicsDirec
 	ray_query.from = start
 	ray_query.to = end
 	ray_query.collision_mask = collision_mask
-	return physics_state.intersect_ray(ray_query)
+	_last_hit = physics_state.intersect_ray(ray_query)
+	projection_completed.emit()
 
 
 func _align_with(t: Transform3D, normal: Vector3) -> Transform3D:

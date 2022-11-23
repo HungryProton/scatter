@@ -23,8 +23,8 @@ noise = SubResource("FastNoiseLite_wpihy")
 [resource]
 render_priority = 0
 shader = ExtResource("1_fntgl")
-shader_parameter/alpha_scissor_threshold = 0.4
-shader_parameter/camera_bend_strength = 0.2
+shader_parameter/alpha_scissor_threshold = 0.3
+shader_parameter/camera_bend_strength = 0.6
 shader_parameter/grass_height = 0.6
 shader_parameter/noise_scale = 6.0
 shader_parameter/secondary_attenuation = 0.2
