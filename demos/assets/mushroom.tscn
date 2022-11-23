@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bodkixm8bubes"]
 
-[ext_resource type="PackedScene" uid="uid://bkrt5s3pig5ge" path="res://addons/proton_scatter/demos/assets/models/mushrooms.glb" id="1_spmys"]
+[ext_resource type="PackedScene" uid="uid://6nx1ddaf2q4l" path="res://addons/proton_scatter/demos/assets/models/mushrooms.glb" id="1_spmys"]
 [ext_resource type="Material" uid="uid://ds2hjlo70hglg" path="res://addons/proton_scatter/demos/assets/materials/m_mushroom.tres" id="2_y6jw1"]
 
 [node name="mushrooms" instance=ExtResource("1_spmys")]

@@ -224,6 +224,9 @@ func _rebuild(force_discover) -> void:
 
 	var transforms: TransformList
 
+	if not use_instancing:
+		_clear_output() # TMP, prevents raycasts in modifier to self intersect with previous output
+
 	if dbg_disable_thread:
 		transforms = modifier_stack.update(self, domain)
 	else:
@@ -234,11 +237,12 @@ func _rebuild(force_discover) -> void:
 
 	if _rebuild_queued:
 		_rebuild_queued = false
-		_rebuild(true)
+		rebuild(true)
 		return
 
 	if not transforms or transforms.size() == 0:
 		_clear_output()
+		update_gizmos()
 		return
 
 	if use_instancing:
@@ -331,7 +335,7 @@ func _create_instance(item: ScatterItem, root: Node3D):
 		return null
 
 	var instance = item.get_item().duplicate()
-	root.add_child(instance, true)
+	root.add_child.bind(instance, true).call_deferred()
 	instance.set_owner(get_tree().get_edited_scene_root())
 	instance.visible = true
 	ScatterUtil.set_owner_recursive(instance, get_tree().get_edited_scene_root())
