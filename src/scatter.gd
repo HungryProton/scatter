@@ -107,8 +107,9 @@ func _ready() -> void:
 	if items.is_empty():
 		var item = ScatterItem.new()
 		add_child(item, true)
-		item.set_owner(get_tree().get_edited_scene_root())
 		item.set_name("ScatterItem")
+		item.set_owner(get_tree().get_edited_scene_root())
+
 
 	if domain.is_empty():
 		var shape = ScatterShape.new()
@@ -187,7 +188,7 @@ func full_rebuild(delayed := false):
 
 
 func rebuild_deferred(force_discover := false):
-	rebuild.bind(force_discover).call_deferred()
+	_rebuild.bind(force_discover).call_deferred()
 
 
 # A wrapper around the _rebuild function. Ensure it's not called more than once

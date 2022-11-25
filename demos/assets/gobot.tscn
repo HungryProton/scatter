@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://bmglbfn5jaubp"]
+
+[ext_resource type="PackedScene" uid="uid://bdpm2rk5swymd" path="res://addons/proton_scatter/demos/assets/models/gobot.glb" id="1_gfyx7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rhuea"]
+albedo_color = Color(0.278431, 0.54902, 0.74902, 1)
+metallic = 0.2
+roughness = 0.5
+rim_enabled = true
+rim = 0.3
+
+[node name="gobot" instance=ExtResource("1_gfyx7")]
+
+[node name="Sphere001" parent="." index="0"]
+surface_material_override/0 = SubResource("StandardMaterial3D_rhuea")

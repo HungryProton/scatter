@@ -60,7 +60,8 @@ static func get_or_create_item_root(item) -> Node3D:
 		item_root = Node3D.new()
 		s.output_root.add_child(item_root)
 		item_root.name = item.name
-		item_root.owner = item_root.get_tree().get_edited_scene_root()
+		if Engine.is_editor_hint():
+			item_root.owner = item_root.get_tree().get_edited_scene_root()
 
 	return item_root
 
@@ -201,7 +202,7 @@ static func get_merged_meshes_from(node: Node) -> MeshInstance3D:
 	return res
 
 
-static func set_owner_recursive(node: Node, owner: Node) -> void:
-	node.set_owner(owner)
+static func set_owner_recursive(node: Node, new_owner) -> void:
+	node.set_owner(new_owner)
 	for c in node.get_children():
-		set_owner_recursive(c, owner)
+		set_owner_recursive(c, new_owner)
