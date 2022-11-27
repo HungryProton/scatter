@@ -1,0 +1,93 @@
+[gd_scene load_steps=4 format=3 uid="uid://bcsosdvstytoq"]
+
+[ext_resource type="Script" path="res://addons/proton_scatter/src/presets/presets.gd" id="1_ualle"]
+[ext_resource type="Texture2D" uid="uid://cun73k8jdmr4e" path="res://addons/proton_scatter/icons/add.svg" id="2_j26xt"]
+[ext_resource type="PackedScene" uid="uid://bosqtuvhckh3g" path="res://addons/proton_scatter/src/presets/preset_entry.tscn" id="2_orram"]
+
+[node name="Presets" type="PopupPanel"]
+title = "Manage presets"
+size = Vector2i(490, 200)
+unresizable = false
+borderless = false
+always_on_top = true
+extend_to_title = true
+min_size = Vector2i(400, 150)
+script = ExtResource("1_ualle")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 486.0
+offset_bottom = 196.0
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 470.0
+offset_bottom = 180.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+offset_right = 458.0
+offset_bottom = 133.0
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="PresetsRoot" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_right = 458.0
+offset_bottom = 133.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+
+[node name="PresetEntry" parent="MarginContainer/VBoxContainer/ScrollContainer/PresetsRoot" instance=ExtResource("2_orram")]
+layout_mode = 2
+anchors_preset = 0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_top = 6.0
+offset_right = 458.0
+offset_bottom = 126.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="NewPresetButton" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+offset_left = 129.0
+offset_top = 137.0
+offset_right = 329.0
+offset_bottom = 168.0
+size_flags_horizontal = 4
+text = "Create new preset"
+icon = ExtResource("2_j26xt")
+
+[node name="NewPresetDialog" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Create new preset"
+
+[node name="MarginContainer" type="MarginContainer" parent="NewPresetDialog"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 192.0
+offset_bottom = 51.0
+
+[node name="NewPresetName" type="LineEdit" parent="NewPresetDialog/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 6.0
+offset_right = 184.0
+offset_bottom = 37.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 4
+placeholder_text = "New preset name"

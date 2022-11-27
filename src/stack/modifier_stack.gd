@@ -6,7 +6,7 @@ signal stack_changed
 signal value_changed
 
 
-const TransformList = preload("../common/transform_list.gd")
+const TransformList = preload("res://addons/proton_scatter/src/common/transform_list.gd")
 
 
 @export var stack: Array[Resource] = []

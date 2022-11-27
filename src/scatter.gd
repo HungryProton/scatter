@@ -8,7 +8,7 @@ signal build_completed
 
 const ScatterUtil := preload('./common/scatter_util.gd')
 const ModifierStack := preload("./stack/modifier_stack.gd")
-const TransformList := preload("./common/transform_list.gd")
+const TransformList := preload("res://addons/proton_scatter/src/common/transform_list.gd")
 const ScatterItem := preload("./scatter_item.gd")
 const ScatterShape := preload("./scatter_shape.gd")
 const Domain := preload("./common/domain.gd")
@@ -84,7 +84,7 @@ var domain: Domain:
 
 var items: Array[ScatterItem]
 var total_item_proportion: int
-var output_root: Node3D
+var output_root: Marker3D
 var editor_options := {} # Holds data relative to the editor itself, used by other parts
 
 var _thread := Thread.new()
@@ -171,6 +171,19 @@ func is_thread_running() -> bool:
 	return _thread.is_alive()
 
 
+# Deletes what the Scatter node generated.
+func clear_output() -> void:
+	if not output_root:
+		output_root = get_node_or_null("ScatterOutput")
+
+	if output_root:
+		remove_child(output_root)
+		output_root.queue_free()
+		output_root = null
+
+	ScatterUtil.ensure_output_root_exists(self)
+
+
 func full_rebuild(delayed := false):
 	if not is_inside_tree():
 		return
@@ -183,7 +196,7 @@ func full_rebuild(delayed := false):
 	if is_thread_running():
 		_thread.wait_to_finish()
 
-	_clear_output()
+	clear_output()
 	_rebuild(true)
 
 
@@ -219,14 +232,14 @@ func _rebuild(force_discover) -> void:
 		domain.discover_shapes(self)
 
 	if items.is_empty() or domain.is_empty():
-		_clear_output()
+		clear_output()
 		print("Scatter warning: No items or domain, abort")
 		return
 
 	var transforms: TransformList
 
 	if not use_instancing:
-		_clear_output() # TMP, prevents raycasts in modifier to self intersect with previous output
+		clear_output() # TMP, prevents raycasts in modifier to self intersect with previous output
 
 	if dbg_disable_thread:
 		transforms = modifier_stack.update(self, domain)
@@ -242,7 +255,7 @@ func _rebuild(force_discover) -> void:
 		return
 
 	if not transforms or transforms.size() == 0:
-		_clear_output()
+		clear_output()
 		update_gizmos()
 		return
 
@@ -344,19 +357,6 @@ func _create_instance(item: ScatterItem, root: Node3D):
 	return instance
 
 
-# Deletes what the Scatter node generated.
-func _clear_output() -> void:
-	if not output_root:
-		output_root = get_node_or_null("ScatterOutput")
-
-	if output_root:
-		remove_child(output_root)
-		output_root.queue_free()
-		output_root = null
-
-	ScatterUtil.ensure_output_root_exists(self)
-
-
 # Enforce the Scatter node has its required variables set.
 func _perform_sanity_check() -> void:
 	if not modifier_stack:
@@ -369,7 +369,7 @@ func _perform_sanity_check() -> void:
 
 
 func _on_node_duplicated() -> void:
-	_clear_output() # Otherwise we get linked multimeshes or other unwanted side effects
+	clear_output() # Otherwise we get linked multimeshes or other unwanted side effects
 	_perform_sanity_check()
 
 

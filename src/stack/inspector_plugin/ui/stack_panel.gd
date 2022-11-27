@@ -19,6 +19,8 @@ func _ready():
 	_modifiers_container.child_moved.connect(_on_modifier_moved)
 	$%Rebuild.pressed.connect(_on_rebuild_pressed)
 	$%DocumentationButton.pressed.connect(_on_documentation_requested.bind("ProtonScatter"))
+	$%LoadPreset.pressed.connect(_on_load_preset_pressed)
+	$%SavePreset.pressed.connect(_on_save_preset_pressed)
 
 	_is_ready = true
 	rebuild_ui()
@@ -68,7 +70,7 @@ func _validate_stack_connections() -> void:
 	_modifier_stack.stack_changed.connect(_on_stack_changed)
 
 	if _modifier_stack.just_created:
-		_on_load_preset("default")
+		$%Presets.load_default(_scatter)
 
 
 func _set_children_owner(new_owner: Node, node: Node):
@@ -142,39 +144,12 @@ func _on_rebuild_pressed() -> void:
 		_scatter.rebuild(true)
 
 
-func _on_save_preset(preset_name) -> void:
-	if not _scatter:
-		return
-
-	var preset = _scatter.duplicate(7)
-	preset.clear()
-	_set_children_owner(preset, preset)
-
-	var packed_scene = PackedScene.new()
-	if packed_scene.pack(preset) != OK:
-		print("Failed to save preset")
-		return
-
-	var preset_path = _get_root_folder() + "/presets/" + preset_name + ".tscn"
-	var _err = ResourceSaver.save(packed_scene, preset_path)
+func _on_save_preset_pressed() -> void:
+	$%Presets.save_preset(_scatter)
 
 
-func _on_load_preset(preset_name) -> void:
-	var preset_path = _get_root_folder() + "/presets/" + preset_name + ".tscn"
-	var preset = load(preset_path).instantiate()
-	if not preset:
-		return
-
-	_modifier_stack = preset.modifier_stack.duplicate(7)
-	_modifier_stack.stack_changed.connect(_on_stack_changed)
-	_scatter.modifier_stack = _modifier_stack
-	rebuild_ui()
-	_scatter.update()
-	preset.queue_free()
-
-
-func _on_delete_preset(preset_name) -> void:
-	DirAccess.remove_absolute(_get_root_folder() + "/presets/" + preset_name + ".tscn")
+func _on_load_preset_pressed() -> void:
+	$%Presets.load_preset(_scatter)
 
 
 func _on_documentation_requested(page_name) -> void:
