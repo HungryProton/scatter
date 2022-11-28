@@ -9,8 +9,11 @@ extends "base_modifier.gd"
 func _init() -> void:
 	display_name = "Look At"
 	category = "Edit"
-	can_use_global_and_local_space = true
 	can_restrict_height = false
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = true
+	use_local_space_by_default()
 
 	documentation.add_paragraph("Rotates every transform such that the forward axis (-Z) points towards the target position.")
 
@@ -21,14 +24,19 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, domain, _seed : int) -> void:
-	for t in transforms.list.size():
-		var transform = transforms.list[t]
-		var origin = transform.origin
-		var original_scale = transform.basis.get_scale()
-		var local_target:Vector3 = target-origin
-		if use_local_space:
-			#target is local so it should be global for the looking_at
-			local_target = domain.get_global_transform()*target-origin
-		var lookat:Transform3D = Transform3D(Basis.looking_at(local_target, up), origin)
+	var st: Transform3D = domain.get_global_transform()
+
+	for t in transforms.size():
+		var transform: Transform3D = transforms.list[t]
+		var origin := transform.origin
+		var original_scale := transform.basis.get_scale()
+		var local_target := target - origin
+
+		if is_using_local_space():
+			local_target = st * local_target
+		elif is_using_individual_instances_space():
+			local_target = transform * local_target
+
+		var lookat := Transform3D(Basis.looking_at(local_target, up), origin)
 		lookat = lookat.scaled_local(original_scale)
-		transforms.list[t]=lookat
+		transforms.list[t] = lookat

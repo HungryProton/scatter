@@ -22,7 +22,7 @@ const PARAMETER_IGNORE_LIST := [
 	"override_global_seed",
 	"custom_seed",
 	"restrict_height",
-	"use_local_space",
+	"reference_frame",
 	]
 
 var _scatter
@@ -77,20 +77,27 @@ func create_ui_for(modifier) -> void:
 
 	# Enable or disable irrelevant controls for this modifier
 	_override_ui.enable(modifier.can_override_seed)
-	_transform_space_ui.enable(modifier.can_use_global_and_local_space)
 	_restrict_height_ui.enable(modifier.can_restrict_height)
+	_transform_space_ui.mark_as_enum(true)
+	_transform_space_ui.toggle_option_item(0, modifier.global_reference_frame_available)
+	_transform_space_ui.toggle_option_item(1, modifier.local_reference_frame_available)
+	_transform_space_ui.toggle_option_item(2, modifier.individual_instances_reference_frame_available)
+	if not modifier.global_reference_frame_available and \
+		not modifier.local_reference_frame_available and \
+		not modifier.individual_instances_reference_frame_available:
+			_transform_space_ui.visible = false
 
 	# Setup header connections
 	_override_ui.value_changed.connect(_on_parameter_value_changed.bind("override_global_seed", _override_ui))
 	_custom_seed_ui.value_changed.connect(_on_parameter_value_changed.bind("custom_seed", _custom_seed_ui))
 	_restrict_height_ui.value_changed.connect(_on_parameter_value_changed.bind("restrict_height", _restrict_height_ui))
-	_transform_space_ui.value_changed.connect(_on_parameter_value_changed.bind("use_local_space", _transform_space_ui))
+	_transform_space_ui.value_changed.connect(_on_parameter_value_changed.bind("reference_frame", _transform_space_ui))
 
 	# Restore header values
 	_override_ui.set_value(modifier.override_global_seed)
 	_custom_seed_ui.set_value(modifier.custom_seed)
 	_restrict_height_ui.set_value(modifier.restrict_height)
-	_transform_space_ui.set_value(modifier.use_local_space)
+	_transform_space_ui.set_value(modifier.reference_frame)
 
 	# Loop over the other properties and create a ui component for each of them
 	for property in modifier.get_property_list():
@@ -152,14 +159,14 @@ func _on_remove_pressed() -> void:
 	removed.emit()
 
 
-func _on_parameter_value_changed(value, previous, name, ui) -> void:
+func _on_parameter_value_changed(value, previous, parameter_name, ui) -> void:
 	if _scatter.undo_redo:
-		_scatter.undo_redo.create_action("Change value " + name.capitalize())
-		_scatter.undo_redo.add_undo_method(self, "_restore_value", name, previous, ui)
-		_scatter.undo_redo.add_do_method(self, "_restore_value", name, value, ui)
+		_scatter.undo_redo.create_action("Change value " + parameter_name.capitalize())
+		_scatter.undo_redo.add_undo_method(self, "_restore_value", parameter_name, previous, ui)
+		_scatter.undo_redo.add_do_method(self, "_restore_value", parameter_name, value, ui)
 		_scatter.undo_redo.commit_action()
 	else:
-		_modifier.set(name, value)
+		_modifier.set(parameter_name, value)
 		value_changed.emit()
 
 

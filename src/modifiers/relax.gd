@@ -10,7 +10,9 @@ extends "base_modifier.gd"
 func _init() -> void:
 	display_name = "Relax Position"
 	category = "Edit"
-	can_use_global_and_local_space = false
+	global_reference_frame_available = false
+	local_reference_frame_available = false
+	individual_instances_reference_frame_available = false
 	can_restrict_height = true
 	restrict_height = true
 

@@ -14,6 +14,9 @@ func _init() -> void:
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 	use_edge_data = true
+	global_reference_frame_available = false
+	local_reference_frame_available = false
+	individual_instances_reference_frame_available = false
 
 	var p
 

@@ -12,6 +12,10 @@ extends "base_modifier.gd"
 func _init() -> void:
 	display_name = "Clusterize"
 	category = "Edit"
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = false
+	# TODO: handle the global / local stuff
 
 	var p
 	documentation.add_paragraph(
@@ -51,13 +55,13 @@ func _init() -> void:
 
 func _process_transforms(transforms, domain, _seed) -> void:
 	if not ResourceLoader.exists(mask):
-		warning += "The specified file " + mask + " could not be loaded"
+		warning += "The specified file " + mask + " could not be loaded."
 		return
 
 	var texture = load(mask)
 
 	if not texture is Texture:
-		warning += "The specified file is not a valid texture"
+		warning += "The specified file is not a valid texture."
 		return
 
 	var image: Image = texture.get_data()

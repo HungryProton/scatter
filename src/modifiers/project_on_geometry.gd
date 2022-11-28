@@ -19,8 +19,11 @@ var _last_hit: Dictionary
 func _init() -> void:
 	display_name = "Project On Colliders"
 	category = "Edit"
-	can_use_global_and_local_space = true
 	can_restrict_height = false
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = true
+	use_global_space_by_default()
 
 	documentation.add_paragraph(
 		"Moves each transforms along the ray direction until they hit a collider.
@@ -84,10 +87,10 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
-	if transforms.list.is_empty():
+	if transforms.is_empty():
 		return
 
-	var space_state = domain.space_state
+	var space_state: PhysicsDirectSpaceState3D = domain.space_state
 	var hit
 	var d: float
 	var t: Transform3D
@@ -98,8 +101,11 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	while i < transforms.size():
 		t = transforms.list[i]
 		is_point_valid = true
+
+		# TODO: Weird behavior in some cases, investigate
 		_project_on_floor.bind(t, domain.root, space_state).call_deferred()
 		await projection_completed
+
 		hit = _last_hit
 
 		if hit.is_empty():
@@ -121,7 +127,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 
 		i += 1
 
-	if transforms.list.is_empty():
+	if transforms.is_empty():
 		warning += """Every points have been removed. Possible reasons include: \n
 		+ No collider is close enough to the domain.
 		+ Ray length is too short.
@@ -136,8 +142,11 @@ func _project_on_floor(t: Transform3D, root: Node3D, physics_state: PhysicsDirec
 	var end = t.origin
 	var dir = ray_direction.normalized()
 
-	if use_local_space:
-		dir *= t.basis
+	if is_using_individual_instances_space():
+		dir = t.basis * dir
+
+	elif is_using_local_space():
+		dir = root.get_global_transform().basis * dir
 
 	start -= ray_offset * dir
 	end += ray_length * dir

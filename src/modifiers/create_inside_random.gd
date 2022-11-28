@@ -13,6 +13,9 @@ func _init() -> void:
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 	can_override_seed = true
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	use_local_space_by_default()
 
 	documentation.add_paragraph(
 		"Randomly place new transforms inside the area defined by
@@ -58,7 +61,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 		if restrict_height:
 			pos.y = height
 
-		if use_local_space:
+		if is_using_local_space():
 			t.basis = gt.basis
 
 		if domain.is_point_inside(pos):

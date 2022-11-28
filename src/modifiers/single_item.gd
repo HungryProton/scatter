@@ -14,8 +14,10 @@ func _init() -> void:
 	warning_ignore_no_shape = true
 	warning_ignore_no_transforms = true
 	can_restrict_height = false
-	can_use_global_and_local_space = true
-	use_local_space = true
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = false
+	use_local_space_by_default()
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
@@ -25,7 +27,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	basis = basis.rotated(Vector3.FORWARD, deg_to_rad(rotation.z))
 	var transform := Transform3D(basis, offset)
 
-	if use_local_space:
+	if is_using_local_space():
 		var gt: Transform3D = domain.get_global_transform()
 		transform = gt * transform.scaled_local(scale)
 	else:

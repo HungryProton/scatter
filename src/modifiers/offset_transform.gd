@@ -11,6 +11,10 @@ func _init() -> void:
 	display_name = "Offset Transform"
 	category = "Offset"
 	can_restrict_height = false
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = true
+	use_local_space_by_default()
 
 	documentation.add_paragraph(
 		"Offsets position, rotation and scale in a single modifier. Every
@@ -31,35 +35,40 @@ func _init() -> void:
 
 func _process_transforms(transforms, domain, _seed) -> void:
 	var t: Transform3D
-	var origin: Vector3
+	var basis: Basis
+	var axis_x := Vector3.RIGHT
+	var axis_y := Vector3.UP
+	var axis_z := Vector3.DOWN
+	var final_scale := scale
+	var final_position := position
 
-	var gt: Transform3D = domain.get_global_transform()
-	origin = gt.origin
-	gt.origin = Vector3.ZERO
-	var global_x: Vector3 = (Vector3.RIGHT * gt).normalized()
-	var global_y: Vector3 = (Vector3.UP * gt).normalized()
-	var global_z: Vector3 = (Vector3.DOWN * gt).normalized()
-	gt.origin = origin
+	if is_using_local_space():
+		var st: Transform3D = domain.get_global_transform()
+		axis_x = st.basis.x
+		axis_y = st.basis.y
+		axis_z = st.basis.z
+		final_scale = st.basis * scale # TODO: scale not working in local mode
+		final_position = st.basis * position
 
 	for i in transforms.size():
 		t = transforms.list[i]
-		origin = t.origin
-		t.origin = Vector3.ZERO
+		basis = t.basis
 
-		if use_local_space:
-			t = t.rotated(t.basis.x.normalized(), deg_to_rad(rotation.x))
-			t = t.rotated(t.basis.y.normalized(), deg_to_rad(rotation.y))
-			t = t.rotated(t.basis.z.normalized(), deg_to_rad(rotation.z))
-			t.basis.x *= scale.x
-			t.basis.y *= scale.y
-			t.basis.z *= scale.z
-			t.origin = origin + (t * position)
-
+		if is_using_individual_instances_space():
+			axis_x = basis.x
+			axis_y = basis.y
+			axis_z = basis.z
+			basis.x *= scale.x
+			basis.y *= scale.y
+			basis.z *= scale.z
+			final_position = t.basis * position
 		else:
-			t = t.rotated(global_x, deg_to_rad(rotation.x))
-			t = t.rotated(global_y, deg_to_rad(rotation.y))
-			t = t.rotated(global_z, deg_to_rad(rotation.z))
-			t.basis = t.basis.scaled(scale)
-			t.origin = origin + position
+			basis = basis.scaled(final_scale)
+
+		basis = basis.rotated(axis_x, deg_to_rad(rotation.x))
+		basis = basis.rotated(axis_y, deg_to_rad(rotation.y))
+		basis = basis.rotated(axis_z, deg_to_rad(rotation.z))
+		t.basis = basis
+		t.origin += final_position
 
 		transforms.list[i] = t

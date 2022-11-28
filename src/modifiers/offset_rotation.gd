@@ -8,8 +8,11 @@ extends "base_modifier.gd"
 func _init() -> void:
 	display_name = "Offset Rotation"
 	category = "Offset"
-	can_use_global_and_local_space = true
 	can_restrict_height = false
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = true
+	use_individual_instances_space_by_default()
 
 	documentation.add_paragraph("Rotates every transform.")
 
@@ -23,18 +26,29 @@ func _process_transforms(transforms, domain, _seed : int) -> void:
 	rotation_rad.y = deg_to_rad(rotation.y)
 	rotation_rad.z = deg_to_rad(rotation.z)
 
+	var t: Transform3D
 	var basis: Basis
-	var axis: Vector3
-	for t in transforms.list.size():
-		basis = transforms.list[t].basis
+	var axis_x := Vector3.RIGHT
+	var axis_y := Vector3.UP
+	var axis_z := Vector3.FORWARD
 
-		axis = (float(use_local_space) * basis.x + float(!use_local_space) * Vector3(1, 0, 0)).normalized()
-		basis = basis.rotated(axis, rotation_rad.x)
+	if is_using_local_space():
+		var st: Transform3D = domain.get_global_transform()
+		axis_x = st.basis.x
+		axis_y = st.basis.y
+		axis_z = st.basis.z
 
-		axis = (float(use_local_space) * basis.y + float(!use_local_space) * Vector3(0, 1, 0)).normalized()
-		basis = basis.rotated(axis, rotation_rad.y)
+	for i in transforms.size():
+		t = transforms.list[i]
+		basis = t.basis
 
-		axis = (float(use_local_space) * basis.z + float(!use_local_space) * Vector3(0, 0, 1)).normalized()
-		basis = basis.rotated(axis, rotation_rad.z)
+		if is_using_individual_instances_space():
+			axis_x = basis.x
+			axis_y = basis.y
+			axis_z = basis.z
 
-		transforms.list[t].basis = basis
+		basis = basis.rotated(axis_x, rotation_rad.x)
+		basis = basis.rotated(axis_y, rotation_rad.y)
+		basis = basis.rotated(axis_z, rotation_rad.z)
+
+		transforms.list[i].basis = basis

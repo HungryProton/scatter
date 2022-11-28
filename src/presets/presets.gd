@@ -10,6 +10,7 @@ const ScatterShape := preload('../scatter_shape.gd')
 
 var _scatter_node
 var _ideal_popup_size: Vector2i
+var _editor_file_system: EditorFileSystem
 
 
 func _ready():
@@ -47,6 +48,13 @@ func load_preset(scatter_node: Node3D) -> void:
 
 func load_default(scatter_node: Node3D) -> void:
 	pass # TODO
+
+
+func set_editor_plugin(editor_plugin: EditorPlugin) -> void:
+	if not editor_plugin:
+		return
+
+	_editor_file_system = editor_plugin.get_editor_interface().get_resource_filesystem()
 
 
 func _clear():
@@ -87,8 +95,8 @@ func _populate() -> void:
 		$%PresetsRoot.add_child(entry)
 
 	dir.list_dir_end()
-	var full_height = $%PresetsRoot.get_child_count() * 150
-	_ideal_popup_size = Vector2i(450, clamp(full_height, 150, 500))
+	var full_height = $%PresetsRoot.get_child_count() * 120
+	_ideal_popup_size = Vector2i(450, clamp(full_height, 120, 500))
 
 
 func _show_preset_dialog() -> void:
@@ -97,7 +105,7 @@ func _show_preset_dialog() -> void:
 
 
 func _on_new_preset_name_confirmed() -> void:
-	var file_name: String = $%NewPresetName.text.to_lower() + ".tscn"
+	var file_name: String = $%NewPresetName.text.to_lower().strip_edges() + ".tscn"
 	var full_path := PRESETS_PATH.path_join(file_name)
 	_on_save_preset(full_path)
 	hide()
@@ -158,3 +166,4 @@ func _on_delete_preset(path: String, entry: Control) -> void:
 	DirAccess.remove_absolute(path)
 	$%PresetsRoot.remove_child(entry)
 	entry.queue_free()
+	_editor_file_system.scan() # Refresh the filesystem view

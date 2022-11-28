@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://blpobpd0eweog"]
+[gd_scene load_steps=21 format=3 uid="uid://blpobpd0eweog"]
 
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/modifier_panel.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://hshxh8s6k677" path="res://addons/proton_scatter/icons/arrow_right.svg" id="2_2djuo"]
@@ -18,6 +18,8 @@
 [ext_resource type="PackedScene" uid="uid://c36gqn03pvlnr" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/components/header/parameter_spinbox.tscn" id="13_vhfch"]
 [ext_resource type="Texture2D" uid="uid://bjha4mlvffrca" path="res://addons/proton_scatter/icons/restrict_volume_lock.svg" id="15_0w0as"]
 [ext_resource type="Texture2D" uid="uid://bpygylbuxdu0f" path="res://addons/proton_scatter/icons/global.svg" id="16_ocvvf"]
+[ext_resource type="PackedScene" uid="uid://bspbhkrpgak0e" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/components/parameter_scalar.tscn" id="17_aoulv"]
+[ext_resource type="Texture2D" uid="uid://be7s3se8bo32r" path="res://addons/proton_scatter/icons/individual_instances.svg" id="19_ln8a3"]
 
 [node name="ModifierPanel" type="MarginContainer"]
 anchors_preset = 10
@@ -28,13 +30,13 @@ script = ExtResource("1")
 
 [node name="Panel" type="Panel" parent="."]
 layout_mode = 2
-offset_right = 1152.0
+offset_right = 1920.0
 offset_bottom = 34.0
 mouse_filter = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
-offset_right = 1152.0
+offset_right = 1920.0
 offset_bottom = 34.0
 grow_horizontal = 2
 mouse_filter = 2
@@ -49,12 +51,12 @@ metadata/_edit_use_custom_anchors = false
 layout_mode = 2
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 1148.0
+offset_right = 1916.0
 offset_bottom = 30.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-offset_right = 1144.0
+offset_right = 1912.0
 offset_bottom = 26.0
 size_flags_vertical = 0
 
@@ -78,7 +80,7 @@ pressed_icon = ExtResource("4_7nlfc")
 unique_name_in_owner = true
 layout_mode = 2
 offset_left = 24.0
-offset_right = 1040.0
+offset_right = 1808.0
 offset_bottom = 26.0
 size_flags_horizontal = 3
 text = "ModifierPanel"
@@ -87,8 +89,8 @@ clip_text = true
 
 [node name="Buttons" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-offset_left = 1044.0
-offset_right = 1144.0
+offset_left = 1812.0
+offset_right = 1912.0
 offset_bottom = 26.0
 theme_override_constants/separation = 2
 alignment = 1
@@ -181,7 +183,7 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 offset_top = 30.0
-offset_right = 1144.0
+offset_right = 1912.0
 offset_bottom = 72.0
 theme_override_constants/margin_left = 3
 theme_override_constants/margin_top = 3
@@ -192,24 +194,24 @@ theme_override_constants/margin_bottom = 3
 layout_mode = 2
 offset_left = 3.0
 offset_top = 3.0
-offset_right = 1141.0
+offset_right = 1909.0
 offset_bottom = 39.0
 
 [node name="ParametersRoot" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_right = 1138.0
+offset_right = 1906.0
 
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer"]
 layout_mode = 2
 offset_top = 4.0
-offset_right = 1138.0
+offset_right = 1906.0
 offset_bottom = 8.0
 
 [node name="CommonHeader" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer"]
 layout_mode = 2
 offset_top = 12.0
-offset_right = 1138.0
+offset_right = 1906.0
 offset_bottom = 36.0
 size_flags_vertical = 4
 alignment = 1
@@ -265,15 +267,15 @@ offset_right = 114.062
 layout_mode = 2
 anchors_preset = 0
 offset_left = 28.0
-offset_right = 1082.0
+offset_right = 1831.0
 offset_bottom = 24.0
 size_flags_horizontal = 3
 
 [node name="RestrictHeight" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader" instance=ExtResource("11_y7srw")]
 unique_name_in_owner = true
 layout_mode = 2
-offset_left = 1086.0
-offset_right = 1110.0
+offset_left = 1835.0
+offset_right = 1859.0
 offset_bottom = 24.0
 size_flags_horizontal = 1
 size_flags_vertical = 3
@@ -289,24 +291,56 @@ icon = ExtResource("12_lx60d")
 default_icon = ExtResource("12_lx60d")
 pressed_icon = ExtResource("15_0w0as")
 
-[node name="TransformSpace" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader" instance=ExtResource("11_y7srw")]
+[node name="TransformSpace" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader" instance=ExtResource("17_aoulv")]
 unique_name_in_owner = true
 layout_mode = 2
-offset_left = 1114.0
-offset_right = 1138.0
+anchors_preset = 0
+anchor_right = 0.0
+offset_left = 1863.0
+offset_right = 1906.0
 offset_bottom = 24.0
-size_flags_horizontal = 1
-size_flags_vertical = 3
+grow_horizontal = 2
 
-[node name="Button" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/TransformSpace" index="0"]
-layout_mode = 2
-offset_right = 24.0
+[node name="Label" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/TransformSpace" index="0"]
+visible = false
+offset_top = 4.0
+offset_right = 1.0
+offset_bottom = 27.0
+text = ""
+
+[node name="MarginContainer" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/TransformSpace" index="1"]
+offset_left = 0.0
+offset_right = 43.0
 offset_bottom = 24.0
-tooltip_text = "Enabled: Use local space
-Disabled: Use global space"
-icon = ExtResource("16_ocvvf")
-default_icon = ExtResource("16_ocvvf")
-pressed_icon = ExtResource("13_txjs8")
+
+[node name="Panel" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/TransformSpace/MarginContainer" index="0"]
+offset_right = 43.0
+offset_bottom = 24.0
+
+[node name="MarginContainer" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/TransformSpace/MarginContainer" index="1"]
+offset_right = 43.0
+offset_bottom = 24.0
+
+[node name="SpinBox" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/TransformSpace/MarginContainer/MarginContainer" index="0"]
+visible = false
+offset_right = 43.0
+offset_bottom = 24.0
+
+[node name="OptionButton" parent="MarginContainer/VBoxContainer/ParametersContainer/VBoxContainer/CommonHeader/TransformSpace/MarginContainer/MarginContainer" index="1"]
+visible = true
+offset_right = 43.0
+offset_bottom = 24.0
+item_count = 3
+fit_to_longest_item = false
+popup/item_0/text = "Global"
+popup/item_0/icon = ExtResource("16_ocvvf")
+popup/item_0/id = 0
+popup/item_1/text = "Local"
+popup/item_1/icon = ExtResource("13_txjs8")
+popup/item_1/id = 1
+popup/item_2/text = "Individual"
+popup/item_2/icon = ExtResource("19_ln8a3")
+popup/item_2/id = 2
 
 [node name="WarningDialog" type="AcceptDialog" parent="."]
 title = "Warning"

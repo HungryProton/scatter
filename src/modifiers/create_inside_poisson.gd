@@ -21,6 +21,7 @@ var _squared_radius: float
 var _domain
 var _bounds: Bounds
 
+var _gt: Transform3D
 var _points: Array[Transform3D] # Stores the generated points
 var _grid: Array[int] = [] # Flattened array
 var _grid_size := Vector3i.ZERO
@@ -38,6 +39,10 @@ func _init() -> void:
 	can_restrict_height = true
 	can_override_seed = true
 	restrict_height = true
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	use_local_space_by_default()
+	# TODO: align transform based on space
 
 	documentation.add_paragraph(
 		"Place transforms without overlaps. Transforms are assumed to have a
@@ -71,17 +76,9 @@ func _process_transforms(transforms, domain, seed) -> void:
 	_rng.set_seed(seed)
 	_domain = domain
 	_bounds = _domain.bounds
-
-	_sample_poisson()
-
-	transforms.append(_points)
-	transforms.shuffle(seed)
-
-
-func _sample_poisson() -> void:
-	# Initialization
-	_init_grid()
+	_gt = domain.get_global_transform()
 	_points = []
+	_init_grid()
 
 	# Stores the possible starting points from where we run the sampling.
 	# This array will progressively be emptied as the algorithm progresses.
@@ -111,6 +108,10 @@ func _sample_poisson() -> void:
 				# Add new points to the lists
 				var t = Transform3D()
 				t.origin = candidate
+
+				if is_using_local_space():
+					t.basis = _gt.basis
+
 				_points.push_back(t)
 				spawn_points.push_back(t)
 				if restrict_height:
@@ -125,6 +126,9 @@ func _sample_poisson() -> void:
 		if not candidate_accepted:
 			spawn_points.remove_at(spawn_index)
 
+	transforms.append(_points)
+	transforms.shuffle(seed)
+
 
 func _init_grid() -> void:
 	_squared_radius = radius * radius
@@ -135,8 +139,6 @@ func _init_grid() -> void:
 
 	_grid_size = _grid_size.clamp(Vector3.ONE, _grid_size)
 
-	print("grid size : " ,_grid_size)
-
 	_grid = []
 	if restrict_height:
 		_grid.resize(_grid_size.x * _grid_size.z)
@@ -146,6 +148,7 @@ func _init_grid() -> void:
 
 # Starting point must be inside the domain, or we run the risk to never generate
 # any valid point later on
+# TODO: Domain may have islands, so we should use multiple starting points
 func _get_starting_point() -> Transform3D:
 	var point: Vector3 = _bounds.center
 

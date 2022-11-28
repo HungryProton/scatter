@@ -138,4 +138,3 @@ unique_name_in_owner = true
 
 [node name="Presets" parent="." instance=ExtResource("11_2ut8s")]
 unique_name_in_owner = true
-visible = false

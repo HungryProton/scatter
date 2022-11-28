@@ -13,8 +13,10 @@ func _init() -> void:
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 	can_restrict_height = true
-	can_use_global_and_local_space = true
 	restrict_height = true
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = false
 
 	documentation.add_paragraph(
 		"Place transforms along the edges of the ScatterShapes")
@@ -46,14 +48,10 @@ func _process_transforms(transforms, domain, seed) -> void:
 
 	var gt: Transform3D = domain.get_global_transform()
 	var center: Vector3 = domain.bounds.center
-	var size: Vector3 = domain.bounds.size
+	var size: Vector3 = domain.bounds_local.size
 
-	if use_local_space:
+	if is_using_local_space():
 		center = domain.bounds_local.center
-		size = domain.bounds_local.size
-
-#	print("center: ", center)
-#	print("size: ", size)
 
 	var half_size := size * 0.5
 	var start_corner := center - half_size
@@ -86,7 +84,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 			pos.z = (i / width) * spacing.z
 			pos += start_corner
 
-			if use_local_space:
+			if is_using_local_space():
 				pos = gt * pos
 				t.basis = gt.basis
 

@@ -16,7 +16,9 @@ func _init() -> void:
 	category = "Misc"
 	can_restrict_height = false
 	can_override_seed = false
-	can_use_global_and_local_space = false
+	global_reference_frame_available = false
+	local_reference_frame_available = false
+	individual_instances_reference_frame_available = false
 	warning_ignore_no_transforms = true
 
 	documentation.add_paragraph("Copy a modifier stack from another ProtonScatter node in the scene.")

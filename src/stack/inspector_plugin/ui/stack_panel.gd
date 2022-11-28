@@ -32,7 +32,8 @@ func set_node(node) -> void:
 
 	_scatter = node
 	_undo_redo = _scatter.undo_redo
-	$%Documentation.set_editor_options(_scatter.editor_options)
+	$%Documentation.set_editor_plugin(_scatter.editor_plugin)
+	$%Presets.set_editor_plugin(_scatter.editor_plugin)
 	rebuild_ui()
 
 

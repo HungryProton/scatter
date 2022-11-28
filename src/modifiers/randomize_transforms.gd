@@ -14,6 +14,10 @@ func _init() -> void:
 	category = "Edit"
 	can_override_seed = true
 	can_restrict_height = false
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = true
+	use_individual_instances_space_by_default()
 
 
 func _process_transforms(transforms, domain, seed) -> void:
@@ -27,6 +31,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 	var gt: Transform3D = domain.get_global_transform()
 	origin = gt.origin
 	gt.origin = Vector3.ZERO
+
 	# Global rotation axis
 	var axis_x: Vector3 = (Vector3.RIGHT * gt).normalized()
 	var axis_y: Vector3 = (Vector3.UP * gt).normalized()
@@ -41,7 +46,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 		s = Vector3.ONE + (_rng.randf() * scale)
 		t = t.scaled(s)
 
-		if use_local_space:
+		if is_using_individual_instances_space():
 			axis_x = t.basis.x.normalized()
 			axis_y = t.basis.y.normalized()
 			axis_z = t.basis.z.normalized()

@@ -4,14 +4,14 @@
 [ext_resource type="Script" path="res://addons/proton_scatter/src/presets/preset_entry.gd" id="1_bqha3"]
 [ext_resource type="Texture2D" uid="uid://bl1rkjjxvxu8f" path="res://addons/proton_scatter/icons/remove.svg" id="2_p04k2"]
 
-[sub_resource type="SystemFont" id="SystemFont_7fs7d"]
+[sub_resource type="SystemFont" id="SystemFont_kgkwq"]
 font_style = 1
 
-[sub_resource type="LabelSettings" id="LabelSettings_kqtju"]
-font = SubResource("SystemFont_7fs7d")
+[sub_resource type="LabelSettings" id="LabelSettings_poli7"]
+font = SubResource("SystemFont_kgkwq")
 
 [node name="PresetEntry" type="MarginContainer"]
-custom_minimum_size = Vector2(450, 120)
+custom_minimum_size = Vector2(450, 0)
 anchors_preset = 14
 anchor_top = 0.5
 anchor_right = 1.0
@@ -26,12 +26,12 @@ script = ExtResource("1_bqha3")
 [node name="Panel" type="Panel" parent="."]
 layout_mode = 2
 offset_right = 1920.0
-offset_bottom = 120.0
+offset_bottom = 90.0
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
 offset_right = 1920.0
-offset_bottom = 120.0
+offset_bottom = 90.0
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
@@ -42,38 +42,37 @@ layout_mode = 2
 offset_left = 12.0
 offset_top = 12.0
 offset_right = 1908.0
-offset_bottom = 108.0
+offset_bottom = 78.0
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_top = 35.0
+offset_top = 20.0
 offset_right = 1669.0
-offset_bottom = 61.0
+offset_bottom = 46.0
 size_flags_horizontal = 3
 text = "Preset name"
-label_settings = SubResource("LabelSettings_kqtju")
+label_settings = SubResource("LabelSettings_poli7")
 
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 offset_left = 1673.0
 offset_right = 1677.0
-offset_bottom = 96.0
+offset_bottom = 66.0
 
 [node name="LoadButtons" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 offset_left = 1681.0
 offset_right = 1860.0
-offset_bottom = 96.0
+offset_bottom = 66.0
 alignment = 1
 
 [node name="LoadStackOnly" type="Button" parent="MarginContainer/HBoxContainer/LoadButtons"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_top = 15.0
 offset_right = 179.0
-offset_bottom = 46.0
+offset_bottom = 31.0
 text = "Load modifier stack"
 icon = ExtResource("1_0auay")
 alignment = 0
@@ -81,9 +80,9 @@ alignment = 0
 [node name="LoadFullPreset" type="Button" parent="MarginContainer/HBoxContainer/LoadButtons"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_top = 50.0
+offset_top = 35.0
 offset_right = 179.0
-offset_bottom = 81.0
+offset_bottom = 66.0
 text = "Load full preset"
 icon = ExtResource("1_0auay")
 alignment = 0
@@ -112,20 +111,20 @@ alignment = 0
 layout_mode = 2
 offset_left = 1864.0
 offset_right = 1868.0
-offset_bottom = 96.0
+offset_bottom = 66.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 offset_left = 1872.0
 offset_right = 1896.0
-offset_bottom = 96.0
+offset_bottom = 66.0
 alignment = 1
 
 [node name="DeleteButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_top = 36.0
+offset_top = 21.0
 offset_right = 24.0
-offset_bottom = 60.0
+offset_bottom = 45.0
 theme_override_colors/icon_normal_color = Color(0.917647, 0.0784314, 0, 1)
 icon = ExtResource("2_p04k2")

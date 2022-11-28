@@ -8,8 +8,8 @@ var _is_int := false
 var _is_enum := false
 
 @onready var _label: Label = $Label
-@onready var _spinbox: SpinBox = $MarginContainer/MarginContainer/SpinBox
-@onready var _option: OptionButton = $MarginContainer/MarginContainer/OptionButton
+@onready var _spinbox: SpinBox = $%SpinBox
+@onready var _option: OptionButton = $%OptionButton
 
 
 func _ready() -> void:
@@ -22,6 +22,14 @@ func mark_as_int(val: bool) -> void:
 	_is_int = val
 	if _is_int and _spinbox:
 		_spinbox.step = 1
+
+
+func mark_as_enum(val: bool) -> void:
+	_is_enum = val
+
+
+func toggle_option_item(idx: int, value := false) -> void:
+	_option.set_item_disabled(idx, not value)
 
 
 func set_parameter_name(text: String) -> void:

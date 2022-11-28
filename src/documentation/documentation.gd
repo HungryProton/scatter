@@ -44,12 +44,15 @@ func _ready() -> void:
 
 
 # Fed from the StackPanel scene, before the ready function
-func set_editor_options(opts: Dictionary) -> void:
-	if "accent_color" in opts:
-		_accent_color = opts["accent_color"]
+func set_editor_plugin(editor_plugin: EditorPlugin) -> void:
+	if not editor_plugin:
+		return
 
-	if "editor_scale" in opts:
-		_editor_scale = opts["editor_scale"]
+	var editor_interface := editor_plugin.get_editor_interface()
+	var editor_settings := editor_interface.get_editor_settings()
+
+	_accent_color = editor_settings.get("interface/theme/accent_color")
+	_editor_scale = editor_interface.get_editor_scale()
 
 
 func show_page(page_name: String) -> void:

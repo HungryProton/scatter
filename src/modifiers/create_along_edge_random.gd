@@ -15,12 +15,16 @@ func _init() -> void:
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 	use_edge_data = true
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = false
 
 
 func _process_transforms(transforms, domain, seed) -> void:
 	_rng = RandomNumberGenerator.new()
 	_rng.set_seed(seed)
 
+	var st: Transform3D = domain.get_global_transform()
 	var new_transforms: Array[Transform3D] = []
 	var curves: Array[Curve3D] = domain.get_edges()
 	var total_curve_length := 0.0
@@ -42,6 +46,8 @@ func _process_transforms(transforms, domain, seed) -> void:
 			t.origin = pos
 			if align_to_path:
 				t = t.looking_at(normal + pos, align_up_axis)
+			elif is_using_local_space():
+				t.basis = st.basis
 
 			new_transforms.push_back(t)
 

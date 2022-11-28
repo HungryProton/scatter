@@ -8,23 +8,30 @@ extends "base_modifier.gd"
 func _init() -> void:
 	display_name = "Offset Position"
 	category = "Offset"
-	can_use_global_and_local_space = true
 	can_restrict_height = false
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = true
+	use_individual_instances_space_by_default()
 
 	documentation.add_paragraph("Moves every transform the same way.")
 
-	documentation.add_parameter("Position").set_type("vector3"
-		).set_description("How far each transforms are moved.")
+	var p := documentation.add_parameter("Position")
+	p.set_type("vector3")
+	p.set_description("How far each transforms are moved.")
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
+	var st: Transform3D = domain.get_global_transform()
 	var t: Transform3D
 
 	for i in transforms.list.size():
 		t = transforms.list[i]
 
-		if use_local_space:
+		if is_using_individual_instances_space():
 			t.origin += t.basis * position
+		elif is_using_local_space():
+			t.origin += st.basis * position
 		else:
 			t.origin += position
 

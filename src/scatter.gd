@@ -85,7 +85,8 @@ var domain: Domain:
 var items: Array[ScatterItem]
 var total_item_proportion: int
 var output_root: Marker3D
-var editor_options := {} # Holds data relative to the editor itself, used by other parts
+
+var editor_plugin # Holds a reference to the EditorPlugin. Used by other parts.
 
 var _thread := Thread.new()
 var _rebuild_queued := false
@@ -110,8 +111,7 @@ func _ready() -> void:
 		item.set_name("ScatterItem")
 		item.set_owner(get_tree().get_edited_scene_root())
 
-
-	if domain.is_empty():
+	if domain.is_empty() and not modifier_stack.does_not_require_shapes():
 		var shape = ScatterShape.new()
 		add_child(shape, true)
 		shape.set_owner(get_tree().get_edited_scene_root())

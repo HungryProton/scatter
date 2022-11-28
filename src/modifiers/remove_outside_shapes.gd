@@ -9,7 +9,9 @@ func _init() -> void:
 	display_name = "Remove Outside"
 	category = "Remove"
 	can_restrict_height = false
-	can_use_global_and_local_space = false
+	global_reference_frame_available = false
+	local_reference_frame_available = false
+	individual_instances_reference_frame_available = false
 
 	documentation.add_paragraph(
 		"Remove all transforms falling outside a ScatterShape node, or inside

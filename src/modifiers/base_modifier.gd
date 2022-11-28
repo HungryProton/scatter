@@ -17,7 +17,7 @@ const DocumentationInfo = preload("../documentation/documentation_info.gd")
 @export var override_global_seed := false
 @export var custom_seed := 0
 @export var restrict_height := false # Tells the modifier whether to constrain transforms to the local XY plane or not
-@export var use_local_space := false
+@export var reference_frame := 0
 
 var display_name: String = "Base Modifier Name"
 var category: String = "None"
@@ -28,7 +28,9 @@ var warning_ignore_no_shape := false
 var expanded := false
 var can_override_seed := false
 var can_restrict_height := true
-var can_use_global_and_local_space := true
+var global_reference_frame_available := true
+var local_reference_frame_available := false
+var individual_instances_reference_frame_available := false
 var use_edge_data := false
 
 
@@ -66,6 +68,30 @@ func get_copy():
 		copy.set(p.name, value)
 
 	return copy
+
+
+func is_using_global_space() -> bool:
+	return reference_frame == 0
+
+
+func is_using_local_space() -> bool:
+	return reference_frame == 1
+
+
+func is_using_individual_instances_space() -> bool:
+	return reference_frame == 2
+
+
+func use_global_space_by_default() -> void:
+	reference_frame = 0
+
+
+func use_local_space_by_default() -> void:
+	reference_frame = 1
+
+
+func use_individual_instances_space_by_default() -> void:
+	reference_frame = 2
 
 
 func _clear_warning() -> void:

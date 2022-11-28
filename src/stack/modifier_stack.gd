@@ -70,3 +70,13 @@ func is_using_edge_data() -> bool:
 			return true
 
 	return false
+
+
+# Returns true if at least one modifier does not require shapes in order to work.
+# (This is the case for the "Add single item" modifier for example)
+func does_not_require_shapes() -> bool:
+	for modifier in stack:
+		if modifier.warning_ignore_no_shape:
+			return true
+
+	return false

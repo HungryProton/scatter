@@ -12,8 +12,10 @@ func _init() -> void:
 	display_name = "Randomize Rotation"
 	category = "Edit"
 	can_restrict_height = false
-	can_use_global_and_local_space = true
-	use_local_space = true
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = true
+	use_individual_instances_space_by_default()
 
 	documentation.add_paragraph("Randomly rotate every transforms individually.")
 
@@ -40,23 +42,27 @@ func _process_transforms(transforms, domain, seed) -> void:
 
 	var gt: Transform3D = domain.get_global_transform()
 	var gb: Basis = gt.basis
-	var global_x: Vector3 = (Vector3.RIGHT * gb).normalized()
-	var global_y: Vector3 = (Vector3.UP * gb).normalized()
-	var global_z: Vector3 = (Vector3.FORWARD * gb).normalized()
+	var axis_x: Vector3 = Vector3.RIGHT
+	var axis_y: Vector3 = Vector3.UP
+	var axis_z: Vector3 = Vector3.FORWARD
+
+	if is_using_local_space():
+		axis_x = (Vector3.RIGHT * gb).normalized()
+		axis_y = (Vector3.UP * gb).normalized()
+		axis_z = (Vector3.FORWARD * gb).normalized()
 
 	for i in transforms.list.size():
 		t = transforms.list[i]
 		b = t.basis
 
-		if use_local_space:
-			b = b.rotated(t.basis.x.normalized(), _random_angle(rotation.x, snap_angle.x))
-			b = b.rotated(t.basis.y.normalized(), _random_angle(rotation.y, snap_angle.y))
-			b = b.rotated(t.basis.z.normalized(), _random_angle(rotation.z, snap_angle.z))
+		if is_using_individual_instances_space():
+			axis_x = t.basis.x.normalized()
+			axis_y = t.basis.y.normalized()
+			axis_z = t.basis.z.normalized()
 
-		else:
-			b = b.rotated(global_x, _random_angle(rotation.x, snap_angle.x))
-			b = b.rotated(global_y, _random_angle(rotation.y, snap_angle.y))
-			b = b.rotated(global_z, _random_angle(rotation.z, snap_angle.z))
+		b = b.rotated(axis_x, _random_angle(rotation.x, snap_angle.x))
+		b = b.rotated(axis_y, _random_angle(rotation.y, snap_angle.y))
+		b = b.rotated(axis_z, _random_angle(rotation.z, snap_angle.z))
 
 		t.basis = b
 		transforms.list[i] = t

@@ -24,7 +24,9 @@ func _init() -> void:
 	category = "Create"
 	can_override_seed = true
 	can_restrict_height = false
-	can_use_global_and_local_space = false
+	global_reference_frame_available = false
+	local_reference_frame_available = false
+	individual_instances_reference_frame_available = false
 
 	documentation.add_paragraph(
 		"Recursively creates copies of the existing transforms, with each copy
@@ -111,12 +113,9 @@ func _process_transforms(transforms, domain, seed: int) -> void:
 	rotation_rad.y = deg_to_rad(rotation.y)
 	rotation_rad.z = deg_to_rad(rotation.z)
 
-	# for each existing object
-	for t in transforms.list.size():
-		# add original transform to array
+	for t in transforms.size():
 		new_transforms.push_back(transforms.list[t])
 
-		# for each iteration of the array
 		var steps = amount
 		if min_amount >= 0:
 			steps = _rng.randi_range(min_amount, amount)

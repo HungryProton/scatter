@@ -8,25 +8,33 @@ extends "base_modifier.gd"
 func _init() -> void:
 	display_name = "Offset Scale"
 	category = "Offset"
-	can_use_global_and_local_space = true
 	can_restrict_height = false
-	use_local_space = true
+	global_reference_frame_available = true
+	local_reference_frame_available = true
+	individual_instances_reference_frame_available = true
+	use_individual_instances_space_by_default()
 
 	documentation.add_paragraph("Scales every transform.")
 
-	documentation.add_parameter("Scale").set_type("Vector3").set_description(
-		"How much to scale the transform along each axes (X, Y, Z)")
+	var p := documentation.add_parameter("Scale")
+	p.set_type("Vector3")
+	p.set_description("How much to scale the transform along each axes (X, Y, Z)")
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
+	var st: Transform3D = domain.get_global_transform()
 	var basis: Basis
-	for t in transforms.list.size():
-		basis = transforms.list[t].basis
-		if use_local_space:
+
+	for i in transforms.size():
+		basis = transforms.list[i].basis
+
+		if is_using_individual_instances_space():
 			basis.x *= scale.x
 			basis.y *= scale.y
 			basis.z *= scale.z
+		elif is_using_local_space():
+			basis = basis.scaled(scale) # TODO: same as offset transform
 		else:
 			basis = basis.scaled(scale)
 
-		transforms.list[t].basis = basis
+		transforms.list[i].basis = basis
