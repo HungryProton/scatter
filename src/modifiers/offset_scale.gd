@@ -24,16 +24,21 @@ func _init() -> void:
 func _process_transforms(transforms, domain, _seed) -> void:
 	var st: Transform3D = domain.get_global_transform()
 	var basis: Basis
+	var t: Transform3D
+	var local_t: Transform3D
 
 	for i in transforms.size():
-		basis = transforms.list[i].basis
+		t = transforms.list[i]
+		basis = t.basis
 
 		if is_using_individual_instances_space():
 			basis.x *= scale.x
 			basis.y *= scale.y
 			basis.z *= scale.z
 		elif is_using_local_space():
-			basis = basis.scaled(scale) # TODO: same as offset transform
+			local_t = t * st
+			local_t.basis = local_t.basis.scaled(scale)
+			basis = (st * local_t).basis
 		else:
 			basis = basis.scaled(scale)
 

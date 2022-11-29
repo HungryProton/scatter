@@ -25,36 +25,52 @@ func _process_transforms(transforms, domain, seed) -> void:
 	_rng.set_seed(seed)
 
 	var t: Transform3D
-	var s: Vector3
-	var origin: Vector3
-
-	var gt: Transform3D = domain.get_global_transform()
-	origin = gt.origin
-	gt.origin = Vector3.ZERO
+	var local_t: Transform3D
+	var basis: Basis
+	var random_scale: Vector3
+	var random_position: Vector3
+	var st: Transform3D = domain.get_global_transform()
 
 	# Global rotation axis
-	var axis_x: Vector3 = (Vector3.RIGHT * gt).normalized()
-	var axis_y: Vector3 = (Vector3.UP * gt).normalized()
-	var axis_z: Vector3 = (Vector3.DOWN * gt).normalized()
-	gt.origin = origin
+	var axis_x := Vector3.RIGHT
+	var axis_y := Vector3.UP
+	var axis_z := Vector3.DOWN
+
+	if is_using_local_space():
+		axis_x = st.basis.x
+		axis_y = st.basis.y
+		axis_z = st.basis.z
 
 	for i in transforms.size():
 		t = transforms.list[i]
-		origin = t.origin
-		t.origin = Vector3.ZERO
+		basis = t.basis
 
-		s = Vector3.ONE + (_rng.randf() * scale)
-		t = t.scaled(s)
+		random_scale = Vector3.ONE + (_rng.randf() * scale)
+		random_position = _random_vec3() * position
 
 		if is_using_individual_instances_space():
-			axis_x = t.basis.x.normalized()
-			axis_y = t.basis.y.normalized()
-			axis_z = t.basis.z.normalized()
+			axis_x = basis.x
+			axis_y = basis.y
+			axis_z = basis.z
+			basis.x *= random_scale.x
+			basis.y *= random_scale.y
+			basis.z *= random_scale.z
+			random_position = t.basis * position
 
-		t = t.rotated(axis_x, deg_to_rad(_random_float() * rotation.x))
-		t = t.rotated(axis_y, deg_to_rad(_random_float() * rotation.y))
-		t = t.rotated(axis_z, deg_to_rad(_random_float() * rotation.z))
-		t.origin = origin + _random_vec3() * position
+		elif is_using_local_space():
+			local_t = t * st
+			local_t.basis = local_t.basis.scaled(random_scale)
+			basis = (st * local_t).basis
+
+		else:
+			basis = basis.scaled(random_scale)
+
+		basis = basis.rotated(axis_x, deg_to_rad(_random_float() * rotation.x))
+		basis = basis.rotated(axis_y, deg_to_rad(_random_float() * rotation.y))
+		basis = basis.rotated(axis_z, deg_to_rad(_random_float() * rotation.z))
+
+		t.origin += random_position
+		t.basis = basis
 
 		transforms.list[i] = t
 

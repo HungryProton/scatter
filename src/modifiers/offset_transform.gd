@@ -35,19 +35,20 @@ func _init() -> void:
 
 func _process_transforms(transforms, domain, _seed) -> void:
 	var t: Transform3D
+	var local_t: Transform3D
 	var basis: Basis
 	var axis_x := Vector3.RIGHT
 	var axis_y := Vector3.UP
 	var axis_z := Vector3.DOWN
 	var final_scale := scale
 	var final_position := position
+	var st: Transform3D = domain.get_global_transform()
 
 	if is_using_local_space():
-		var st: Transform3D = domain.get_global_transform()
 		axis_x = st.basis.x
 		axis_y = st.basis.y
 		axis_z = st.basis.z
-		final_scale = st.basis * scale # TODO: scale not working in local mode
+		final_scale = scale.rotated(Vector3.RIGHT, st.basis.get_euler().x)
 		final_position = st.basis * position
 
 	for i in transforms.size():
@@ -62,6 +63,12 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			basis.y *= scale.y
 			basis.z *= scale.z
 			final_position = t.basis * position
+
+		elif is_using_local_space():
+			local_t = t * st
+			local_t.basis = local_t.basis.scaled(final_scale)
+			basis = (st * local_t).basis
+
 		else:
 			basis = basis.scaled(final_scale)
 
