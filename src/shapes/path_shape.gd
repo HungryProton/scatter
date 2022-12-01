@@ -37,6 +37,9 @@ func is_point_inside(point: Vector3, global_transform: Transform3D) -> bool:
 	if not _polygon:
 		_update_polygon_from_curve()
 
+	if not _polygon:
+		return false
+
 	point = global_transform.affine_inverse() * point
 
 	if thickness > 0:
@@ -202,19 +205,18 @@ func get_open_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[Cur
 func _update_polygon_from_curve() -> void:
 	var connections = PackedInt32Array()
 	var polygon_points = PackedVector2Array()
+
 	if not _bounds:
 		_bounds = Bounds.new()
+
 	_bounds.clear()
+	_polygon = PolygonPathFinder.new()
 
 	if not curve:
 		curve = Curve3D.new()
-		return
 
 	if curve.get_point_count() == 0:
 		return
-
-	if not _polygon:
-		_polygon = PolygonPathFinder.new()
 
 	var baked_points = curve.tessellate(4, 6)
 	var steps := baked_points.size()

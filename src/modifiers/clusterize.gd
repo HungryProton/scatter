@@ -13,11 +13,9 @@ func _init() -> void:
 	display_name = "Clusterize"
 	category = "Edit"
 	global_reference_frame_available = true
-	local_reference_frame_available = true
+	local_reference_frame_available = false # TODO, enable this and handle this case
 	individual_instances_reference_frame_available = false
-	# TODO: handle the global / local stuff
 
-	var p
 	documentation.add_paragraph(
 		"Clump transforms together based on a mask.
 		Sampling the mask returns values between 0 and 1. The transforms are
@@ -25,7 +23,7 @@ func _init() -> void:
 		scale while dark area scales them down. Transforms are then removed
 		below a threshold, leaving clumps behind.")
 
-	p = documentation.add_parameter("Mask")
+	var p := documentation.add_parameter("Mask")
 	p.set_type("Texture")
 	p.set_description("The texture used as a mask.")
 	p.add_warning(

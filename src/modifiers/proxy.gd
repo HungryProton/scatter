@@ -26,6 +26,10 @@ func _init() -> void:
 		"Useful when you need multiple Scatter nodes sharing the same rules, without having to
 		replicate their modifiers and settings in each."
 	)
+	documentation.add_paragraph(
+		"Unlike presets which are full independent copies, this method is more similar to a linked
+		copy. Changes on the original modifier stack will be accounted for in here."
+	)
 
 	var p = documentation.add_parameter("Scatter node")
 	p.set_type("NodePath")

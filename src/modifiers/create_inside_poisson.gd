@@ -41,8 +41,8 @@ func _init() -> void:
 	restrict_height = true
 	global_reference_frame_available = true
 	local_reference_frame_available = true
+	individual_instances_reference_frame_available = false
 	use_local_space_by_default()
-	# TODO: align transform based on space
 
 	documentation.add_paragraph(
 		"Place transforms without overlaps. Transforms are assumed to have a

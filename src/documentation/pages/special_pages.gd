@@ -12,6 +12,10 @@ static func get_scatter_documentation() -> DocumentationInfo:
 		"ProtonScatter is a content positioning add-on. It is suited to place
 		a large amount of objects in a procedural way.")
 	info.add_paragraph(
+		"This add-on is [color=red][b]IN BETA[/b][/color] which means breaking
+		changes may happen. It is not recommended to use in production yet."
+	)
+	info.add_paragraph(
 		"First, define [i]what[/i] you want to place using [b]ScatterItems[/b]
 		nodes.")
 	info.add_paragraph(
