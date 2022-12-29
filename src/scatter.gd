@@ -82,7 +82,7 @@ var domain: Domain:
 	set(val):
 		domain = Domain.new() # Enforce uniqueness
 
-var items: Array[ScatterItem]
+var items: Array = []
 var total_item_proportion: int
 var output_root: Marker3D
 
