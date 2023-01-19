@@ -2,14 +2,14 @@
 extends Control
 
 
-const ModifierPanel := preload("./modifier/modifier_panel.tscn")
+const ModifierPanelNode := preload("./modifier/modifier_panel.tscn")
 
 
 @onready var _modifiers_container: Control = $%ModifiersContainer
 @onready var _modifiers_popup: PopupPanel = $%ModifiersPopup
 
 var _scatter
-var _modifier_stack
+var _modifier_stack :ModifierStack
 var _undo_redo
 var _is_ready := false
 
@@ -44,7 +44,7 @@ func rebuild_ui() -> void:
 	_validate_stack_connections()
 	_clear()
 	for m in _modifier_stack.stack:
-		var ui = ModifierPanel.instantiate()
+		var ui = ModifierPanelNode.instantiate()
 		_modifiers_container.add_child(ui)
 		ui.set_root(_scatter)
 		ui.create_ui_for(m)

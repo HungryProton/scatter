@@ -1,5 +1,5 @@
 @tool
-extends EditorNode3DGizmoPlugin
+class_name ScatterGizmoPlugin extends EditorNode3DGizmoPlugin
 
 
 #

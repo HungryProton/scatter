@@ -1,17 +1,17 @@
 @tool
-extends Node3D
+class_name Scatter extends Node3D
 
 
 signal shape_changed
 signal thread_completed
 signal build_completed
 
-const ScatterUtil := preload('./common/scatter_util.gd')
-const ModifierStack := preload("./stack/modifier_stack.gd")
-const TransformList := preload("res://addons/proton_scatter/src/common/transform_list.gd")
-const ScatterItem := preload("./scatter_item.gd")
-const ScatterShape := preload("./scatter_shape.gd")
-const Domain := preload("./common/domain.gd")
+#const ScatterUtil := preload('./common/scatter_util.gd')
+#const ModifierStack := preload("./stack/modifier_stack.gd")
+#const TransformList := preload("res://addons/proton_scatter/src/common/transform_list.gd")
+#const ScatterItem := preload("./scatter_item.gd")
+#const ScatterShape := preload("./scatter_shape.gd")
+#const Domain := preload("./common/domain.gd")
 
 
 @export_category("ProtonScatter")
@@ -349,10 +349,16 @@ func _create_instance(item: ScatterItem, root: Node3D):
 		return null
 
 	var instance = item.get_item().duplicate()
-	root.add_child.bind(instance, true).call_deferred()
-	instance.set_owner(get_tree().get_edited_scene_root())
 	instance.visible = true
-	ScatterUtil.set_owner_recursive(instance, get_tree().get_edited_scene_root())
+	root.add_child.bind(instance, true).call_deferred()
+	instance.set_owner.bind(get_tree().get_edited_scene_root()).call_deferred()
+	var defer_ownership := func(inst,ownership):
+		ScatterUtil.set_owner_recursive(instance, ownership)
+	defer_ownership.bind(instance,get_tree().get_edited_scene_root()).call_deferred()
+
+
+
+#	ScatterUtil.set_owner_recursive(instance, get_tree().get_edited_scene_root())
 
 	return instance
 

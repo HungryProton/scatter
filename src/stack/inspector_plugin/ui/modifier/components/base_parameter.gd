@@ -1,5 +1,5 @@
 @tool
-extends Control
+class_name BaseParameter extends Control
 
 
 signal value_changed

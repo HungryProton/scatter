@@ -1,5 +1,5 @@
 @tool
-extends EditorNode3DGizmoPlugin
+class_name ShapeGizmoPlugin extends EditorNode3DGizmoPlugin
 
 
 # Actual logic split in the handler class to avoid cluttering this script as
@@ -10,8 +10,8 @@ extends EditorNode3DGizmoPlugin
 # than it's worth (2 fewer files), so it's done like this instead.
 
 
-const ScatterShape = preload("../../scatter_shape.gd")
-const GizmoHandler = preload("./gizmo_handler.gd")
+#const ScatterShape = preload("../../scatter_shape.gd")
+#const GizmoHandler = preload("./gizmo_handler.gd")
 
 var _handlers: Dictionary
 
@@ -35,9 +35,9 @@ func _init():
 	create_handle_material("primary_handle", false, handle_icon)
 	create_handle_material("secondary_handle", false, secondary_handle_icon)
 
-	_handlers[ProtonScatterSphereShape] = preload("./sphere_gizmo.gd").new()
-	_handlers[ProtonScatterPathShape] = preload("./path_gizmo.gd").new()
-	_handlers[ProtonScatterBoxShape] = preload("./box_gizmo.gd").new()
+	_handlers[ProtonScatterSphereShape] = SphereGizmo.new()
+	_handlers[ProtonScatterPathShape] = PathGizmo.new()
+	_handlers[ProtonScatterBoxShape] = BoxGizmo.new()
 
 
 func _get_gizmo_name() -> String:

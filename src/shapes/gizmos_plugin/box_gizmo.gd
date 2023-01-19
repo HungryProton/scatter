@@ -1,5 +1,5 @@
 @tool
-extends "gizmo_handler.gd"
+class_name BoxGizmo extends GizmoHandler
 
 # 3D Gizmo for the Box shape.
 

@@ -1,13 +1,13 @@
 @tool
-extends PopupPanel
+class_name Documentation extends PopupPanel
 
 
 # Formats and displays the DocumentationData provided by other parts of the addon
 # TODO: Adjust title font size based on the editor font size / scaling
 
 
-const DocumentationInfo = preload("./documentation_info.gd")
-const SpecialPages = preload("./pages/special_pages.gd")
+#const DocumentationInfo = preload("./documentation_info.gd")
+#const SpecialPages = preload("./pages/special_pages.gd")
 
 var _pages := {}
 var _items := {}

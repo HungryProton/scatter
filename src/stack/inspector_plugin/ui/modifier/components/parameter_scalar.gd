@@ -1,7 +1,7 @@
 # warning-ignore-all:return_value_discarded
 
 @tool
-extends "base_parameter.gd"
+class_name ParameterScalar extends BaseParameter
 
 
 var _is_int := false

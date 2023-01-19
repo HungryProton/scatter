@@ -1,5 +1,5 @@
 @tool
-extends RefCounted
+class_name Domain extends RefCounted
 
 # A domain is the complete area where transforms can (and can't) be placed.
 # A Scatter node has one single domain, a domain has one or more shape nodes.
@@ -11,14 +11,14 @@ extends RefCounted
 # An instance of this class is passed to the modifiers during a rebuild.
 
 
-const ScatterShape := preload("../scatter_shape.gd")
-const BaseShape := preload("../shapes/base_shape.gd")
-const Bounds := preload("../common/bounds.gd")
+#const ScatterShape := preload("../scatter_shape.gd")
+#const BaseShape := preload("../shapes/base_shape.gd")
+#const Bounds := preload("../common/bounds.gd")
 
 
 class DomainShapeInfo:
 	var transform: Transform3D
-	var shape: BaseShape
+	var shape: ProtonScatterBaseShape
 
 	func is_point_inside(point: Vector3) -> bool:
 		return shape.is_point_inside(point, transform)
@@ -63,11 +63,17 @@ class ComplexPolygon:
 var root: Node3D:
 	set(val):
 		root = val
-		space_state = null
 		if root:
-			space_state = root.get_world_3d().get_direct_space_state()
+			space_state_rid = root.get_world_3d().space
+	get:
+		return root
 
-var space_state: PhysicsDirectSpaceState3D
+#	BIG CHANGES : In Godot 4 beta 13 the space state is only accessible
+#	in the physics frame. As such, care on when the modifier stack is called
+#	is a must. Only the modifiers that depends on physics should use it.
+#	We can however store the RID of the root node space and retrieve the direct
+#	space state with PhysicsServer3d.space_get_direct_state(root.space_state_rid)
+var space_state_rid : RID
 var inclusive_shapes: Array[DomainShapeInfo]
 var exclusive_shapes: Array[DomainShapeInfo]
 var bounds: Bounds = Bounds.new()
@@ -269,18 +275,18 @@ func get_copy():
 	var copy = get_script().new()
 
 	copy.root = root
-	copy.space_state = space_state
+	copy.space_state_rid = space_state_rid
 	copy.bounds = bounds
 	copy.bounds_local = bounds_local
 
 	for s in inclusive_shapes:
-		var s_copy = DomainShapeInfo.new()
+		var s_copy := DomainShapeInfo.new()
 		s_copy.transform = s.transform
 		s_copy.shape = s.shape.get_copy()
 		copy.inclusive_shapes.push_back(s_copy)
 
 	for s in exclusive_shapes:
-		var s_copy = DomainShapeInfo.new()
+		var s_copy := DomainShapeInfo.new()
 		s_copy.transform = s.transform
 		s_copy.shape = s.shape.get_copy()
 		copy.exclusive_shapes.push_back(s_copy)

@@ -1,10 +1,10 @@
 @tool
-extends "gizmo_handler.gd"
+class_name PathGizmo extends GizmoHandler
 
 
-const ScatterShape = preload("../../scatter_shape.gd")
-const PathPanel = preload("./components/path_panel.gd")
-const EventUtil = preload("../../common/event_util.gd")
+#const ScatterShape = preload("../../scatter_shape.gd")
+#const PathPanel = preload("./components/path_panel.gd")
+#const EventUtil = preload("../../common/event_util.gd")
 
 var _gizmo_panel: PathPanel
 var _event_util: EventUtil

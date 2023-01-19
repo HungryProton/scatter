@@ -1,5 +1,5 @@
 @tool
-extends EditorProperty
+class_name Editor extends EditorProperty
 
 
 var _ui: Control

@@ -1,7 +1,7 @@
 @tool
-extends RefCounted
+class_name SpecialPages extends RefCounted
 
-const DocumentationInfo = preload("../documentation_info.gd")
+#const DocumentationInfo = preload("../documentation_info.gd")
 
 
 static func get_scatter_documentation() -> DocumentationInfo:

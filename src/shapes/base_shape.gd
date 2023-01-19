@@ -1,6 +1,5 @@
 @tool
-class_name ProtonScatterBaseShape
-extends Resource
+class_name ProtonScatterBaseShape extends Resource
 
 
 func is_point_inside(point_global: Vector3, global_transform: Transform3D) -> bool:

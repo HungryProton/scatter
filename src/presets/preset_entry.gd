@@ -1,5 +1,5 @@
 @tool
-extends MarginContainer
+class_name PresetEntry extends MarginContainer
 
 signal load_full
 signal load_stack_only

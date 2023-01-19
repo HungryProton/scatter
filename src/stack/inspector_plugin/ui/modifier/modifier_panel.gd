@@ -1,5 +1,5 @@
 @tool
-extends Control
+class_name ModifierPanel extends Control
 
 
 signal value_changed
@@ -8,15 +8,15 @@ signal documentation_requested
 signal duplication_requested
 
 
-const ParameterBool := preload("./components/parameter_bool.tscn")
-const ParameterScalar := preload("./components/parameter_scalar.tscn")
-const ParameterNodeSelector = preload("./components/parameter_node_selector.tscn")
-const ParameterFile = preload("./components/parameter_file.tscn")
-const ParameterCurve = preload("./components/parameter_curve.tscn")
-const ParameterBitmask = preload("./components/parameter_bitmask.tscn")
-const ParameterString = preload("./components/parameter_string.tscn")
-const ParameterVector3 = preload("./components/parameter_vector3.tscn")
-const ParameterVector2 = preload("./components/parameter_vector2.tscn")
+const ParameterBoolNode := preload("./components/parameter_bool.tscn")
+const ParameterScalarNode := preload("./components/parameter_scalar.tscn")
+const ParameterNodeSelectorNode = preload("./components/parameter_node_selector.tscn")
+const ParameterFileNode = preload("./components/parameter_file.tscn")
+const ParameterCurveNode = preload("./components/parameter_curve.tscn")
+const ParameterBitmaskNode = preload("./components/parameter_bitmask.tscn")
+const ParameterStringNode = preload("./components/parameter_string.tscn")
+const ParameterVector3Node = preload("./components/parameter_vector3.tscn")
+const ParameterVector2Node = preload("./components/parameter_vector2.tscn")
 const PARAMETER_IGNORE_LIST := [
 	"enabled",
 	"override_global_seed",
@@ -110,28 +110,28 @@ func create_ui_for(modifier) -> void:
 		var parameter_ui
 		match property.type:
 			TYPE_BOOL:
-				parameter_ui = ParameterBool.instantiate()
+				parameter_ui = ParameterBoolNode.instantiate()
 			TYPE_FLOAT:
-				parameter_ui = ParameterScalar.instantiate()
+				parameter_ui = ParameterScalarNode.instantiate()
 			TYPE_INT:
 				if property.hint == PROPERTY_HINT_LAYERS_3D_PHYSICS:
-					parameter_ui = ParameterBitmask.instantiate()
+					parameter_ui = ParameterBitmaskNode.instantiate()
 				else:
-					parameter_ui = ParameterScalar.instantiate()
+					parameter_ui = ParameterScalarNode.instantiate()
 					parameter_ui.mark_as_int(true)
 			TYPE_STRING:
 				if property.hint_string == "File" or property.hint_string == "Texture":
-					parameter_ui = ParameterFile.instantiate()
+					parameter_ui = ParameterFileNode.instantiate()
 				elif property.hint_string == "Curve":
-					parameter_ui = ParameterCurve.instantiate()
+					parameter_ui = ParameterCurveNode.instantiate()
 				else:
-					parameter_ui = ParameterString.instantiate()
+					parameter_ui = ParameterStringNode.instantiate()
 			TYPE_VECTOR3:
-				parameter_ui = ParameterVector3.instantiate()
+				parameter_ui = ParameterVector3Node.instantiate()
 			TYPE_VECTOR2:
-				parameter_ui = ParameterVector2.instantiate()
+				parameter_ui = ParameterVector2Node.instantiate()
 			TYPE_NODE_PATH:
-				parameter_ui = ParameterNodeSelector.instantiate()
+				parameter_ui = ParameterNodeSelectorNode.instantiate()
 				parameter_ui.set_root(_scatter)
 
 		if parameter_ui:

@@ -1,8 +1,8 @@
 @tool
-extends "base_parameter.gd"
+class_name ParameterCurve extends BaseParameter
 
 
-const Util = preload("../../../../../common/util.gd")
+#const Util = preload("../../../../../common/util.gd")
 
 
 @onready var _label: Label = $Label

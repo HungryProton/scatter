@@ -3,7 +3,7 @@ class_name ProtonScatterPathShape
 extends ProtonScatterBaseShape
 
 
-const Bounds := preload("../common/bounds.gd")
+#const Bounds := preload("../common/bounds.gd")
 
 
 @export var closed := true:

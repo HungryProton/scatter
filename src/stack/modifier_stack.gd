@@ -1,12 +1,12 @@
 @tool
-extends Resource
+class_name ModifierStack extends Resource
 
 
 signal stack_changed
 signal value_changed
 
 
-const TransformList = preload("res://addons/proton_scatter/src/common/transform_list.gd")
+#const TransformList = preload("res://addons/proton_scatter/src/common/transform_list.gd")
 
 
 @export var stack: Array[Resource] = []
@@ -14,7 +14,7 @@ const TransformList = preload("res://addons/proton_scatter/src/common/transform_
 var just_created := false
 
 
-func update(scatter_node: Node3D, domain) -> TransformList:
+func update(scatter_node: Node3D, domain:Domain) -> TransformList:
 	var transforms = TransformList.new()
 	for modifier in stack:
 		modifier.process_transforms(transforms, domain, scatter_node.global_seed)

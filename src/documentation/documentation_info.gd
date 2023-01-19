@@ -1,5 +1,5 @@
 @tool
-extends RefCounted
+class_name DocumentationInfo extends RefCounted
 
 
 # Stores raw documentation data.
@@ -10,7 +10,7 @@ extends RefCounted
 
 # Formatting is handled by the main Documentation class.
 
-const Util := preload("../common/util.gd")
+#const Util := preload("../common/util.gd")
 
 
 class Warning:

@@ -1,4 +1,4 @@
-extends RefCounted
+class_name EventUtil extends RefCounted
 
 # Utility class that mimics the Input class behavior
 #

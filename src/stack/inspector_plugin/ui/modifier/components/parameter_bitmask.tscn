@@ -4,39 +4,34 @@
 [ext_resource type="PackedScene" uid="uid://cf4lrr5tnlwnw" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/components/bitmask_button.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://n66mufjib4ds" path="res://addons/proton_scatter/icons/menu.svg" id="3"]
 [ext_resource type="Texture2D" uid="uid://bosx22dy64f11" path="res://addons/proton_scatter/icons/clear.svg" id="4"]
-[ext_resource type="Texture2D" uid="uid://bb6107shgmiaw" path="res://addons/proton_scatter/icons/select_all.svg" id="4_h30jm"]
+[ext_resource type="Texture2D" uid="uid://c027p8qhvdaoy" path="res://addons/proton_scatter/icons/select_all.svg" id="4_h30jm"]
 
 [node name="parameter_bitmask" type="VBoxContainer"]
+anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 178.0
 script = ExtResource("1")
 
 [node name="Label" type="Label" parent="."]
-offset_right = 1024.0
-offset_bottom = 26.0
+layout_mode = 2
 text = "Parameter name"
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-offset_top = 30.0
-offset_right = 1024.0
-offset_bottom = 130.0
+layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
-offset_right = 1024.0
-offset_bottom = 100.0
+layout_mode = 2
 alignment = 2
 
 [node name="MenuButton" type="MenuButton" parent="MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
-offset_left = 772.0
-offset_right = 796.0
-offset_bottom = 100.0
+layout_mode = 2
 icon = ExtResource("3")
 item_count = 39
-popup/item_0/text = "Layer 1"
+popup/item_0/text = "Environment"
 popup/item_0/checkable = 1
 popup/item_0/id = 31
-popup/item_1/text = "Layer 2"
+popup/item_1/text = "Pawn"
 popup/item_1/checkable = 1
 popup/item_1/id = 30
 popup/item_2/text = "Layer 3"
@@ -152,282 +147,186 @@ popup/item_38/checkable = 1
 popup/item_38/id = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
-offset_left = 800.0
-offset_right = 996.0
-offset_bottom = 100.0
+layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
-offset_right = 196.0
-offset_bottom = 44.0
+layout_mode = 2
 
 [node name="GridContainer1" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-offset_right = 92.0
-offset_bottom = 44.0
+layout_mode = 2
 columns = 4
 
 [node name="Button1" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_right = 20.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "1"
 
 [node name="Button2" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 24.0
-offset_right = 44.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "2"
 
 [node name="Button3" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 48.0
-offset_right = 68.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "3"
 
 [node name="Button4" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 72.0
-offset_right = 92.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "4"
 
 [node name="Button5" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_top = 24.0
-offset_right = 20.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "5"
 
 [node name="Button6" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 24.0
-offset_top = 24.0
-offset_right = 44.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "6"
 
 [node name="Button7" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 48.0
-offset_top = 24.0
-offset_right = 68.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "7"
 
 [node name="Button8" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer1" instance=ExtResource("2")]
-offset_left = 72.0
-offset_top = 24.0
-offset_right = 92.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "8"
 
 [node name="VSeparator" type="VSeparator" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
-offset_left = 96.0
-offset_right = 100.0
-offset_bottom = 44.0
+layout_mode = 2
 
 [node name="GridContainer2" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-offset_left = 104.0
-offset_right = 196.0
-offset_bottom = 44.0
+layout_mode = 2
 columns = 4
 
 [node name="Button9" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_right = 20.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "9"
 
 [node name="Button10" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 24.0
-offset_right = 44.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "10"
 
 [node name="Button11" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 48.0
-offset_right = 68.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "11"
 
 [node name="Button12" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 72.0
-offset_right = 92.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "12"
 
 [node name="Button13" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_top = 24.0
-offset_right = 20.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "13"
 
 [node name="Button14" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 24.0
-offset_top = 24.0
-offset_right = 44.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "14"
 
 [node name="Button15" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 48.0
-offset_top = 24.0
-offset_right = 68.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "15"
 
 [node name="Button16" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2")]
-offset_left = 72.0
-offset_top = 24.0
-offset_right = 92.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "16"
 
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/HBoxContainer/VBoxContainer"]
-offset_top = 48.0
-offset_right = 196.0
-offset_bottom = 52.0
+layout_mode = 2
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
-offset_top = 56.0
-offset_right = 196.0
-offset_bottom = 100.0
+layout_mode = 2
 
 [node name="GridContainer3" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
-offset_right = 92.0
-offset_bottom = 44.0
+layout_mode = 2
 columns = 4
 
 [node name="Button17" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_right = 20.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "17"
 
 [node name="Button18" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 24.0
-offset_right = 44.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "18"
 
 [node name="Button19" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 48.0
-offset_right = 68.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "19"
 
 [node name="Button20" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 72.0
-offset_right = 92.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "20"
 
 [node name="Button21" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_top = 24.0
-offset_right = 20.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "21"
 
 [node name="Button22" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 24.0
-offset_top = 24.0
-offset_right = 44.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "22"
 
 [node name="Button23" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 48.0
-offset_top = 24.0
-offset_right = 68.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "23"
 
 [node name="Button24" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer3" instance=ExtResource("2")]
-offset_left = 72.0
-offset_top = 24.0
-offset_right = 92.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "24"
 
 [node name="VSeparator2" type="VSeparator" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
-offset_left = 96.0
-offset_right = 100.0
-offset_bottom = 44.0
+layout_mode = 2
 
 [node name="GridContainer4" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
-offset_left = 104.0
-offset_right = 196.0
-offset_bottom = 44.0
+layout_mode = 2
 columns = 4
 
 [node name="Button25" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_right = 20.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "25"
 
 [node name="Button26" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 24.0
-offset_right = 44.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "26"
 
 [node name="Button27" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 48.0
-offset_right = 68.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "27"
 
 [node name="Button28" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 72.0
-offset_right = 92.0
-offset_bottom = 20.0
+layout_mode = 2
 text = "28"
 
 [node name="Button29" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_top = 24.0
-offset_right = 20.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "29"
 
 [node name="Button30" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 24.0
-offset_top = 24.0
-offset_right = 44.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "30"
 
 [node name="Button31" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 48.0
-offset_top = 24.0
-offset_right = 68.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "31"
 
 [node name="Button32" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainer4" instance=ExtResource("2")]
-offset_left = 72.0
-offset_top = 24.0
-offset_right = 92.0
-offset_bottom = 44.0
+layout_mode = 2
 text = "32"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
-offset_left = 1000.0
-offset_right = 1024.0
-offset_bottom = 100.0
+layout_mode = 2
 alignment = 1
 
 [node name="EnableAll" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
-offset_right = 24.0
-offset_bottom = 48.0
+layout_mode = 2
 size_flags_vertical = 3
-hint_tooltip = "Enable all layers"
 focus_mode = 0
 icon = ExtResource("4_h30jm")
 flat = true
 expand_icon = true
 
 [node name="ClearButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
-offset_top = 52.0
-offset_right = 24.0
-offset_bottom = 100.0
+layout_mode = 2
 size_flags_vertical = 3
-hint_tooltip = "Clear all layers"
 focus_mode = 0
 icon = ExtResource("4")
 flat = true

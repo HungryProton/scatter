@@ -1,12 +1,12 @@
 @tool
-extends "gizmo_handler.gd"
+class_name SphereGizmo extends GizmoHandler
 
 # 3D Gizmo for the Sphere shape. Draws three circle on each axis to represent
 # a sphere, displays one handle on the size to control the radius.
 #
 # (handle_id is ignored in every function since there's a single handle)
 
-const SphereShape = preload("../sphere_shape.gd")
+#const ProtonScatterSphereShape = preload("../sphere_shape.gd")
 
 
 func get_handle_name(_gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool) -> String:
@@ -30,7 +30,7 @@ func set_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, cam
 
 
 func commit_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, restore: Variant, cancel: bool) -> void:
-	var shape: SphereShape = gizmo.get_node_3d().shape
+	var shape: ProtonScatterSphereShape = gizmo.get_node_3d().shape
 	if cancel:
 		shape.radius = restore
 		return
@@ -44,7 +44,7 @@ func commit_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, 
 func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.clear()
 	var scatter_shape = gizmo.get_node_3d()
-	var shape: SphereShape = scatter_shape.shape
+	var shape: ProtonScatterSphereShape = scatter_shape.shape
 
 	### Draw the 3 circles on each axis to represent the sphere
 	var lines = PackedVector3Array()
@@ -91,6 +91,6 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.add_mesh(mesh, mesh_material)
 
 
-func _set_radius(sphere: SphereShape, radius: float) -> void:
+func _set_radius(sphere: ProtonScatterSphereShape, radius: float) -> void:
 	if sphere:
 		sphere.radius = radius

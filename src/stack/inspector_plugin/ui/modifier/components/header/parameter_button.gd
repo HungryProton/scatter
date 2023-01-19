@@ -1,5 +1,5 @@
 @tool
-extends "../base_parameter.gd"
+class_name ParameterButton extends BaseParameter
 
 
 var _button

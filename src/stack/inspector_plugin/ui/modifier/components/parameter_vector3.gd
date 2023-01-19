@@ -1,5 +1,5 @@
 @tool
-extends "base_parameter.gd"
+class_name ParameterVector3 extends BaseParameter
 
 
 @onready var _label: Label = $Label

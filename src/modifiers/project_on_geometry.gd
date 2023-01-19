@@ -86,11 +86,13 @@ func _init() -> void:
 		scene when you're editing it.")
 
 
-func _process_transforms(transforms, domain, _seed) -> void:
+func _process_transforms(transforms, domain:Domain, _seed) -> void:
 	if transforms.is_empty():
 		return
-
-	var space_state: PhysicsDirectSpaceState3D = domain.space_state
+#	This modifier depends on physics, as such we need to execute this in the
+#	physics process and retrieve the direct space state using the rid stored in the domain
+	await domain.root.get_tree().physics_frame # Ensure we are in physics
+	var space_state: PhysicsDirectSpaceState3D = PhysicsServer3D.space_get_direct_state(domain.space_state_rid)
 	var hit
 	var d: float
 	var t: Transform3D
@@ -98,6 +100,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	var remapped_max_slope = remap(max_slope, 0.0, 90.0, 0.0, 1.0)
 	var is_point_valid := false
 
+#	domain.space_state= domain.root.get_world_3d().get_direct_space_state()
 	while i < transforms.size():
 		t = transforms.list[i]
 		is_point_valid = true

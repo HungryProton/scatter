@@ -3,10 +3,10 @@ extends Popup
 
 
 const PRESETS_PATH = "res://addons/proton_scatter/presets"
-const PresetEntry := preload("./preset_entry.tscn")
-const ScatterUtil := preload('../common/scatter_util.gd')
-const ScatterItem := preload('../scatter_item.gd')
-const ScatterShape := preload('../scatter_shape.gd')
+const PresetEntryNode := preload("./preset_entry.tscn")
+#const ScatterUtil := preload('../common/scatter_util.gd')
+#const ScatterItem := preload('../scatter_item.gd')
+#const ScatterShape := preload('../scatter_shape.gd')
 
 var _scatter_node
 var _ideal_popup_size: Vector2i
@@ -86,7 +86,7 @@ func _populate() -> void:
 
 		# Preset found, create an entry
 		var full_path = PRESETS_PATH.path_join(file)
-		var entry := PresetEntry.instantiate()
+		var entry := PresetEntryNode.instantiate()
 		entry.set_preset_name(file.get_basename())
 		entry.load_full.connect(_on_load_full_preset.bind(full_path))
 		entry.load_stack_only.connect(_on_load_stack_only.bind(full_path))

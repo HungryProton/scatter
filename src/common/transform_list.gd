@@ -1,5 +1,5 @@
 @tool
-extends RefCounted
+class_name TransformList extends RefCounted
 
 
 var list: Array[Transform3D] = []

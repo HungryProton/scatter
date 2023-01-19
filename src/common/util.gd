@@ -1,5 +1,5 @@
 @tool
-extends RefCounted
+class_name Util extends RefCounted
 
 
 # Create a new Mesh with as many surfaces as inputs

@@ -1,8 +1,8 @@
 @tool
-extends Node3D
+class_name ScatterShape extends Node3D
 
 
-const ScatterUtil := preload('./common/scatter_util.gd')
+#const ScatterUtil := preload('./common/scatter_util.gd')
 
 
 @export_category("ScatterShape")

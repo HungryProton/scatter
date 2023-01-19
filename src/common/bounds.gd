@@ -1,5 +1,5 @@
 @tool
-extends Resource
+class_name Bounds extends Resource
 
 # Essentially a Rect3
 # Used by the Domain class

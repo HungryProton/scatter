@@ -1,11 +1,11 @@
-extends Node
+class_name ScatterUtil extends Node
 
 # To prevent the other core scripts from becoming too large, some of their
 # utility functions are written here (only the functions that don't disturb
 # reading the core code, mostly data validation and other verbose checks).
 
 
-const ModifierStack := preload("../stack/modifier_stack.gd")
+#const ModifierStack := preload("../stack/modifier_stack.gd")
 
 
 ### SCATTER UTILITY FUNCTIONS ###
@@ -36,7 +36,7 @@ static func ensure_output_root_exists(s: Node) -> void:
 	enforce_output_root_owner(s)
 
 
-static func enforce_output_root_owner(s) -> void:
+static func enforce_output_root_owner(s:Scatter) -> void:
 	if is_instance_valid(s.output_root) and s.is_inside_tree():
 		if s.show_output_in_tree:
 			set_owner_recursive(s.output_root, s.get_tree().get_edited_scene_root())

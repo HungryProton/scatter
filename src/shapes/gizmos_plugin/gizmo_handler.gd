@@ -1,5 +1,5 @@
 @tool
-extends RefCounted
+class_name GizmoHandler extends RefCounted
 
 # Abstract class.
 
