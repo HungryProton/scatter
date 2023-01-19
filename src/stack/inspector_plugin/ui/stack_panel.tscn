@@ -3,12 +3,12 @@
 [ext_resource type="Texture2D" uid="uid://cun73k8jdmr4e" path="res://addons/proton_scatter/icons/add.svg" id="1_4vwtj"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/stack_panel.gd" id="1_ga4or"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/drag_container.gd" id="1_hg5ys"]
-[ext_resource type="Texture2D" uid="uid://bl3ngfq3rv5i" path="res://addons/proton_scatter/icons/rebuild.svg" id="2_svid4"]
+[ext_resource type="Texture2D" uid="uid://d2q0ecpon840i" path="res://addons/proton_scatter/icons/rebuild.svg" id="2_svid4"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/add_modifier_button.gd" id="3_01ldn"]
 [ext_resource type="PackedScene" uid="uid://belutr5odecw2" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier_list_popup/popup.tscn" id="3_pkswu"]
 [ext_resource type="Texture2D" uid="uid://ddjrq1h4mkn6a" path="res://addons/proton_scatter/icons/load.svg" id="3_w72lv"]
 [ext_resource type="Texture2D" uid="uid://b2omj2e03x72e" path="res://addons/proton_scatter/icons/save.svg" id="4_5l2cx"]
-[ext_resource type="Texture2D" uid="uid://bg22siy20wrwp" path="res://addons/proton_scatter/icons/doc.svg" id="8_fgqhd"]
+[ext_resource type="Texture2D" uid="uid://cnwg3p2m4lbf3" path="res://addons/proton_scatter/icons/doc.svg" id="8_fgqhd"]
 [ext_resource type="PackedScene" uid="uid://cfg8iqtuion8b" path="res://addons/proton_scatter/src/documentation/documentation.tscn" id="9_y57kc"]
 [ext_resource type="PackedScene" uid="uid://bcsosdvstytoq" path="res://addons/proton_scatter/src/presets/presets.tscn" id="11_2ut8s"]
 
@@ -25,13 +25,21 @@ script = ExtResource("1_ga4or")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 452.0
+offset_bottom = 140.0
 theme_override_constants/separation = 16
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
+offset_right = 448.0
+offset_bottom = 31.0
 
 [node name="Add" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
+offset_right = 131.0
+offset_bottom = 31.0
 size_flags_horizontal = 2
 focus_mode = 0
 toggle_mode = true
@@ -47,6 +55,9 @@ visible = false
 [node name="Rebuild" type="Button" parent="VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+offset_left = 324.0
+offset_right = 348.0
+offset_bottom = 31.0
 size_flags_horizontal = 4
 tooltip_text = "Force rebuild.
 
@@ -60,10 +71,16 @@ icon_alignment = 1
 [node name="VSeparator" type="VSeparator" parent="VBoxContainer/HBoxContainer"]
 modulate = Color(1, 1, 1, 0.54902)
 layout_mode = 2
+offset_left = 352.0
+offset_right = 356.0
+offset_bottom = 31.0
 
 [node name="LoadPreset" type="Button" parent="VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+offset_left = 360.0
+offset_right = 384.0
+offset_bottom = 31.0
 tooltip_text = "Load a preset."
 focus_mode = 0
 text = "
@@ -74,6 +91,9 @@ icon_alignment = 1
 [node name="SavePreset" type="Button" parent="VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+offset_left = 388.0
+offset_right = 412.0
+offset_bottom = 31.0
 tooltip_text = "Save a preset."
 focus_mode = 0
 text = "
@@ -84,10 +104,16 @@ icon_alignment = 1
 [node name="VSeparator2" type="VSeparator" parent="VBoxContainer/HBoxContainer"]
 modulate = Color(1, 1, 1, 0.54902)
 layout_mode = 2
+offset_left = 416.0
+offset_right = 420.0
+offset_bottom = 31.0
 
 [node name="DocumentationButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+offset_left = 424.0
+offset_right = 448.0
+offset_bottom = 31.0
 tooltip_text = "Open documentation"
 focus_mode = 0
 text = "
@@ -100,6 +126,9 @@ unique_name_in_owner = true
 clip_children = 1
 custom_minimum_size = Vector2(0, -4)
 layout_mode = 2
+offset_top = 47.0
+offset_right = 448.0
+offset_bottom = 136.0
 size_flags_vertical = 3
 mouse_filter = 0
 script = ExtResource("1_hg5ys")

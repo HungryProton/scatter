@@ -1,9 +1,12 @@
-[gd_scene load_steps=10 format=3 uid="uid://blpobpd0eweog"]
+[gd_scene load_steps=13 format=3 uid="uid://blpobpd0eweog"]
 
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/modifier_panel.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cx07j7houcyks" path="res://addons/proton_scatter/icons/arrow_right.svg" id="2_lhumm"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/toggle_button.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://deqfr62cnnatf" path="res://addons/proton_scatter/icons/arrow_down.svg" id="4_j1frm"]
 [ext_resource type="Texture2D" uid="uid://dahwdjl2er75o" path="res://addons/proton_scatter/icons/close.svg" id="5"]
 [ext_resource type="Texture2D" uid="uid://n66mufjib4ds" path="res://addons/proton_scatter/icons/menu.svg" id="6_lmo8k"]
+[ext_resource type="Texture2D" uid="uid://cib4ay0u4lduh" path="res://addons/proton_scatter/icons/drag_area.svg" id="8_4c07b"]
 [ext_resource type="Texture2D" uid="uid://dj0y6peid681t" path="res://addons/proton_scatter/icons/warning.svg" id="9"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/override_seed_button.gd" id="10_ptukr"]
 [ext_resource type="PackedScene" uid="uid://w6ycb4oveqhd" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/components/header/parameter_button.tscn" id="11_y7srw"]
@@ -40,14 +43,18 @@ size_flags_vertical = 0
 
 [node name="Expand" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 tooltip_text = "Toggle the parameters view"
 focus_mode = 0
 mouse_filter = 1
 toggle_mode = true
+icon = ExtResource("2_lhumm")
 flat = true
 icon_alignment = 1
 script = ExtResource("4")
+default_icon = ExtResource("2_lhumm")
+pressed_icon = ExtResource("4_j1frm")
 
 [node name="ModifierName" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
@@ -59,8 +66,9 @@ clip_text = true
 
 [node name="Buttons" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 8
 theme_override_constants/separation = 2
-alignment = 1
+alignment = 2
 
 [node name="Warning" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 unique_name_in_owner = true
@@ -118,11 +126,14 @@ layout_mode = 2
 
 [node name="DragControl" type="TextureRect" parent="MarginContainer/VBoxContainer/HBoxContainer/Buttons"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
+size_flags_horizontal = 10
 tooltip_text = "Drag and move this button to change the stack order. 
 
 Modifiers are processed from top to bottom."
 mouse_default_cursor_shape = 6
+texture = ExtResource("8_4c07b")
 stretch_mode = 3
 
 [node name="ParametersContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
