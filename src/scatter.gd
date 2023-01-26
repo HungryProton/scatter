@@ -349,10 +349,12 @@ func _create_instance(item: ScatterItem, root: Node3D):
 		return null
 
 	var instance = item.get_item().duplicate()
-	root.add_child.bind(instance, true).call_deferred()
-	instance.set_owner(get_tree().get_edited_scene_root())
 	instance.visible = true
-	ScatterUtil.set_owner_recursive(instance, get_tree().get_edited_scene_root())
+	root.add_child.bind(instance, true).call_deferred()
+	instance.set_owner.bind(get_tree().get_edited_scene_root()).call_deferred()
+	var defer_ownership := func(inst,ownership):
+		ScatterUtil.set_owner_recursive(instance, ownership)
+	defer_ownership.bind(instance,get_tree().get_edited_scene_root()).call_deferred()
 
 	return instance
 
