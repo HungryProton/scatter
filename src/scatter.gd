@@ -221,7 +221,6 @@ func rebuild_deferred(force_discover := false):
 # TRANSFORM_CHANGED notification in every children, which in turn notify the
 # parent Scatter node back about the changes.
 func rebuild(force_discover := false) -> void:
-	print("in rebuild ", name)
 	update_gizmos()
 
 	if not is_inside_tree():
