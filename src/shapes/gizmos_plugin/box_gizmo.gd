@@ -111,7 +111,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	mesh.size = shape.size
 
 	var mesh_material: StandardMaterial3D
-	if scatter_shape.exclusive:
+	if scatter_shape.negative:
 		mesh_material = plugin.get_material("exclusive", gizmo)
 	else:
 		mesh_material = plugin.get_material("inclusive", gizmo)

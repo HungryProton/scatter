@@ -5,6 +5,9 @@ extends "base_modifier.gd"
 signal projection_completed
 
 
+const ProtonScatterPhysicsHelper := preload("res://addons/proton_scatter/src/common/physics_helper.gd")
+
+
 @export var ray_direction := Vector3.DOWN
 @export var ray_length := 10.0
 @export var ray_offset := 1.0
@@ -90,23 +93,48 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	if transforms.is_empty():
 		return
 
-	var space_state: PhysicsDirectSpaceState3D = domain.space_state
-	var hit
+	# Create all the physics ray queries
+	var domain_basis: Basis = domain.get_root().get_global_transform().basis
+	var queries: Array[PhysicsRayQueryParameters3D] = []
+	for t in transforms.list:
+		var start = t.origin
+		var end = t.origin
+		var dir = ray_direction.normalized()
+
+		if is_using_individual_instances_space():
+			dir = t.basis * dir
+
+		elif is_using_local_space():
+			dir = domain_basis * dir
+
+		start -= ray_offset * dir
+		end += ray_length * dir
+
+		var ray_query := PhysicsRayQueryParameters3D.new()
+		ray_query.from = start
+		ray_query.to = end
+		ray_query.collision_mask = collision_mask
+
+		queries.push_back(ray_query)
+
+	# Run the queries in the physics helper since we can't access the PhysicsServer
+	# from outside the _physics_process while also being in a separate thread.
+	var physics_helper: ProtonScatterPhysicsHelper = domain.get_root().get_physics_helper()
+	var ray_hits = await physics_helper.execute(queries)
+
+	if ray_hits.is_empty():
+		return
+
+	# Apply the results
+
+	var index := 0
 	var d: float
 	var t: Transform3D
-	var i := 0
 	var remapped_max_slope = remap(max_slope, 0.0, 90.0, 0.0, 1.0)
 	var is_point_valid := false
 
-	while i < transforms.size():
-		t = transforms.list[i]
+	for hit in ray_hits:
 		is_point_valid = true
-
-		# TODO: Weird behavior in some cases, investigate
-		_project_on_floor.bind(t, domain.root, space_state).call_deferred()
-		await projection_completed
-
-		hit = _last_hit
 
 		if hit.is_empty():
 			is_point_valid = false
@@ -115,48 +143,26 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			is_point_valid = d >= (1.0 - remapped_max_slope)
 
 		if is_point_valid:
+			t = transforms.list[index]
+
 			if align_with_collision_normal:
 				t = _align_with(t, hit.normal)
 
 			t.origin = hit.position
-			transforms.list[i] = t
+			transforms.list[index] = t
+			index += 1
 
 		elif remove_points_on_miss:
-			transforms.list.remove_at(i)
-			continue
-
-		i += 1
+			transforms.list.remove_at(index)
 
 	if transforms.is_empty():
 		warning += """Every points have been removed. Possible reasons include: \n
-		+ No collider is close enough to the domain.
+		+ No collider is close enough to the shapes.
 		+ Ray length is too short.
 		+ Ray direction is incorrect.
 		+ Collision mask is not set properly.
 		+ Max slope is too low.
 		"""
-
-
-func _project_on_floor(t: Transform3D, root: Node3D, physics_state: PhysicsDirectSpaceState3D) -> void:
-	var start = t.origin
-	var end = t.origin
-	var dir = ray_direction.normalized()
-
-	if is_using_individual_instances_space():
-		dir = t.basis * dir
-
-	elif is_using_local_space():
-		dir = root.get_global_transform().basis * dir
-
-	start -= ray_offset * dir
-	end += ray_length * dir
-
-	var ray_query := PhysicsRayQueryParameters3D.new()
-	ray_query.from = start
-	ray_query.to = end
-	ray_query.collision_mask = collision_mask
-	_last_hit = physics_state.intersect_ray(ray_query)
-	projection_completed.emit()
 
 
 func _align_with(t: Transform3D, normal: Vector3) -> Transform3D:

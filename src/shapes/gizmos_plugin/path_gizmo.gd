@@ -2,12 +2,13 @@
 extends "gizmo_handler.gd"
 
 
-const ScatterShape = preload("../../scatter_shape.gd")
-const PathPanel = preload("./components/path_panel.gd")
-const EventUtil = preload("../../common/event_util.gd")
+const ProtonScatter := preload("res://addons/proton_scatter/src/scatter.gd")
+const ProtonScatterShape := preload("res://addons/proton_scatter/src/scatter_shape.gd")
+const ProtonScatterEventHelper := preload("res://addons/proton_scatter/src/common/event_helper.gd")
+const PathPanel := preload("./components/path_panel.gd")
 
 var _gizmo_panel: PathPanel
-var _event_util: EventUtil
+var _event_helper: ProtonScatterEventHelper
 
 
 func get_handle_name(_gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool) -> String:
@@ -23,7 +24,7 @@ func set_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, camer
 	if not _gizmo_panel.is_select_mode_enabled():
 		return
 
-	var shape_node: ScatterShape = gizmo.get_node_3d()
+	var shape_node: ProtonScatterShape = gizmo.get_node_3d()
 	var curve: Curve3D = shape_node.shape.curve
 	var point_count: int = curve.get_point_count()
 	var curve_index := handle_id
@@ -71,7 +72,7 @@ func set_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, camer
 
 
 func commit_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, restore: Variant, cancel: bool) -> void:
-	var shape_node: ScatterShape = gizmo.get_node_3d()
+	var shape_node: ProtonScatterShape = gizmo.get_node_3d()
 
 	if cancel:
 		_edit_path(shape_node, restore)
@@ -92,7 +93,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	if is_selected(gizmo):
 		_gizmo_panel.selection_changed([gizmo.get_node_3d()])
 
-	var shape_node: ScatterShape = gizmo.get_node_3d()
+	var shape_node: ProtonScatterShape = gizmo.get_node_3d()
 	var shape: ProtonScatterPathShape = shape_node.shape
 
 	if not shape:
@@ -110,7 +111,7 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 
 	var line_material: StandardMaterial3D = plugin.get_material("primary_top", gizmo)
 	var mesh_material: StandardMaterial3D = plugin.get_material("inclusive", gizmo)
-	if shape_node.exclusive:
+	if shape_node.negative:
 		mesh_material = plugin.get_material("exclusive", gizmo)
 
 	# ------ Main line along the path curve ------
@@ -259,18 +260,18 @@ func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 
 
 func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> bool:
-	if not _event_util:
-		_event_util = EventUtil.new()
+	if not _event_helper:
+		_event_helper = ProtonScatterEventHelper.new()
 
-	_event_util.feed(event)
+	_event_helper.feed(event)
 
 	if not event is InputEventMouseButton:
 		return false
 
-	if not _event_util.is_key_just_pressed(MOUSE_BUTTON_LEFT): # Can't use just_released here
+	if not _event_helper.is_key_just_pressed(MOUSE_BUTTON_LEFT): # Can't use just_released here
 		return false
 
-	var shape_node: ScatterShape = _gizmo_panel.shape_node
+	var shape_node: ProtonScatterShape = _gizmo_panel.shape_node
 	if not shape_node:
 		return false
 
@@ -305,13 +306,13 @@ func set_gizmo_panel(panel: PathPanel) -> void:
 	_gizmo_panel = panel
 
 
-func _edit_path(shape_node: ScatterShape, restore: ProtonScatterPathShape) -> void:
+func _edit_path(shape_node: ProtonScatterShape, restore: ProtonScatterPathShape) -> void:
 	shape_node.shape.curve = restore.curve.duplicate()
 	shape_node.shape.thickness = restore.thickness
 	shape_node.update_gizmos()
 
 
-func _intersect_with(path: ScatterShape, camera: Camera3D, screen_point: Vector2, handle_position_local = null) -> Vector3:
+func _intersect_with(path: ProtonScatterShape, camera: Camera3D, screen_point: Vector2, handle_position_local = null) -> Vector3:
 	# Get the ray data
 	var from = camera.project_ray_origin(screen_point)
 	var dir = camera.project_ray_normal(screen_point)

@@ -4,7 +4,7 @@ extends RefCounted
 #
 # This only useful when using actions from the Input class isn't possible,
 # like in _unhandled_input or forward_3d_gui_input for example, where you don't
-# have a native way to detect if a key was just pressed or release.
+# have a native way to detect if a key was just pressed or released.
 #
 # How to use:
 # Call the feed() method first with the latest event you received, then call

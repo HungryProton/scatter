@@ -4,9 +4,11 @@ extends Resource
 
 signal stack_changed
 signal value_changed
+signal transforms_ready
 
 
-const TransformList = preload("res://addons/proton_scatter/src/common/transform_list.gd")
+const ProtonScatter := preload("../scatter.gd")
+const TransformList = preload("../common/transform_list.gd")
 
 
 @export var stack: Array[Resource] = []
@@ -14,12 +16,13 @@ const TransformList = preload("res://addons/proton_scatter/src/common/transform_
 var just_created := false
 
 
-func update(scatter_node: Node3D, domain) -> TransformList:
+func start_update(scatter_node: ProtonScatter, domain) -> void:
 	var transforms = TransformList.new()
-	for modifier in stack:
-		modifier.process_transforms(transforms, domain, scatter_node.global_seed)
 
-	return transforms
+	for modifier in stack:
+		await modifier.process_transforms(transforms, domain, scatter_node.global_seed)
+
+	transforms_ready.emit(transforms)
 
 
 func add(modifier) -> void:

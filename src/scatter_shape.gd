@@ -6,9 +6,9 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 
 
 @export_category("ScatterShape")
-@export var exclusive = false:
+@export var negative = false:
 	set(val):
-		exclusive = val
+		negative = val
 		update_gizmos()
 		ScatterUtil.request_parent_to_rebuild(self)
 

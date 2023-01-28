@@ -2,7 +2,7 @@
 extends "base_modifier.gd"
 
 
-@export var exclusive_shapes_only := false
+@export var negative_shapes_only := false
 
 
 func _init() -> void:
@@ -15,12 +15,12 @@ func _init() -> void:
 
 	documentation.add_paragraph(
 		"Remove all transforms falling outside a ScatterShape node, or inside
-		a shape set to 'Exclusive' mode.")
+		a shape set to 'Negative' mode.")
 
-	var p := documentation.add_parameter("Exclusive Shapes Only")
+	var p := documentation.add_parameter("Negative Shapes Only")
 	p.set_type("bool")
 	p.set_description(
-		"Only remove transforms falling inside the exclusive shapes (shown
+		"Only remove transforms falling inside the negative shapes (shown
 		in red). Transforms outside any shapes will still remain.")
 
 
@@ -32,7 +32,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 	while i < transforms.size():
 		point = transforms.list[i].origin
 
-		if exclusive_shapes_only:
+		if negative_shapes_only:
 			to_remove = domain.is_point_excluded(point)
 		else:
 			to_remove = not domain.is_point_inside(point)

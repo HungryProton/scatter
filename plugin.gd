@@ -2,12 +2,12 @@
 extends EditorPlugin
 
 
-const Scatter = preload("./src/scatter.gd")
-const ScatterShape = preload("./src/scatter_shape.gd")
-const ModifierStackPlugin = preload("./src/stack/inspector_plugin/modifier_stack_plugin.gd")
-const ScatterGizmoPlugin = preload("./src/scatter_gizmo_plugin.gd")
-const ShapeGizmoPlugin = preload("./src/shapes/gizmos_plugin/shape_gizmo_plugin.gd")
-const PathPanel = preload("./src/shapes/gizmos_plugin/components/path_panel.tscn")
+const ProtonScatter := preload("./src/scatter.gd")
+const ProtonScatterShape := preload("./src/scatter_shape.gd")
+const ModifierStackPlugin := preload("./src/stack/inspector_plugin/modifier_stack_plugin.gd")
+const ScatterGizmoPlugin := preload("./src/scatter_gizmo_plugin.gd")
+const ShapeGizmoPlugin := preload("./src/shapes/gizmos_plugin/shape_gizmo_plugin.gd")
+const PathPanel := preload("./src/shapes/gizmos_plugin/components/path_panel.tscn")
 
 
 var _modifier_stack_plugin: EditorInspectorPlugin = ModifierStackPlugin.new()
@@ -73,7 +73,7 @@ func _exit_tree():
 
 
 func _handles(node) -> bool:
-	return node is ScatterShape
+	return node is ProtonScatterShape
 
 
 func _forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> int:
@@ -88,7 +88,7 @@ func _on_selection_changed() -> void:
 		return
 
 	var selected_node = selected[0]
-	if selected_node is Scatter:
+	if selected_node is ProtonScatter:
 		selected_node.undo_redo = get_undo_redo()
 		selected_node.editor_plugin = self
 

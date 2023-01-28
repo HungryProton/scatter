@@ -56,7 +56,9 @@ func process_transforms(transforms: TransformList, domain: Domain, global_seed: 
 	var seed = global_seed
 	if can_override_seed and override_global_seed:
 		seed = custom_seed
-	_process_transforms(transforms, domain, seed)
+
+	await _process_transforms(transforms, domain, seed)
+
 	warning_changed.emit()
 
 

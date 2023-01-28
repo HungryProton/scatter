@@ -2,18 +2,23 @@
 extends EditorNode3DGizmoPlugin
 
 
+# Gizmo plugin for the ProtonScatter nodes.
 #
+# Displays a loading animation when the node is rebuilding its output
+# Also displays the domain edges if one of its modifiers is using this data.
 
-const Scatter := preload("./scatter.gd")
 
-var _panel
+const ProtonScatter := preload("./scatter.gd")
+const LoadingAnimation := preload("../icons/loading/m_loading.tres")
+
+var _panel: Control
 var _loading_mesh: Mesh
 
 
 func _init():
 	# TODO: Replace hardcoded colors by a setting fetch
 	create_custom_material("line", Color(0.2, 0.4, 0.8))
-	add_material("loading", preload("../icons/loading/m_loading.tres"))
+	add_material("loading", LoadingAnimation)
 
 	_loading_mesh = QuadMesh.new()
 	_loading_mesh.set_size(Vector2.ONE * 0.15)
@@ -24,7 +29,7 @@ func _get_gizmo_name() -> String:
 
 
 func _has_gizmo(node) -> bool:
-	return node is Scatter
+	return node is ProtonScatter
 
 
 func _redraw(gizmo: EditorNode3DGizmo):
@@ -57,10 +62,7 @@ func set_path_gizmo_panel(panel: Control) -> void:
 	_panel = panel
 
 
-func set_editor_plugin(plugin: EditorPlugin) -> void:
-	pass
-
-
+# WORKAROUND
 # Creates a standard material displayed on top of everything.
 # Only exists because 'create_material() on_top' parameter doesn't seem to work.
 func create_custom_material(name, color := Color.WHITE):

@@ -6,12 +6,16 @@ signal shape_changed
 signal thread_completed
 signal build_completed
 
-const ScatterUtil := preload('./common/scatter_util.gd')
-const ModifierStack := preload("./stack/modifier_stack.gd")
-const TransformList := preload("res://addons/proton_scatter/src/common/transform_list.gd")
-const ScatterItem := preload("./scatter_item.gd")
-const ScatterShape := preload("./scatter_shape.gd")
-const Domain := preload("./common/domain.gd")
+
+# Includes
+const ProtonScatter := preload("./scatter.gd")
+const ProtonScatterDomain := preload("./common/domain.gd")
+const ProtonScatterItem := preload("./scatter_item.gd")
+const ProtonScatterModifierStack := preload("./stack/modifier_stack.gd")
+const ProtonScatterPhysicsHelper := preload("./common/physics_helper.gd")
+const ProtonScatterShape := preload("./scatter_shape.gd")
+const ProtonScatterTransformList := preload("./common/transform_list.gd")
+const ProtonScatterUtil := preload('./common/scatter_util.gd')
 
 
 @export_category("ProtonScatter")
@@ -25,7 +29,7 @@ const Domain := preload("./common/domain.gd")
 	set(val):
 		show_output_in_tree = val
 		if output_root:
-			ScatterUtil.enforce_output_root_owner(self)
+			ProtonScatterUtil.enforce_output_root_owner(self)
 
 @export_group("Performance")
 @export var use_instancing := true:
@@ -65,22 +69,25 @@ const Domain := preload("./common/domain.gd")
 @export_group("Debug", "dbg_")
 @export var dbg_disable_thread := false
 
-var undo_redo # : EditorUndoRedoManager # Can't type this
-var modifier_stack: ModifierStack:
+var undo_redo # EditorUndoRedoManager - Can't type this, class not available outside the editor
+var modifier_stack: ProtonScatterModifierStack:
 	set(val):
 		if modifier_stack:
 			if modifier_stack.value_changed.is_connected(rebuild):
 				modifier_stack.value_changed.disconnect(rebuild)
 			if modifier_stack.stack_changed.is_connected(rebuild):
 				modifier_stack.stack_changed.disconnect(rebuild)
+			if modifier_stack.transforms_ready.is_connected(_on_transforms_ready):
+				modifier_stack.transforms_ready.disconnect(_on_transforms_ready)
 
 		modifier_stack = val.get_copy() # Enfore uniqueness
 		modifier_stack.value_changed.connect(rebuild)
 		modifier_stack.stack_changed.connect(rebuild)
+		modifier_stack.transforms_ready.connect(_on_transforms_ready)
 
-var domain: Domain:
+var domain: ProtonScatterDomain:
 	set(val):
-		domain = Domain.new() # Enforce uniqueness
+		domain = ProtonScatterDomain.new() # Enforce uniqueness
 
 var items: Array = []
 var total_item_proportion: int
@@ -91,6 +98,13 @@ var editor_plugin # Holds a reference to the EditorPlugin. Used by other parts.
 var _thread := Thread.new()
 var _rebuild_queued := false
 var _dependency_parent
+var _physics_helper: ProtonScatterPhysicsHelper
+var _thread_just_started := false
+
+
+func _exit_tree():
+	if is_thread_running():
+		_thread.wait_to_finish()
 
 
 func _ready() -> void:
@@ -98,29 +112,24 @@ func _ready() -> void:
 	set_notify_transform(true)
 	child_exiting_tree.connect(_on_child_exiting_tree)
 
-	if scatter_parent.is_empty():
-		rebuild.call_deferred()
-
 	# Check if the required nodes exists, if not, create them.
 	_discover_items()
 	domain.discover_shapes(self)
 
 	if items.is_empty():
-		var item = ScatterItem.new()
+		var item = ProtonScatterItem.new()
 		add_child(item, true)
 		item.set_name("ScatterItem")
 		item.set_owner(get_tree().get_edited_scene_root())
 
 	if domain.is_empty() and not modifier_stack.does_not_require_shapes():
-		var shape = ScatterShape.new()
+		var shape = ProtonScatterShape.new()
 		add_child(shape, true)
 		shape.set_owner(get_tree().get_edited_scene_root())
 		shape.set_name("ScatterShape")
 
-
-func _process(delta: float) -> void:
-	if _thread and _thread.is_started() and not _thread.is_alive():
-		thread_completed.emit()
+	if not is_instance_valid(_dependency_parent):
+		full_rebuild.bind(true).call_deferred()
 
 
 func _get_property_list() -> Array:
@@ -133,13 +142,13 @@ func _get_property_list() -> Array:
 	return list
 
 
-func _get_configuration_warning() -> String:
-	var warning = ""
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
 	if items.is_empty():
-		warning += "At least one ScatterItem node is required.\n"
+		warnings.push_back("At least one ScatterItem node is required.")
 	if domain.is_empty():
-		warning += "At least one ScatterShape node in inclusive mode is required.\n"
-	return warning
+		warnings.push_back("At least one ScatterShape node is required.")
+	return warnings
 
 
 func _notification(what):
@@ -155,20 +164,22 @@ func _set(property, _value):
 
 	# Workaround to detect when the node was duplicated from the editor.
 	if property == "transform":
-		call_deferred("_on_node_duplicated")
+		_on_node_duplicated.call_deferred()
 
 	return false
 
 
-# Only used for type checking.
-# Useful to other scripts which can't preload this due to cyclic references.
-# TODO: Old workaround from alpha 2, check if this is still needed
-func is_scatter_node() -> bool:
-	return true
-
-
 func is_thread_running() -> bool:
-	return _thread.is_alive()
+	return _thread != null and _thread.is_started()
+
+
+# Used by some modifiers to retrieve a physics helper node
+func get_physics_helper() -> ProtonScatterPhysicsHelper:
+	if not is_instance_valid(_physics_helper):
+		_physics_helper = ProtonScatterPhysicsHelper.new()
+		add_child(_physics_helper)
+
+	return _physics_helper
 
 
 # Deletes what the Scatter node generated.
@@ -181,7 +192,7 @@ func clear_output() -> void:
 		output_root.queue_free()
 		output_root = null
 
-	ScatterUtil.ensure_output_root_exists(self)
+	ProtonScatterUtil.ensure_output_root_exists(self)
 
 
 func full_rebuild(delayed := false):
@@ -195,6 +206,7 @@ func full_rebuild(delayed := false):
 
 	if is_thread_running():
 		_thread.wait_to_finish()
+		_thread = null
 
 	clear_output()
 	_rebuild(true)
@@ -209,12 +221,13 @@ func rebuild_deferred(force_discover := false):
 # TRANSFORM_CHANGED notification in every children, which in turn notify the
 # parent Scatter node back about the changes.
 func rebuild(force_discover := false) -> void:
+	print("in rebuild ", name)
 	update_gizmos()
 
 	if not is_inside_tree():
 		return
 
-	if _thread.is_started(): # still running in the background
+	if is_thread_running():
 		_rebuild_queued = true
 		return
 
@@ -233,42 +246,19 @@ func _rebuild(force_discover) -> void:
 
 	if items.is_empty() or domain.is_empty():
 		clear_output()
-		print("Scatter warning: No items or domain, abort")
+		push_warning("ProtonScatter warning: No items or shapes, abort")
 		return
-
-	var transforms: TransformList
 
 	if not use_instancing:
 		clear_output() # TMP, prevents raycasts in modifier to self intersect with previous output
 
 	if dbg_disable_thread:
-		transforms = modifier_stack.update(self, domain)
-	else:
-		var update_function := modifier_stack.update.bind(self, domain.get_copy())
-		var err = _thread.start(update_function, Thread.PRIORITY_NORMAL)
-		await thread_completed
-		transforms = _thread.wait_to_finish()
-
-	if _rebuild_queued:
-		_rebuild_queued = false
-		rebuild(true)
+		modifier_stack.start_update(self, domain)
 		return
 
-	if not transforms or transforms.size() == 0:
-		clear_output()
-		update_gizmos()
-		return
-
-	if use_instancing:
-		_update_multimeshes(transforms)
-	else:
-		_update_duplicates(transforms)
-
-	update_gizmos()
-
-	if not _rebuild_queued:
-		await get_tree().process_frame
-		build_completed.emit()
+	_thread = Thread.new()
+	var update_function := modifier_stack.start_update.bind(self, domain.get_copy())
+	_thread.start(update_function, Thread.PRIORITY_NORMAL)
 
 
 func _discover_items() -> void:
@@ -276,7 +266,7 @@ func _discover_items() -> void:
 	total_item_proportion = 0
 
 	for c in get_children():
-		if c is ScatterItem:
+		if c is ProtonScatterItem:
 			items.push_back(c)
 			total_item_proportion += c.proportion
 
@@ -285,15 +275,15 @@ func _discover_items() -> void:
 
 
 # Creates one MultimeshInstance3D for each ScatterItem node.
-func _update_multimeshes(transforms: TransformList) -> void:
+func _update_multimeshes(transforms: ProtonScatterTransformList) -> void:
 	var offset := 0
 	var transforms_count: int = transforms.size()
 	var inverse_transform := global_transform.affine_inverse()
 
 	for item in items:
-		var item_root = ScatterUtil.get_or_create_item_root(item)
+		var item_root = ProtonScatterUtil.get_or_create_item_root(item)
 		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		var mmi = ScatterUtil.get_or_create_multimesh(item, count)
+		var mmi = ProtonScatterUtil.get_or_create_multimesh(item, count)
 		if not mmi:
 			return
 
@@ -310,14 +300,14 @@ func _update_multimeshes(transforms: TransformList) -> void:
 		offset += count
 
 
-func _update_duplicates(transforms: TransformList) -> void:
+func _update_duplicates(transforms: ProtonScatterTransformList) -> void:
 	var offset := 0
 	var transforms_count: int = transforms.size()
 	var inverse_transform := global_transform.affine_inverse()
 
 	for item in items:
 		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		var root = ScatterUtil.get_or_create_item_root(item)
+		var root = ProtonScatterUtil.get_or_create_item_root(item)
 		var child_count = root.get_child_count()
 
 		for i in count:
@@ -344,7 +334,7 @@ func _update_duplicates(transforms: TransformList) -> void:
 		offset += count
 
 
-func _create_instance(item: ScatterItem, root: Node3D):
+func _create_instance(item: ProtonScatterItem, root: Node3D):
 	if not item or not item.get_item():
 		return null
 
@@ -353,7 +343,7 @@ func _create_instance(item: ScatterItem, root: Node3D):
 	root.add_child.bind(instance, true).call_deferred()
 	instance.set_owner.bind(get_tree().get_edited_scene_root()).call_deferred()
 	var defer_ownership := func(inst,ownership):
-		ScatterUtil.set_owner_recursive(instance, ownership)
+		ProtonScatterUtil.set_owner_recursive(instance, ownership)
 	defer_ownership.bind(instance,get_tree().get_edited_scene_root()).call_deferred()
 
 	return instance
@@ -362,10 +352,10 @@ func _create_instance(item: ScatterItem, root: Node3D):
 # Enforce the Scatter node has its required variables set.
 func _perform_sanity_check() -> void:
 	if not modifier_stack:
-		modifier_stack = ModifierStack.new()
+		modifier_stack = ProtonScatterModifierStack.new()
 
 	if not domain:
-		domain = Domain.new()
+		domain = ProtonScatterDomain.new()
 
 	scatter_parent = scatter_parent
 
@@ -376,5 +366,33 @@ func _on_node_duplicated() -> void:
 
 
 func _on_child_exiting_tree(node: Node) -> void:
-	if node is ScatterShape or node is ScatterItem:
-		rebuild.call_deferred(true)
+	if node is ProtonScatterShape or node is ProtonScatterItem:
+		rebuild.bind(true).call_deferred()
+
+
+# Called when the modifier stack is done generating the full transform list
+func _on_transforms_ready(transforms: ProtonScatterTransformList) -> void:
+	if is_thread_running():
+		_thread.wait_to_finish()
+		_thread = null
+
+	if _rebuild_queued:
+		_rebuild_queued = false
+		rebuild(true)
+		return
+
+	if not transforms or transforms.size() == 0:
+		clear_output()
+		update_gizmos()
+		return
+
+	if use_instancing:
+		_update_multimeshes(transforms)
+	else:
+		_update_duplicates(transforms)
+
+	update_gizmos()
+
+	if not _rebuild_queued:
+		await get_tree().process_frame
+		build_completed.emit()
