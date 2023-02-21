@@ -1,0 +1,40 @@
+[gd_resource type="ShaderMaterial" load_steps=6 format=3 uid="uid://c7mw5tryqfggw"]
+
+[ext_resource type="Shader" path="res://addons/proton_scatter/demos/assets/materials/m_water.gdshader" id="1_j8rl3"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_7bjdc"]
+noise_type = 2
+fractal_type = 3
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_wxuht"]
+seamless = true
+noise = SubResource("FastNoiseLite_7bjdc")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_dx86n"]
+noise_type = 2
+domain_warp_enabled = true
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_1j0ob"]
+seamless = true
+noise = SubResource("FastNoiseLite_dx86n")
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_j8rl3")
+shader_parameter/beer_factor = 4.0
+shader_parameter/foam_distance = 0.01
+shader_parameter/foam_max_distance = 0.345
+shader_parameter/foam_min_distance = 0.05
+shader_parameter/foam_color = Color(1, 1, 1, 0.784314)
+shader_parameter/surface_noise_tiling = Vector2(1, 4)
+shader_parameter/surface_noise_scroll = Vector3(0.03, 0.03, 0)
+shader_parameter/surface_noise_cutoff = 0.875
+shader_parameter/surface_distortion_amount = 0.65
+shader_parameter/_DepthGradientShallow = Color(0.435294, 0.647059, 0.972549, 0.72549)
+shader_parameter/_DepthGradientDeep = Color(0.0823529, 0.392157, 0.701961, 0.862745)
+shader_parameter/_DepthMaxDistance = 1.0
+shader_parameter/_DepthFactor = 1.0
+shader_parameter/roughness = 0.001
+shader_parameter/specular = 0.5
+shader_parameter/surfaceNoise = SubResource("NoiseTexture2D_1j0ob")
+shader_parameter/distortNoise = SubResource("NoiseTexture2D_wxuht")

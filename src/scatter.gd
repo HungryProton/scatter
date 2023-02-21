@@ -63,7 +63,7 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 
 		scatter_parent = val
 		_dependency_parent = node
-		_dependency_parent.build_completed.connect(rebuild_deferred)
+		_dependency_parent.build_completed.connect(rebuild, CONNECT_DEFERRED)
 
 
 @export_group("Debug", "dbg_")
@@ -81,9 +81,9 @@ var modifier_stack: ProtonScatterModifierStack:
 				modifier_stack.transforms_ready.disconnect(_on_transforms_ready)
 
 		modifier_stack = val.get_copy() # Enfore uniqueness
-		modifier_stack.value_changed.connect(rebuild)
-		modifier_stack.stack_changed.connect(rebuild)
-		modifier_stack.transforms_ready.connect(_on_transforms_ready)
+		modifier_stack.value_changed.connect(rebuild, CONNECT_DEFERRED)
+		modifier_stack.stack_changed.connect(rebuild, CONNECT_DEFERRED)
+		modifier_stack.transforms_ready.connect(_on_transforms_ready, CONNECT_DEFERRED)
 
 var domain: ProtonScatterDomain:
 	set(val):
@@ -95,7 +95,7 @@ var output_root: Marker3D
 
 var editor_plugin # Holds a reference to the EditorPlugin. Used by other parts.
 
-var _thread := Thread.new()
+var _thread: Thread
 var _rebuild_queued := false
 var _dependency_parent
 var _physics_helper: ProtonScatterPhysicsHelper
@@ -105,6 +105,7 @@ var _thread_just_started := false
 func _exit_tree():
 	if is_thread_running():
 		_thread.wait_to_finish()
+		_thread = null
 
 
 func _ready() -> void:
@@ -129,7 +130,8 @@ func _ready() -> void:
 		shape.set_name("ScatterShape")
 
 	if not is_instance_valid(_dependency_parent):
-		full_rebuild.bind(true).call_deferred()
+		print("in ", name, " calling full rebuild ")
+		full_rebuild.call_deferred()
 
 
 func _get_property_list() -> Array:
@@ -212,10 +214,6 @@ func full_rebuild(delayed := false):
 	_rebuild(true)
 
 
-func rebuild_deferred(force_discover := false):
-	_rebuild.bind(force_discover).call_deferred()
-
-
 # A wrapper around the _rebuild function. Ensure it's not called more than once
 # per frame. (Happens when the Scatter node is moved, which triggers the
 # TRANSFORM_CHANGED notification in every children, which in turn notify the
@@ -254,6 +252,9 @@ func _rebuild(force_discover) -> void:
 	if dbg_disable_thread:
 		modifier_stack.start_update(self, domain)
 		return
+
+	if _thread:
+		await _thread.wait_to_finish()
 
 	_thread = Thread.new()
 	var update_function := modifier_stack.start_update.bind(self, domain.get_copy())
@@ -340,10 +341,11 @@ func _create_instance(item: ProtonScatterItem, root: Node3D):
 	var instance = item.get_item().duplicate()
 	instance.visible = true
 	root.add_child.bind(instance, true).call_deferred()
-	instance.set_owner.bind(get_tree().get_edited_scene_root()).call_deferred()
-	var defer_ownership := func(inst,ownership):
-		ProtonScatterUtil.set_owner_recursive(instance, ownership)
-	defer_ownership.bind(instance,get_tree().get_edited_scene_root()).call_deferred()
+
+	if show_output_in_tree:
+		var defer_ownership := func(i, o):
+			ProtonScatterUtil.set_owner_recursive(i, o)
+		defer_ownership.bind(instance, get_tree().get_edited_scene_root()).call_deferred()
 
 	return instance
 
@@ -377,10 +379,10 @@ func _on_transforms_ready(transforms: ProtonScatterTransformList) -> void:
 
 	if _rebuild_queued:
 		_rebuild_queued = false
-		rebuild(true)
+		rebuild.call_deferred()
 		return
 
-	if not transforms or transforms.size() == 0:
+	if not transforms or transforms.is_empty():
 		clear_output()
 		update_gizmos()
 		return
@@ -391,7 +393,5 @@ func _on_transforms_ready(transforms: ProtonScatterTransformList) -> void:
 		_update_duplicates(transforms)
 
 	update_gizmos()
-
-	if not _rebuild_queued:
-		await get_tree().process_frame
-		build_completed.emit()
+	await get_tree().process_frame
+	build_completed.emit()

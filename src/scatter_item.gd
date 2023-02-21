@@ -37,10 +37,17 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		source_ignore_scale = val
 		ScatterUtil.request_parent_to_rebuild(self)
 
-var path: String
+var path: String:
+	set(val):
+		path = val
+		_target_scene = load(path) if source != 0 else null
+		ScatterUtil.request_parent_to_rebuild(self)
+
 var source_position: Vector3
 var source_rotation: Vector3
 var source_scale: Vector3
+
+var _target_scene: PackedScene
 
 
 func _get_property_list() -> Array:
@@ -63,6 +70,7 @@ func _get_property_list() -> Array:
 
 func get_item() -> Node3D:
 	if path.is_empty():
+		print("in get item, path empty")
 		return null
 
 	var node: Node3D
@@ -70,9 +78,7 @@ func get_item() -> Node3D:
 	if source == 0:
 		node = get_node_or_null(path)
 	else:
-		var scene = load(path)
-		if scene:
-			node = scene.instantiate()
+		node = _target_scene.instantiate()
 
 	if node:
 		_save_source_data(node)

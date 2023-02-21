@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://ctkii8aivl17n"]
 
-[ext_resource type="PackedScene" uid="uid://r3qu6lrmqf1q" path="res://addons/proton_scatter/demos/assets/models/dead_branch.glb" id="1_5foyv"]
+[ext_resource type="PackedScene" uid="uid://cmqlv88xp71tw" path="res://addons/proton_scatter/demos/assets/models/dead_branch.glb" id="1_5foyv"]
 [ext_resource type="Material" uid="uid://d01d0h08lqqn6" path="res://addons/proton_scatter/demos/assets/materials/m_trunk.tres" id="2_tldro"]
 
 [node name="dead_branch" instance=ExtResource("1_5foyv")]

@@ -18,7 +18,7 @@ uniform float wind_speed = 1.0;
 uniform float wind_strength = 2.0;
 uniform float noise_scale = 20.0;
 
-uniform float camera_bend_strength : hint_range(0.0, 3.0) = 0.2;
+instance uniform float camera_bend_strength : hint_range(0.0, 3.0) = 0.2;
 
 varying float color;
 varying float height;

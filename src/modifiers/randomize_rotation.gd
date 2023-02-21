@@ -11,6 +11,7 @@ var _rng: RandomNumberGenerator
 func _init() -> void:
 	display_name = "Randomize Rotation"
 	category = "Edit"
+	can_override_seed = true
 	can_restrict_height = false
 	global_reference_frame_available = true
 	local_reference_frame_available = true

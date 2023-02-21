@@ -106,7 +106,7 @@ func _process_transforms(transforms, domain, seed: int) -> void:
 	_rng = RandomNumberGenerator.new()
 	_rng.set_seed(seed)
 
-	var new_transforms := []
+	var new_transforms: Array[Transform3D] = []
 	var rotation_rad := Vector3.ZERO
 
 	rotation_rad.x = deg_to_rad(rotation.x)

@@ -50,7 +50,7 @@ func _enter_tree():
 		"ScatterShape",
 		"Node3D",
 		preload("./src/scatter_shape.gd"),
-		preload("./icons/item.svg")
+		preload("./icons/shape.svg")
 	)
 
 	var editor_selection = get_editor_interface().get_selection()

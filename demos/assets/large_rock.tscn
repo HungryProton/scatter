@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://8ay5rlrutcmx"]
 
-[ext_resource type="PackedScene" uid="uid://bsct3gagfitm1" path="res://addons/proton_scatter/demos/assets/models/large_rock.glb" id="1_etns1"]
+[ext_resource type="PackedScene" uid="uid://bxqkgplyoipsx" path="res://addons/proton_scatter/demos/assets/models/large_rock.glb" id="1_etns1"]
 [ext_resource type="Material" uid="uid://i0jgjmbbl2m5" path="res://addons/proton_scatter/demos/assets/materials/m_rock.tres" id="2_fes1d"]
 
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_6ssqc"]

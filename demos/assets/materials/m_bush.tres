@@ -1,11 +1,11 @@
-[gd_resource type="ShaderMaterial" load_steps=7 format=3 uid="uid://c4mot1fo3siox"]
+[gd_resource type="ShaderMaterial" load_steps=7 format=3 uid="uid://bn3fr3m3glrnp"]
 
-[ext_resource type="Shader" path="res://addons/proton_scatter/demos/assets/materials/grass.gdshader" id="1_fntgl"]
-[ext_resource type="Texture2D" uid="uid://d23p13yi7asw0" path="res://addons/proton_scatter/demos/assets/textures/t_grass_2.png" id="2_1odx0"]
+[ext_resource type="Shader" path="res://addons/proton_scatter/demos/assets/materials/grass.gdshader" id="1_peshr"]
+[ext_resource type="Texture2D" uid="uid://b2a6ylo2enm4g" path="res://addons/proton_scatter/demos/assets/textures/t_bush.png" id="2_mbhvd"]
 
 [sub_resource type="Gradient" id="Gradient_122hb"]
-offsets = PackedFloat32Array(0, 0.473451, 1)
-colors = PackedColorArray(0.179688, 0.0855483, 0.00322032, 1, 0.251693, 0.390625, 0.0117187, 1, 1, 0.964706, 0.129412, 1)
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.179688, 0.0759602, 0.0183228, 1, 0.386532, 0.390625, 0.0230687, 1, 1, 0.693237, 0.0687054, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_i0bw2"]
 gradient = SubResource("Gradient_122hb")
@@ -22,17 +22,16 @@ noise = SubResource("FastNoiseLite_eeqpx")
 
 [resource]
 render_priority = 0
-shader = ExtResource("1_fntgl")
-shader_parameter/alpha_scissor_threshold = 0.3
-shader_parameter/transmission = Color(0.737255, 0.72549, 0, 1)
+shader = ExtResource("1_peshr")
+shader_parameter/alpha_scissor_threshold = 0.25
+shader_parameter/transmission = Color(0.619608, 0.541176, 0.101961, 1)
 shader_parameter/secondary_color = Color(0, 0, 0, 1)
 shader_parameter/secondary_attenuation = 0.2
-shader_parameter/grass_height = 0.6
+shader_parameter/grass_height = 0.829
 shader_parameter/wind_direction = Vector2(1, -0.5)
 shader_parameter/wind_speed = 0.5
 shader_parameter/wind_strength = 0.15
 shader_parameter/noise_scale = 6.0
-shader_parameter/camera_bend_strength = 0.3
-shader_parameter/texture_albedo = ExtResource("2_1odx0")
+shader_parameter/texture_albedo = ExtResource("2_mbhvd")
 shader_parameter/texture_gradient = SubResource("GradientTexture1D_i0bw2")
 shader_parameter/texture_noise = SubResource("NoiseTexture2D_7l0n1")

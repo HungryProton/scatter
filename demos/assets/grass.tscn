@@ -1,9 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://c3c76je2y6vfj"]
 
-[ext_resource type="PackedScene" uid="uid://bmmxbxaq5u6c8" path="res://addons/proton_scatter/demos/assets/models/grass.glb" id="1_203fe"]
+[ext_resource type="PackedScene" uid="uid://018flajgtx7t" path="res://addons/proton_scatter/demos/assets/models/grass.glb" id="1_203fe"]
 [ext_resource type="Material" uid="uid://c4mot1fo3siox" path="res://addons/proton_scatter/demos/assets/materials/m_grass.tres" id="2_sv1ar"]
 
 [node name="grass" instance=ExtResource("1_203fe")]
 
 [node name="Plane011" parent="." index="0"]
+instance_shader_parameters/camera_bend_strength = 0.35
 surface_material_override/0 = ExtResource("2_sv1ar")

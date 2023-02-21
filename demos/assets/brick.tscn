@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://b4ted6l27vuyd"]
 
-[ext_resource type="PackedScene" uid="uid://cx4ibepy8bymc" path="res://addons/proton_scatter/demos/assets/models/brick.glb" id="1_bkmk2"]
-[ext_resource type="Texture2D" uid="uid://bih3inkmqnr6o" path="res://addons/proton_scatter/demos/assets/textures/t_rock.jpg" id="2_235bd"]
+[ext_resource type="PackedScene" uid="uid://d1d1fag0m04yc" path="res://addons/proton_scatter/demos/assets/models/brick.glb" id="1_bkmk2"]
+[ext_resource type="Texture2D" uid="uid://dqa2jfs1jy0hq" path="res://addons/proton_scatter/demos/assets/textures/t_rock.jpg" id="2_235bd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nwvh2"]
 albedo_color = Color(0.678431, 0.596078, 0.466667, 1)

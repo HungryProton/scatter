@@ -55,7 +55,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 			basis.x *= random_scale.x
 			basis.y *= random_scale.y
 			basis.z *= random_scale.z
-			random_position = t.basis * position
+			random_position = t.basis * random_position
 
 		elif is_using_local_space():
 			local_t = t * st

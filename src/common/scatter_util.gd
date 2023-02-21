@@ -83,7 +83,8 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 	mmi.position = Vector3.ZERO
 	# item.update_shadows()
 
-	var mesh_instance: MeshInstance3D = get_merged_meshes_from(item.get_item())
+	var node = item.get_item()
+	var mesh_instance: MeshInstance3D = get_merged_meshes_from(node)
 	if not mesh_instance:
 		return
 
@@ -128,7 +129,7 @@ static func get_all_mesh_instances_from(node: Node3D) -> Array[MeshInstance3D]:
 		res.push_back(node)
 
 	for c in node.get_children():
-		res += get_all_mesh_instances_from(c)
+		res.append_array(get_all_mesh_instances_from(c))
 
 	return res
 
@@ -148,7 +149,7 @@ static func get_merged_meshes_from(node: Node) -> MeshInstance3D:
 		transform_backup = node.transform
 		node.transform = Transform3D()
 
-	var instances := get_all_mesh_instances_from(node)
+	var instances: Array[MeshInstance3D] = get_all_mesh_instances_from(node)
 	if instances.is_empty():
 		return null
 
