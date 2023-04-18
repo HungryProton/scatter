@@ -1,40 +1,52 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=16 format=3 uid="uid://yxn1ih6qrc01"]
 
 [ext_resource type="Script" path="res://addons/proton_scatter/src/scatter.gd" id="1_e0kty"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/modifier_stack.gd" id="2_lt5xy"]
-[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/create_inside_grid.gd" id="3_nry4c"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/create_inside_random.gd" id="3_0051t"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/randomize_transforms.gd" id="4_5a045"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/project_on_geometry.gd" id="5_gkw57"]
+[ext_resource type="Script" path="res://addons/proton_scatter/src/modifiers/relax.gd" id="5_n2in0"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/scatter_item.gd" id="6_3iwkw"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/scatter_shape.gd" id="7_jofmq"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/shapes/sphere_shape.gd" id="8_gnbkw"]
 
-[sub_resource type="Resource" id="Resource_741ly"]
-script = ExtResource("3_nry4c")
-spacing = Vector3(0.2, 1, 0.2)
+[sub_resource type="Resource" id="Resource_jbxru"]
+script = ExtResource("3_0051t")
+amount = 75
 enabled = true
 override_global_seed = false
 custom_seed = 0
 restrict_height = true
-use_local_space = false
+reference_frame = 1
 
-[sub_resource type="Resource" id="Resource_n0177"]
+[sub_resource type="Resource" id="Resource_0oyil"]
 script = ExtResource("4_5a045")
 position = Vector3(0.15, 0.15, 0.15)
 rotation = Vector3(20, 360, 20)
-scale = Vector3(2, 2, 2)
+scale = Vector3(0.1, 0.1, 0.1)
 enabled = true
 override_global_seed = false
 custom_seed = 0
 restrict_height = false
-use_local_space = true
+reference_frame = 2
 
-[sub_resource type="Resource" id="Resource_hqvoo"]
+[sub_resource type="Resource" id="Resource_ogw66"]
+script = ExtResource("5_n2in0")
+iterations = 3
+offset_step = 0.2
+consecutive_step_multiplier = 0.75
+enabled = true
+override_global_seed = false
+custom_seed = 0
+restrict_height = true
+reference_frame = 0
+
+[sub_resource type="Resource" id="Resource_awufl"]
 script = ExtResource("5_gkw57")
 ray_direction = Vector3(0, -1, 0)
 ray_length = 5.0
 ray_offset = 5.0
-remove_points_on_miss = true
+remove_points_on_miss = false
 align_with_collision_normal = false
 max_slope = 90.0
 collision_mask = 1
@@ -42,28 +54,25 @@ enabled = true
 override_global_seed = false
 custom_seed = 0
 restrict_height = false
-use_local_space = false
+reference_frame = 0
 
-[sub_resource type="Resource" id="Resource_asuhn"]
+[sub_resource type="Resource" id="Resource_xqhqc"]
 script = ExtResource("2_lt5xy")
-stack = [SubResource("Resource_741ly"), SubResource("Resource_n0177"), SubResource("Resource_hqvoo")]
+stack = Array[Resource]([SubResource("Resource_jbxru"), SubResource("Resource_0oyil"), SubResource("Resource_ogw66"), SubResource("Resource_awufl")])
 
 [sub_resource type="Resource" id="Resource_g8bsm"]
 script = ExtResource("8_gnbkw")
 radius = 2.0
 
-[node name="ProtonScatter3" type="Node3D"]
+[node name="ProtonScatter" type="Node3D"]
 script = ExtResource("1_e0kty")
-scatter_parent = NodePath("")
-modifier_stack = SubResource("Resource_asuhn")
+modifier_stack = SubResource("Resource_xqhqc")
 
-[node name="Grass" type="Node3D" parent="."]
+[node name="ScatterItem" type="Node3D" parent="."]
 script = ExtResource("6_3iwkw")
-path = "res://addons/proton_scatter/demos/assets/grass_2.tscn"
+path = "res://addons/proton_scatter/demos/assets/brick.tscn"
 
-[node name="ScatterShape2" type="Node3D" parent="."]
+[node name="ScatterShape" type="Node3D" parent="."]
 transform = Transform3D(1, 0, -2.98023e-08, 0, 1, 0, 2.98023e-08, 0, 1, 0, 0, 0)
 script = ExtResource("7_jofmq")
 shape = SubResource("Resource_g8bsm")
-
-[node name="ScatterOutput" type="Marker3D" parent="."]

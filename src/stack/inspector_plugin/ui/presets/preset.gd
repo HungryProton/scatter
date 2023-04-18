@@ -14,8 +14,8 @@ func set_preset_name(text) -> void:
 
 
 func _on_pressed() -> void:
-	emit_signal("load_preset")
+	load_preset.emit()
 
 
 func _on_delete() -> void:
-	emit_signal("delete_preset")
+	delete_preset.emit()

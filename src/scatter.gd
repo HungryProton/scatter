@@ -113,24 +113,10 @@ func _ready() -> void:
 	set_notify_transform(true)
 	child_exiting_tree.connect(_on_child_exiting_tree)
 
-	# Check if the required nodes exists, if not, create them.
 	_discover_items()
 	domain.discover_shapes(self)
 
-	if items.is_empty():
-		var item = ProtonScatterItem.new()
-		add_child(item, true)
-		item.set_name("ScatterItem")
-		item.set_owner(get_tree().get_edited_scene_root())
-
-	if domain.is_empty() and not modifier_stack.does_not_require_shapes():
-		var shape = ProtonScatterShape.new()
-		add_child(shape, true)
-		shape.set_owner(get_tree().get_edited_scene_root())
-		shape.set_name("ScatterShape")
-
 	if not is_instance_valid(_dependency_parent):
-		print("in ", name, " calling full rebuild ")
 		full_rebuild.call_deferred()
 
 
@@ -354,11 +340,12 @@ func _create_instance(item: ProtonScatterItem, root: Node3D):
 func _perform_sanity_check() -> void:
 	if not modifier_stack:
 		modifier_stack = ProtonScatterModifierStack.new()
+		modifier_stack.just_created = true
 
 	if not domain:
 		domain = ProtonScatterDomain.new()
 
-	scatter_parent = scatter_parent
+	scatter_parent = scatter_parent # TODO: Why ?
 
 
 func _on_node_duplicated() -> void:

@@ -47,7 +47,8 @@ func load_preset(scatter_node: Node3D) -> void:
 
 
 func load_default(scatter_node: Node3D) -> void:
-	pass # TODO
+	_scatter_node = scatter_node
+	_on_load_full_preset(PRESETS_PATH.path_join("scatter_default.tscn"))
 
 
 func set_editor_plugin(editor_plugin: EditorPlugin) -> void:
@@ -128,7 +129,12 @@ func _on_save_preset(path) -> void:
 
 
 func _on_load_full_preset(path: String) -> void:
-	var preset = load(path).instantiate()
+	var preset_scene: PackedScene = load(path)
+	if not preset_scene:
+		print("Could not find preset ", path)
+		return
+
+	var preset = preset_scene.instantiate()
 	if preset:
 		_scatter_node.modifier_stack = preset.modifier_stack.get_copy()
 		preset.global_transform = _scatter_node.get_global_transform()

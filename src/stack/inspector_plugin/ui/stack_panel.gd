@@ -17,10 +17,10 @@ var _is_ready := false
 func _ready():
 	_modifiers_popup.add_modifier.connect(_on_modifier_added)
 	_modifiers_container.child_moved.connect(_on_modifier_moved)
-	$%Rebuild.pressed.connect(_on_rebuild_pressed)
-	$%DocumentationButton.pressed.connect(_on_documentation_requested.bind("ProtonScatter"))
-	$%LoadPreset.pressed.connect(_on_load_preset_pressed)
-	$%SavePreset.pressed.connect(_on_save_preset_pressed)
+	%Rebuild.pressed.connect(_on_rebuild_pressed)
+	%DocumentationButton.pressed.connect(_on_documentation_requested.bind("ProtonScatter"))
+	%LoadPreset.pressed.connect(_on_load_preset_pressed)
+	%SavePreset.pressed.connect(_on_save_preset_pressed)
 
 	_is_ready = true
 	rebuild_ui()
@@ -32,8 +32,8 @@ func set_node(node) -> void:
 
 	_scatter = node
 	_undo_redo = _scatter.undo_redo
-	$%Documentation.set_editor_plugin(_scatter.editor_plugin)
-	$%Presets.set_editor_plugin(_scatter.editor_plugin)
+	%Documentation.set_editor_plugin(_scatter.editor_plugin)
+	%Presets.set_editor_plugin(_scatter.editor_plugin)
 	rebuild_ui()
 
 
@@ -71,7 +71,8 @@ func _validate_stack_connections() -> void:
 	_modifier_stack.stack_changed.connect(_on_stack_changed)
 
 	if _modifier_stack.just_created:
-		$%Presets.load_default(_scatter)
+		%Presets.load_default(_scatter)
+		_modifier_stack.just_created = false
 
 
 func _set_children_owner(new_owner: Node, node: Node):
@@ -146,12 +147,12 @@ func _on_rebuild_pressed() -> void:
 
 
 func _on_save_preset_pressed() -> void:
-	$%Presets.save_preset(_scatter)
+	%Presets.save_preset(_scatter)
 
 
 func _on_load_preset_pressed() -> void:
-	$%Presets.load_preset(_scatter)
+	%Presets.load_preset(_scatter)
 
 
 func _on_documentation_requested(page_name) -> void:
-	$%Documentation.show_page(page_name)
+	%Documentation.show_page(page_name)

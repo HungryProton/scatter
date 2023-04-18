@@ -70,7 +70,6 @@ func _get_property_list() -> Array:
 
 func get_item() -> Node3D:
 	if path.is_empty():
-		print("in get item, path empty")
 		return null
 
 	var node: Node3D

@@ -32,7 +32,6 @@ shader_parameter/wind_direction = Vector2(1, -0.5)
 shader_parameter/wind_speed = 0.5
 shader_parameter/wind_strength = 0.15
 shader_parameter/noise_scale = 6.0
-shader_parameter/camera_bend_strength = 0.3
 shader_parameter/texture_albedo = ExtResource("2_1odx0")
 shader_parameter/texture_gradient = SubResource("GradientTexture1D_i0bw2")
 shader_parameter/texture_noise = SubResource("NoiseTexture2D_7l0n1")
