@@ -81,7 +81,8 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 		mmi.multimesh = MultiMesh.new()
 
 	mmi.position = Vector3.ZERO
-	# item.update_shadows()
+	mmi.set_cast_shadows_setting(item.override_cast_shadow)
+	mmi.set_material_override(item.override_material)
 
 	var node = item.get_item()
 	var mesh_instance: MeshInstance3D = get_merged_meshes_from(node)
@@ -103,9 +104,9 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 # the children nodes, but keeping track of the children is annoying (they can
 # be moved around from a Scatter node to another, or put under a wrong node, or
 # other edge cases).
-# So instead, when a child changed, it notifies the parent Scatter node through
+# So instead, when a child change, it notifies the parent Scatter node through
 # this method.
-static func request_parent_to_rebuild(node: Node, deferred := false) -> void:
+static func request_parent_to_rebuild(node: Node, deferred := true) -> void:
 	var parent = node.get_parent()
 	if not parent or not parent.is_inside_tree():
 		return
@@ -134,73 +135,156 @@ static func get_all_mesh_instances_from(node: Node3D) -> Array[MeshInstance3D]:
 	return res
 
 
-# Find all the meshes below node and create a new single mesh with multiple
-# surfaces from all of them.
-static func get_merged_meshes_from(node: Node) -> MeshInstance3D:
-	if not node:
+# Merge all the MeshInstances from the local node tree into a single MeshInstance.
+# /!\ This is a best effort algorithm and will not work in some specific cases. /!\
+#
+# Mesh resources can have a maximum of 8 surfaces:
+# + If less than 8 different surfaces are found across all the MeshInstances,
+#   this returns a single instance with all the surfaces.
+#
+# + If more than 8 surfaces are found, but some shares the same material,
+#   these surface will be merged together if there's less than 8 unique materials.
+#
+# + If there's more than 8 unique materials, everything will be merged into
+#   a single surface. Material and custom data will NOT be preserved on the new mesh.
+#
+static func get_merged_meshes_from(source: Node) -> MeshInstance3D:
+	if not source:
 		return null
 
-	# Reset node transform for this step, overwise they'll stack
-	var transform_backup: Transform3D
-	if node.is_inside_tree():
-		transform_backup = node.get_global_transform()
-		node.global_transform = Transform3D()
-	else:
-		transform_backup = node.transform
+	# Do not alter the source node, use a duplicate instead.
+	var node: Node = source.duplicate(0)
+	if node is Node3D:
 		node.transform = Transform3D()
 
-	var instances: Array[MeshInstance3D] = get_all_mesh_instances_from(node)
-	if instances.is_empty():
+	# Get all the mesh instances
+	var mesh_instances: Array[MeshInstance3D] = get_all_mesh_instances_from(node)
+	if mesh_instances.is_empty():
 		return null
 
-	var total_surfaces = 0
-	var array_mesh = ArrayMesh.new()
+	# Only one mesh instance found, no merge required.
+	# TODO: Uncomment these two lines once we find a way to make surface material
+	# overrides play nicely with a single mesh and instancing.
+	# For now, this means meshes will always be duplicated in each scenes, which is bad.
+#	if mesh_instances.size() == 1:
+#		return mesh_instances[0]
 
-	for i in instances.size():
-		var mi: MeshInstance3D = instances[i]
-		var mesh: Mesh = mi.mesh
-		var surface_count = mesh.get_surface_count()
-		var material_override = mi.get_material_override()
-		var inverse_transform: Transform3D
-		if mi.is_inside_tree():
-			inverse_transform = mi.global_transform.affine_inverse()
-		else:
-			inverse_transform = mi.transform.affine_inverse()
+	# Helper lambdas
+	var get_material_for_surface = func (mi: MeshInstance3D, idx: int) -> Material:
+		if mi.get_material_override():
+			return mi.get_material_override()
 
-		for j in surface_count:
-			var arrays = mesh.surface_get_arrays(j)
-			var length = arrays[ArrayMesh.ARRAY_VERTEX].size()
+		if mi.get_surface_override_material(idx):
+			return mi.get_surface_override_material(idx)
 
-			for k in length:
-				var pos: Vector3 = arrays[ArrayMesh.ARRAY_VERTEX][k]
-				pos = pos * inverse_transform
-				arrays[ArrayMesh.ARRAY_VERTEX][k] = pos
+		if mi.mesh is PrimitiveMesh:
+			return mi.mesh.get_material()
 
-			array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+		return mi.mesh.surface_get_material(idx)
 
-			# Retrieve the material on the MeshInstance first, if none is defined,
-			# use the one from the mesh resource.
-			var material: Material
-			if material_override:
-				material = material_override
-			else:
-				material = mi.get_surface_override_material(j)
-			if not material:
-				material = mesh.surface_get_material(j)
-			array_mesh.surface_set_material(total_surfaces, material)
+	# Count how many surfaces / materials there are in the source instances
+	var total_surfaces := 0
+	var surfaces_map := {}
+	# Key: Material
+	# data: Array[Dictionary]
+	# 	"surface": surface index
+	#	"mesh_instance": parent mesh instance
 
-			total_surfaces += 1
+	for mi in mesh_instances:
+		if not mi.mesh:
+			continue # Should not happen
 
-	# Restore node initial transform
-	if node.is_inside_tree():
-		node.global_transform = transform_backup
-	else:
-		node.transform = transform_backup
+		# Update the total surface count
+		var surface_count = mi.mesh.get_surface_count()
+		total_surfaces += surface_count
 
-	# Return merged mesh
-	var res := MeshInstance3D.new()
-	res.mesh = array_mesh
-	return res
+		# Store surfaces in the material indexed dictionary
+		for surface_index in surface_count:
+			var material: Material = get_material_for_surface.call(mi, surface_index)
+			if not material in surfaces_map:
+				surfaces_map[material] = []
+
+			surfaces_map[material].push_back({
+				"surface": surface_index,
+				"mesh_instance": mi,
+			})
+
+	# ------
+	# Less than 8 surfaces, merge in a single MeshInstance
+	# ------
+	if total_surfaces <= 8:
+		var array_mesh := ArrayMesh.new()
+
+		for mi in mesh_instances:
+			var inverse_transform := mi.transform.affine_inverse()
+
+			for surface_index in mi.mesh.get_surface_count():
+				# Retrieve surface data
+				var primitive_type = Mesh.PRIMITIVE_TRIANGLES
+				var format = 0
+				var arrays := mi.mesh.surface_get_arrays(surface_index)
+				if mi.mesh is ArrayMesh:
+					primitive_type = mi.mesh.surface_get_primitive_type(surface_index)
+					format = mi.mesh.surface_get_format(surface_index) # Preserve custom data format
+
+				# Update vertex position based on MeshInstance transform
+				var vertex_count = arrays[ArrayMesh.ARRAY_VERTEX].size()
+				var vertex: Vector3
+				for index in vertex_count:
+					vertex = arrays[ArrayMesh.ARRAY_VERTEX][index] * inverse_transform
+					arrays[ArrayMesh.ARRAY_VERTEX][index] = vertex
+
+				# Store updated surface data in the new mesh
+				array_mesh.add_surface_from_arrays(primitive_type, arrays, [], {}, format)
+
+				# Restore material if any
+				var material := get_material_for_surface.call(mi, surface_index)
+				array_mesh.surface_set_material(array_mesh.get_surface_count() - 1, material)
+
+		var instance := MeshInstance3D.new()
+		instance.mesh = array_mesh
+		return instance
+
+	# ------
+	# Too many surfaces, merge everything in a single one.
+	# ------
+	var total_unique_materials := surfaces_map.size()
+
+	if total_unique_materials > 8:
+		var surface_tool := SurfaceTool.new()
+		surface_tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+
+		for mi in mesh_instances:
+			var mesh : Mesh = mi.mesh
+			for surface_i in mesh.get_surface_count():
+				surface_tool.append_from(mesh, surface_i, mi.transform)
+
+		var instance = MeshInstance3D.new()
+		instance.mesh = surface_tool.commit()
+		return instance
+
+	# ------
+	# Merge surfaces grouped by their materials
+	# ------
+	var array_mesh := ArrayMesh.new()
+
+	for material in surfaces_map.keys():
+		var surface_tool := SurfaceTool.new()
+		surface_tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+
+		var surfaces: Array = surfaces_map[material]
+		for data in surfaces:
+			var idx: int = data["surface"]
+			var mi: MeshInstance3D = data["mesh_instance"]
+
+			surface_tool.append_from(mi.mesh, idx, mi.transform)
+
+		array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_tool.commit_to_arrays())
+		array_mesh.surface_set_material(array_mesh.get_surface_count() - 1, material)
+
+	var instance := MeshInstance3D.new()
+	instance.mesh = array_mesh
+	return instance
 
 
 static func set_owner_recursive(node: Node, new_owner) -> void:

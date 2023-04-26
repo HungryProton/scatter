@@ -26,3 +26,4 @@ enabled=PackedStringArray("res://addons/proton_scatter/plugin.cfg")
 [rendering]
 
 anti_aliasing/quality/msaa_3d=2
+anti_aliasing/quality/use_taa=true

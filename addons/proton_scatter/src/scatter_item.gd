@@ -37,6 +37,17 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		source_ignore_scale = val
 		ScatterUtil.request_parent_to_rebuild(self)
 
+@export_group("Override options", "override_")
+@export var override_material: BaseMaterial3D:
+	set(val):
+		override_material = val
+		ScatterUtil.request_parent_to_rebuild(self)
+
+@export var override_cast_shadow: GeometryInstance3D.ShadowCastingSetting = GeometryInstance3D.SHADOW_CASTING_SETTING_ON:
+	set(val):
+		override_cast_shadow = val
+		ScatterUtil.request_parent_to_rebuild(self) # TODO - Only change the multimesh flag instead
+
 var path: String:
 	set(val):
 		path = val
