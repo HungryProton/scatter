@@ -289,5 +289,9 @@ static func get_merged_meshes_from(source: Node) -> MeshInstance3D:
 
 static func set_owner_recursive(node: Node, new_owner) -> void:
 	node.set_owner(new_owner)
+
+	if not node.get_scene_file_path().is_empty():
+		return # Node is an instantiated scene, don't change its children owner.
+
 	for c in node.get_children():
 		set_owner_recursive(c, new_owner)
