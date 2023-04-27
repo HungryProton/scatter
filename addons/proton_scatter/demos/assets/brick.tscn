@@ -19,5 +19,5 @@ material_override = SubResource("StandardMaterial3D_nwvh2")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." index="1"]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." index="2"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" index="0"]
 shape = SubResource("BoxShape3D_0rrnn")

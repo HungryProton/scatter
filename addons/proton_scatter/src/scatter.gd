@@ -37,6 +37,9 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 		use_instancing = val
 		full_rebuild(true)
 
+@export var force_rebuild_on_load := true
+@export var enable_updates_in_game := false
+
 @export_group("Dependency")
 @export var scatter_parent: NodePath:
 	set(val):
@@ -109,10 +112,14 @@ func _exit_tree():
 
 
 func _ready() -> void:
-	_perform_sanity_check()
-	set_notify_transform(true)
-	child_exiting_tree.connect(_on_child_exiting_tree)
+	if Engine.is_editor_hint() or enable_updates_in_game:
+		set_notify_transform(true)
+		child_exiting_tree.connect(_on_child_exiting_tree)
 
+	if not force_rebuild_on_load:
+		return
+
+	_perform_sanity_check()
 	_discover_items()
 	domain.discover_shapes(self)
 
