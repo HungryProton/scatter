@@ -7,7 +7,7 @@ const Scatter = preload("../../scatter.gd")
 
 
 func _can_handle(object):
-	return object is Scatter
+	return is_instance_of(object, Scatter)
 
 
 func _parse_property(object, type, name, hint_type, hint_string, usage_flags, wide):
