@@ -81,6 +81,7 @@ https://user-images.githubusercontent.com/52043844/232786762-330314a9-bc8a-49f4-
 ## License
 
 - This add-on is published under the MIT license.
-- Most 2D and 3D assets in the demos folder are MIT, with a few exceptions.
-Refer to the LICENCE.md in the assets folder for more details.
+- About the game assets under the `demo` folder:
+  + 3D assets are under the MIT license.
+  + Most textures bundled with this project have been created with images from Textures.com. You cannot redistribute them on their own, but they're free to use as part of a bigger project. Please visit [www.textures.com](https://www.textures.com/support/faq-license) for more information. 
 
