@@ -4,9 +4,9 @@ extends Popup
 
 const PRESETS_PATH = "res://addons/proton_scatter/presets"
 const PresetEntry := preload("./preset_entry.tscn")
-const ScatterUtil := preload('../common/scatter_util.gd')
-const ScatterItem := preload('../scatter_item.gd')
-const ScatterShape := preload('../scatter_shape.gd')
+const ProtonScatterUtil := preload('../common/scatter_util.gd')
+const ProtonScatterItem := preload('../scatter_item.gd')
+const ProtonScatterShape := preload('../scatter_shape.gd')
 
 var _scatter_node
 var _ideal_popup_size: Vector2i
@@ -115,7 +115,7 @@ func _on_new_preset_name_confirmed() -> void:
 func _on_save_preset(path) -> void:
 	var preset = _scatter_node.duplicate(7)
 	preset.clear_output()
-	ScatterUtil.set_owner_recursive(preset, preset)
+	ProtonScatterUtil.set_owner_recursive(preset, preset)
 	preset.global_transform.origin = Vector3.ZERO
 
 	var packed_scene = PackedScene.new()
@@ -140,7 +140,7 @@ func _on_load_full_preset(path: String) -> void:
 		preset.global_transform = _scatter_node.get_global_transform()
 
 		for c in _scatter_node.get_children():
-			if c is ScatterItem or c is ScatterShape:
+			if c is ProtonScatterItem or c is ProtonScatterShape:
 				_scatter_node.remove_child(c)
 				c.queue_free()
 
@@ -150,7 +150,7 @@ func _on_load_full_preset(path: String) -> void:
 			preset.remove_child(c)
 			_scatter_node.add_child(c, true)
 
-		ScatterUtil.set_owner_recursive(_scatter_node, get_tree().get_edited_scene_root())
+		ProtonScatterUtil.set_owner_recursive(_scatter_node, get_tree().get_edited_scene_root())
 
 		_scatter_node.rebuild.call_deferred()
 		preset.queue_free()

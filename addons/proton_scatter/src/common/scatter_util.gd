@@ -34,6 +34,7 @@ static func ensure_output_root_exists(s: ProtonScatter) -> void:
 	s.output_root = Marker3D.new()
 	s.output_root.name = "ScatterOutput"
 	s.add_child(s.output_root, true)
+
 	enforce_output_root_owner(s)
 
 
@@ -59,10 +60,11 @@ static func get_or_create_item_root(item: ProtonScatterItem) -> Node3D:
 
 	if not item_root:
 		item_root = Node3D.new()
-		s.output_root.add_child(item_root)
 		item_root.name = item.name
+		s.output_root.add_child(item_root, true)
+
 		if Engine.is_editor_hint():
-			item_root.owner = item_root.get_tree().get_edited_scene_root()
+			item_root.owner = item.get_tree().get_edited_scene_root()
 
 	return item_root
 
@@ -73,7 +75,8 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 
 	if not mmi:
 		mmi = MultiMeshInstance3D.new()
-		item_root.add_child(mmi)
+		item_root.add_child(mmi, true)
+
 		mmi.set_owner(item_root.owner)
 		mmi.set_name("MultiMeshInstance3D")
 

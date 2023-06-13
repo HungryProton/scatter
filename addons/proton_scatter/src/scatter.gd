@@ -35,7 +35,7 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 @export var use_instancing := true:
 	set(val):
 		use_instancing = val
-		full_rebuild(true)
+		full_rebuild.call_deferred()
 
 @export var force_rebuild_on_load := true
 @export var enable_updates_in_game := false
@@ -150,7 +150,7 @@ func _notification(what):
 	match what:
 		NOTIFICATION_TRANSFORM_CHANGED:
 			domain.compute_bounds()
-			rebuild()
+			rebuild.call_deferred()
 
 
 func _set(property, _value):
@@ -172,7 +172,9 @@ func is_thread_running() -> bool:
 func get_physics_helper() -> ProtonScatterPhysicsHelper:
 	if not is_instance_valid(_physics_helper):
 		_physics_helper = ProtonScatterPhysicsHelper.new()
-		add_child(_physics_helper)
+		_physics_helper.name = "PhysicsHelper"
+		add_child.bind(_physics_helper, true).call_deferred()
+		await get_tree().process_frame
 
 	return _physics_helper
 
@@ -190,17 +192,16 @@ func clear_output() -> void:
 	ProtonScatterUtil.ensure_output_root_exists(self)
 
 
-func full_rebuild(delayed := false):
+# Wrapper around the _rebuild function. Clears previous output and force
+# a clean rebuild.
+func full_rebuild():
+	update_gizmos()
+
 	if not is_inside_tree():
 		return
 
-	update_gizmos()
-
-	if delayed:
-		await get_tree().process_frame
-
 	if is_thread_running():
-		_thread.wait_to_finish()
+		await _thread.wait_to_finish()
 		_thread = null
 
 	clear_output()
@@ -210,7 +211,7 @@ func full_rebuild(delayed := false):
 # A wrapper around the _rebuild function. Ensure it's not called more than once
 # per frame. (Happens when the Scatter node is moved, which triggers the
 # TRANSFORM_CHANGED notification in every children, which in turn notify the
-# parent Scatter node back about the changes.
+# parent Scatter node back about the changes).
 func rebuild(force_discover := false) -> void:
 	update_gizmos()
 
@@ -250,8 +251,12 @@ func _rebuild(force_discover) -> void:
 		await _thread.wait_to_finish()
 
 	_thread = Thread.new()
-	var update_function := modifier_stack.start_update.bind(self, domain.get_copy())
-	_thread.start(update_function, Thread.PRIORITY_NORMAL)
+	_thread.start(_rebuild_threaded, Thread.PRIORITY_NORMAL)
+
+
+func _rebuild_threaded() -> void:
+	_thread.set_thread_safety_checks_enabled(false)
+	modifier_stack.start_update(self, domain.get_copy())
 
 
 func _discover_items() -> void:
@@ -259,7 +264,7 @@ func _discover_items() -> void:
 	total_item_proportion = 0
 
 	for c in get_children():
-		if c is ProtonScatterItem:
+		if is_instance_of(c, ProtonScatterItem):
 			items.push_back(c)
 			total_item_proportion += c.proportion
 
@@ -274,9 +279,9 @@ func _update_multimeshes(transforms: ProtonScatterTransformList) -> void:
 	var inverse_transform := global_transform.affine_inverse()
 
 	for item in items:
-		var item_root = ProtonScatterUtil.get_or_create_item_root(item)
+		var item_root = await ProtonScatterUtil.get_or_create_item_root(item)
 		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		var mmi = ProtonScatterUtil.get_or_create_multimesh(item, count)
+		var mmi = await ProtonScatterUtil.get_or_create_multimesh(item, count)
 		if not mmi:
 			return
 
@@ -299,9 +304,9 @@ func _update_duplicates(transforms: ProtonScatterTransformList) -> void:
 	var inverse_transform := global_transform.affine_inverse()
 
 	for item in items:
-		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		var root = ProtonScatterUtil.get_or_create_item_root(item)
-		var child_count = root.get_child_count()
+		var count := int(round(float(item.proportion) / total_item_proportion * transforms_count))
+		var root: Node3D = ProtonScatterUtil.get_or_create_item_root(item)
+		var child_count := root.get_child_count()
 
 		for i in count:
 			if (offset + i) >= transforms_count:
