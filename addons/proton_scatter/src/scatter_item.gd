@@ -38,7 +38,7 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		ScatterUtil.request_parent_to_rebuild(self)
 
 @export_group("Override options", "override_")
-@export var override_material: BaseMaterial3D:
+@export var override_material: Material:
 	set(val):
 		override_material = val
 		ScatterUtil.request_parent_to_rebuild(self)

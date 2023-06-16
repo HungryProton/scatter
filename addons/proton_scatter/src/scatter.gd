@@ -255,7 +255,10 @@ func _rebuild(force_discover) -> void:
 
 
 func _rebuild_threaded() -> void:
-	_thread.set_thread_safety_checks_enabled(false)
+	# Disable thread safety, but only after 4.1 beta 3
+	if _thread.has_method("set_thread_safety_checks_enabled"):
+		_thread.set_thread_safety_checks_enabled(false)
+
 	modifier_stack.start_update(self, domain.get_copy())
 
 
