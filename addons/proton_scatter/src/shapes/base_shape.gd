@@ -3,7 +3,11 @@ class_name ProtonScatterBaseShape
 extends Resource
 
 
-func is_point_inside(point_global: Vector3, global_transform: Transform3D) -> bool:
+func is_point_inside_global(point_global: Vector3, global_transform: Transform3D) -> bool:
+	return false
+
+
+func is_point_inside_local(point_local: Vector3) -> bool:
 	return false
 
 

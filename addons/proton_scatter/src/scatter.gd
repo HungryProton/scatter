@@ -95,6 +95,7 @@ var domain: ProtonScatterDomain:
 var items: Array = []
 var total_item_proportion: int
 var output_root: Marker3D
+var transforms: ProtonScatterTransformList
 
 var editor_plugin # Holds a reference to the EditorPlugin. Used by other parts.
 
@@ -138,17 +139,22 @@ func _get_property_list() -> Array:
 
 
 func _get_configuration_warnings() -> PackedStringArray:
+	_perform_sanity_check()
 	var warnings := PackedStringArray()
+
 	if items.is_empty():
 		warnings.push_back("At least one ScatterItem node is required.")
-	if domain.is_empty():
+
+	if domain and domain.is_empty():
 		warnings.push_back("At least one ScatterShape node is required.")
+
 	return warnings
 
 
 func _notification(what):
 	match what:
 		NOTIFICATION_TRANSFORM_CHANGED:
+			_perform_sanity_check()
 			domain.compute_bounds()
 			rebuild.call_deferred()
 
@@ -271,12 +277,14 @@ func _discover_items() -> void:
 			items.push_back(c)
 			total_item_proportion += c.proportion
 
-	if is_inside_tree():
-		get_tree().node_configuration_warning_changed.emit(self)
+	update_configuration_warnings()
 
 
 # Creates one MultimeshInstance3D for each ScatterItem node.
-func _update_multimeshes(transforms: ProtonScatterTransformList) -> void:
+func _update_multimeshes() -> void:
+	if items.is_empty():
+		_discover_items()
+
 	var offset := 0
 	var transforms_count: int = transforms.size()
 	var inverse_transform := global_transform.affine_inverse()
@@ -296,12 +304,12 @@ func _update_multimeshes(transforms: ProtonScatterTransformList) -> void:
 				return
 
 			t = item.process_transform(transforms.list[offset + i])
-			mmi.multimesh.set_instance_transform(i, inverse_transform * t)
+			mmi.multimesh.set_instance_transform(i, t)
 
 		offset += count
 
 
-func _update_duplicates(transforms: ProtonScatterTransformList) -> void:
+func _update_duplicates() -> void:
 	var offset := 0
 	var transforms_count: int = transforms.size()
 	var inverse_transform := global_transform.affine_inverse()
@@ -325,7 +333,7 @@ func _update_duplicates(transforms: ProtonScatterTransformList) -> void:
 				break
 
 			var t: Transform3D = item.process_transform(transforms.list[offset + i])
-			instance.transform = inverse_transform * t
+			instance.transform = t
 
 		# Delete the unused instances left in the pool if any
 		if count < child_count:
@@ -344,6 +352,9 @@ func _create_instance(item: ProtonScatterItem, root: Node3D):
 	root.add_child.bind(instance, true).call_deferred()
 
 	if show_output_in_tree:
+		# We have to use a lambda here because ProtonScatterUtil isn't an
+		# actual class_name, it's a const, which makes it impossible to reference
+		# the callable, (but we can still call it)
 		var defer_ownership := func(i, o):
 			ProtonScatterUtil.set_owner_recursive(i, o)
 		defer_ownership.bind(instance, get_tree().get_edited_scene_root()).call_deferred()
@@ -360,7 +371,8 @@ func _perform_sanity_check() -> void:
 	if not domain:
 		domain = ProtonScatterDomain.new()
 
-	scatter_parent = scatter_parent # TODO: Why ?
+	# Retrigger the parent setter, in case the parent node no longer exists or changed type.
+	scatter_parent = scatter_parent
 
 
 func _on_node_duplicated() -> void:
@@ -374,7 +386,8 @@ func _on_child_exiting_tree(node: Node) -> void:
 
 
 # Called when the modifier stack is done generating the full transform list
-func _on_transforms_ready(transforms: ProtonScatterTransformList) -> void:
+func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
+	print("transforms ready ", new_transforms.list.size())
 	if is_thread_running():
 		_thread.wait_to_finish()
 		_thread = null
@@ -384,16 +397,19 @@ func _on_transforms_ready(transforms: ProtonScatterTransformList) -> void:
 		rebuild.call_deferred()
 		return
 
+	transforms = new_transforms
+
 	if not transforms or transforms.is_empty():
+		print("empty transforms")
 		clear_output()
 		update_gizmos()
 		return
 
 	if use_instancing:
-		_update_multimeshes(transforms)
+		_update_multimeshes()
 	else:
-		_update_duplicates(transforms)
-
+		_update_duplicates()
+	print("after update")
 	update_gizmos()
 	await get_tree().process_frame
 	build_completed.emit()
