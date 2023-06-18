@@ -46,12 +46,9 @@ func _process_transforms(transforms, domain, seed) -> void:
 	spacing.y = max(_min_spacing, spacing.y)
 	spacing.z = max(_min_spacing, spacing.z)
 
-	var gt: Transform3D = domain.get_global_transform()
-	var center: Vector3 = domain.bounds.center
+	var gt: Transform3D = domain.get_local_transform()
+	var center: Vector3 = domain.bounds_local.center
 	var size: Vector3 = domain.bounds_local.size
-
-	if is_using_local_space():
-		center = domain.bounds_local.center
 
 	var half_size := size * 0.5
 	var start_corner := center - half_size
@@ -84,9 +81,9 @@ func _process_transforms(transforms, domain, seed) -> void:
 			pos.z = (i / width) * spacing.z
 			pos += start_corner
 
-			if is_using_local_space():
-				pos = gt * pos
-				t.basis = gt.basis
+			if is_using_global_space():
+				t.basis = gt.affine_inverse().basis
+				pos = t * pos
 
 			if domain.is_point_inside(pos):
 				t.origin = pos
