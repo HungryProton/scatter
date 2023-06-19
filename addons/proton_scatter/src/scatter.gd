@@ -145,8 +145,9 @@ func _get_configuration_warnings() -> PackedStringArray:
 	if items.is_empty():
 		warnings.push_back("At least one ScatterItem node is required.")
 
-	if domain and domain.is_empty():
-		warnings.push_back("At least one ScatterShape node is required.")
+	if not modifier_stack.does_not_require_shapes():
+		if domain and domain.is_empty():
+			warnings.push_back("At least one ScatterShape node is required.")
 
 	return warnings
 
@@ -241,7 +242,7 @@ func _rebuild(force_discover) -> void:
 		_discover_items()
 		domain.discover_shapes(self)
 
-	if items.is_empty() or domain.is_empty():
+	if items.is_empty() or (domain.is_empty() and not modifier_stack.does_not_require_shapes()):
 		clear_output()
 		push_warning("ProtonScatter warning: No items or shapes, abort")
 		return

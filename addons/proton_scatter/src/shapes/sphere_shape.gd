@@ -45,29 +45,22 @@ func get_corners_global(gt: Transform3D) -> Array:
 
 
 
-# Returns the circle matching the intersection between the transform's XZ plane
-# and the sphere. Returns an empty array if there's no intersection
-func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[PackedVector2Array]:
+# Returns the circle matching the intersection between the scatter node XZ plane
+# and the sphere. Returns an empty array if there's no intersection.
+func get_closed_edges(_scatter_gt: Transform3D, shape_t: Transform3D) -> Array[PackedVector2Array]:
 	var edge := PackedVector2Array()
+	var plane := Plane(Vector3.UP, 0.0)
 
-	var a = scatter_gt.basis.x
-	var b = scatter_gt.basis.z
-	var c = a + b
-	var o = scatter_gt.origin
-	var plane = Plane(a + o, b + o, c + o)
-
-	var sphere_center := shape_gt.origin
+	var sphere_center := shape_t.origin
 	var dist2plane = plane.distance_to(sphere_center)
 	var radius_at_ground_level := sqrt(pow(radius, 2) - pow(dist2plane, 2))
 
 	# No intersection with plane
-	if radius_at_ground_level <= 0 or radius_at_ground_level > radius:
+	if radius_at_ground_level <= 0.0 or radius_at_ground_level > radius:
 		return []
 
-	var sphere_center_local = scatter_gt.affine_inverse() * sphere_center
-
-	var origin := Vector2(sphere_center_local.x, sphere_center_local.z)
-	var steps: int = max(16, radius_at_ground_level * 12.0)
+	var origin := Vector2(sphere_center.x, sphere_center.z)
+	var steps: int = max(16, int(radius_at_ground_level * 12))
 	var angle: float = TAU / steps
 
 	for i in steps + 1:

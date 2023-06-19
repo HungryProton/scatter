@@ -234,8 +234,6 @@ func compute_edges() -> void:
 		if not merged:
 			merged_polygons.push_back(p1)
 
-	var gt_inverse := root_gt.affine_inverse()
-
 	## For each polygons from the previous step, create a corresponding Curve3D
 	for cp in merged_polygons:
 		for polygon in cp.get_all():
@@ -244,10 +242,14 @@ func compute_edges() -> void:
 
 			var curve := Curve3D.new()
 			for point in polygon:
-				var p = Vector3(point.x, 0.0, point.y)
-				curve.add_point(root_gt * p)
+				curve.add_point(Vector3(point.x, 0.0, point.y))
 
-			curve.add_point(curve.get_point_position(0)) # Close the loop
+			# Close the look if the last vertex is missing (Randomly happens)
+			var first_point := polygon[0]
+			var last_point := polygon[-1]
+			if first_point != last_point:
+				curve.add_point(Vector3(first_point.x, 0.0, first_point.y))
+
 			edges.push_back(curve)
 
 

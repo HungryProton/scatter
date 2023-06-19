@@ -44,7 +44,6 @@ func _redraw(gizmo: EditorNode3DGizmo):
 
 	if node.modifier_stack.is_using_edge_data():
 		var curves: Array[Curve3D] = node.domain.get_edges()
-		var inverse_transform := node.get_global_transform().affine_inverse()
 
 		for curve in curves:
 			var lines := PackedVector3Array()
@@ -52,8 +51,8 @@ func _redraw(gizmo: EditorNode3DGizmo):
 			var lines_count := points.size() - 1
 
 			for i in lines_count:
-				lines.append(inverse_transform * points[i])
-				lines.append(inverse_transform * points[i + 1])
+				lines.append(points[i])
+				lines.append(points[i + 1])
 
 			gizmo.add_lines(lines, get_material("line"))
 

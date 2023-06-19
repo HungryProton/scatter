@@ -15,7 +15,7 @@ var _shape_gizmo_plugin: EditorNode3DGizmoPlugin = ShapeGizmoPlugin.new()
 var _path_panel
 
 
-func get_name():
+func _get_plugin_name():
 	return "ProtonScatter"
 
 

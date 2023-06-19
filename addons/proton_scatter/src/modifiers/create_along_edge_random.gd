@@ -20,11 +20,11 @@ func _init() -> void:
 	individual_instances_reference_frame_available = false
 
 
-func _process_transforms(transforms, domain, seed) -> void:
+func _process_transforms(transforms, domain, random_seed) -> void:
 	_rng = RandomNumberGenerator.new()
-	_rng.set_seed(seed)
+	_rng.set_seed(random_seed)
 
-	var st: Transform3D = domain.get_global_transform()
+	var gt_inverse: Transform3D = domain.get_global_transform().affine_inverse()
 	var new_transforms: Array[Transform3D] = []
 	var curves: Array[Curve3D] = domain.get_edges()
 	var total_curve_length := 0.0
@@ -46,8 +46,8 @@ func _process_transforms(transforms, domain, seed) -> void:
 			t.origin = pos
 			if align_to_path:
 				t = t.looking_at(normal + pos, align_up_axis)
-			elif is_using_local_space():
-				t.basis = st.basis
+			elif is_using_global_space():
+				t.basis = gt_inverse.basis
 
 			new_transforms.push_back(t)
 
