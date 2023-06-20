@@ -48,7 +48,7 @@ func get_corners_global(gt: Transform3D) -> Array:
 # vertices.
 # Compute the intersection of each of the 12 edges to the plane, then recompute
 # the polygon from the positions found.
-func get_closed_edges(scatter_gt: Transform3D, shape_t: Transform3D) -> Array[PackedVector2Array]:
+func get_closed_edges(shape_t: Transform3D) -> Array[PackedVector2Array]:
 	var polygon := PackedVector2Array()
 
 	var plane := Plane(Vector3.UP, 0.0)

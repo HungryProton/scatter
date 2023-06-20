@@ -142,7 +142,7 @@ func get_closest_to(position):
 	return closest
 
 
-func get_closed_edges(scatter_gt: Transform3D, shape_t: Transform3D) -> Array[PackedVector2Array]:
+func get_closed_edges(shape_t: Transform3D) -> Array[PackedVector2Array]:
 	if not closed and thickness <= 0:
 		return []
 
@@ -152,7 +152,6 @@ func get_closed_edges(scatter_gt: Transform3D, shape_t: Transform3D) -> Array[Pa
 	var edges: Array[PackedVector2Array] = []
 	var polyline := PackedVector2Array()
 	var shape_t_inverse := shape_t.affine_inverse()
-	var scatter_gt_inverse := scatter_gt.affine_inverse()
 	var points := curve.tessellate(5, 5) # TODO: find optimal values
 
 	for p in points:
@@ -194,7 +193,7 @@ func get_closed_edges(scatter_gt: Transform3D, shape_t: Transform3D) -> Array[Pa
 	return edges
 
 
-func get_open_edges(_scatter_gt: Transform3D, shape_t: Transform3D) -> Array[Curve3D]:
+func get_open_edges(shape_t: Transform3D) -> Array[Curve3D]:
 	if not curve or closed or thickness > 0:
 		return []
 

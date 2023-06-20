@@ -47,7 +47,7 @@ func get_corners_global(gt: Transform3D) -> Array:
 
 # Returns the circle matching the intersection between the scatter node XZ plane
 # and the sphere. Returns an empty array if there's no intersection.
-func get_closed_edges(_scatter_gt: Transform3D, shape_t: Transform3D) -> Array[PackedVector2Array]:
+func get_closed_edges(shape_t: Transform3D) -> Array[PackedVector2Array]:
 	var edge := PackedVector2Array()
 	var plane := Plane(Vector3.UP, 0.0)
 

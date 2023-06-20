@@ -85,7 +85,8 @@ func set_hint_string(hint: String) -> void:
 	_is_int = true
 
 	for i in tokens.size():
-		_option.add_item(tokens[i], i)
+		_option.add_item(_sanitize_option_name(tokens[i]), i)
+
 	set_value(int(_spinbox.get_value()))
 
 
@@ -112,3 +113,7 @@ func _set_range(start, end) -> void:
 		_spinbox.max_value = end
 		_spinbox.allow_greater = false
 		_spinbox.allow_lesser = false
+
+
+func _sanitize_option_name(token: String) -> String:
+	return token.left(token.find(":"))

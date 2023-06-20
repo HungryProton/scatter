@@ -21,7 +21,8 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
-	var gt_inverse: Transform3D = domain.get_global_transform().affine_inverse()
+	var gt: Transform3D = domain.get_global_transform()
+	var gt_inverse: Transform3D = gt.affine_inverse()
 
 	var t_origin := offset
 	var basis := Basis()
@@ -40,11 +41,15 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	basis = basis.rotated(y_axis, deg_to_rad(rotation.y))
 	basis = basis.rotated(z_axis, deg_to_rad(rotation.z))
 
-	var transform := Transform3D(basis, t_origin)
+	var transform := Transform3D(basis, Vector3.ZERO)
 
-	if is_using_local_space():
-		transform = transform.scaled_local(scale)
+	if is_using_global_space():
+		var global_t: Transform3D = gt * transform
+		global_t.basis = global_t.basis.scaled(scale)
+		transform = gt_inverse * global_t
 	else:
-		transform = transform.scaled(scale)
+		transform = transform.scaled_local(scale)
+
+	transform.origin = t_origin
 
 	transforms.list.push_back(transform)

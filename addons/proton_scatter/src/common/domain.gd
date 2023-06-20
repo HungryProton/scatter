@@ -141,13 +141,12 @@ func compute_edges() -> void:
 		return
 
 	var source_polygons: Array[ComplexPolygon] = []
-	var root_gt: Transform3D = root.get_global_transform()
 
 	## Retrieve all polygons
 	for info in positive_shapes:
 		# Store all closed polygons in a specific array
 		var polygon := ComplexPolygon.new()
-		polygon.add_array(info.shape.get_closed_edges(root_gt, info.node.transform))
+		polygon.add_array(info.shape.get_closed_edges(info.node.transform))
 
 		# Polygons with holes must be merged together first
 		if not polygon.inner.is_empty():
@@ -157,7 +156,7 @@ func compute_edges() -> void:
 
 		# Store open edges directly since they are already Curve3D and we
 		# don't apply boolean operations to them.
-		var open_edges = info.shape.get_open_edges(root_gt, info.node.transform)
+		var open_edges = info.shape.get_open_edges(info.node.transform)
 		edges.append_array(open_edges)
 
 	if source_polygons.is_empty():
