@@ -24,7 +24,8 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
-	var gt_inverse: Transform3D = domain.get_global_transform().affine_inverse()
+	var s_gt: Transform3D = domain.get_global_transform()
+	var s_gt_inverse: Transform3D = s_gt.affine_inverse()
 	var t: Transform3D
 
 	for i in transforms.list.size():
@@ -35,7 +36,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		if is_using_individual_instances_space():
 			value = t.basis * position
 		elif is_using_global_space():
-			value = gt_inverse.basis * position
+			value = s_gt_inverse.basis * position
 		else:
 			value = position
 
@@ -43,10 +44,19 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			0:
 				t.origin += value
 			1:
-				if is_using_global_space():
-					t.origin += value
-				else:
+				if is_using_local_space():
 					t.origin *= value
+
+				if is_using_global_space():
+					var global_pos = s_gt * t.origin
+					global_pos -= s_gt.origin
+					global_pos *= position
+					global_pos += s_gt.origin
+
+					t.origin = s_gt_inverse * global_pos
+
+				elif is_using_individual_instances_space():
+					pass # Multiply does nothing on this reference frame.
 			2:
 				t.origin = value
 

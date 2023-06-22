@@ -127,6 +127,8 @@ func _ready() -> void:
 	if not is_instance_valid(_dependency_parent):
 		full_rebuild.call_deferred()
 
+	update_configuration_warnings.call_deferred()
+
 
 func _get_property_list() -> Array:
 	var list := []
@@ -139,13 +141,12 @@ func _get_property_list() -> Array:
 
 
 func _get_configuration_warnings() -> PackedStringArray:
-	_perform_sanity_check()
 	var warnings := PackedStringArray()
 
 	if items.is_empty():
 		warnings.push_back("At least one ScatterItem node is required.")
 
-	if not modifier_stack.does_not_require_shapes():
+	if modifier_stack and not modifier_stack.does_not_require_shapes():
 		if domain and domain.is_empty():
 			warnings.push_back("At least one ScatterShape node is required.")
 
