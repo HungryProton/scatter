@@ -48,9 +48,9 @@ func _process_transforms(transforms, domain, seed) -> void:
 
 		# Apply rotation
 		if is_using_individual_instances_space():
-			axis_x = basis.x
-			axis_y = basis.y
-			axis_z = basis.z
+			axis_x = basis.x.normalized()
+			axis_y = basis.y.normalized()
+			axis_z = basis.z.normalized()
 
 		basis = basis.rotated(axis_x, deg_to_rad(_random_float() * rotation.x))
 		basis = basis.rotated(axis_y, deg_to_rad(_random_float() * rotation.y))
@@ -65,8 +65,8 @@ func _process_transforms(transforms, domain, seed) -> void:
 			basis.z *= random_scale.z
 
 		elif is_using_global_space():
-			global_t = Transform3D(basis, Vector3.ZERO) * s_gt
-			global_t.basis = global_t.basis.scaled(random_scale)
+			global_t = s_gt * Transform3D(basis, Vector3.ZERO)
+			global_t = global_t.scaled(random_scale)
 			basis = (s_gt_inverse * global_t).basis
 
 		else:
@@ -77,6 +77,9 @@ func _process_transforms(transforms, domain, seed) -> void:
 
 		if is_using_individual_instances_space():
 			random_position = t.basis * random_position
+
+		elif is_using_global_space():
+			random_position = s_gt_inverse.basis * random_position
 
 		t.origin += random_position
 		t.basis = basis

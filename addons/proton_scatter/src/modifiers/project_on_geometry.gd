@@ -152,10 +152,12 @@ func _process_transforms(transforms, domain, _seed) -> void:
 
 			t.origin = gt_inverse * hit.position
 			transforms.list[index] = t
-			index += 1
 
 		elif remove_points_on_miss:
 			transforms.list.remove_at(index)
+			continue # Don't increase the index counter
+
+		index += 1
 
 	if transforms.is_empty():
 		warning += """Every points have been removed. Possible reasons include: \n

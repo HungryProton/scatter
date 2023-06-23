@@ -73,6 +73,15 @@ static func get_shape_documentation() -> DocumentationInfo:
 	return info
 
 
+static func get_cache_documentation() -> DocumentationInfo:
+	var info := DocumentationInfo.new()
+
+	info.set_title("ScatterCache")
+	info.add_paragraph("TODO: Write this page")
+
+	return info
+
+
 static func get_modifiers_documentation() -> DocumentationInfo:
 	var info := DocumentationInfo.new()
 

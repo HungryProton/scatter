@@ -36,6 +36,7 @@ func _ready() -> void:
 	add_page(SpecialPages.get_scatter_documentation(), tree.create_item())
 	add_page(SpecialPages.get_item_documentation(), tree.create_item())
 	add_page(SpecialPages.get_shape_documentation(), tree.create_item())
+	add_page(SpecialPages.get_cache_documentation(), tree.create_item())
 
 	_modifiers_root = tree.create_item()
 	add_page(SpecialPages.get_modifiers_documentation(), _modifiers_root)
@@ -155,6 +156,12 @@ func _discover_modifiers_recursive(path, result) -> void:
 				NOT closed). If you can't see these lines, make sure to have at
 				least one Shape crossing the ProtonScatter local XZ plane.",
 				1)
+
+		if modifier.deprecated:
+			info.add_warning(
+				"This modifier has been deprecated. It won't receive any updates
+				and will be deleted in a future update.",
+				2)
 
 		result[modifier.display_name] = info
 

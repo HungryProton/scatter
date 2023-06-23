@@ -184,7 +184,6 @@ func get_closed_edges(shape_t: Transform3D) -> Array[PackedVector2Array]:
 
 		t2 = Transform2D().scaled(Vector2.ONE * (1.0 / scale))
 		for polygon in result:
-			prints(polygon.size(), "is hole:", Geometry2D.is_polygon_clockwise(polygon))
 			edges.push_back(polygon * t2)
 
 	if closed and thickness == 0.0:

@@ -8,13 +8,15 @@ extends "base_modifier.gd"
 
 
 func _init() -> void:
-	display_name = "Offset Transform"
+	display_name = "Edit Transform"
 	category = "Offset"
 	can_restrict_height = false
 	global_reference_frame_available = true
 	local_reference_frame_available = true
 	individual_instances_reference_frame_available = true
 	use_local_space_by_default()
+	deprecated = true
+	deprecation_message = "Use a combination of 'Edit Position', 'Edit Rotation' and 'Edit Scale' instead."
 
 	documentation.add_paragraph(
 		"Offsets position, rotation and scale in a single modifier. Every

@@ -89,7 +89,7 @@ var modifier_stack: ProtonScatterModifierStack:
 		modifier_stack.transforms_ready.connect(_on_transforms_ready, CONNECT_DEFERRED)
 
 var domain: ProtonScatterDomain:
-	set(val):
+	set(_val):
 		domain = ProtonScatterDomain.new() # Enforce uniqueness
 
 var items: Array = []
@@ -103,7 +103,6 @@ var _thread: Thread
 var _rebuild_queued := false
 var _dependency_parent
 var _physics_helper: ProtonScatterPhysicsHelper
-var _thread_just_started := false
 
 
 func _exit_tree():
@@ -255,7 +254,7 @@ func _rebuild(force_discover) -> void:
 		modifier_stack.start_update(self, domain)
 		return
 
-	if _thread:
+	if is_thread_running():
 		await _thread.wait_to_finish()
 
 	_thread = Thread.new()
@@ -265,7 +264,7 @@ func _rebuild(force_discover) -> void:
 func _rebuild_threaded() -> void:
 	# Disable thread safety, but only after 4.1 beta 3
 	if _thread.has_method("set_thread_safety_checks_enabled"):
-		_thread.set_thread_safety_checks_enabled(false)
+		Thread.set_thread_safety_checks_enabled(false)
 
 	modifier_stack.start_update(self, domain.get_copy())
 
@@ -289,12 +288,10 @@ func _update_multimeshes() -> void:
 
 	var offset := 0
 	var transforms_count: int = transforms.size()
-	var inverse_transform := global_transform.affine_inverse()
 
 	for item in items:
-		var item_root = await ProtonScatterUtil.get_or_create_item_root(item)
 		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		var mmi = await ProtonScatterUtil.get_or_create_multimesh(item, count)
+		var mmi = ProtonScatterUtil.get_or_create_multimesh(item, count)
 		if not mmi:
 			return
 
@@ -314,7 +311,6 @@ func _update_multimeshes() -> void:
 func _update_duplicates() -> void:
 	var offset := 0
 	var transforms_count: int = transforms.size()
-	var inverse_transform := global_transform.affine_inverse()
 
 	for item in items:
 		var count := int(round(float(item.proportion) / total_item_proportion * transforms_count))
@@ -378,8 +374,9 @@ func _perform_sanity_check() -> void:
 
 
 func _on_node_duplicated() -> void:
-	clear_output() # Otherwise we get linked multimeshes or other unwanted side effects
-	_perform_sanity_check()
+	# Force a full rebuild (which clears the existing outputs), otherwise we get
+	# linked multimeshes or other unwanted side effects
+	full_rebuild.call_deferred()
 
 
 func _on_child_exiting_tree(node: Node) -> void:
@@ -389,9 +386,8 @@ func _on_child_exiting_tree(node: Node) -> void:
 
 # Called when the modifier stack is done generating the full transform list
 func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
-	print("transforms ready ", new_transforms.list.size())
 	if is_thread_running():
-		_thread.wait_to_finish()
+		await _thread.wait_to_finish()
 		_thread = null
 
 	if _rebuild_queued:
@@ -402,7 +398,6 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 	transforms = new_transforms
 
 	if not transforms or transforms.is_empty():
-		print("empty transforms")
 		clear_output()
 		update_gizmos()
 		return
@@ -411,7 +406,7 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		_update_multimeshes()
 	else:
 		_update_duplicates()
-	print("after update")
+
 	update_gizmos()
 	await get_tree().process_frame
 	build_completed.emit()
