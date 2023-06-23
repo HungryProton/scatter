@@ -32,10 +32,20 @@ func _process_transforms(transforms, domain, _seed : int) -> void:
 	var s_gt_inverse := s_gt.affine_inverse()
 	var t: Transform3D
 	var basis: Basis
-	var axis_x := Vector3.RIGHT
-	var axis_y := Vector3.UP
-	var axis_z := Vector3.FORWARD
+	var axis_x: Vector3
+	var axis_y: Vector3
+	var axis_z: Vector3
 	var final_rotation: Vector3
+
+	if is_using_local_space():
+		axis_x = Vector3.RIGHT
+		axis_y = Vector3.UP
+		axis_z = Vector3.FORWARD
+
+	elif is_using_global_space():
+		axis_x = (s_gt_inverse.basis * Vector3.RIGHT).normalized()
+		axis_y = (s_gt_inverse.basis * Vector3.UP).normalized()
+		axis_z = (s_gt_inverse.basis * Vector3.FORWARD).normalized()
 
 	for i in transforms.size():
 		t = transforms.list[i]
@@ -43,29 +53,48 @@ func _process_transforms(transforms, domain, _seed : int) -> void:
 
 		match operation:
 			0: # Offset
-				if is_using_individual_instances_space():
-					basis = basis.rotated(basis.x, rotation_rad.x)
-					basis = basis.rotated(basis.y, rotation_rad.y)
-					basis = basis.rotated(basis.z, rotation_rad.z)
-
-				elif is_using_local_space():
-					basis = basis.rotated(Vector3.RIGHT, rotation_rad.x)
-					basis = basis.rotated(Vector3.UP, rotation_rad.y)
-					basis = basis.rotated(Vector3.FORWARD, rotation_rad.z)
-
-				else:
-					basis = basis.rotated(s_gt_inverse.basis * Vector3.RIGHT, rotation_rad.x)
-					basis = basis.rotated(s_gt_inverse.basis * Vector3.UP, rotation_rad.y)
-					basis = basis.rotated(s_gt_inverse.basis * Vector3.FORWARD, rotation_rad.z)
-
-#				basis = basis.rotated(axis_x, rotation_rad.x)
-#				basis = basis.rotated(axis_y, rotation_rad.y)
-#				basis = basis.rotated(axis_z, rotation_rad.z)
+				final_rotation = rotation_rad
 
 			1: # Multiply
-				pass
+				# TMP: Local and global space calculations are probably wrong
+				var current_rotation: Vector3
+
+				if is_using_individual_instances_space():
+					current_rotation = basis.get_euler()
+
+				elif is_using_local_space():
+					var local_t := t * s_lt
+					current_rotation = local_t.basis.get_euler()
+
+				else:
+					var global_t := t * s_gt
+					current_rotation = global_t.basis.get_euler()
+
+				final_rotation = (current_rotation * rotation) - current_rotation
 
 			2: # Override
-				pass
+				# Creates a new basis with the original scale only
+				# Applies new rotation on top
+
+				if is_using_individual_instances_space():
+					basis = Basis().from_scale(t.basis.get_scale())
+
+				elif is_using_local_space():
+					basis = (s_gt_inverse * s_gt).basis
+
+				else:
+					var tmp_t = Transform3D(Basis.from_scale(t.basis.get_scale()), Vector3.ZERO)
+					basis = (s_gt_inverse * tmp_t).basis
+
+				final_rotation = rotation_rad
+
+		if is_using_individual_instances_space():
+			axis_x = basis.x.normalized()
+			axis_y = basis.y.normalized()
+			axis_z = basis.z.normalized()
+
+		basis = basis.rotated(axis_y, final_rotation.y)
+		basis = basis.rotated(axis_x, final_rotation.x)
+		basis = basis.rotated(axis_z, final_rotation.z)
 
 		transforms.list[i].basis = basis

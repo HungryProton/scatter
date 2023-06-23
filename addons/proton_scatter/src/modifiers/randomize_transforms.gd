@@ -2,9 +2,9 @@
 extends "base_modifier.gd"
 
 
-@export var position := Vector3.ONE
-@export var rotation := Vector3(360.0, 360.0, 360.0)
-@export var scale := Vector3.ONE
+@export var position := Vector3.ZERO
+@export var rotation := Vector3.ZERO
+@export var scale := Vector3.ZERO
 
 var _rng: RandomNumberGenerator
 
@@ -25,49 +25,58 @@ func _process_transforms(transforms, domain, seed) -> void:
 	_rng.set_seed(seed)
 
 	var t: Transform3D
-	var local_t: Transform3D
+	var global_t: Transform3D
 	var basis: Basis
 	var random_scale: Vector3
 	var random_position: Vector3
-	var st: Transform3D = domain.get_global_transform()
+	var s_gt: Transform3D = domain.get_global_transform()
+	var s_gt_inverse := s_gt.affine_inverse()
 
 	# Global rotation axis
 	var axis_x := Vector3.RIGHT
 	var axis_y := Vector3.UP
 	var axis_z := Vector3.DOWN
 
-	if is_using_local_space():
-		axis_x = st.basis.x
-		axis_y = st.basis.y
-		axis_z = st.basis.z
+	if is_using_global_space():
+		axis_x = (s_gt_inverse.basis * Vector3.RIGHT).normalized()
+		axis_y = (s_gt_inverse.basis * Vector3.UP).normalized()
+		axis_z = (s_gt_inverse.basis * Vector3.FORWARD).normalized()
 
 	for i in transforms.size():
 		t = transforms.list[i]
 		basis = t.basis
 
-		random_scale = Vector3.ONE + (_rng.randf() * scale)
-		random_position = _random_vec3() * position
-
+		# Apply rotation
 		if is_using_individual_instances_space():
 			axis_x = basis.x
 			axis_y = basis.y
 			axis_z = basis.z
-			basis.x *= random_scale.x
-			basis.y *= random_scale.y
-			basis.z *= random_scale.z
-			random_position = t.basis * random_position
-
-		elif is_using_local_space():
-			local_t = t * st
-			local_t.basis = local_t.basis.scaled(random_scale)
-			basis = (st * local_t).basis
-
-		else:
-			basis = basis.scaled(random_scale)
 
 		basis = basis.rotated(axis_x, deg_to_rad(_random_float() * rotation.x))
 		basis = basis.rotated(axis_y, deg_to_rad(_random_float() * rotation.y))
 		basis = basis.rotated(axis_z, deg_to_rad(_random_float() * rotation.z))
+
+		# Apply scale
+		random_scale = Vector3.ONE + (_rng.randf() * scale)
+
+		if is_using_individual_instances_space():
+			basis.x *= random_scale.x
+			basis.y *= random_scale.y
+			basis.z *= random_scale.z
+
+		elif is_using_global_space():
+			global_t = Transform3D(basis, Vector3.ZERO) * s_gt
+			global_t.basis = global_t.basis.scaled(random_scale)
+			basis = (s_gt_inverse * global_t).basis
+
+		else:
+			basis = basis.scaled(random_scale)
+
+		# Apply position
+		random_position = _random_vec3() * position
+
+		if is_using_individual_instances_space():
+			random_position = t.basis * random_position
 
 		t.origin += random_position
 		t.basis = basis

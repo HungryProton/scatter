@@ -20,6 +20,9 @@ func _init() -> void:
 
 	documentation.add_paragraph("Randomly rotate every transforms individually.")
 
+	documentation.add_warning("This modifier is deprecated.
+		It will be replaced by the 'Snap Transform' modifier.", 2)
+
 	var p := documentation.add_parameter("Rotation")
 	p.set_type("Vector3")
 	p.set_description("Rotation angle (in degrees) along each axes (X, Y, Z)")
