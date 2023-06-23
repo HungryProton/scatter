@@ -238,6 +238,8 @@ func rebuild(force_discover := false) -> void:
 # Scattered objects are stored under a Marker3D node called "ScatterOutput"
 # DON'T call this function directly outside of the 'rebuild()' function above.
 func _rebuild(force_discover) -> void:
+	_perform_sanity_check()
+
 	if force_discover:
 		_discover_items()
 		domain.discover_shapes(self)

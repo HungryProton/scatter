@@ -14,23 +14,13 @@ extends Node
 const DEFAULT_CACHE_FOLDER := "res://addons/proton_scatter/cache/"
 
 const ProtonScatter := preload("res://addons/proton_scatter/src/scatter.gd")
-const ProtonScatterTransformList := preload("./common/transform_list.gd")
+const ProtonScatterTransformList := preload("../common/transform_list.gd")
 
 
 @export_file("*.res", "*.tres") var cache_file := "":
 	set(val):
 		cache_file = val
-		#update_configuration_warnings()
-
-@export var rebuild: bool:
-	set(val):
-		rebuild = false
-		_rebuild_cache()
-
-@export var restore: bool:
-	set(val):
-		restore = false
-		_restore_cache()
+		update_configuration_warnings()
 
 # The resource where transforms are actually stored
 var _local_cache: ProtonScatterCacheResource
@@ -43,7 +33,6 @@ func _ready() -> void:
 		return
 
 	_scene_root = _get_local_scene_root(self)
-	prints("Cache: scene root:", _scene_root, _scene_root.get_scene_file_path())
 
 	# By default, Set the cache path to a file next to the current scene.
 	if cache_file.is_empty():
@@ -60,7 +49,7 @@ func _ready() -> void:
 		cache_file = DEFAULT_CACHE_FOLDER.get_basename().path_join(scene_name + "_scatter_cache.tres")
 		return
 
-	_restore_cache.call_deferred()
+	restore_cache.call_deferred()
 
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -71,10 +60,9 @@ func _get_configuration_warnings() -> PackedStringArray:
 	return warnings
 
 
-func _rebuild_cache() -> void:
+func rebuild_cache() -> void:
 	if cache_file.is_empty():
 		printerr("Cache file path is empty.")
-
 		return
 
 	_scatter_nodes.clear()
@@ -100,7 +88,7 @@ func _rebuild_cache() -> void:
 	ResourceSaver.save(_local_cache, cache_file)
 
 
-func _restore_cache(force_restore := false) -> void:
+func restore_cache(force_restore := false) -> void:
 	# Load the cache file if it exists
 	_local_cache = load(cache_file)
 	if not _local_cache:

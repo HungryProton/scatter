@@ -8,10 +8,12 @@ const ModifierStackPlugin := preload("./src/stack/inspector_plugin/modifier_stac
 const ScatterGizmoPlugin := preload("./src/scatter_gizmo_plugin.gd")
 const ShapeGizmoPlugin := preload("./src/shapes/gizmos_plugin/shape_gizmo_plugin.gd")
 const PathPanel := preload("./src/shapes/gizmos_plugin/components/path_panel.tscn")
+const ScatterCachePlugin := preload("./src/cache/inspector_plugin/scatter_cache_plugin.gd")
 
-var _modifier_stack_plugin: EditorInspectorPlugin = ModifierStackPlugin.new()
-var _scatter_gizmo_plugin: ScatterGizmoPlugin = ScatterGizmoPlugin.new()
-var _shape_gizmo_plugin: EditorNode3DGizmoPlugin = ShapeGizmoPlugin.new()
+var _modifier_stack_plugin := ModifierStackPlugin.new()
+var _scatter_gizmo_plugin := ScatterGizmoPlugin.new()
+var _shape_gizmo_plugin := ShapeGizmoPlugin.new()
+var _scatter_cache_plugin := ScatterCachePlugin.new()
 var _path_panel
 
 
@@ -21,6 +23,7 @@ func _get_plugin_name():
 
 func _enter_tree():
 	add_inspector_plugin(_modifier_stack_plugin)
+	add_inspector_plugin(_scatter_cache_plugin)
 
 	_path_panel = PathPanel.instantiate()
 	add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_MENU, _path_panel)
@@ -54,7 +57,7 @@ func _enter_tree():
 	add_custom_type(
 		"ScatterCache",
 		"Node3D",
-		preload("./src/scatter_cache.gd"),
+		preload("./src/cache/scatter_cache.gd"),
 		preload("./icons/cache.svg")
 	)
 
@@ -70,6 +73,7 @@ func _exit_tree():
 	remove_custom_type("ScatterShape")
 	remove_custom_type("ScatterCache")
 	remove_inspector_plugin(_modifier_stack_plugin)
+	remove_inspector_plugin(_scatter_cache_plugin)
 	remove_node_3d_gizmo_plugin(_shape_gizmo_plugin)
 	remove_node_3d_gizmo_plugin(_scatter_gizmo_plugin)
 	if _path_panel:
