@@ -60,6 +60,11 @@ func _get_configuration_warnings() -> PackedStringArray:
 	return warnings
 
 
+func _notification(what):
+	if what == NOTIFICATION_EDITOR_PRE_SAVE:
+		rebuild_cache()
+
+
 func rebuild_cache() -> void:
 	if cache_file.is_empty():
 		printerr("Cache file path is empty.")

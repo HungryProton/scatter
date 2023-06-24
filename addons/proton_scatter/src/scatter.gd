@@ -105,12 +105,6 @@ var _dependency_parent
 var _physics_helper: ProtonScatterPhysicsHelper
 
 
-func _exit_tree():
-	if is_thread_running():
-		_thread.wait_to_finish()
-		_thread = null
-
-
 func _ready() -> void:
 	if Engine.is_editor_hint() or enable_updates_in_game:
 		set_notify_transform(true)
