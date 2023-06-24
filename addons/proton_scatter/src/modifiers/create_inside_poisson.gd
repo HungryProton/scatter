@@ -75,7 +75,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 	_rng = RandomNumberGenerator.new()
 	_rng.set_seed(seed)
 	_domain = domain
-	_bounds = _domain.bounds
+	_bounds = _domain.bounds_local
 	_gt = domain.get_global_transform()
 	_points = []
 	_init_grid()
@@ -109,15 +109,20 @@ func _process_transforms(transforms, domain, seed) -> void:
 				var t = Transform3D()
 				t.origin = candidate
 
-				if is_using_local_space():
-					t.basis = _gt.basis
+				if is_using_global_space():
+					t.basis = _gt.affine_inverse().basis
 
 				_points.push_back(t)
 				spawn_points.push_back(t)
+
+				var index: int
 				if restrict_height:
-					_grid[_cell_x + _cell_z * _grid_size.z] = _points.size() - 1
+					index = _cell_x + _cell_z * _grid_size.z
 				else:
-					_grid[_cell_x + (_grid_size.y * _cell_y) + (_grid_size.x * _grid_size.y * _cell_z)] = _points.size() - 1
+					index = _cell_x + (_grid_size.y * _cell_y) + (_grid_size.x * _grid_size.y * _cell_z)
+
+				if index < _grid.size():
+					_grid[index] = _points.size() - 1
 
 				break
 
@@ -202,8 +207,8 @@ func _is_valid(candidate: Vector3) -> bool:
 	return true
 
 
-func _is_point_too_close(candidate: Vector3, point_index) -> bool:
-	if point_index == null:
+func _is_point_too_close(candidate: Vector3, point_index: int) -> bool:
+	if point_index >= _points.size():
 		return false
 
 	var other_point := _points[point_index]

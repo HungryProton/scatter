@@ -24,7 +24,7 @@ var category: String = "None"
 var documentation := DocumentationInfo.new()
 var warning: String = ""
 var warning_ignore_no_transforms := false
-var warning_ignore_no_shape := false
+var warning_ignore_no_shape := true
 var expanded := false
 var can_override_seed := false
 var can_restrict_height := true
@@ -32,6 +32,8 @@ var global_reference_frame_available := true
 var local_reference_frame_available := false
 var individual_instances_reference_frame_available := false
 var use_edge_data := false
+var deprecated := false
+var deprecation_message: String
 
 
 func get_warning() -> String:
@@ -41,7 +43,12 @@ func get_warning() -> String:
 func process_transforms(transforms: TransformList, domain: Domain, global_seed: int) -> void:
 	_clear_warning()
 
+	if deprecated:
+		warning += "This modifier is deprecated.\n"
+		warning += deprecation_message + "\n"
+
 	if not enabled:
+		warning_changed.emit()
 		return
 
 	if domain.is_empty() and not warning_ignore_no_shape:

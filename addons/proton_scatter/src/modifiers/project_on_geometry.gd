@@ -94,18 +94,20 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		return
 
 	# Create all the physics ray queries
-	var domain_basis: Basis = domain.get_root().get_global_transform().basis
+	var gt: Transform3D = domain.get_global_transform()
+	var gt_inverse := gt.affine_inverse()
 	var queries: Array[PhysicsRayQueryParameters3D] = []
+
 	for t in transforms.list:
-		var start = t.origin
-		var end = t.origin
+		var start = gt * t.origin
+		var end = start
 		var dir = ray_direction.normalized()
 
 		if is_using_individual_instances_space():
 			dir = t.basis * dir
 
 		elif is_using_local_space():
-			dir = domain_basis * dir
+			dir = gt.basis * dir
 
 		start -= ray_offset * dir
 		end += ray_length * dir
@@ -146,14 +148,16 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			t = transforms.list[index]
 
 			if align_with_collision_normal:
-				t = _align_with(t, hit.normal)
+				t = _align_with(t, gt_inverse.basis * hit.normal)
 
-			t.origin = hit.position
+			t.origin = gt_inverse * hit.position
 			transforms.list[index] = t
-			index += 1
 
 		elif remove_points_on_miss:
 			transforms.list.remove_at(index)
+			continue # Don't increase the index counter
+
+		index += 1
 
 	if transforms.is_empty():
 		warning += """Every points have been removed. Possible reasons include: \n

@@ -17,6 +17,8 @@ func _init() -> void:
 	local_reference_frame_available = true
 	individual_instances_reference_frame_available = true
 	use_individual_instances_space_by_default()
+	deprecated = true
+	deprecation_message = "Use the 'Snap transform' modifier instead."
 
 	documentation.add_paragraph("Randomly rotate every transforms individually.")
 

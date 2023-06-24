@@ -241,7 +241,7 @@ static func get_merged_meshes_from(source: Node) -> MeshInstance3D:
 				array_mesh.add_surface_from_arrays(primitive_type, arrays, [], {}, format)
 
 				# Restore material if any
-				var material := get_material_for_surface.call(mi, surface_index)
+				var material: Material = get_material_for_surface.call(mi, surface_index)
 				array_mesh.surface_set_material(array_mesh.get_surface_count() - 1, material)
 
 		var instance := MeshInstance3D.new()

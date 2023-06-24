@@ -7,81 +7,54 @@
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 31.0
-size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_constants/separation = 0
 script = ExtResource("2")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
-offset_right = 1152.0
-offset_bottom = 31.0
 
 [node name="Label" type="Label" parent="HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_top = 2.0
-offset_right = 574.0
-offset_bottom = 28.0
 size_flags_horizontal = 3
 text = "Parameter name"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer"]
 layout_mode = 2
-offset_left = 578.0
-offset_right = 1152.0
-offset_bottom = 31.0
 size_flags_horizontal = 3
 
 [node name="FileButton" type="Button" parent="HBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_right = 546.0
-offset_bottom = 31.0
 size_flags_horizontal = 3
 text = "Select a file"
 
 [node name="ClearButton" type="Button" parent="HBoxContainer/HBoxContainer"]
 layout_mode = 2
-offset_left = 550.0
-offset_right = 574.0
-offset_bottom = 31.0
 icon = ExtResource("1")
 
 [node name="PreviewRoot" type="HBoxContainer" parent="."]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-offset_top = 31.0
-offset_right = 1024.0
-offset_bottom = 39.0
 size_flags_horizontal = 3
 
 [node name="Control" type="Control" parent="PreviewRoot"]
 layout_mode = 2
-anchors_preset = 0
-offset_right = 1012.0
-offset_bottom = 8.0
 size_flags_horizontal = 3
 
 [node name="TextureButton" type="Button" parent="PreviewRoot"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_left = 1016.0
-offset_right = 1024.0
-offset_bottom = 8.0
 flat = true
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 2
-anchors_preset = 0
-offset_top = 31.0
-offset_right = 1152.0
-offset_bottom = 31.0
 
 [node name="FileDialog" type="FileDialog" parent="Control"]
 unique_name_in_owner = true
-title = "Open a texture file"
+title = "Open a File"
 size = Vector2i(400, 600)
 ok_button_text = "Open"
 file_mode = 0

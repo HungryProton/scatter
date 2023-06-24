@@ -10,10 +10,8 @@ const Util := preload("../common/util.gd")
 # + Use the curve up vector, default to local Y+ when not available
 @export var spacing := 1.0
 @export var offset := 0.0
-@export_enum("X", "Y", "Z") var up_axis := 1
-@export var align_x := false
-@export var align_y := false
-@export var align_z := false
+@export var align_to_path := false
+@export var align_up_axis := Vector3.UP
 
 var _min_spacing := 0.05
 
@@ -24,8 +22,8 @@ func _init() -> void:
 	warning_ignore_no_transforms = true
 	warning_ignore_no_shape = false
 	can_restrict_height = false
-	global_reference_frame_available = false
-	local_reference_frame_available = false
+	global_reference_frame_available = true
+	local_reference_frame_available = true
 	individual_instances_reference_frame_available = false
 	use_edge_data = true
 
@@ -46,10 +44,7 @@ func _init() -> void:
 func _process_transforms(transforms, domain, _seed) -> void:
 	spacing = max(_min_spacing, spacing)
 
-	var up := get_align_up_vector(up_axis)
-	var inverse_basis: Basis = domain.get_global_transform().affine_inverse().basis
-	var up_local := up * inverse_basis
-
+	var gt_inverse: Transform3D = domain.get_global_transform().affine_inverse()
 	var new_transforms: Array[Transform3D] = []
 	var curves: Array[Curve3D] = domain.get_edges()
 
@@ -73,34 +68,11 @@ func _process_transforms(transforms, domain, _seed) -> void:
 
 			var t := Transform3D()
 			t.origin = pos
-			t = t.looking_at(normal + pos, up)
-
-			var angles := t.basis.get_euler()
-			angles.x *= int(align_x)
-			angles.y *= int(align_y)
-			angles.z *= int(align_y)
-
-			t.basis = t.basis.from_euler(angles)
+			if align_to_path:
+				t = t.looking_at(normal + pos, align_up_axis)
+			elif is_using_global_space():
+				t.basis = gt_inverse.basis
 
 			new_transforms.push_back(t)
 
 	transforms.append(new_transforms)
-
-
-static func get_align_up_vector(align : int) -> Vector3:
-	var axis : Vector3
-	match align:
-		#x
-		0:
-			axis = Vector3.RIGHT
-		#y
-		1:
-			axis = Vector3.UP
-		#z
-		2:
-			axis = Vector3.BACK
-		_:
-			#default return y axis
-			axis = Vector3.UP
-
-	return axis

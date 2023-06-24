@@ -14,6 +14,10 @@ config/name="ProtonScatter"
 config/features=PackedStringArray("4.1", "Forward Plus")
 config/icon="res://icon.svg"
 
+[debug]
+
+gdscript/warnings/exclude_addons=false
+
 [display]
 
 window/size/viewport_width=1280
@@ -26,4 +30,3 @@ enabled=PackedStringArray("res://addons/proton_scatter/plugin.cfg")
 [rendering]
 
 anti_aliasing/quality/msaa_3d=2
-anti_aliasing/quality/use_taa=true

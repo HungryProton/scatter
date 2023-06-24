@@ -89,12 +89,13 @@ var modifier_stack: ProtonScatterModifierStack:
 		modifier_stack.transforms_ready.connect(_on_transforms_ready, CONNECT_DEFERRED)
 
 var domain: ProtonScatterDomain:
-	set(val):
+	set(_val):
 		domain = ProtonScatterDomain.new() # Enforce uniqueness
 
 var items: Array = []
 var total_item_proportion: int
 var output_root: Marker3D
+var transforms: ProtonScatterTransformList
 
 var editor_plugin # Holds a reference to the EditorPlugin. Used by other parts.
 
@@ -102,7 +103,6 @@ var _thread: Thread
 var _rebuild_queued := false
 var _dependency_parent
 var _physics_helper: ProtonScatterPhysicsHelper
-var _thread_just_started := false
 
 
 func _exit_tree():
@@ -126,6 +126,8 @@ func _ready() -> void:
 	if not is_instance_valid(_dependency_parent):
 		full_rebuild.call_deferred()
 
+	update_configuration_warnings.call_deferred()
+
 
 func _get_property_list() -> Array:
 	var list := []
@@ -139,16 +141,21 @@ func _get_property_list() -> Array:
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
+
 	if items.is_empty():
 		warnings.push_back("At least one ScatterItem node is required.")
-	if domain.is_empty():
-		warnings.push_back("At least one ScatterShape node is required.")
+
+	if modifier_stack and not modifier_stack.does_not_require_shapes():
+		if domain and domain.is_empty():
+			warnings.push_back("At least one ScatterShape node is required.")
+
 	return warnings
 
 
 func _notification(what):
 	match what:
 		NOTIFICATION_TRANSFORM_CHANGED:
+			_perform_sanity_check()
 			domain.compute_bounds()
 			rebuild.call_deferred()
 
@@ -231,11 +238,13 @@ func rebuild(force_discover := false) -> void:
 # Scattered objects are stored under a Marker3D node called "ScatterOutput"
 # DON'T call this function directly outside of the 'rebuild()' function above.
 func _rebuild(force_discover) -> void:
+	_perform_sanity_check()
+
 	if force_discover:
 		_discover_items()
 		domain.discover_shapes(self)
 
-	if items.is_empty() or domain.is_empty():
+	if items.is_empty() or (domain.is_empty() and not modifier_stack.does_not_require_shapes()):
 		clear_output()
 		push_warning("ProtonScatter warning: No items or shapes, abort")
 		return
@@ -247,7 +256,7 @@ func _rebuild(force_discover) -> void:
 		modifier_stack.start_update(self, domain)
 		return
 
-	if _thread:
+	if is_thread_running():
 		await _thread.wait_to_finish()
 
 	_thread = Thread.new()
@@ -257,7 +266,7 @@ func _rebuild(force_discover) -> void:
 func _rebuild_threaded() -> void:
 	# Disable thread safety, but only after 4.1 beta 3
 	if _thread.has_method("set_thread_safety_checks_enabled"):
-		_thread.set_thread_safety_checks_enabled(false)
+		Thread.set_thread_safety_checks_enabled(false)
 
 	modifier_stack.start_update(self, domain.get_copy())
 
@@ -271,20 +280,20 @@ func _discover_items() -> void:
 			items.push_back(c)
 			total_item_proportion += c.proportion
 
-	if is_inside_tree():
-		get_tree().node_configuration_warning_changed.emit(self)
+	update_configuration_warnings()
 
 
 # Creates one MultimeshInstance3D for each ScatterItem node.
-func _update_multimeshes(transforms: ProtonScatterTransformList) -> void:
+func _update_multimeshes() -> void:
+	if items.is_empty():
+		_discover_items()
+
 	var offset := 0
 	var transforms_count: int = transforms.size()
-	var inverse_transform := global_transform.affine_inverse()
 
 	for item in items:
-		var item_root = await ProtonScatterUtil.get_or_create_item_root(item)
 		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		var mmi = await ProtonScatterUtil.get_or_create_multimesh(item, count)
+		var mmi = ProtonScatterUtil.get_or_create_multimesh(item, count)
 		if not mmi:
 			return
 
@@ -296,15 +305,14 @@ func _update_multimeshes(transforms: ProtonScatterTransformList) -> void:
 				return
 
 			t = item.process_transform(transforms.list[offset + i])
-			mmi.multimesh.set_instance_transform(i, inverse_transform * t)
+			mmi.multimesh.set_instance_transform(i, t)
 
 		offset += count
 
 
-func _update_duplicates(transforms: ProtonScatterTransformList) -> void:
+func _update_duplicates() -> void:
 	var offset := 0
 	var transforms_count: int = transforms.size()
-	var inverse_transform := global_transform.affine_inverse()
 
 	for item in items:
 		var count := int(round(float(item.proportion) / total_item_proportion * transforms_count))
@@ -325,7 +333,7 @@ func _update_duplicates(transforms: ProtonScatterTransformList) -> void:
 				break
 
 			var t: Transform3D = item.process_transform(transforms.list[offset + i])
-			instance.transform = inverse_transform * t
+			instance.transform = t
 
 		# Delete the unused instances left in the pool if any
 		if count < child_count:
@@ -344,6 +352,9 @@ func _create_instance(item: ProtonScatterItem, root: Node3D):
 	root.add_child.bind(instance, true).call_deferred()
 
 	if show_output_in_tree:
+		# We have to use a lambda here because ProtonScatterUtil isn't an
+		# actual class_name, it's a const, which makes it impossible to reference
+		# the callable, (but we can still call it)
 		var defer_ownership := func(i, o):
 			ProtonScatterUtil.set_owner_recursive(i, o)
 		defer_ownership.bind(instance, get_tree().get_edited_scene_root()).call_deferred()
@@ -360,12 +371,14 @@ func _perform_sanity_check() -> void:
 	if not domain:
 		domain = ProtonScatterDomain.new()
 
-	scatter_parent = scatter_parent # TODO: Why ?
+	# Retrigger the parent setter, in case the parent node no longer exists or changed type.
+	scatter_parent = scatter_parent
 
 
 func _on_node_duplicated() -> void:
-	clear_output() # Otherwise we get linked multimeshes or other unwanted side effects
-	_perform_sanity_check()
+	# Force a full rebuild (which clears the existing outputs), otherwise we get
+	# linked multimeshes or other unwanted side effects
+	full_rebuild.call_deferred()
 
 
 func _on_child_exiting_tree(node: Node) -> void:
@@ -374,9 +387,9 @@ func _on_child_exiting_tree(node: Node) -> void:
 
 
 # Called when the modifier stack is done generating the full transform list
-func _on_transforms_ready(transforms: ProtonScatterTransformList) -> void:
+func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 	if is_thread_running():
-		_thread.wait_to_finish()
+		await _thread.wait_to_finish()
 		_thread = null
 
 	if _rebuild_queued:
@@ -384,15 +397,17 @@ func _on_transforms_ready(transforms: ProtonScatterTransformList) -> void:
 		rebuild.call_deferred()
 		return
 
+	transforms = new_transforms
+
 	if not transforms or transforms.is_empty():
 		clear_output()
 		update_gizmos()
 		return
 
 	if use_instancing:
-		_update_multimeshes(transforms)
+		_update_multimeshes()
 	else:
-		_update_duplicates(transforms)
+		_update_duplicates()
 
 	update_gizmos()
 	await get_tree().process_frame

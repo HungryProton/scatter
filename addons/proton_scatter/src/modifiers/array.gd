@@ -102,9 +102,9 @@ func _init() -> void:
 		repetitive patterns if you're using multiple ScatterItem nodes.")
 
 
-func _process_transforms(transforms, domain, seed: int) -> void:
+func _process_transforms(transforms, domain, random_seed: int) -> void:
 	_rng = RandomNumberGenerator.new()
-	_rng.set_seed(seed)
+	_rng.set_seed(random_seed)
 
 	var new_transforms: Array[Transform3D] = []
 	var rotation_rad := Vector3.ZERO
@@ -112,6 +112,10 @@ func _process_transforms(transforms, domain, seed: int) -> void:
 	rotation_rad.x = deg_to_rad(rotation.x)
 	rotation_rad.y = deg_to_rad(rotation.y)
 	rotation_rad.z = deg_to_rad(rotation.z)
+
+	var axis_x := Vector3.RIGHT
+	var axis_y := Vector3.UP
+	var axis_z := Vector3.FORWARD
 
 	for t in transforms.size():
 		new_transforms.push_back(transforms.list[t])
@@ -128,13 +132,21 @@ func _process_transforms(transforms, domain, seed: int) -> void:
 			var basis := transform.basis
 
 			# first move to rotation point defined in rotation offset
-			var rotation_pivot_offset = (float(individual_rotation_pivots) * (transform * rotation_pivot) + float(!individual_rotation_pivots) * (rotation_pivot))
+			var rotation_pivot_offset = rotation_pivot
+			if individual_rotation_pivots:
+				rotation_pivot_offset = transform * rotation_pivot
+
 			transform.origin -= rotation_pivot_offset
 
 			# then rotate
-			transform = transform.rotated(float(local_rotation) * basis.x + float(!local_rotation) * Vector3(1, 0, 0), rotation_rad.x * a)
-			transform = transform.rotated(float(local_rotation) * basis.y + float(!local_rotation) * Vector3(0, 1, 0), rotation_rad.y * a)
-			transform = transform.rotated(float(local_rotation) * basis.z + float(!local_rotation) * Vector3(0, 0, 1), rotation_rad.z * a)
+			if local_rotation:
+				axis_x = basis.x.normalized()
+				axis_y = basis.y.normalized()
+				axis_z = basis.z.normalized()
+
+			transform = transform.rotated(axis_x, rotation_rad.x * a)
+			transform = transform.rotated(axis_y, rotation_rad.y * a)
+			transform = transform.rotated(axis_z, rotation_rad.z * a)
 
 			# scale
 			# If the scale is different than 1, each transform gets bigger or
@@ -155,7 +167,10 @@ func _process_transforms(transforms, domain, seed: int) -> void:
 			transform.origin += rotation_pivot_offset
 
 			# offset
-			transform.origin += (float(!local_offset) * offset * a) + (float(local_offset) * (basis * offset) * a)
+			if local_offset:
+				transform.origin += offset * a
+			else:
+				transform.origin += (basis * offset) * a
 
 			# store the final result if the position is valid
 			if not domain.is_point_excluded(transform.origin):
@@ -164,4 +179,4 @@ func _process_transforms(transforms, domain, seed: int) -> void:
 	transforms.list = new_transforms
 
 	if randomize_indices:
-		transforms.shuffle(seed)
+		transforms.shuffle(random_seed)

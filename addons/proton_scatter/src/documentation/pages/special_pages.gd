@@ -68,7 +68,39 @@ static func get_shape_documentation() -> DocumentationInfo:
 	var info := DocumentationInfo.new()
 
 	info.set_title("ScatterShapes")
+
 	info.add_paragraph("TODO: Write this page")
+
+	return info
+
+
+static func get_cache_documentation() -> DocumentationInfo:
+	var info := DocumentationInfo.new()
+
+	info.set_title("ScatterCache")
+
+	info.add_paragraph(
+		"By default, Scatter nodes will recalculate their output on load,
+		which can be slow in really complex scenes. The cache allows you to
+		store these results in a file on your disk, and load these instead.")
+	info.add_paragraph(
+		"This can significantly speed up loading times, while also being VCS
+		friendly since the transforms are stored in their own files, rather
+		than your scenes files.")
+	info.add_paragraph("[b]How to use:[/b]")
+	info.add_paragraph(
+		"[p]+ Disable the [code]Force rebuild on load[code] on every Scatter item you want to cache.[/p]
+		[p]+ Add a ScatterCache node anywhere in your scene.[/p]
+		[p]+ Press the 'Rebuild' button to scan for other ProtonScatter nodes
+		and store their results in the cache.[/p]")
+	info.add_paragraph("[i]A single cache per scene is enough.[/i]")
+
+	var p := info.add_parameter("Cache File")
+	p.set_cost(0)
+	p.set_description("Path to the cache file. By default they are store in the
+	add-on folder. Their name has a random component to avoid naming collisions
+	with scenes sharing the same file name. You are free to place this file
+	anywhere, using any name you would like.")
 
 	return info
 

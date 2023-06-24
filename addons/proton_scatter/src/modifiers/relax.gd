@@ -16,24 +16,38 @@ func _init() -> void:
 	can_restrict_height = true
 	restrict_height = true
 
+	documentation.add_warning(
+		"This modifier is currently has an O(n²) complexity and will be slow with
+		large amounts of points.
+		It will be optimized in a later update.",
+		1)
+
 
 func _process_transforms(transforms, domain, _seed) -> void:
 	# TODO this can benefit greatly from multithreading
 	if transforms.size() < 2:
 		return
 
-	var offset = offset_step
+	var offset := offset_step
 
 	for iteration in iterations:
 		for i in transforms.size():
-			var min_vector = Vector3.ONE * 99999
+			var min_vector = Vector3.ONE * 99999.0
+			var threshold := 99999.0
+			var distance := 0.0
+			var diff: Vector3
+
 			# Find the closest point
 			for j in transforms.size():
 				if i == j:
 					continue
-				var d = transforms.list[i].origin - transforms.list[j].origin
-				if d.length() < min_vector.length():
-					min_vector = d
+
+				diff = transforms.list[i].origin - transforms.list[j].origin
+				distance = diff.length_squared()
+
+				if distance < threshold:
+					min_vector = diff
+					threshold = distance
 
 			if restrict_height:
 				min_vector.y = 0.0

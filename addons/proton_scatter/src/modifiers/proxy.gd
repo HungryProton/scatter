@@ -5,7 +5,7 @@ extends "base_modifier.gd"
 const Scatter = preload("../scatter.gd")
 
 
-@export_node_path var scatter_node
+@export_node_path var scatter_node: NodePath
 #@export var auto_sync_changes := true # TODO: find a solution to this.
 
 var _reference_node
@@ -45,5 +45,6 @@ func _process_transforms(transforms, domain, _seed) -> void:
 
 	if reference_node.modifier_stack:
 		var stack = reference_node.modifier_stack.get_copy()
-		var result = stack.update(domain.get_root(), domain)
+		stack.start_update(domain.get_root(), domain)
+		var result = await stack.transforms_ready
 		transforms.append(result.list)

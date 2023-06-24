@@ -48,6 +48,9 @@ func _can_drop_data(at_position, data) -> bool:
 			break
 		computed_index += 1
 
+	# Prevents edge case when dragging the last item below its current position
+	computed_index = clamp(computed_index, 0, get_child_count() - 1)
+
 	if computed_index != data.get_index():
 		move_child(data, computed_index)
 		_new_index = computed_index

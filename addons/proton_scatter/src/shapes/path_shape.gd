@@ -142,7 +142,7 @@ func get_closest_to(position):
 	return closest
 
 
-func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[PackedVector2Array]:
+func get_closed_edges(shape_t: Transform3D) -> Array[PackedVector2Array]:
 	if not closed and thickness <= 0:
 		return []
 
@@ -151,14 +151,21 @@ func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[P
 
 	var edges: Array[PackedVector2Array] = []
 	var polyline := PackedVector2Array()
-	var shape_gt_inverse := shape_gt.affine_inverse()
-	var scatter_gt_inverse := scatter_gt.affine_inverse()
+	var shape_t_inverse := shape_t.affine_inverse()
 	var points := curve.tessellate(5, 5) # TODO: find optimal values
 
 	for p in points:
-		p = p * shape_gt_inverse # Convert to global coords
-		p = scatter_gt_inverse * p # convert to scatter local coords
+		p *= shape_t_inverse # Apply the shape node transform
 		polyline.push_back(Vector2(p.x, p.z))
+
+	if closed:
+		# Ensure the polygon is closed
+		var first_point: Vector3 = points[0]
+		var last_point: Vector3 = points[-1]
+
+		if first_point != last_point:
+			first_point *= shape_t_inverse
+			polyline.push_back(Vector2(first_point.x, first_point.z))
 
 	# Prevents the polyline to be considered as a hole later.
 	if Geometry2D.is_polygon_clockwise(polyline):
@@ -179,24 +186,24 @@ func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[P
 		for polygon in result:
 			edges.push_back(polygon * t2)
 
-	if closed:
+	if closed and thickness == 0.0:
 		edges.push_back(polyline)
 
 	return edges
 
 
-func get_open_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[Curve3D]:
+func get_open_edges(shape_t: Transform3D) -> Array[Curve3D]:
 	if not curve or closed or thickness > 0:
 		return []
 
 	var res := Curve3D.new()
-	var shape_gt_inverse := shape_gt.affine_inverse()
+	var shape_t_inverse := shape_t.affine_inverse()
 
 	for i in curve.get_point_count():
 		var pos = curve.get_point_position(i)
-		var pos_t = pos * shape_gt_inverse
-		var p_in = (curve.get_point_in(i) + pos) * shape_gt_inverse - pos_t
-		var p_out = (curve.get_point_out(i) + pos) * shape_gt_inverse - pos_t
+		var pos_t = pos * shape_t_inverse
+		var p_in = (curve.get_point_in(i) + pos) * shape_t_inverse - pos_t
+		var p_out = (curve.get_point_out(i) + pos) * shape_t_inverse - pos_t
 		res.add_point(pos_t, p_in, p_out)
 
 	return [res]

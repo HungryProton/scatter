@@ -3,7 +3,11 @@ class_name ProtonScatterBaseShape
 extends Resource
 
 
-func is_point_inside(point_global: Vector3, global_transform: Transform3D) -> bool:
+func is_point_inside_global(point_global: Vector3, global_transform: Transform3D) -> bool:
+	return false
+
+
+func is_point_inside_local(point_local: Vector3) -> bool:
 	return false
 
 
@@ -14,15 +18,14 @@ func get_corners_global(shape_global_transform: Transform3D) -> Array[Vector3]:
 
 
 # Returns the closed contour of the shape (closed, inner and outer if
-# applicable) as a 2D polygon.
-# Results in local space relative to the scatter node.
-func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[PackedVector2Array]:
+# applicable) as a 2D polygon, in local space relative to the scatter node.
+func get_closed_edges(shape_t: Transform3D) -> Array[PackedVector2Array]:
 	return []
 
 
 # Returns the open edges (in the case of a regular path, not closed)
 # in local space relative to the scatter node.
-func get_open_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[Curve3D]:
+func get_open_edges(shape_t: Transform3D) -> Array[Curve3D]:
 	return []
 
 

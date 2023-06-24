@@ -26,17 +26,14 @@ func _init() -> void:
 func _process_transforms(transforms, domain, _seed : int) -> void:
 	var st: Transform3D = domain.get_global_transform()
 
-	for t in transforms.size():
-		var transform: Transform3D = transforms.list[t]
-		var origin := transform.origin
-		var original_scale := transform.basis.get_scale()
-		var local_target := target - origin
+	for i in transforms.size():
+		var transform: Transform3D = transforms.list[i]
+		var local_target := target
 
-		if is_using_local_space():
-			local_target = st * local_target
+		if is_using_global_space():
+			local_target = st.affine_inverse().basis * local_target
+
 		elif is_using_individual_instances_space():
-			local_target = transform * local_target
+			local_target = transform.basis * local_target
 
-		var lookat := Transform3D(Basis.looking_at(local_target, up), origin)
-		lookat = lookat.scaled_local(original_scale)
-		transforms.list[t] = lookat
+		transforms.list[i] = transform.looking_at(local_target, up)

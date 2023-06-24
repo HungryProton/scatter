@@ -18,14 +18,17 @@ const Bounds := preload("../common/bounds.gd")
 
 
 class DomainShapeInfo:
-	var transform: Transform3D
+	var node: Node3D
 	var shape: BaseShape
 
-	func is_point_inside(point: Vector3) -> bool:
-		return shape.is_point_inside(point, transform)
+	func is_point_inside(point: Vector3, local: bool) -> bool:
+		var t: Transform3D
+		t = node.get_transform() if local else node.get_global_transform()
+		return shape.is_point_inside(point, t)
 
 	func get_corners_global() -> Array:
-		return shape.get_corners_global(transform)
+		return shape.get_corners_global(node.get_global_transform())
+
 
 # A polygon made of one outer boundary and one or multiple holes (inner polygons)
 class ComplexPolygon:
@@ -63,7 +66,7 @@ class ComplexPolygon:
 var root: ProtonScatter
 var positive_shapes: Array[DomainShapeInfo]
 var negative_shapes: Array[DomainShapeInfo]
-var bounds: Bounds = Bounds.new()
+var bounds_global: Bounds = Bounds.new()
 var bounds_local: Bounds = Bounds.new()
 var edges: Array[Curve3D] = []
 
@@ -75,13 +78,13 @@ func is_empty() -> bool:
 # If a point is in an exclusion shape, returns false
 # If a point is in an inclusion shape (but not in an exclusion one), returns true
 # If a point is in neither, returns false
-func is_point_inside(point: Vector3) -> bool:
+func is_point_inside(point: Vector3, local := true) -> bool:
 	for s in negative_shapes:
-		if s.is_point_inside(point):
+		if s.is_point_inside(point, local):
 			return false
 
 	for s in positive_shapes:
-		if s.is_point_inside(point):
+		if s.is_point_inside(point, local):
 			return true
 
 	return false
@@ -89,9 +92,9 @@ func is_point_inside(point: Vector3) -> bool:
 
 # If a point is inside an exclusion shape, returns true
 # Returns false in every other case
-func is_point_excluded(point: Vector3) -> bool:
+func is_point_excluded(point: Vector3, local := true) -> bool:
 	for s in negative_shapes:
-		if s.is_point_inside(point):
+		if s.is_point_inside(point, local):
 			return true
 
 	return false
@@ -103,6 +106,10 @@ func discover_shapes(root_node: Node3D) -> void:
 	root = root_node
 	positive_shapes.clear()
 	negative_shapes.clear()
+
+	if not is_instance_valid(root):
+		return
+
 	for c in root.get_children():
 		_discover_shapes_recursive(c)
 	compute_bounds()
@@ -110,30 +117,36 @@ func discover_shapes(root_node: Node3D) -> void:
 
 
 func compute_bounds() -> void:
-	bounds.clear()
+	bounds_global.clear()
 	bounds_local.clear()
+
+	if not is_instance_valid(root):
+		return
 
 	var gt: Transform3D = root.get_global_transform().affine_inverse()
 
 	for info in positive_shapes:
 		for point in info.get_corners_global():
-			bounds.feed(point)
+			bounds_global.feed(point)
 			bounds_local.feed(gt * point)
 
-	bounds.compute_bounds()
+	bounds_global.compute_bounds()
 	bounds_local.compute_bounds()
 
 
 func compute_edges() -> void:
 	edges.clear()
+
+	if not is_instance_valid(root):
+		return
+
 	var source_polygons: Array[ComplexPolygon] = []
-	var root_gt: Transform3D = root.get_global_transform()
 
 	## Retrieve all polygons
 	for info in positive_shapes:
 		# Store all closed polygons in a specific array
 		var polygon := ComplexPolygon.new()
-		polygon.add_array(info.shape.get_closed_edges(root_gt, info.transform))
+		polygon.add_array(info.shape.get_closed_edges(info.node.transform))
 
 		# Polygons with holes must be merged together first
 		if not polygon.inner.is_empty():
@@ -143,7 +156,7 @@ func compute_edges() -> void:
 
 		# Store open edges directly since they are already Curve3D and we
 		# don't apply boolean operations to them.
-		var open_edges = info.shape.get_open_edges(root_gt, info.transform)
+		var open_edges = info.shape.get_open_edges(info.node.transform)
 		edges.append_array(open_edges)
 
 	if source_polygons.is_empty():
@@ -220,8 +233,6 @@ func compute_edges() -> void:
 		if not merged:
 			merged_polygons.push_back(p1)
 
-	var gt_inverse := root_gt.affine_inverse()
-
 	## For each polygons from the previous step, create a corresponding Curve3D
 	for cp in merged_polygons:
 		for polygon in cp.get_all():
@@ -230,10 +241,14 @@ func compute_edges() -> void:
 
 			var curve := Curve3D.new()
 			for point in polygon:
-				var p = Vector3(point.x, 0.0, point.y)
-				curve.add_point(root_gt * p)
+				curve.add_point(Vector3(point.x, 0.0, point.y))
 
-			curve.add_point(curve.get_point_position(0)) # Close the loop
+			# Close the look if the last vertex is missing (Randomly happens)
+			var first_point := polygon[0]
+			var last_point := polygon[-1]
+			if first_point != last_point:
+				curve.add_point(Vector3(first_point.x, 0.0, first_point.y))
+
 			edges.push_back(curve)
 
 
@@ -259,18 +274,18 @@ func get_copy():
 	var copy = get_script().new()
 
 	copy.root = root
-	copy.bounds = bounds
+	copy.bounds_global = bounds_global
 	copy.bounds_local = bounds_local
 
 	for s in positive_shapes:
 		var s_copy = DomainShapeInfo.new()
-		s_copy.transform = s.transform
+		s_copy.node = s.node
 		s_copy.shape = s.shape.get_copy()
 		copy.positive_shapes.push_back(s_copy)
 
 	for s in negative_shapes:
 		var s_copy = DomainShapeInfo.new()
-		s_copy.transform = s.transform
+		s_copy.node = s.node
 		s_copy.shape = s.shape.get_copy()
 		copy.negative_shapes.push_back(s_copy)
 
@@ -283,7 +298,7 @@ func _discover_shapes_recursive(node: Node) -> void:
 
 	if node is ProtonScatterShape and node.shape != null:
 		var info := DomainShapeInfo.new()
-		info.transform = node.get_global_transform()
+		info.node = node
 		info.shape = node.shape
 
 		if node.negative:

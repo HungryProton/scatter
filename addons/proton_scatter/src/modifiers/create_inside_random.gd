@@ -30,7 +30,7 @@ func _init() -> void:
 		"In some cases, the amount of transforms created by this modifier
 		might be lower than the requested amount (but never higher). This may
 		happen if the provided ScatterShape has a huge bounding box but a tiny
-		valid space, like a narrow path.")
+		valid space, like a curved and narrow path.")
 
 
 # TODO:
@@ -41,17 +41,16 @@ func _process_transforms(transforms, domain, seed) -> void:
 	_rng.set_seed(seed)
 
 	var gt: Transform3D = domain.get_global_transform()
-	var gt_inverse = gt.affine_inverse()
-	var center: Vector3 = domain.bounds.center
-	var half_size: Vector3 = domain.bounds.size / 2.0
-	var height: float = domain.bounds.center.y
+	var center: Vector3 = domain.bounds_local.center
+	var half_size: Vector3 = domain.bounds_local.size / 2.0
+	var height: float = domain.bounds_local.center.y
 
 	# Generate a random point in the bounding box. Store if it's inside the
 	# domain, or discard if invalid. Repeat until enough valid points are found.
 	var t: Transform3D
 	var pos: Vector3
 	var new_transforms: Array[Transform3D] = []
-	var max_retries = amount * 10
+	var max_retries = amount * 10 # TODO: expose this parameter?
 	var tries := 0
 
 	while new_transforms.size() != amount:
@@ -61,8 +60,8 @@ func _process_transforms(transforms, domain, seed) -> void:
 		if restrict_height:
 			pos.y = height
 
-		if is_using_local_space():
-			t.basis = gt.basis
+		if is_using_global_space():
+			t.basis = gt.affine_inverse().basis
 
 		if domain.is_point_inside(pos):
 			t.origin = pos

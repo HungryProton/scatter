@@ -2,11 +2,13 @@
 extends "base_modifier.gd"
 
 
-@export_file("Texture") var mask
-@export var mask_scale := Vector2.ONE
-@export var mask_offset := Vector2.ZERO
+@export_file("Texture") var mask: String
 @export var mask_rotation := 0.0
+@export var mask_offset := Vector2.ZERO
+@export var mask_scale := Vector2.ONE
+@export var pixel_to_unit_ratio := 64.0
 @export_range(0.0, 1.0) var remove_below = 0.1
+@export var scale_transforms := true
 
 
 func _init() -> void:
@@ -56,46 +58,53 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		warning += "The specified file " + mask + " could not be loaded."
 		return
 
-	var texture = load(mask)
+	var texture: Texture = load(mask)
 
 	if not texture is Texture:
 		warning += "The specified file is not a valid texture."
 		return
 
-	var image: Image = texture.get_data()
-	var _err = image.decompress()
-	image.lock()
+	var image: Image
 
-	var width = image.get_width()
-	var height = image.get_height()
-	var i = 0
-	var count = transforms.list.size()
-	var angle = deg_to_rad(mask_rotation)
+	# Wait for a frame or risk the whole editor to freeze because of get_image()
+	# TODO: Check if more safe guards are required here.
+	await domain.get_root().get_tree().process_frame
 
-	while i < count:
-		var t = transforms.list[i]
-		var origin = t.origin.rotated(Vector3.UP, angle)
+	if texture is Texture2D:
+		image = texture.get_image()
 
-		var x = origin.x * mask_scale.x + mask_offset.x
+	elif texture is Texture3D:
+		image = texture.get_data()[0] # TMP, this should depends on the transforms Y coordinates
+
+	elif texture is TextureLayered:
+		image = texture.get_layer_data(0) # TMP
+
+	image.decompress()
+
+	var width := image.get_width()
+	var height := image.get_height()
+	var i := 0
+	var angle := deg_to_rad(mask_rotation)
+
+	while i < transforms.list.size():
+		var t: Transform3D = transforms.list[i]
+		var origin := t.origin.rotated(Vector3.UP, angle)
+
+		var x := origin.x * (pixel_to_unit_ratio / mask_scale.x) + mask_offset.x
 		x = fposmod(x, width - 1)
-		var y = origin.z * mask_scale.y + mask_offset.y
+		var y := origin.z * (pixel_to_unit_ratio / mask_scale.y) + mask_offset.y
 		y = fposmod(y, height - 1)
 
-		var level = _get_pixel(image, x, y)
+		var level := _get_pixel(image, x, y)
 		if level < remove_below:
-			transforms.list.remove(i)
-			count -= 1
+			transforms.list.remove_at(i)
 			continue
 
-		origin = t.origin
-		t.origin = Vector3.ZERO
-		t = t.scaled(Vector3(level, level, level))
-		t.origin = origin
+		if scale_transforms:
+			t.basis = t.basis.scaled(Vector3(level, level, level))
 
 		transforms.list[i] = t
 		i += 1
-
-	image.unlock()
 
 
 # x and y don't always match an exact pixel, so we sample the neighboring

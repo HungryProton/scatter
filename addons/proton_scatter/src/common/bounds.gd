@@ -1,9 +1,8 @@
 @tool
 extends Resource
 
-# Essentially a Rect3
 # Used by the Domain class
-
+# TODO: This could be replaced by a built-in AABB
 
 var size: Vector3
 var center: Vector3

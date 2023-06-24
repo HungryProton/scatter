@@ -48,14 +48,10 @@ func get_corners_global(gt: Transform3D) -> Array:
 # vertices.
 # Compute the intersection of each of the 12 edges to the plane, then recompute
 # the polygon from the positions found.
-func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[PackedVector2Array]:
+func get_closed_edges(shape_t: Transform3D) -> Array[PackedVector2Array]:
 	var polygon := PackedVector2Array()
 
-	var a = scatter_gt.basis.x
-	var b = scatter_gt.basis.z
-	var c = a + b
-	var o = scatter_gt.origin
-	var plane = Plane(a + o, b + o, c + o)
+	var plane := Plane(Vector3.UP, 0.0)
 
 	var box_edges := [
 		# Bottom square
@@ -79,15 +75,14 @@ func get_closed_edges(scatter_gt: Transform3D, shape_gt: Transform3D) -> Array[P
 
 	var intersection_points := PackedVector3Array()
 	var point
-	var gt_inverse := scatter_gt.affine_inverse()
-	var shape_gt_inverse := shape_gt.affine_inverse()
+	var shape_t_inverse := shape_t.affine_inverse()
 
 	for edge in box_edges:
-		var p1 = (edge[0] * _half_size) * shape_gt_inverse
-		var p2 = (edge[1] * _half_size) * shape_gt_inverse
+		var p1 = (edge[0] * _half_size) * shape_t_inverse
+		var p2 = (edge[1] * _half_size) * shape_t_inverse
 		point = plane.intersects_segment(p1, p2)
 		if point:
-			intersection_points.push_back(gt_inverse * point)
+			intersection_points.push_back(point)
 
 	if intersection_points.size() < 3:
 		return []
