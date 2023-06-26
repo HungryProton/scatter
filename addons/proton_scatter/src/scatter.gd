@@ -379,17 +379,6 @@ func _update_particles_system() -> void:
 		offset += count
 
 
-func _auto_restart_particles() -> void:
-	await get_tree().create_timer(0.8).timeout
-
-	for item in items:
-		var particles = ProtonScatterUtil.get_or_create_particles(item)
-		if particles:
-			particles.restart()
-
-	_auto_restart_particles()
-
-
 func _create_instance(item: ProtonScatterItem, root: Node3D):
 	if not item or not item.get_item():
 		return null
