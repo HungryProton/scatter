@@ -43,6 +43,11 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		override_material = val
 		ScatterUtil.request_parent_to_rebuild(self)
 
+@export var override_process_material: Material:
+	set(val):
+		override_process_material = val
+		ScatterUtil.request_parent_to_rebuild(self) # TODO - No need for a full rebuild here
+
 @export var override_cast_shadow: GeometryInstance3D.ShadowCastingSetting = GeometryInstance3D.SHADOW_CASTING_SETTING_ON:
 	set(val):
 		override_cast_shadow = val

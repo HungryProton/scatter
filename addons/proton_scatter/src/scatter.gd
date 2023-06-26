@@ -8,7 +8,6 @@ signal build_completed
 
 
 # Includes
-const ProtonScatter := preload("./scatter.gd")
 const ProtonScatterDomain := preload("./common/domain.gd")
 const ProtonScatterItem := preload("./scatter_item.gd")
 const ProtonScatterModifierStack := preload("./stack/modifier_stack.gd")
@@ -32,9 +31,12 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 			ProtonScatterUtil.enforce_output_root_owner(self)
 
 @export_group("Performance")
-@export var use_instancing := true:
+@export_enum(
+	"Use Instancing:0",
+	"Create Copies:1",
+	"Use Particles:2") var render_mode := 0:
 	set(val):
-		use_instancing = val
+		render_mode = val
 		full_rebuild.call_deferred()
 
 @export var force_rebuild_on_load := true
@@ -99,6 +101,13 @@ var transforms: ProtonScatterTransformList
 
 var editor_plugin # Holds a reference to the EditorPlugin. Used by other parts.
 
+# No longer exposed, but kept for backward compatiblity.
+var use_instancing := true:
+	set(val):
+		use_instancing = val
+		render_mode = 0 if val else 1
+
+# Internal variables
 var _thread: Thread
 var _rebuild_queued := false
 var _dependency_parent
@@ -260,7 +269,9 @@ func _rebuild(force_discover) -> void:
 func _rebuild_threaded() -> void:
 	# Disable thread safety, but only after 4.1 beta 3
 	if _thread.has_method("set_thread_safety_checks_enabled"):
-		Thread.set_thread_safety_checks_enabled(false)
+		# Calls static method on instance, otherwise it crashes in 4.0.x
+		@warning_ignore("static_called_on_instance")
+		_thread.set_thread_safety_checks_enabled(false)
 
 	modifier_stack.start_update(self, domain.get_copy())
 
@@ -289,7 +300,7 @@ func _update_multimeshes() -> void:
 		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
 		var mmi = ProtonScatterUtil.get_or_create_multimesh(item, count)
 		if not mmi:
-			return
+			continue
 
 		var t: Transform3D
 		for i in count:
@@ -335,6 +346,48 @@ func _update_duplicates() -> void:
 				root.get_child(-1).queue_free()
 
 		offset += count
+
+
+func _update_particles_system() -> void:
+	var offset := 0
+	var transforms_count: int = transforms.size()
+
+	for item in items:
+		var count := int(round(float(item.proportion) / total_item_proportion * transforms_count))
+		var particles = ProtonScatterUtil.get_or_create_particles(item)
+		if not particles:
+			continue
+
+		particles.visibility_aabb = AABB(domain.bounds_local.min, domain.bounds_local.size)
+		particles.amount = count
+
+		var t: Transform3D
+
+		for i in count:
+			if (offset + i) >= transforms_count:
+				particles.amount = i - 1
+				return
+
+			t = item.process_transform(transforms.list[offset + i])
+			particles.emit_particle(
+				t,
+				Vector3.ZERO,
+				Color.WHITE,
+				Color.BLACK,
+				GPUParticles3D.EMIT_FLAG_POSITION | GPUParticles3D.EMIT_FLAG_ROTATION_SCALE)
+
+		offset += count
+
+
+func _auto_restart_particles() -> void:
+	await get_tree().create_timer(0.8).timeout
+
+	for item in items:
+		var particles = ProtonScatterUtil.get_or_create_particles(item)
+		if particles:
+			particles.restart()
+
+	_auto_restart_particles()
 
 
 func _create_instance(item: ProtonScatterItem, root: Node3D):
@@ -398,10 +451,13 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		update_gizmos()
 		return
 
-	if use_instancing:
-		_update_multimeshes()
-	else:
-		_update_duplicates()
+	match render_mode:
+		0:
+			_update_multimeshes()
+		1:
+			_update_duplicates()
+		2:
+			_update_particles_system()
 
 	update_gizmos()
 	await get_tree().process_frame
