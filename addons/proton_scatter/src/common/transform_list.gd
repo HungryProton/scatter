@@ -26,11 +26,11 @@ func resize(count: int) -> void:
 	if max_count >= 0:
 		count = int(min(count, max_count))
 
-	var size = list.size()
-	if count > size:
-		add(count - size)
+	var current_count = list.size()
+	if count > current_count:
+		add(count - current_count)
 	else:
-		remove(size - count)
+		remove(current_count - count)
 
 
 # TODO: Faster algorithm probably exists for this, research an alternatives

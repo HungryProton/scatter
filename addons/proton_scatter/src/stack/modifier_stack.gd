@@ -51,8 +51,8 @@ func remove_at(index: int) -> void:
 func duplicate_modifier(modifier) -> void:
 	var index: int = stack.find(modifier)
 	if index != -1:
-		var duplicate = modifier.get_copy()
-		add(duplicate)
+		var copy = modifier.get_copy()
+		add(copy)
 		move(stack.size() - 1, index + 1)
 
 

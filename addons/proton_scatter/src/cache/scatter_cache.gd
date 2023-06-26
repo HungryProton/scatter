@@ -34,7 +34,7 @@ func _ready() -> void:
 
 	_scene_root = _get_local_scene_root(self)
 
-	# By default, Set the cache path to a file next to the current scene.
+	# By default, set the cache path to the cache folder, with a unique recognizable name
 	if cache_file.is_empty():
 		var scene_path: String = _scene_root.get_scene_file_path()
 		var scene_name: String
@@ -43,7 +43,7 @@ func _ready() -> void:
 		if scene_path.is_empty():
 			scene_name = str(randi())
 		else:
-			scene_name = scene_path.get_file().get_base_dir()
+			scene_name = scene_path.get_file().get_basename()
 			scene_name += "_" + str(scene_path.hash()) # Prevents name collisions
 
 		cache_file = DEFAULT_CACHE_FOLDER.get_basename().path_join(scene_name + "_scatter_cache.tres")

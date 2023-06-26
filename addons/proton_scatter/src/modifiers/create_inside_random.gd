@@ -36,9 +36,9 @@ func _init() -> void:
 # TODO:
 # + Multithreading
 # + Spatial partionning to discard areas outside the domain earlier
-func _process_transforms(transforms, domain, seed) -> void:
+func _process_transforms(transforms, domain, random_seed) -> void:
 	_rng = RandomNumberGenerator.new()
-	_rng.set_seed(seed)
+	_rng.set_seed(random_seed)
 
 	var gt: Transform3D = domain.get_global_transform()
 	var center: Vector3 = domain.bounds_local.center

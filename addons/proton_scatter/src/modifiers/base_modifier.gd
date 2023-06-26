@@ -60,11 +60,12 @@ func process_transforms(transforms: TransformList, domain: Domain, global_seed: 
 		Make sure you have a Create modifier before this one.\n
 		"""
 
-	var seed = global_seed
+	var random_seed = global_seed
 	if can_override_seed and override_global_seed:
-		seed = custom_seed
+		random_seed = custom_seed
 
-	await _process_transforms(transforms, domain, seed)
+	@warning_ignore("redundant_await") # Not redundant as child classes could use the await keyword here.
+	await _process_transforms(transforms, domain, random_seed)
 
 	warning_changed.emit()
 

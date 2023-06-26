@@ -15,6 +15,9 @@ func store(node_name: String, transforms: Array[Transform3D]) -> void:
 
 
 func get_transforms(node_name: String) -> Array[Transform3D]:
+	var res: Array[Transform3D]
+
 	if node_name in data:
-		return data[node_name]
-	return []
+		res.assign(data[node_name])
+
+	return res

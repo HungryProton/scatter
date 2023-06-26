@@ -20,9 +20,9 @@ func _init() -> void:
 	use_individual_instances_space_by_default()
 
 
-func _process_transforms(transforms, domain, seed) -> void:
+func _process_transforms(transforms, domain, random_seed) -> void:
 	_rng = RandomNumberGenerator.new()
-	_rng.set_seed(seed)
+	_rng.set_seed(random_seed)
 
 	var t: Transform3D
 	var global_t: Transform3D
