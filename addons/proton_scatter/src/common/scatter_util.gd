@@ -130,6 +130,9 @@ static func get_or_create_particles(item: ProtonScatterItem) -> GPUParticles3D:
 		process_material = ShaderMaterial.new()
 		process_material.shader = preload("../particles/static.gdshader")
 
+	if process_material is ShaderMaterial:
+		process_material.set_shader_parameter("global_transform", item_root.get_global_transform())
+
 	particles.set_process_material(process_material)
 
 	# TMP: Workaround to get infinite life time.

@@ -1,6 +1,9 @@
 shader_type particles;
 
 
+uniform mat4 global_transform;
+
+
 float rand_from_seed(in uint seed) {
 	int k;
 	int s = int(seed);
