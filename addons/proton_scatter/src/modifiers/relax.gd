@@ -7,7 +7,7 @@ extends "base_modifier.gd"
 @export var consecutive_step_multiplier : float = 0.5
 @export var use_computeshader : bool = true
 
-#const shader_file := preload("res://compute_example.glsl")
+const shader_file := preload("res://addons/proton_scatter/src/modifiers/ComputeShaders/compute_relax.glsl")
 
 func _init() -> void:
 	display_name = "Relax Position"
@@ -26,7 +26,6 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
-	var starttime = Time.get_ticks_msec()
 	var offset := offset_step
 	if transforms.size() < 2:
 		return
@@ -68,20 +67,16 @@ func _process_transforms(transforms, domain, _seed) -> void:
 				transforms.list[i].origin += min_vector.normalized() * offset
 
 			offset *= consecutive_step_multiplier
-	
-	var endtime = Time.get_ticks_msec()
-	print(str(endtime - starttime) + "ms\t Computeshader" + ("  ON" if use_computeshader else " OFF") +"\t"+ str(transforms.size()) + " instances")
 
-# compute the closest points to each other
+# compute the closest points to each other using a compute shader
 # return a vector for each point that points away from the closest neighbour
 func compute_closest(transforms) -> PackedVector3Array:
-	var shader_file := load("res://compute_example.glsl")
 	var padded_num_vecs = ceil(float(transforms.size()) / 64.0) * 64
 	var padded_num_floats = padded_num_vecs * 4
 	var rd := RenderingServer.create_local_rendering_device()
 	var shader_spirv: RDShaderSPIRV = shader_file.get_spirv()
 	var shader := rd.shader_create_from_spirv(shader_spirv)
-	# Prepare our data. We use floats in the shader, so we need 32 bit.
+	# Prepare our data. We use vec4 floats in the shader, so we need 32 bit.
 	var input := PackedFloat32Array()
 	for i in transforms.size():
 		input.append(transforms.list[i].origin.x)
@@ -89,8 +84,7 @@ func compute_closest(transforms) -> PackedVector3Array:
 		input.append(transforms.list[i].origin.z)
 		input.append(0) # needed to use vec4, necessary for byte alignment in the shader code
 	# buffer size, number of vectors sent to the gpu
-	print("resize from ", input.size(), " to ", padded_num_floats)
-	input.resize(padded_num_floats)
+	input.resize(padded_num_floats) # indexing in the compute shader requires padding
 	var input_bytes := input.to_byte_array()
 	var output_bytes := input_bytes.duplicate()
 	# Create a storage buffer that can hold our float values.
@@ -116,9 +110,8 @@ func compute_closest(transforms) -> PackedVector3Array:
 	rd.compute_list_bind_compute_pipeline(compute_list, pipeline)
 	rd.compute_list_bind_uniform_set(compute_list, uniform_set, 0)
 	# each workgroup computes 64 vectors
-	print("Dispatching workgroups: ", padded_num_vecs/64)
+#	print("Dispatching workgroups: ", padded_num_vecs/64)
 	rd.compute_list_dispatch(compute_list, padded_num_vecs/64, 1, 1)
-#	rd.compute_list_dispatch(compute_list, transforms.size()/64, 1, 1)
 	rd.compute_list_end()
 	# Submit to GPU and wait for sync
 	rd.submit()
