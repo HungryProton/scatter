@@ -31,13 +31,13 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 			ProtonScatterUtil.enforce_output_root_owner(self)
 
 @export_group("Performance")
-@export_enum(\
+@export_enum(
 	"Use Instancing:0",
 	"Create Copies:1",
 	"Use Particles:2") var render_mode := 0:
-		set(val):
-			render_mode = val
-			full_rebuild.call_deferred()
+	set(val):
+		render_mode = val
+		full_rebuild.call_deferred()
 
 @export var force_rebuild_on_load := true
 @export var enable_updates_in_game := false
