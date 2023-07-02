@@ -5,7 +5,9 @@ extends "base_modifier.gd"
 @export var iterations : int = 3
 @export var offset_step : float = 0.01
 @export var consecutive_step_multiplier : float = 0.5
+@export var use_computeshader : bool = true
 
+const shader_file := preload("res://addons/proton_scatter/src/modifiers/ComputeShaders/compute_relax.glsl")
 
 func _init() -> void:
 	display_name = "Relax Position"
@@ -24,35 +26,113 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
-	# TODO this can benefit greatly from multithreading
+	var offset := offset_step
 	if transforms.size() < 2:
 		return
+	
+	if use_computeshader:
 
-	var offset := offset_step
+		for iteration in iterations:
+			var movedir : PackedVector3Array = compute_closest(transforms)
+			for i in transforms.size():
+				# move away from closest point
+				transforms.list[i].origin += movedir[i].normalized() * offset
+			offset *= consecutive_step_multiplier
+	
+	else:
+		# calculate the relax transforms on the cpu
+		for iteration in iterations:
+			for i in transforms.size():
+				var min_vector = Vector3.ONE * 99999.0
+				var threshold := 99999.0
+				var distance := 0.0
+				var diff: Vector3
 
-	for iteration in iterations:
-		for i in transforms.size():
-			var min_vector = Vector3.ONE * 99999.0
-			var threshold := 99999.0
-			var distance := 0.0
-			var diff: Vector3
+				# Find the closest point
+				for j in transforms.size():
+					if i == j:
+						continue
 
-			# Find the closest point
-			for j in transforms.size():
-				if i == j:
-					continue
+					diff = transforms.list[i].origin - transforms.list[j].origin
+					distance = diff.length_squared()
 
-				diff = transforms.list[i].origin - transforms.list[j].origin
-				distance = diff.length_squared()
+					if distance < threshold:
+						min_vector = diff
+						threshold = distance
 
-				if distance < threshold:
-					min_vector = diff
-					threshold = distance
+				if restrict_height:
+					min_vector.y = 0.0
 
-			if restrict_height:
-				min_vector.y = 0.0
+				# move away from closest point
+				transforms.list[i].origin += min_vector.normalized() * offset
 
-			# move away from closest point
-			transforms.list[i].origin += min_vector.normalized() * offset
+			offset *= consecutive_step_multiplier
 
-		offset *= consecutive_step_multiplier
+# compute the closest points to each other using a compute shader
+# return a vector for each point that points away from the closest neighbour
+func compute_closest(transforms) -> PackedVector3Array:
+	var padded_num_vecs = ceil(float(transforms.size()) / 64.0) * 64
+	var padded_num_floats = padded_num_vecs * 4
+	var rd := RenderingServer.create_local_rendering_device()
+	var shader_spirv: RDShaderSPIRV = shader_file.get_spirv()
+	var shader := rd.shader_create_from_spirv(shader_spirv)
+	# Prepare our data. We use vec4 floats in the shader, so we need 32 bit.
+	var input := PackedFloat32Array()
+	for i in transforms.size():
+		input.append(transforms.list[i].origin.x)
+		input.append(transforms.list[i].origin.y)
+		input.append(transforms.list[i].origin.z)
+		input.append(0) # needed to use vec4, necessary for byte alignment in the shader code
+	# buffer size, number of vectors sent to the gpu
+	input.resize(padded_num_floats) # indexing in the compute shader requires padding
+	var input_bytes := input.to_byte_array()
+	var output_bytes := input_bytes.duplicate()
+	# Create a storage buffer that can hold our float values.
+	var buffer_in := rd.storage_buffer_create(input_bytes.size(), input_bytes)
+	var buffer_out := rd.storage_buffer_create(output_bytes.size(), output_bytes)
+	
+	# Create a uniform to assign the buffer to the rendering device
+	var uniform_in := RDUniform.new()
+	uniform_in.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	uniform_in.binding = 0 # this needs to match the "binding" in our shader file
+	uniform_in.add_id(buffer_in)
+	# Create a uniform to assign the buffer to the rendering device
+	var uniform_out := RDUniform.new()
+	uniform_out.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	uniform_out.binding = 1 # this needs to match the "binding" in our shader file
+	uniform_out.add_id(buffer_out)
+	# the last parameter (the 0) needs to match the "set" in our shader file
+	var uniform_set := rd.uniform_set_create([uniform_in, uniform_out], shader, 0)
+		
+	# Create a compute pipeline
+	var pipeline := rd.compute_pipeline_create(shader)
+	var compute_list := rd.compute_list_begin()
+	rd.compute_list_bind_compute_pipeline(compute_list, pipeline)
+	rd.compute_list_bind_uniform_set(compute_list, uniform_set, 0)
+	# each workgroup computes 64 vectors
+#	print("Dispatching workgroups: ", padded_num_vecs/64)
+	rd.compute_list_dispatch(compute_list, padded_num_vecs/64, 1, 1)
+	rd.compute_list_end()
+	# Submit to GPU and wait for sync
+	rd.submit()
+	rd.sync()
+	# Read back the data from the buffer
+	var result_bytes := rd.buffer_get_data(buffer_out)
+	var result := result_bytes.to_float32_array()
+	var retval = PackedVector3Array()
+	for i in transforms.size():
+		retval.append(Vector3(result[i*4], result[i*4+1], result[i*4+2]))
+	
+	# Free the allocated objects.
+	# All resources must be freed after use to avoid memory leaks.
+	if rd != null:
+		rd.free_rid(shader_spirv)
+		rd.free_rid(buffer_in)
+		rd.free_rid(buffer_out)
+		rd.free_rid(uniform_in)
+		rd.free_rid(uniform_out)
+		rd.free_rid(uniform_set)
+		rd.free_rid(pipeline)
+		rd.free()
+		rd = null
+	return retval
