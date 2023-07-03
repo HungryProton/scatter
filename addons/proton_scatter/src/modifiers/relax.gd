@@ -2,12 +2,14 @@
 extends "base_modifier.gd"
 
 
+const shader_file := preload("./compute_shaders/compute_relax.glsl")
+
+
 @export var iterations : int = 3
 @export var offset_step : float = 0.01
 @export var consecutive_step_multiplier : float = 0.5
 @export var use_computeshader : bool = true
 
-const shader_file := preload("res://addons/proton_scatter/src/modifiers/ComputeShaders/compute_relax.glsl")
 
 func _init() -> void:
 	display_name = "Relax Position"
@@ -25,20 +27,23 @@ func _init() -> void:
 		1)
 
 
-func _process_transforms(transforms, domain, _seed) -> void:
+func _process_transforms(transforms, _domain, _seed) -> void:
 	var offset := offset_step
 	if transforms.size() < 2:
 		return
-	
-	if use_computeshader:
 
+	if use_computeshader:
 		for iteration in iterations:
 			var movedir : PackedVector3Array = compute_closest(transforms)
 			for i in transforms.size():
+				var dir = movedir[i]
+				if restrict_height:
+					dir.y = 0.0
 				# move away from closest point
-				transforms.list[i].origin += movedir[i].normalized() * offset
+				transforms.list[i].origin += dir.normalized() * offset
+
 			offset *= consecutive_step_multiplier
-	
+
 	else:
 		# calculate the relax transforms on the cpu
 		for iteration in iterations:
@@ -68,6 +73,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 
 			offset *= consecutive_step_multiplier
 
+
 # compute the closest points to each other using a compute shader
 # return a vector for each point that points away from the closest neighbour
 func compute_closest(transforms) -> PackedVector3Array:
@@ -90,7 +96,7 @@ func compute_closest(transforms) -> PackedVector3Array:
 	# Create a storage buffer that can hold our float values.
 	var buffer_in := rd.storage_buffer_create(input_bytes.size(), input_bytes)
 	var buffer_out := rd.storage_buffer_create(output_bytes.size(), output_bytes)
-	
+
 	# Create a uniform to assign the buffer to the rendering device
 	var uniform_in := RDUniform.new()
 	uniform_in.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
@@ -103,7 +109,7 @@ func compute_closest(transforms) -> PackedVector3Array:
 	uniform_out.add_id(buffer_out)
 	# the last parameter (the 0) needs to match the "set" in our shader file
 	var uniform_set := rd.uniform_set_create([uniform_in, uniform_out], shader, 0)
-		
+
 	# Create a compute pipeline
 	var pipeline := rd.compute_pipeline_create(shader)
 	var compute_list := rd.compute_list_begin()
@@ -122,17 +128,15 @@ func compute_closest(transforms) -> PackedVector3Array:
 	var retval = PackedVector3Array()
 	for i in transforms.size():
 		retval.append(Vector3(result[i*4], result[i*4+1], result[i*4+2]))
-	
+
 	# Free the allocated objects.
 	# All resources must be freed after use to avoid memory leaks.
 	if rd != null:
-		rd.free_rid(shader_spirv)
+		rd.free_rid(pipeline)
+		rd.free_rid(uniform_set)
+		rd.free_rid(shader)
 		rd.free_rid(buffer_in)
 		rd.free_rid(buffer_out)
-		rd.free_rid(uniform_in)
-		rd.free_rid(uniform_out)
-		rd.free_rid(uniform_set)
-		rd.free_rid(pipeline)
 		rd.free()
 		rd = null
 	return retval
