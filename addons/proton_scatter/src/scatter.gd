@@ -36,6 +36,7 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 		render_mode = val
 		full_rebuild.call_deferred()
 
+@export var keep_static_colliders := false
 @export var force_rebuild_on_load := true
 @export var enable_updates_in_game := false
 
@@ -109,6 +110,8 @@ var _thread: Thread
 var _rebuild_queued := false
 var _dependency_parent
 var _physics_helper: ProtonScatterPhysicsHelper
+var _body_rid: RID
+var _collision_shapes: Array[RID]
 
 
 func _ready() -> void:
@@ -127,6 +130,10 @@ func _ready() -> void:
 		full_rebuild.call_deferred()
 
 	update_configuration_warnings.call_deferred()
+
+
+func _exit_tree():
+	_clear_collision_data()
 
 
 func _get_property_list() -> Array:
@@ -197,6 +204,18 @@ func clear_output() -> void:
 		output_root = null
 
 	ProtonScatterUtil.ensure_output_root_exists(self)
+	_clear_collision_data()
+
+
+func _clear_collision_data() -> void:
+	if _body_rid.is_valid():
+		PhysicsServer3D.free_rid(_body_rid)
+		_body_rid = RID()
+
+	for rid in _collision_shapes:
+		PhysicsServer3D.free_rid(rid)
+
+	_collision_shapes.clear()
 
 
 # Wrapper around the _rebuild function. Clears previous output and force
@@ -298,6 +317,7 @@ func _update_multimeshes() -> void:
 		var mmi = ProtonScatterUtil.get_or_create_multimesh(item, count)
 		if not mmi:
 			continue
+		var static_body := ProtonScatterUtil.get_collision_data(item)
 
 		var t: Transform3D
 		for i in count:
@@ -308,7 +328,9 @@ func _update_multimeshes() -> void:
 
 			t = item.process_transform(transforms.list[offset + i])
 			mmi.multimesh.set_instance_transform(i, t)
+			_create_collision(static_body, t)
 
+		static_body.queue_free()
 		offset += count
 
 
@@ -358,6 +380,7 @@ func _update_particles_system() -> void:
 		particles.visibility_aabb = AABB(domain.bounds_local.min, domain.bounds_local.size)
 		particles.amount = count
 
+		var static_body := ProtonScatterUtil.get_collision_data(item)
 		var t: Transform3D
 
 		for i in count:
@@ -372,8 +395,89 @@ func _update_particles_system() -> void:
 				Color.WHITE,
 				Color.BLACK,
 				GPUParticles3D.EMIT_FLAG_POSITION | GPUParticles3D.EMIT_FLAG_ROTATION_SCALE)
+			_create_collision(static_body, t)
 
 		offset += count
+
+
+func _create_collision(body: StaticBody3D, t: Transform3D) -> void:
+	if not keep_static_colliders:
+		return
+
+	# Create a static body
+	if not _body_rid.is_valid():
+		_body_rid = PhysicsServer3D.body_create()
+		PhysicsServer3D.body_set_mode(_body_rid, PhysicsServer3D.BODY_MODE_STATIC)
+		PhysicsServer3D.body_set_state(_body_rid, PhysicsServer3D.BODY_STATE_TRANSFORM, global_transform)
+		PhysicsServer3D.body_set_space(_body_rid, get_world_3d().space)
+
+	for c in body.get_children():
+		if c is CollisionShape3D:
+			var shape_rid: RID
+			var data: Variant
+
+			if c.shape is SphereShape3D:
+				shape_rid = PhysicsServer3D.sphere_shape_create()
+				data = c.shape.radius
+
+			elif c.shape is BoxShape3D:
+				shape_rid = PhysicsServer3D.box_shape_create()
+				data = c.shape.size / 2.0
+
+			elif c.shape is CapsuleShape3D:
+				shape_rid = PhysicsServer3D.capsule_shape_create()
+				data = {
+					"radius": c.shape.radius,
+					"height": c.shape.height,
+				}
+
+			elif c.shape is CylinderShape3D:
+				shape_rid = PhysicsServer3D.cylinder_shape_create()
+				data = {
+					"radius": c.shape.radius,
+					"height": c.shape.height,
+				}
+
+			elif c.shape is ConcavePolygonShape3D:
+				shape_rid = PhysicsServer3D.concave_polygon_shape_create()
+				data = {
+					"faces": c.shape.faces,
+					"backface_collision": c.shape.backface_collision,
+				}
+
+			elif c.shape is ConvexPolygonShape3D:
+				shape_rid = PhysicsServer3D.convex_polygon_shape_create()
+				data = c.shape.points
+
+			elif c.shape is HeightMapShape3D:
+				shape_rid = PhysicsServer3D.heightmap_shape_create()
+				var min_height := 9999999.0
+				var max_height := -9999999.0
+				for v in c.shape.map_data:
+					min_height = v if v < min_height else min_height
+					max_height = v if v > max_height else max_height
+				data = {
+					"width": c.shape.map_width,
+					"depth": c.shape.map_depth,
+					"heights": c.shape.map_data,
+					"min_height": min_height,
+					"max_height": max_height,
+				}
+
+			elif c.shape is SeparationRayShape3D:
+				shape_rid = PhysicsServer3D.separation_ray_shape_create()
+				data = {
+					"length": c.shape.length,
+					"slide_on_slope": c.shape.slide_on_slope,
+				}
+
+			else:
+				print_debug("Scatter - Unsupported collision shape: ", c.shape)
+				continue
+
+			PhysicsServer3D.shape_set_data(shape_rid, data)
+			PhysicsServer3D.body_add_shape(_body_rid, shape_rid, t * c.transform)
+			_collision_shapes.push_back(shape_rid)
 
 
 func _create_instance(item: ProtonScatterItem, root: Node3D):
@@ -436,6 +540,8 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		clear_output()
 		update_gizmos()
 		return
+
+	_clear_collision_data()
 
 	match render_mode:
 		0:

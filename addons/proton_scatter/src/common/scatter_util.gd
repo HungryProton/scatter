@@ -336,6 +336,36 @@ static func get_merged_meshes_from(source: Node) -> MeshInstance3D:
 	return instance
 
 
+static func get_all_static_bodies_from(node: Node3D) -> Array[StaticBody3D]:
+	var res: Array[StaticBody3D] = []
+
+	if node is StaticBody3D:
+		res.push_back(node)
+
+	for c in node.get_children():
+		res.append_array(get_all_static_bodies_from(c))
+
+	return res
+
+
+# Grab every static bodies from the source item and merge them in a single
+# one with multiple collision shapes.
+static func get_collision_data(item: ProtonScatterItem) -> StaticBody3D:
+	var static_body := StaticBody3D.new()
+	var source: Node3D = item.get_item().duplicate(0)
+	source.transform = Transform3D()
+
+	for body in get_all_static_bodies_from(source):
+		for child in body.get_children():
+			if child is CollisionShape3D:
+				# Don't use reparent() here or the child transform gets reset.
+				body.remove_child(child)
+				static_body.add_child(child)
+
+	source.queue_free()
+	return static_body
+
+
 static func set_owner_recursive(node: Node, new_owner) -> void:
 	node.set_owner(new_owner)
 
