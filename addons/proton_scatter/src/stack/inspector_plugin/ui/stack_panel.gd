@@ -143,7 +143,7 @@ func _on_value_changed() -> void:
 
 func _on_rebuild_pressed() -> void:
 	if _scatter:
-		_scatter.rebuild(true)
+		_scatter.full_rebuild()
 
 
 func _on_save_preset_pressed() -> void:
