@@ -96,14 +96,7 @@ var items: Array = []
 var total_item_proportion: int
 var output_root: Marker3D
 var transforms: ProtonScatterTransformList
-
 var editor_plugin # Holds a reference to the EditorPlugin. Used by other parts.
-
-# No longer exposed, but kept for backward compatiblity.
-var use_instancing := true:
-	set(val):
-		use_instancing = val
-		render_mode = 0 if val else 1
 
 # Internal variables
 var _thread: Thread
@@ -167,13 +160,19 @@ func _notification(what):
 			rebuild.call_deferred()
 
 
-func _set(property, _value):
+func _set(property, value):
 	if not Engine.is_editor_hint():
 		return false
 
 	# Workaround to detect when the node was duplicated from the editor.
 	if property == "transform":
 		_on_node_duplicated.call_deferred()
+
+	# Backward compatibility.
+	# Convert the value of previous property "use_instancing" into the proper render_mode.
+	elif property == "use_instancing":
+		render_mode = 0 if value else 1
+		return true
 
 	return false
 
@@ -187,7 +186,7 @@ func get_physics_helper() -> ProtonScatterPhysicsHelper:
 	if not is_instance_valid(_physics_helper):
 		_physics_helper = ProtonScatterPhysicsHelper.new()
 		_physics_helper.name = "PhysicsHelper"
-		add_child.bind(_physics_helper, true).call_deferred()
+		add_child.bind(_physics_helper, true, INTERNAL_MODE_BACK).call_deferred()
 		await get_tree().process_frame
 
 	return _physics_helper
@@ -268,8 +267,11 @@ func _rebuild(force_discover) -> void:
 		push_warning("ProtonScatter warning: No items or shapes, abort")
 		return
 
-	if not use_instancing:
+	if render_mode == 1:
 		clear_output() # TMP, prevents raycasts in modifier to self intersect with previous output
+
+	if keep_static_colliders:
+		_clear_collision_data()
 
 	if dbg_disable_thread:
 		modifier_stack.start_update(self, domain)

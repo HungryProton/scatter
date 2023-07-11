@@ -152,7 +152,7 @@ func _on_load_full_preset(path: String) -> void:
 
 		ProtonScatterUtil.set_owner_recursive(_scatter_node, get_tree().get_edited_scene_root())
 
-		_scatter_node.rebuild.call_deferred()
+		_scatter_node.full_rebuild.call_deferred()
 		preset.queue_free()
 
 	hide()
