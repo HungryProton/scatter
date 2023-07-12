@@ -15,6 +15,7 @@ const ProtonScatterPhysicsHelper := preload("res://addons/proton_scatter/src/com
 @export var align_with_collision_normal := false
 @export_range(0.0, 90.0) var max_slope = 90.0
 @export_flags_3d_physics var collision_mask = 1
+@export_flags_3d_physics var exclude_mask = 0
 
 var _last_hit: Dictionary
 
@@ -87,6 +88,11 @@ func _init() -> void:
 		"Only collide with colliders on these layers. Disabled layers will
 		be ignored. It's useful to ignore players or npcs that might be on the
 		scene when you're editing it.")
+	
+	p = documentation.add_parameter("Exclude Mask")
+	p.set_description(
+		"Tests if the snapping would collide with the selected layers.
+		If it collides, the point will be excluded from the list.")
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
@@ -97,6 +103,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	var gt: Transform3D = domain.get_global_transform()
 	var gt_inverse := gt.affine_inverse()
 	var queries: Array[PhysicsRayQueryParameters3D] = []
+	var exclude_queries: Array[PhysicsRayQueryParameters3D] = []
 
 	for t in transforms.list:
 		var start = gt * t.origin
@@ -118,6 +125,13 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		ray_query.collision_mask = collision_mask
 
 		queries.push_back(ray_query)
+		
+		var exclude_query := PhysicsRayQueryParameters3D.new()
+		exclude_query.from = start
+		exclude_query.to = end
+		exclude_query.collision_mask = exclude_mask
+		exclude_queries.push_back(exclude_query)
+		
 
 	# Run the queries in the physics helper since we can't access the PhysicsServer
 	# from outside the _physics_process while also being in a separate thread.
@@ -127,9 +141,20 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	if ray_hits.is_empty():
 		return
 
-	# Apply the results
-
+	# Create queries from the hit points
 	var index := 0
+	for ray_hit in ray_hits:
+		var hit : Dictionary = ray_hit
+		if hit.is_empty():
+			exclude_queries[index].collision_mask = 0 # this point is empty anyway, we dont care
+			continue
+		exclude_queries[index].to = hit.position # only cast up to hit point for correct ordering
+		index += 1
+	
+	var exclude_hits := await physics_helper.execute(exclude_queries)
+	
+	# Apply the results
+	index = 0
 	var d: float
 	var t: Transform3D
 	var remapped_max_slope = remap(max_slope, 0.0, 90.0, 0.0, 1.0)
@@ -143,6 +168,11 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		else:
 			d = abs(Vector3.UP.dot(hit.normal))
 			is_point_valid = d >= (1.0 - remapped_max_slope)
+
+		# use pop because index is not always incremented
+		var exclude_hit = exclude_hits.pop_front() 
+		if not exclude_hit.is_empty():
+			is_point_valid = false
 
 		if is_point_valid:
 			t = transforms.list[index]
