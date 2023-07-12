@@ -142,14 +142,14 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		return
 
 	# Create queries from the hit points
-	var index := 0
+	var index := -1
 	for ray_hit in ray_hits:
+		index += 1
 		var hit : Dictionary = ray_hit
 		if hit.is_empty():
 			exclude_queries[index].collision_mask = 0 # this point is empty anyway, we dont care
 			continue
 		exclude_queries[index].to = hit.position # only cast up to hit point for correct ordering
-		index += 1
 	
 	var exclude_hits : Array[Dictionary] = []
 	if exclude_mask != 0: # Only cast the rays if it makes any sense
@@ -161,6 +161,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	var t: Transform3D
 	var remapped_max_slope = remap(max_slope, 0.0, 90.0, 0.0, 1.0)
 	var is_point_valid := false
+	exclude_hits.reverse()
 
 	for hit in ray_hits:
 		is_point_valid = true
@@ -172,7 +173,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			is_point_valid = d >= (1.0 - remapped_max_slope)
 
 		# use pop because index is not always incremented
-		var exclude_hit = exclude_hits.pop_front()
+		var exclude_hit = exclude_hits.pop_back() 
 		if exclude_hit != null:
 			if not exclude_hit.is_empty():
 				is_point_valid = false
