@@ -151,7 +151,9 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		exclude_queries[index].to = hit.position # only cast up to hit point for correct ordering
 		index += 1
 	
-	var exclude_hits := await physics_helper.execute(exclude_queries)
+	var exclude_hits : Array[Dictionary] = []
+	if exclude_mask != 0: # Only cast the rays if it makes any sense
+		exclude_hits = await physics_helper.execute(exclude_queries)
 	
 	# Apply the results
 	index = 0
@@ -170,9 +172,10 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			is_point_valid = d >= (1.0 - remapped_max_slope)
 
 		# use pop because index is not always incremented
-		var exclude_hit = exclude_hits.pop_front() 
-		if not exclude_hit.is_empty():
-			is_point_valid = false
+		var exclude_hit = exclude_hits.pop_front()
+		if exclude_hit != null:
+			if not exclude_hit.is_empty():
+				is_point_valid = false
 
 		if is_point_valid:
 			t = transforms.list[index]
