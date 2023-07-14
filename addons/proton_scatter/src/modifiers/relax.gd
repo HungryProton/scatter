@@ -25,16 +25,25 @@ func _init() -> void:
 		large amounts of points.
 		It will be optimized in a later update.",
 		1)
+	documentation.add_warning(
+		"The `use_computeshader` parameter is disable by default when
+		your using the OpenGL backend or running in headless mode.")
 
 
 func _process_transforms(transforms, _domain, _seed) -> void:
 	var offset := offset_step
 	if transforms.size() < 2:
 		return
+	
+	# Disable the use of compute shader, if we cannot create a RenderingDevice
+	if use_computeshader:
+		var rd := RenderingServer.create_local_rendering_device()
+		if rd == null:
+			use_computeshader = false
 
 	if use_computeshader:
 		for iteration in iterations:
-			var movedir : PackedVector3Array = compute_closest(transforms)
+			var movedir: PackedVector3Array = compute_closest(transforms)
 			for i in transforms.size():
 				var dir = movedir[i]
 				if restrict_height:
