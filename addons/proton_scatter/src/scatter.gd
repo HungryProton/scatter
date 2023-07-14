@@ -128,6 +128,9 @@ func _ready() -> void:
 func _exit_tree():
 	_clear_collision_data()
 
+	if is_thread_running():
+		await _thread.wait_to_finish()
+		_thread = null
 
 func _get_property_list() -> Array:
 	var list := []
