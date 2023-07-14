@@ -33,14 +33,17 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 @export_group("Performance")
 @export_enum("Use Instancing:0",
 			 "Create Copies:1",
-			 "Use Particles:2",
-			 "Use Split multimesh:3",)\
+			 "Use Particles:2")\
 		var render_mode := 0:
 	set(val):
 		render_mode = val
 		notify_property_list_changed()
 		full_rebuild.call_deferred()
 
+@export var use_chunks : bool = true:
+	set(val):
+		use_chunks = val
+		notify_property_list_changed()
 @export var keep_static_colliders := false
 @export var force_rebuild_on_load := true
 @export var enable_updates_in_game := false
@@ -154,7 +157,7 @@ func _get_property_list() -> Array:
 		hint_string = "ScatterModifierStack",
 	})
 	
-	var property_usage = PROPERTY_USAGE_DEFAULT if render_mode == 3 else PROPERTY_USAGE_NO_EDITOR
+	var property_usage = PROPERTY_USAGE_DEFAULT if use_chunks else PROPERTY_USAGE_NO_EDITOR
 	list.push_back({
 		name = "split_dimensions",
 		type = TYPE_VECTOR3I,
@@ -638,13 +641,14 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 
 	match render_mode:
 		0:
-			_update_multimeshes()
+			if use_chunks:
+				_update_split_multimeshes()
+			else:
+				_update_multimeshes()
 		1:
 			_update_duplicates()
 		2:
 			_update_particles_system()
-		3:
-			_update_split_multimeshes()
 
 	update_gizmos()
 	await get_tree().process_frame
