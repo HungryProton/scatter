@@ -31,11 +31,19 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 			ProtonScatterUtil.enforce_output_root_owner(self)
 
 @export_group("Performance")
-@export_enum("Use Instancing:0", "Create Copies:1", "Use Particles:2") var render_mode := 0:
+@export_enum("Use Instancing:0",
+			 "Create Copies:1",
+			 "Use Particles:2")\
+		var render_mode := 0:
 	set(val):
 		render_mode = val
+		notify_property_list_changed()
 		full_rebuild.call_deferred()
 
+@export var use_chunks : bool = true:
+	set(val):
+		use_chunks = val
+		notify_property_list_changed()
 @export var keep_static_colliders := false
 @export var force_rebuild_on_load := true
 @export var enable_updates_in_game := false
@@ -106,6 +114,8 @@ var _physics_helper: ProtonScatterPhysicsHelper
 var _body_rid: RID
 var _collision_shapes: Array[RID]
 
+var split_dimensions : Vector3i = Vector3i.ONE
+
 
 func _ready() -> void:
 	if Engine.is_editor_hint() or enable_updates_in_game:
@@ -138,6 +148,13 @@ func _get_property_list() -> Array:
 		name = "modifier_stack",
 		type = TYPE_OBJECT,
 		hint_string = "ScatterModifierStack",
+	})
+	
+	var property_usage = PROPERTY_USAGE_DEFAULT if use_chunks else PROPERTY_USAGE_NO_EDITOR
+	list.push_back({
+		name = "split_dimensions",
+		type = TYPE_VECTOR3I,
+		usage = property_usage,
 	})
 	return list
 
@@ -336,6 +353,75 @@ func _update_multimeshes() -> void:
 			_create_collision(static_body, t)
 
 		static_body.queue_free()
+		offset += count
+
+
+func _update_split_multimeshes() -> void:
+	if split_dimensions[split_dimensions.min_axis_index()] <= 0:
+		print("Split dimensions cannot be less than 1 in any direction")
+		return
+	
+	if items.is_empty():
+		_discover_items()
+
+	var offset := 0 # this many transforms have been used up
+	var transforms_count: int = transforms.size()
+	clear_output()
+	
+	for item in items:
+		var root: Node3D = ProtonScatterUtil.get_or_create_item_root(item)
+		# use count number of transforms for this item
+		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
+		
+		# create 3d array with dimensions of split_size to store the chunks' transforms
+		var transform_chunks : Array = []
+		for xi in split_dimensions.x:
+			transform_chunks.append([])
+			for yi in split_dimensions.y:
+				transform_chunks[xi].append([])
+				for zi in split_dimensions.z:
+					transform_chunks[xi][yi].append([])
+					
+		var t_list = transforms.list.slice(offset)
+		var aabb = ProtonScatterUtil.get_aabb_from_transforms(t_list)
+		aabb = aabb.grow(0.1) # avoid degenerate cases
+		
+		for i in count:
+			# both aabb and t are in mmi's local coordinates
+			var t = item.process_transform(transforms.list[offset + i])
+			var p_rel = (t.origin - aabb.position) / aabb.size
+			# Chunk index
+			var ci = (p_rel * Vector3(split_dimensions)).floor()
+#			printt(i, ci)
+			# Store the transform to the appropriate array
+			transform_chunks[ci.x][ci.y][ci.z].append(t)
+
+		# The relevant transforms are now ordered in chunks
+		for xi in split_dimensions.x:
+			for yi in split_dimensions.y:
+				for zi in split_dimensions.z:
+					#prints(xi, yi, zi, transform_chunks[xi][yi][zi])
+					#prints("transforms in chunk", xi, yi, zi, transform_chunks[xi][yi][zi].size())
+					var chunk_elements = transform_chunks[xi][yi][zi].size()
+					if chunk_elements == 0:
+						continue
+					var mmi = ProtonScatterUtil.get_or_create_multimesh_chunk(item, Vector3i(xi, yi, zi), chunk_elements)
+					if not mmi:
+						continue
+					
+					# Use the eventual aabb as origin
+					# The multimeshinstance needs to be centered where the transforms are
+					# This matters because otherwise the visibility range fading is messed up
+					var center =  ProtonScatterUtil.get_aabb_from_transforms(transform_chunks[xi][yi][zi]).get_center()
+					mmi.transform.origin = center
+					var static_body := ProtonScatterUtil.get_collision_data(item)
+					var t: Transform3D
+					for i in chunk_elements:
+						t = transform_chunks[xi][yi][zi][i]
+						t.origin -= center
+						mmi.multimesh.set_instance_transform(i, t)
+						_create_collision(static_body, t)
+					static_body.queue_free()
 		offset += count
 
 
@@ -550,7 +636,10 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 
 	match render_mode:
 		0:
-			_update_multimeshes()
+			if use_chunks:
+				_update_split_multimeshes()
+			else:
+				_update_multimeshes()
 		1:
 			_update_duplicates()
 		2:

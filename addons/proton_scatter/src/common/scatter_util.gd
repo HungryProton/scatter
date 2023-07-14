@@ -75,10 +75,10 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 
 	if not mmi:
 		mmi = MultiMeshInstance3D.new()
+		mmi.set_name("MultiMeshInstance3D")
 		item_root.add_child(mmi, true)
 
 		mmi.set_owner(item_root.owner)
-		mmi.set_name("MultiMeshInstance3D")
 
 	if not mmi.multimesh:
 		mmi.multimesh = MultiMesh.new()
@@ -95,6 +95,57 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 	mmi.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
 	mmi.multimesh.mesh = mesh_instance.mesh
 	mmi.multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	
+	mmi.visibility_range_begin 			= item.visibility_range_begin
+	mmi.visibility_range_begin_margin 	= item.visibility_range_begin_margin
+	mmi.visibility_range_end 			= item.visibility_range_end
+	mmi.visibility_range_end_margin 	= item.visibility_range_end_margin
+	mmi.visibility_range_fade_mode 		= item.visibility_range_fade_mode
+	
+	mmi.multimesh.instance_count = count
+
+	mesh_instance.queue_free()
+
+	return mmi
+
+
+static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector3i, count) -> MultiMeshInstance3D:
+	var item_root := get_or_create_item_root(item)
+	var chunk_name = "MultiMeshInstance3D" + "_%s_%s_%s"%[index.x, index.y, index.z]
+	var mmi: MultiMeshInstance3D = item_root.get_node_or_null(chunk_name)
+
+	if not mmi:
+		mmi = MultiMeshInstance3D.new()
+		mmi.set_name(chunk_name) 
+		# if set_name is used after add_child it is crazy slow
+		# This doesn't make much sense but it is definitely the case.
+		# About a 100x slowdown was observed in this case
+		item_root.add_child(mmi, true)
+
+		mmi.set_owner(item_root.owner)
+
+	if not mmi.multimesh:
+		mmi.multimesh = MultiMesh.new()
+
+	mmi.position = Vector3.ZERO
+	mmi.set_cast_shadows_setting(item.override_cast_shadow)
+	mmi.set_material_override(item.override_material)
+
+	var node = item.get_item()
+	var mesh_instance: MeshInstance3D = get_merged_meshes_from(node)
+	if not mesh_instance:
+		return
+
+	mmi.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
+	mmi.multimesh.mesh = mesh_instance.mesh
+	mmi.multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	
+	mmi.visibility_range_begin 			= item.visibility_range_begin
+	mmi.visibility_range_begin_margin 	= item.visibility_range_begin_margin
+	mmi.visibility_range_end 			= item.visibility_range_end
+	mmi.visibility_range_end_margin 	= item.visibility_range_end_margin
+	mmi.visibility_range_fade_mode 		= item.visibility_range_fade_mode
+	
 	mmi.multimesh.instance_count = count
 
 	mesh_instance.queue_free()
@@ -108,9 +159,9 @@ static func get_or_create_particles(item: ProtonScatterItem) -> GPUParticles3D:
 
 	if not particles:
 		particles = GPUParticles3D.new()
+		particles.set_name("GPUParticles3D")
 		item_root.add_child(particles)
 
-		particles.set_name("GPUParticles3D")
 		particles.set_owner(item_root.owner)
 
 	var node = item.get_item()
@@ -374,3 +425,12 @@ static func set_owner_recursive(node: Node, new_owner) -> void:
 
 	for c in node.get_children():
 		set_owner_recursive(c, new_owner)
+
+
+static func get_aabb_from_transforms(transforms : Array) -> AABB:
+	if transforms.size() < 1:
+		return AABB(Vector3.ZERO, Vector3.ZERO)
+	var aabb = AABB(transforms[0].origin, Vector3.ZERO)
+	for t in transforms:
+		aabb = aabb.expand(t.origin)
+	return aabb
