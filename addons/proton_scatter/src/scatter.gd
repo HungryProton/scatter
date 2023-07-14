@@ -40,10 +40,19 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 		notify_property_list_changed()
 		full_rebuild.call_deferred()
 
-@export var use_chunks : bool = true:
+var use_chunks : bool = true:
 	set(val):
 		use_chunks = val
 		notify_property_list_changed()
+		full_rebuild.call_deferred()
+
+var chunk_dimensions := Vector3.ONE * 15.0:
+	set(val):
+		chunk_dimensions.x = max(val.x, 1.0)
+		chunk_dimensions.y = max(val.y, 1.0)
+		chunk_dimensions.z = max(val.z, 1.0)
+		rebuild()
+
 @export var keep_static_colliders := false
 @export var force_rebuild_on_load := true
 @export var enable_updates_in_game := false
@@ -114,8 +123,6 @@ var _physics_helper: ProtonScatterPhysicsHelper
 var _body_rid: RID
 var _collision_shapes: Array[RID]
 
-var split_dimensions : Vector3i = Vector3i.ONE
-
 
 func _ready() -> void:
 	if Engine.is_editor_hint() or enable_updates_in_game:
@@ -149,12 +156,24 @@ func _get_property_list() -> Array:
 		type = TYPE_OBJECT,
 		hint_string = "ScatterModifierStack",
 	})
-	
-	var property_usage = PROPERTY_USAGE_DEFAULT if use_chunks else PROPERTY_USAGE_NO_EDITOR
+
+	var chunk_usage := PROPERTY_USAGE_NO_EDITOR
+	var dimensions_usage := PROPERTY_USAGE_NO_EDITOR
+	if render_mode == 0 or render_mode == 2:
+		chunk_usage = PROPERTY_USAGE_DEFAULT
+		if use_chunks:
+			dimensions_usage = PROPERTY_USAGE_DEFAULT
+
 	list.push_back({
-		name = "split_dimensions",
-		type = TYPE_VECTOR3I,
-		usage = property_usage,
+		name = "Performance/use_chunks",
+		type = TYPE_BOOL,
+		usage = chunk_usage
+	})
+
+	list.push_back({
+		name = "Performance/chunk_dimensions",
+		type = TYPE_VECTOR3,
+		usage = dimensions_usage
 	})
 	return list
 
@@ -188,6 +207,12 @@ func _set(property, value):
 	if property == "transform":
 		_on_node_duplicated.call_deferred()
 
+	elif property == "Performance/use_chunks":
+		use_chunks = value
+
+	elif property == "Performance/chunk_dimensions":
+		chunk_dimensions = value
+
 	# Backward compatibility.
 	# Convert the value of previous property "use_instancing" into the proper render_mode.
 	elif property == "use_instancing":
@@ -195,6 +220,14 @@ func _set(property, value):
 		return true
 
 	return false
+
+
+func _get(property):
+	if property == "Performance/use_chunks":
+		return use_chunks
+
+	elif property == "Performance/chunk_dimensions":
+		return chunk_dimensions
 
 
 func is_thread_running() -> bool:
@@ -357,58 +390,58 @@ func _update_multimeshes() -> void:
 
 
 func _update_split_multimeshes() -> void:
-	if split_dimensions[split_dimensions.min_axis_index()] <= 0:
-		print("Split dimensions cannot be less than 1 in any direction")
-		return
-	
+	var size = domain.bounds_local.size
+
+	var splits := Vector3i.ONE
+	splits.x = ceil(size.x / chunk_dimensions.x)
+	splits.y = ceil(size.y / chunk_dimensions.y)
+	splits.z = ceil(size.z / chunk_dimensions.z)
+
 	if items.is_empty():
 		_discover_items()
 
 	var offset := 0 # this many transforms have been used up
 	var transforms_count: int = transforms.size()
 	clear_output()
-	
+
 	for item in items:
 		var root: Node3D = ProtonScatterUtil.get_or_create_item_root(item)
 		# use count number of transforms for this item
 		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		
+
 		# create 3d array with dimensions of split_size to store the chunks' transforms
 		var transform_chunks : Array = []
-		for xi in split_dimensions.x:
+		for xi in splits.x:
 			transform_chunks.append([])
-			for yi in split_dimensions.y:
+			for yi in splits.y:
 				transform_chunks[xi].append([])
-				for zi in split_dimensions.z:
+				for zi in splits.z:
 					transform_chunks[xi][yi].append([])
-					
+
 		var t_list = transforms.list.slice(offset)
 		var aabb = ProtonScatterUtil.get_aabb_from_transforms(t_list)
 		aabb = aabb.grow(0.1) # avoid degenerate cases
-		
+
 		for i in count:
 			# both aabb and t are in mmi's local coordinates
 			var t = item.process_transform(transforms.list[offset + i])
 			var p_rel = (t.origin - aabb.position) / aabb.size
 			# Chunk index
-			var ci = (p_rel * Vector3(split_dimensions)).floor()
-#			printt(i, ci)
+			var ci = (p_rel * Vector3(splits)).floor()
 			# Store the transform to the appropriate array
 			transform_chunks[ci.x][ci.y][ci.z].append(t)
 
 		# The relevant transforms are now ordered in chunks
-		for xi in split_dimensions.x:
-			for yi in split_dimensions.y:
-				for zi in split_dimensions.z:
-					#prints(xi, yi, zi, transform_chunks[xi][yi][zi])
-					#prints("transforms in chunk", xi, yi, zi, transform_chunks[xi][yi][zi].size())
+		for xi in splits.x:
+			for yi in splits.y:
+				for zi in splits.z:
 					var chunk_elements = transform_chunks[xi][yi][zi].size()
 					if chunk_elements == 0:
 						continue
 					var mmi = ProtonScatterUtil.get_or_create_multimesh_chunk(item, Vector3i(xi, yi, zi), chunk_elements)
 					if not mmi:
 						continue
-					
+
 					# Use the eventual aabb as origin
 					# The multimeshinstance needs to be centered where the transforms are
 					# This matters because otherwise the visibility range fading is messed up
