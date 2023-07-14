@@ -77,16 +77,6 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 		_dependency_parent.build_completed.connect(rebuild, CONNECT_DEFERRED)
 
 
-@export_group("Visibility range", "visibility_range_")
-@export var visibility_range_begin : float = 0
-@export var visibility_range_begin_margin : float = 0
-@export var visibility_range_end : float = 0
-@export var visibility_range_end_margin : float = 0
-#TODO what is a nicer way to expose this?
-@export_enum("Disabled:0",
-			 "Self:1")\
-			 var visibility_range_fade_mode = 0
-
 @export_group("Debug", "dbg_")
 @export var dbg_disable_thread := false
 
@@ -389,12 +379,8 @@ func _update_split_multimeshes() -> void:
 				for zi in split_dimensions.z:
 					transform_chunks[xi][yi].append([])
 					
-		
-		var aabb : AABB = AABB(item.process_transform(transforms.list[offset]).origin, Vector3.ZERO)
-		for i in count:
-			# generate the aabb for chunking
-			var t : Transform3D = item.process_transform(transforms.list[offset + i])
-			aabb = aabb.expand(t.origin)
+		var t_list = transforms.list.slice(offset)
+		var aabb = ProtonScatterUtil.get_aabb_from_transforms(t_list)
 		aabb = aabb.grow(0.1) # avoid degenerate cases
 		
 		for i in count:
@@ -420,10 +406,16 @@ func _update_split_multimeshes() -> void:
 					if not mmi:
 						continue
 					
+					# Use the eventual aabb as origin
+					# The multimeshinstance needs to be centered where the transforms are
+					# This matters because otherwise the visibility range fading is messed up
+					var center =  ProtonScatterUtil.get_aabb_from_transforms(transform_chunks[xi][yi][zi]).get_center()
+					mmi.transform.origin = center
 					var static_body := ProtonScatterUtil.get_collision_data(item)
 					var t: Transform3D
 					for i in chunk_elements:
 						t = transform_chunks[xi][yi][zi][i]
+						t.origin -= center
 						mmi.multimesh.set_instance_transform(i, t)
 						_create_collision(static_body, t)
 					static_body.queue_free()

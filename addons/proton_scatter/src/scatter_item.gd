@@ -53,6 +53,16 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		override_cast_shadow = val
 		ScatterUtil.request_parent_to_rebuild(self) # TODO - Only change the multimesh flag instead
 
+@export_group("Visibility range", "visibility_range_")
+@export var visibility_range_begin : float = 0
+@export var visibility_range_begin_margin : float = 0
+@export var visibility_range_end : float = 0
+@export var visibility_range_end_margin : float = 0
+#TODO what is a nicer way to expose this?
+@export_enum("Disabled:0",
+			 "Self:1")\
+			 var visibility_range_fade_mode = 0
+
 var path: String:
 	set(val):
 		path = val

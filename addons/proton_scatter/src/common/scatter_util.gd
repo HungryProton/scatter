@@ -95,6 +95,13 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 	mmi.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
 	mmi.multimesh.mesh = mesh_instance.mesh
 	mmi.multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	
+	mmi.visibility_range_begin 			= item.visibility_range_begin
+	mmi.visibility_range_begin_margin 	= item.visibility_range_begin_margin
+	mmi.visibility_range_end 			= item.visibility_range_end
+	mmi.visibility_range_end_margin 	= item.visibility_range_end_margin
+	mmi.visibility_range_fade_mode 		= item.visibility_range_fade_mode
+	
 	mmi.multimesh.instance_count = count
 
 	mesh_instance.queue_free()
@@ -132,6 +139,13 @@ static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector
 	mmi.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
 	mmi.multimesh.mesh = mesh_instance.mesh
 	mmi.multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	
+	mmi.visibility_range_begin 			= item.visibility_range_begin
+	mmi.visibility_range_begin_margin 	= item.visibility_range_begin_margin
+	mmi.visibility_range_end 			= item.visibility_range_end
+	mmi.visibility_range_end_margin 	= item.visibility_range_end_margin
+	mmi.visibility_range_fade_mode 		= item.visibility_range_fade_mode
+	
 	mmi.multimesh.instance_count = count
 
 	mesh_instance.queue_free()
@@ -145,9 +159,9 @@ static func get_or_create_particles(item: ProtonScatterItem) -> GPUParticles3D:
 
 	if not particles:
 		particles = GPUParticles3D.new()
+		particles.set_name("GPUParticles3D")
 		item_root.add_child(particles)
 
-		particles.set_name("GPUParticles3D")
 		particles.set_owner(item_root.owner)
 
 	var node = item.get_item()
@@ -411,3 +425,12 @@ static func set_owner_recursive(node: Node, new_owner) -> void:
 
 	for c in node.get_children():
 		set_owner_recursive(c, new_owner)
+
+
+static func get_aabb_from_transforms(transforms : Array) -> AABB:
+	if transforms.size() < 1:
+		return AABB(Vector3.ZERO, Vector3.ZERO)
+	var aabb = AABB(transforms[0].origin, Vector3.ZERO)
+	for t in transforms:
+		aabb = aabb.expand(t.origin)
+	return aabb
