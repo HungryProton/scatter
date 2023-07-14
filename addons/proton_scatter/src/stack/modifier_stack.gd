@@ -20,7 +20,10 @@ func start_update(scatter_node: ProtonScatter, domain) -> void:
 	var transforms = TransformList.new()
 
 	for modifier in stack:
-		await modifier.process_transforms(transforms, domain, scatter_node.global_seed)
+		if modifier.has_method(&"process_transforms"):
+			await modifier.process_transforms(transforms, domain, scatter_node.global_seed)
+		else:
+			printerr(modifier, " not inherit from 'base_modifier.gd'")
 
 	transforms_ready.emit(transforms)
 
