@@ -393,9 +393,9 @@ func _update_split_multimeshes() -> void:
 	var size = domain.bounds_local.size
 
 	var splits := Vector3i.ONE
-	splits.x = ceil(size.x / chunk_dimensions.x)
-	splits.y = ceil(size.y / chunk_dimensions.y)
-	splits.z = ceil(size.z / chunk_dimensions.z)
+	splits.x = max(1, ceil(size.x / chunk_dimensions.x))
+	splits.y = max(1, ceil(size.y / chunk_dimensions.y))
+	splits.z = max(1, ceil(size.z / chunk_dimensions.z))
 
 	if items.is_empty():
 		_discover_items()
