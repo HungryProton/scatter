@@ -75,10 +75,10 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 
 	if not mmi:
 		mmi = MultiMeshInstance3D.new()
+		mmi.set_name("MultiMeshInstance3D")
 		item_root.add_child(mmi, true)
 
 		mmi.set_owner(item_root.owner)
-		mmi.set_name("MultiMeshInstance3D")
 
 	if not mmi.multimesh:
 		mmi.multimesh = MultiMesh.new()
@@ -109,10 +109,13 @@ static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector
 
 	if not mmi:
 		mmi = MultiMeshInstance3D.new()
+		mmi.set_name(chunk_name) 
+		# if set_name is used after add_child it is crazy slow
+		# This doesn't make much sense but it is definitely the case.
+		# About a 100x slowdown was observed in this case
 		item_root.add_child(mmi, true)
 
 		mmi.set_owner(item_root.owner)
-		mmi.set_name(chunk_name)
 
 	if not mmi.multimesh:
 		mmi.multimesh = MultiMesh.new()
