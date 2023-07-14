@@ -8,10 +8,11 @@ signal transforms_ready
 
 
 const ProtonScatter := preload("../scatter.gd")
-const TransformList = preload("../common/transform_list.gd")
+const TransformList := preload("../common/transform_list.gd")
+const BaseModifier := preload("../modifiers/base_modifier.gd")
 
 
-@export var stack: Array[Resource] = []
+@export var stack: Array[BaseModifier] = []
 
 var just_created := false
 
@@ -20,15 +21,12 @@ func start_update(scatter_node: ProtonScatter, domain) -> void:
 	var transforms = TransformList.new()
 
 	for modifier in stack:
-		if modifier.has_method(&"process_transforms"):
-			await modifier.process_transforms(transforms, domain, scatter_node.global_seed)
-		else:
-			printerr(modifier, " not inherit from 'base_modifier.gd'")
+		await modifier.process_transforms(transforms, domain, scatter_node.global_seed)
 
 	transforms_ready.emit(transforms)
 
 
-func add(modifier) -> void:
+func add(modifier: BaseModifier) -> void:
 	stack.push_back(modifier)
 	stack_changed.emit()
 
@@ -39,7 +37,7 @@ func move(old_index: int, new_index: int) -> void:
 	stack_changed.emit()
 
 
-func remove(modifier) -> void:
+func remove(modifier: BaseModifier) -> void:
 	if stack.has(modifier):
 		stack.erase(modifier)
 		stack_changed.emit()
@@ -51,7 +49,7 @@ func remove_at(index: int) -> void:
 		stack_changed.emit()
 
 
-func duplicate_modifier(modifier) -> void:
+func duplicate_modifier(modifier: BaseModifier) -> void:
 	var index: int = stack.find(modifier)
 	if index != -1:
 		var copy = modifier.get_copy()
@@ -66,7 +64,7 @@ func get_copy():
 	return copy
 
 
-func get_index(modifier) -> int:
+func get_index(modifier: BaseModifier) -> int:
 	return stack.find(modifier)
 
 
