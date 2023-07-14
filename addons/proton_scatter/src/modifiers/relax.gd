@@ -36,15 +36,14 @@ func _process_transforms(transforms, _domain, _seed) -> void:
 		return
 	
 	# Disable the use of compute shader, if we cannot create a RenderingDevice
-	var rd = null
 	if use_computeshader:
-		rd = RenderingServer.create_local_rendering_device()
+		var rd := RenderingServer.create_local_rendering_device()
 		if rd == null:
 			use_computeshader = false
 
 	if use_computeshader:
 		for iteration in iterations:
-			var movedir : PackedVector3Array = compute_closest(transforms, rd)
+			var movedir: PackedVector3Array = compute_closest(transforms)
 			for i in transforms.size():
 				var dir = movedir[i]
 				if restrict_height:
@@ -86,11 +85,10 @@ func _process_transforms(transforms, _domain, _seed) -> void:
 
 # compute the closest points to each other using a compute shader
 # return a vector for each point that points away from the closest neighbour
-func compute_closest(transforms, rd: RenderingDevice = null) -> PackedVector3Array:
+func compute_closest(transforms) -> PackedVector3Array:
 	var padded_num_vecs = ceil(float(transforms.size()) / 64.0) * 64
 	var padded_num_floats = padded_num_vecs * 4
-	if rd == null:
-		rd := RenderingServer.create_local_rendering_device()
+	var rd := RenderingServer.create_local_rendering_device()
 	var shader_spirv: RDShaderSPIRV = shader_file.get_spirv()
 	var shader := rd.shader_create_from_spirv(shader_spirv)
 	# Prepare our data. We use vec4 floats in the shader, so we need 32 bit.
