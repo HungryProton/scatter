@@ -102,6 +102,40 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 	return mmi
 
 
+static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector3i, count) -> MultiMeshInstance3D:
+	var item_root := get_or_create_item_root(item)
+	var chunk_name = "MultiMeshInstance3D" + "_%s_%s_%s"%[index.x, index.y, index.z]
+	var mmi: MultiMeshInstance3D = item_root.get_node_or_null(chunk_name)
+
+	if not mmi:
+		mmi = MultiMeshInstance3D.new()
+		item_root.add_child(mmi, true)
+
+		mmi.set_owner(item_root.owner)
+		mmi.set_name(chunk_name)
+
+	if not mmi.multimesh:
+		mmi.multimesh = MultiMesh.new()
+
+	mmi.position = Vector3.ZERO
+	mmi.set_cast_shadows_setting(item.override_cast_shadow)
+	mmi.set_material_override(item.override_material)
+
+	var node = item.get_item()
+	var mesh_instance: MeshInstance3D = get_merged_meshes_from(node)
+	if not mesh_instance:
+		return
+
+	mmi.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
+	mmi.multimesh.mesh = mesh_instance.mesh
+	mmi.multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	mmi.multimesh.instance_count = count
+
+	mesh_instance.queue_free()
+
+	return mmi
+
+
 static func get_or_create_particles(item: ProtonScatterItem) -> GPUParticles3D:
 	var item_root := get_or_create_item_root(item)
 	var particles: GPUParticles3D = item_root.get_node_or_null("GPUParticles3D")
