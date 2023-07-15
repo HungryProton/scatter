@@ -526,6 +526,9 @@ func _update_particles_system() -> void:
 		offset += count
 
 
+# Creates collision data with the Physics server directly.
+# This does not create new nodes in the scene tree. This also means you can't
+# see these colliders, even when enabling "Debug > Visible collision shapes".
 func _create_collision(body: StaticBody3D, t: Transform3D) -> void:
 	if not keep_static_colliders or render_mode == 1:
 		return
@@ -567,7 +570,7 @@ func _create_collision(body: StaticBody3D, t: Transform3D) -> void:
 			elif c.shape is ConcavePolygonShape3D:
 				shape_rid = PhysicsServer3D.concave_polygon_shape_create()
 				data = {
-					"faces": c.shape.faces,
+					"faces": c.shape.get_faces(),
 					"backface_collision": c.shape.backface_collision,
 				}
 
@@ -604,7 +607,6 @@ func _create_collision(body: StaticBody3D, t: Transform3D) -> void:
 			PhysicsServer3D.shape_set_data(shape_rid, data)
 			PhysicsServer3D.body_add_shape(_body_rid, shape_rid, t * c.transform)
 			_collision_shapes.push_back(shape_rid)
-			#print("collider on ", (t * c.transform).origin)
 
 
 func _create_instance(item: ProtonScatterItem, root: Node3D):

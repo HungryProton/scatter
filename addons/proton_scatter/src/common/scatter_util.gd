@@ -87,10 +87,7 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 	mmi.set_cast_shadows_setting(item.override_cast_shadow)
 	mmi.set_material_override(item.override_material)
 
-	var node = item.get_item()
-	var mesh_instance: MeshInstance3D = get_merged_meshes_from(node)
-	node.queue_free()
-
+	var mesh_instance: MeshInstance3D = get_merged_meshes_from(item)
 	if not mesh_instance:
 		return
 
@@ -133,10 +130,7 @@ static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector
 	mmi.set_cast_shadows_setting(item.override_cast_shadow)
 	mmi.set_material_override(item.override_material)
 
-	var node = item.get_item()
-	var mesh_instance: MeshInstance3D = get_merged_meshes_from(node)
-	node.queue_free()
-
+	var mesh_instance: MeshInstance3D = get_merged_meshes_from(item)
 	if not mesh_instance:
 		return
 
@@ -168,10 +162,7 @@ static func get_or_create_particles(item: ProtonScatterItem) -> GPUParticles3D:
 
 		particles.set_owner(item_root.owner)
 
-	var node = item.get_item()
-	var mesh_instance: MeshInstance3D = get_merged_meshes_from(node)
-	node.queue_free()
-
+	var mesh_instance: MeshInstance3D = get_merged_meshes_from(item)
 	if not mesh_instance:
 		return
 
@@ -254,17 +245,17 @@ static func get_all_mesh_instances_from(node: Node3D) -> Array[MeshInstance3D]:
 # + If there's more than 8 unique materials, everything will be merged into
 #   a single surface. Material and custom data will NOT be preserved on the new mesh.
 #
-static func get_merged_meshes_from(source: Node) -> MeshInstance3D:
-	if not source:
+static func get_merged_meshes_from(item: ProtonScatterItem) -> MeshInstance3D:
+	if not item:
 		return null
 
-	# Do not alter the source node, use a duplicate instead.
-	var node: Node = source.duplicate(0)
-	if node is Node3D:
-		node.transform = Transform3D()
+	var source: Node = item.get_item()
+	source.transform = Transform3D()
 
 	# Get all the mesh instances
-	var mesh_instances: Array[MeshInstance3D] = get_all_mesh_instances_from(node)
+	var mesh_instances: Array[MeshInstance3D] = get_all_mesh_instances_from(source)
+	source.queue_free()
+
 	if mesh_instances.is_empty():
 		return null
 
