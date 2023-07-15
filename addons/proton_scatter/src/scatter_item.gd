@@ -66,12 +66,14 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 var path: String:
 	set(val):
 		path = val
+		source_data_ready = false
 		_target_scene = load(path) if source != 0 else null
 		ScatterUtil.request_parent_to_rebuild(self)
 
 var source_position: Vector3
 var source_rotation: Vector3
 var source_scale: Vector3
+var source_data_ready := false
 
 var _target_scene: PackedScene
 
@@ -116,6 +118,9 @@ func get_item() -> Node3D:
 # If the source transform is not ignored, also copy the source position, rotation and scale.
 # Returns the processed transform
 func process_transform(t: Transform3D) -> Transform3D:
+	if not source_data_ready:
+		get_item().queue_free() # Force update
+
 	var origin = t.origin
 	t.origin = Vector3.ZERO
 
@@ -144,3 +149,4 @@ func _save_source_data(node: Node3D) -> void:
 	source_position = node.position
 	source_rotation = node.rotation
 	source_scale = node.scale
+	source_data_ready = true

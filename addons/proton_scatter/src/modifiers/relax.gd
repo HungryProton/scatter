@@ -34,7 +34,7 @@ func _process_transforms(transforms, _domain, _seed) -> void:
 	var offset := offset_step
 	if transforms.size() < 2:
 		return
-	
+
 	# Disable the use of compute shader, if we cannot create a RenderingDevice
 	if use_computeshader:
 		var rd := RenderingServer.create_local_rendering_device()

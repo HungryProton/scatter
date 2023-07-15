@@ -134,7 +134,6 @@ func _ready() -> void:
 
 	_perform_sanity_check()
 	_discover_items()
-	domain.discover_shapes(self)
 
 	if not is_instance_valid(_dependency_parent):
 		full_rebuild.call_deferred()
@@ -421,6 +420,7 @@ func _update_split_multimeshes() -> void:
 		var t_list = transforms.list.slice(offset)
 		var aabb = ProtonScatterUtil.get_aabb_from_transforms(t_list)
 		aabb = aabb.grow(0.1) # avoid degenerate cases
+		var static_body := ProtonScatterUtil.get_collision_data(item)
 
 		for i in count:
 			# both aabb and t are in mmi's local coordinates
@@ -430,6 +430,9 @@ func _update_split_multimeshes() -> void:
 			var ci = (p_rel * Vector3(splits)).floor()
 			# Store the transform to the appropriate array
 			transform_chunks[ci.x][ci.y][ci.z].append(t)
+			_create_collision(static_body, t)
+
+		static_body.queue_free()
 
 		# The relevant transforms are now ordered in chunks
 		for xi in splits.x:
@@ -447,14 +450,13 @@ func _update_split_multimeshes() -> void:
 					# This matters because otherwise the visibility range fading is messed up
 					var center =  ProtonScatterUtil.get_aabb_from_transforms(transform_chunks[xi][yi][zi]).get_center()
 					mmi.transform.origin = center
-					var static_body := ProtonScatterUtil.get_collision_data(item)
+
 					var t: Transform3D
 					for i in chunk_elements:
 						t = transform_chunks[xi][yi][zi][i]
 						t.origin -= center
 						mmi.multimesh.set_instance_transform(i, t)
-						_create_collision(static_body, t)
-					static_body.queue_free()
+
 		offset += count
 
 
@@ -525,7 +527,7 @@ func _update_particles_system() -> void:
 
 
 func _create_collision(body: StaticBody3D, t: Transform3D) -> void:
-	if not keep_static_colliders:
+	if not keep_static_colliders or render_mode == 1:
 		return
 
 	# Create a static body
@@ -602,6 +604,7 @@ func _create_collision(body: StaticBody3D, t: Transform3D) -> void:
 			PhysicsServer3D.shape_set_data(shape_rid, data)
 			PhysicsServer3D.body_add_shape(_body_rid, shape_rid, t * c.transform)
 			_collision_shapes.push_back(shape_rid)
+			#print("collider on ", (t * c.transform).origin)
 
 
 func _create_instance(item: ProtonScatterItem, root: Node3D):
@@ -631,6 +634,8 @@ func _perform_sanity_check() -> void:
 
 	if not domain:
 		domain = ProtonScatterDomain.new()
+
+	domain.discover_shapes(self)
 
 	# Retrigger the parent setter, in case the parent node no longer exists or changed type.
 	scatter_parent = scatter_parent

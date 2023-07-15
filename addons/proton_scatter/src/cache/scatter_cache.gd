@@ -110,6 +110,7 @@ func restore_cache(force_restore := false) -> void:
 		# Send the cached transforms to the scatter node.
 		var transforms = ProtonScatterTransformList.new()
 		transforms.list = _local_cache.get_transforms(s.name)
+		s._perform_sanity_check()
 		s._on_transforms_ready(transforms)
 
 

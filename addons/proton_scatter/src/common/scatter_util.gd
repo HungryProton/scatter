@@ -95,13 +95,13 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 	mmi.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
 	mmi.multimesh.mesh = mesh_instance.mesh
 	mmi.multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	
+
 	mmi.visibility_range_begin 			= item.visibility_range_begin
 	mmi.visibility_range_begin_margin 	= item.visibility_range_begin_margin
 	mmi.visibility_range_end 			= item.visibility_range_end
 	mmi.visibility_range_end_margin 	= item.visibility_range_end_margin
 	mmi.visibility_range_fade_mode 		= item.visibility_range_fade_mode
-	
+
 	mmi.multimesh.instance_count = count
 
 	mesh_instance.queue_free()
@@ -116,7 +116,7 @@ static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector
 
 	if not mmi:
 		mmi = MultiMeshInstance3D.new()
-		mmi.set_name(chunk_name) 
+		mmi.set_name(chunk_name)
 		# if set_name is used after add_child it is crazy slow
 		# This doesn't make much sense but it is definitely the case.
 		# About a 100x slowdown was observed in this case
@@ -139,13 +139,13 @@ static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector
 	mmi.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
 	mmi.multimesh.mesh = mesh_instance.mesh
 	mmi.multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	
+
 	mmi.visibility_range_begin 			= item.visibility_range_begin
 	mmi.visibility_range_begin_margin 	= item.visibility_range_begin_margin
 	mmi.visibility_range_end 			= item.visibility_range_end
 	mmi.visibility_range_end_margin 	= item.visibility_range_end_margin
 	mmi.visibility_range_fade_mode 		= item.visibility_range_fade_mode
-	
+
 	mmi.multimesh.instance_count = count
 
 	mesh_instance.queue_free()
