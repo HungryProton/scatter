@@ -21,13 +21,40 @@ func _init() -> void:
 	restrict_height = true
 
 	documentation.add_warning(
-		"This modifier is currently has an O(n²) complexity and will be slow with
-		large amounts of points.
-		It will be optimized in a later update.",
+		"This modifier is has an O(n²) complexity and will be slow with
+		large amounts of points, unless your device supports compute shaders.",
 		1)
-	documentation.add_warning(
-		"The `use_computeshader` parameter is disable by default when
-		your using the OpenGL backend or running in headless mode.")
+
+	var p := documentation.add_parameter("iterations")
+	p.set_type("int")
+	p.set_cost(2)
+	p.set_description(
+		"How many times the relax algorithm will run. Increasing this value will
+		generally improves the result, at the cost of execution speed."
+		)
+
+	p = documentation.add_parameter("Offset step")
+	p.set_type("float")
+	p.set_cost(0)
+	p.set_description("How far the transform will be pushed away each iteration.")
+
+	p = documentation.add_parameter("Consecutive step multiplier")
+	p.set_type("float")
+	p.set_cost(0)
+	p.set_description(
+		"On each iteration, multiply the offset step by this value. This value
+		is usually set between 0 and 1, to make the effect less pronounced on
+		successive iterations.")
+
+	p = documentation.add_parameter("Use compute shader")
+	p.set_cost(0)
+	p.set_type("bool")
+	p.set_description(
+		"Run the calculations on the GPU instead of the CPU. This provides
+		a significant speed boost and should be enabled when possible.")
+	p.add_warning(
+		"This parameter can't be enabled when using the OpenGL backend or running
+		in headless mode.", 2)
 
 
 func _process_transforms(transforms, _domain, _seed) -> void:

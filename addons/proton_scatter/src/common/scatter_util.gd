@@ -89,6 +89,8 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 
 	var node = item.get_item()
 	var mesh_instance: MeshInstance3D = get_merged_meshes_from(node)
+	node.queue_free()
+
 	if not mesh_instance:
 		return
 
@@ -133,6 +135,8 @@ static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector
 
 	var node = item.get_item()
 	var mesh_instance: MeshInstance3D = get_merged_meshes_from(node)
+	node.queue_free()
+
 	if not mesh_instance:
 		return
 
@@ -166,6 +170,8 @@ static func get_or_create_particles(item: ProtonScatterItem) -> GPUParticles3D:
 
 	var node = item.get_item()
 	var mesh_instance: MeshInstance3D = get_merged_meshes_from(node)
+	node.queue_free()
+
 	if not mesh_instance:
 		return
 
@@ -403,7 +409,7 @@ static func get_all_static_bodies_from(node: Node3D) -> Array[StaticBody3D]:
 # one with multiple collision shapes.
 static func get_collision_data(item: ProtonScatterItem) -> StaticBody3D:
 	var static_body := StaticBody3D.new()
-	var source: Node3D = item.get_item().duplicate(0)
+	var source: Node3D = item.get_item()
 	source.transform = Transform3D()
 
 	for body in get_all_static_bodies_from(source):

@@ -122,24 +122,29 @@ static func get_modifiers_documentation() -> DocumentationInfo:
 		you get access to this modifier's parameters. This is where you can
 		adjust its behavior according to your needs.")
 	info.add_paragraph(
-		"Three common options might be found on these modifiers. (They can
-		be disabled if they are irrelevant). They are defined as follow:")
+		"Three common options might be found on these modifiers. (They may
+		not appear if they are irrelevant). They are defined as follow:")
 
 	var p := info.add_parameter("Use local seed")
+	p.set_type("bool")
 	p.set_description(
 		"The dice icon on the left allows you to force a specific seed for the
 		modifier. If this option is not used then the Global seed from the
 		ProtonScatter node will be used instead.")
 
 	p = info.add_parameter("Restrict height")
+	p.set_type("bool")
 	p.set_description(
 		"When applicable, the modifier will remain within the local XZ plane
 		instead of using the full volume described by the ScatterShape nodes.")
 
-	p = info.add_parameter("Use local space")
+	p = info.add_parameter("Reference frame")
+	p.set_type("int")
 	p.set_description(
-		"When enabled, the modifier will operate in local space relative to
-		the ProtonScatter node. If disabled, the modifier operates in
-		global space.")
+		"[p]+ [b]Global[/b]: Modifier operates in Global space. [/p]
+		[p]+ [b]Local[/b]: Modifier operates in local space, relative to the ProtonScatter node.[/p]
+		[p]+ [b]Individual[/b]: Modifier operates on local space, relative to each
+		individual transforms.[/p]"
+		)
 
 	return info

@@ -608,10 +608,13 @@ func _create_collision(body: StaticBody3D, t: Transform3D) -> void:
 
 
 func _create_instance(item: ProtonScatterItem, root: Node3D):
-	if not item or not item.get_item():
+	if not item:
 		return null
 
-	var instance = item.get_item().duplicate()
+	var instance = item.get_item()
+	if not instance:
+		return null
+
 	instance.visible = true
 	root.add_child.bind(instance, true).call_deferred()
 

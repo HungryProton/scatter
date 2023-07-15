@@ -11,7 +11,7 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		proportion = val
 		ScatterUtil.request_parent_to_rebuild(self)
 
-@export_enum("From current scene", "From disk") var source = 1:
+@export_enum("From current scene:0", "From disk:1") var source = 1:
 	set(val):
 		source = val
 		property_list_changed.emit()
@@ -102,9 +102,9 @@ func get_item() -> Node3D:
 
 	var node: Node3D
 
-	if source == 0:
-		node = get_node_or_null(path)
-	else:
+	if source == 0 and has_node(path):
+		node = get_node(path).duplicate() # Never expose the original node
+	elif source == 1:
 		node = _target_scene.instantiate()
 
 	if node:
