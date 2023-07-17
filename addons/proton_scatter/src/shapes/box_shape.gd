@@ -19,7 +19,6 @@ func get_copy():
 
 
 func is_point_inside(point: Vector3, global_transform: Transform3D) -> bool:
-	var position = global_transform * -_half_size
 	var local_point = global_transform.affine_inverse() * point
 	return AABB(-_half_size, size).has_point(local_point)
 

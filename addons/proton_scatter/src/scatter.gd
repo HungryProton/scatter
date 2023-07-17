@@ -32,8 +32,8 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 
 @export_group("Performance")
 @export_enum("Use Instancing:0",
-			 "Create Copies:1",
-			 "Use Particles:2")\
+			"Create Copies:1",
+			"Use Particles:2")\
 		var render_mode := 0:
 	set(val):
 		render_mode = val

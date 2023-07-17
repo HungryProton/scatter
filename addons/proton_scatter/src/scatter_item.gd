@@ -59,9 +59,7 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 @export var visibility_range_end : float = 0
 @export var visibility_range_end_margin : float = 0
 #TODO what is a nicer way to expose this?
-@export_enum("Disabled:0",
-			 "Self:1")\
-			 var visibility_range_fade_mode = 0
+@export_enum("Disabled:0", "Self:1") var visibility_range_fade_mode = 0
 
 var path: String:
 	set(val):
@@ -119,7 +117,7 @@ func get_item() -> Node3D:
 # Returns the processed transform
 func process_transform(t: Transform3D) -> Transform3D:
 	if not source_data_ready:
-		get_item().queue_free() # Force update
+		_update_source_data()
 
 	var origin = t.origin
 	t.origin = Vector3.ZERO
@@ -150,3 +148,9 @@ func _save_source_data(node: Node3D) -> void:
 	source_rotation = node.rotation
 	source_scale = node.scale
 	source_data_ready = true
+
+
+func _update_source_data() -> void:
+	var node = get_item()
+	if node:
+		node.queue_free()

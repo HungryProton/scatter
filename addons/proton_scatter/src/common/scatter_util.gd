@@ -250,6 +250,9 @@ static func get_merged_meshes_from(item: ProtonScatterItem) -> MeshInstance3D:
 		return null
 
 	var source: Node = item.get_item()
+	if not is_instance_valid(source):
+		return null
+
 	source.transform = Transform3D()
 
 	# Get all the mesh instances
@@ -401,6 +404,9 @@ static func get_all_static_bodies_from(node: Node3D) -> Array[StaticBody3D]:
 static func get_collision_data(item: ProtonScatterItem) -> StaticBody3D:
 	var static_body := StaticBody3D.new()
 	var source: Node3D = item.get_item()
+	if not is_instance_valid(source):
+		return static_body
+
 	source.transform = Transform3D()
 
 	for body in get_all_static_bodies_from(source):
