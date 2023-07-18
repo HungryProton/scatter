@@ -41,7 +41,7 @@ func _init() -> void:
 		to 0.05 at least.")
 
 
-func _process_transforms(transforms, domain, _seed) -> void:
+func _process_transforms(transforms, domain, seed) -> void:
 	spacing = max(_min_spacing, spacing)
 
 	var gt_inverse: Transform3D = domain.get_global_transform().affine_inverse()
@@ -76,3 +76,4 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			new_transforms.push_back(t)
 
 	transforms.append(new_transforms)
+	transforms.shuffle(seed)
