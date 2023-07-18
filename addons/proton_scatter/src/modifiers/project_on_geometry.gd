@@ -159,7 +159,8 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	var t: Transform3D
 	var remapped_max_slope = remap(max_slope, 0.0, 90.0, 0.0, 1.0)
 	var is_point_valid := false
-	exclude_hits.reverse()
+	exclude_hits.reverse() # makes it possible to use pop_back which is much faster
+	var new_transforms_array : Array[Transform3D] = []
 
 	for hit in ray_hits:
 		is_point_valid = true
@@ -170,26 +171,26 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			d = abs(Vector3.UP.dot(hit.normal))
 			is_point_valid = d >= (1.0 - remapped_max_slope)
 
-		# use pop because index is not always incremented
 		var exclude_hit = exclude_hits.pop_back()
 		if exclude_hit != null:
 			if not exclude_hit.is_empty():
 				is_point_valid = false
 
+		t = transforms.list[index]
 		if is_point_valid:
-			t = transforms.list[index]
-
 			if align_with_collision_normal:
 				t = _align_with(t, gt_inverse.basis * hit.normal)
 
 			t.origin = gt_inverse * hit.position
-			transforms.list[index] = t
-
-		elif remove_points_on_miss:
-			transforms.list.remove_at(index)
-			continue # Don't increase the index counter
+			new_transforms_array.push_back(t)
+		elif not remove_points_on_miss:
+			new_transforms_array.push_back(t)
 
 		index += 1
+
+	# All done, store the transforms in the original array
+	transforms.list.clear()
+	transforms.list.append_array(new_transforms_array) # this avoids memory leak
 
 	if transforms.is_empty():
 		warning += """Every points have been removed. Possible reasons include: \n
