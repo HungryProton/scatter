@@ -8,6 +8,7 @@ extends "base_modifier.gd"
 @export var mask_scale := Vector2.ONE
 @export var pixel_to_unit_ratio := 64.0
 @export_range(0.0, 1.0) var remove_below = 0.1
+@export_range(0.0, 1.0) var remove_above = 1.0
 @export var scale_transforms := true
 
 
@@ -52,6 +53,9 @@ func _init() -> void:
 	p.set_type("Float")
 	p.set_description("Threshold below which the transforms are removed.")
 
+	p = documentation.add_parameter("Remove above")
+	p.set_type("Float")
+	p.set_description("Threshold above which the transforms are removed.")
 
 func _process_transforms(transforms, domain, _seed) -> void:
 	if not ResourceLoader.exists(mask):
@@ -97,6 +101,10 @@ func _process_transforms(transforms, domain, _seed) -> void:
 
 		var level := _get_pixel(image, x, y)
 		if level < remove_below:
+			transforms.list.remove_at(i)
+			continue
+
+		if level > remove_above:
 			transforms.list.remove_at(i)
 			continue
 
