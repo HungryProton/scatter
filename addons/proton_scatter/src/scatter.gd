@@ -378,7 +378,7 @@ func _update_multimeshes() -> void:
 			# Extra check because of how 'count' is calculated
 			if (offset + i) >= transforms_count:
 				mmi.multimesh.instance_count = i - 1
-				return
+				continue
 
 			t = item.process_transform(transforms.list[offset + i])
 			mmi.multimesh.set_instance_transform(i, t)
@@ -423,6 +423,8 @@ func _update_split_multimeshes() -> void:
 		var static_body := ProtonScatterUtil.get_collision_data(item)
 
 		for i in count:
+			if (offset + i) >= transforms_count:
+				continue
 			# both aabb and t are in mmi's local coordinates
 			var t = item.process_transform(transforms.list[offset + i])
 			var p_rel = (t.origin - aabb.position) / aabb.size
