@@ -67,6 +67,9 @@ func _process_transforms(transforms, _domain, _seed) -> void:
 		var rd := RenderingServer.create_local_rendering_device()
 		if rd == null:
 			use_computeshader = false
+		else:
+			rd.free()
+			rd = null
 
 	if use_computeshader:
 		for iteration in iterations:
