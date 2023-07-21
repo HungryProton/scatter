@@ -5,9 +5,5 @@ export.cfg
 export_presets.cfg
 .godot/
 
-# Mono-specific ignores
-.mono/
-*.import
-
 # Scatter-specific ignores
 addons/proton_scatter/cache/

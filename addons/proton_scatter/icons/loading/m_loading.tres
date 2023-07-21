@@ -1,6 +1,6 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://do5bc6dg6mp4u"]
 
-[ext_resource type="Texture2D" uid="uid://il8i8280eew6" path="res://addons/proton_scatter/icons/loading/t_loading.tres" id="1_7rsk1"]
+[ext_resource type="Texture2D" uid="uid://dev74yqbbxjc6" path="res://addons/proton_scatter/icons/loading/t_loading.tres" id="1_7rsk1"]
 
 [resource]
 render_priority = 120

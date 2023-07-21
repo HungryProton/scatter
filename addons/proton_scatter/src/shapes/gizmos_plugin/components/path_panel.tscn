@@ -1,10 +1,10 @@
 [gd_scene load_steps=7 format=3 uid="uid://vijpujrvtyin"]
 
 [ext_resource type="Script" path="res://addons/proton_scatter/src/shapes/gizmos_plugin/components/path_panel.gd" id="1_o7kkg"]
-[ext_resource type="Texture2D" uid="uid://b2b62ko7v686h" path="res://addons/proton_scatter/icons/curve_select.svg" id="2_d7o1n"]
+[ext_resource type="Texture2D" uid="uid://c1t5x34pc4vs5" path="res://addons/proton_scatter/icons/curve_select.svg" id="2_d7o1n"]
 [ext_resource type="ButtonGroup" uid="uid://1xy55037k3k5" path="res://addons/proton_scatter/src/shapes/gizmos_plugin/components/curve_mode_button_group.tres" id="2_sl6yo"]
-[ext_resource type="Texture2D" uid="uid://c31odatai1367" path="res://addons/proton_scatter/icons/curve_create.svg" id="3_l70sn"]
-[ext_resource type="Texture2D" uid="uid://pog84tx0x6ka" path="res://addons/proton_scatter/icons/curve_delete.svg" id="4_b5yum"]
+[ext_resource type="Texture2D" uid="uid://cmykha5ja17vj" path="res://addons/proton_scatter/icons/curve_create.svg" id="3_l70sn"]
+[ext_resource type="Texture2D" uid="uid://cligdljx1ad5e" path="res://addons/proton_scatter/icons/curve_delete.svg" id="4_b5yum"]
 [ext_resource type="Texture2D" uid="uid://n66mufjib4ds" path="res://addons/proton_scatter/icons/menu.svg" id="6_xiaj2"]
 
 [node name="PathPanel" type="MarginContainer"]
@@ -16,21 +16,15 @@ script = ExtResource("1_o7kkg")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
-offset_right = 108.0
-offset_bottom = 24.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer"]
 layout_mode = 2
-offset_right = 80.0
-offset_bottom = 24.0
 
 [node name="Select" type="Button" parent="HBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_right = 24.0
-offset_bottom = 24.0
 focus_mode = 0
 toggle_mode = true
 button_pressed = true
@@ -42,9 +36,6 @@ icon_alignment = 1
 [node name="Create" type="Button" parent="HBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_left = 28.0
-offset_right = 52.0
-offset_bottom = 24.0
 focus_mode = 0
 toggle_mode = true
 button_group = ExtResource("2_sl6yo")
@@ -55,9 +46,6 @@ icon_alignment = 1
 [node name="Delete" type="Button" parent="HBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_left = 56.0
-offset_right = 80.0
-offset_bottom = 24.0
 focus_mode = 0
 toggle_mode = true
 button_group = ExtResource("2_sl6yo")
@@ -68,9 +56,6 @@ icon_alignment = 1
 [node name="Options" type="Button" parent="HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_left = 84.0
-offset_right = 108.0
-offset_bottom = 24.0
 focus_mode = 0
 toggle_mode = true
 action_mode = 0
@@ -94,19 +79,13 @@ metadata/_edit_use_custom_anchors = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="OptionsPanel/AdvancedOptionsPanel"]
 layout_mode = 2
-offset_right = 221.0
-offset_bottom = 171.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer"]
 layout_mode = 2
-offset_right = 217.0
-offset_bottom = 171.0
 
 [node name="MirrorAngle" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_right = 217.0
-offset_bottom = 31.0
 focus_mode = 0
 button_pressed = true
 text = "Mirror handles angle"
@@ -114,9 +93,6 @@ text = "Mirror handles angle"
 [node name="MirrorLength" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_top = 35.0
-offset_right = 217.0
-offset_bottom = 66.0
 focus_mode = 0
 button_pressed = true
 text = "Mirror handles length"
@@ -124,18 +100,12 @@ text = "Mirror handles length"
 [node name="ClosedPath" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_top = 70.0
-offset_right = 217.0
-offset_bottom = 101.0
 focus_mode = 0
 text = "Closed path"
 
 [node name="LockToPlane" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_top = 105.0
-offset_right = 217.0
-offset_bottom = 136.0
 focus_mode = 0
 button_pressed = true
 text = "Lock to plane"
@@ -143,21 +113,12 @@ text = "Lock to plane"
 [node name="SnapToColliders" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_top = 140.0
-offset_right = 217.0
-offset_bottom = 171.0
 focus_mode = 0
 text = "Snap to colliders"
 
 [node name="VSeparator" type="VSeparator" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer"]
 visible = false
 layout_mode = 2
-offset_left = 221.0
-offset_right = 225.0
-offset_bottom = 136.0
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer"]
 layout_mode = 2
-offset_left = 221.0
-offset_right = 221.0
-offset_bottom = 171.0
