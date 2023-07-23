@@ -38,20 +38,23 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 	set(val):
 		render_mode = val
 		notify_property_list_changed()
-		full_rebuild.call_deferred()
+		if is_ready:
+			full_rebuild.call_deferred()
 
 var use_chunks : bool = true:
 	set(val):
 		use_chunks = val
 		notify_property_list_changed()
-		full_rebuild.call_deferred()
+		if is_ready:
+			full_rebuild.call_deferred()
 
 var chunk_dimensions := Vector3.ONE * 15.0:
 	set(val):
 		chunk_dimensions.x = max(val.x, 1.0)
 		chunk_dimensions.y = max(val.y, 1.0)
 		chunk_dimensions.z = max(val.z, 1.0)
-		rebuild()
+		if is_ready:
+			rebuild.call_deferred()
 
 @export var keep_static_colliders := false
 @export var force_rebuild_on_load := true
@@ -114,6 +117,7 @@ var total_item_proportion: int
 var output_root: Marker3D
 var transforms: ProtonScatterTransformList
 var editor_plugin # Holds a reference to the EditorPlugin. Used by other parts.
+var is_ready := false
 
 # Internal variables
 var _thread: Thread
@@ -129,16 +133,13 @@ func _ready() -> void:
 		set_notify_transform(true)
 		child_exiting_tree.connect(_on_child_exiting_tree)
 
-	if not force_rebuild_on_load:
-		return
-
 	_perform_sanity_check()
 	_discover_items()
-
-	if not is_instance_valid(_dependency_parent):
-		full_rebuild.call_deferred()
-
 	update_configuration_warnings.call_deferred()
+	is_ready = true
+
+	if force_rebuild_on_load and not is_instance_valid(_dependency_parent):
+		full_rebuild.call_deferred()
 
 
 func _exit_tree():
@@ -147,6 +148,7 @@ func _exit_tree():
 	if is_thread_running():
 		await _thread.wait_to_finish()
 		_thread = null
+
 
 func _get_property_list() -> Array:
 	var list := []
@@ -276,6 +278,8 @@ func full_rebuild():
 
 	if not is_inside_tree():
 		return
+
+	_rebuild_queued = false
 
 	if is_thread_running():
 		await _thread.wait_to_finish()
@@ -665,6 +669,8 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		await _thread.wait_to_finish()
 		_thread = null
 
+	_clear_collision_data()
+
 	if _rebuild_queued:
 		_rebuild_queued = false
 		rebuild.call_deferred()
@@ -676,8 +682,6 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		clear_output()
 		update_gizmos()
 		return
-
-	_clear_collision_data()
 
 	match render_mode:
 		0:

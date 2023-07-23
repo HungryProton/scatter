@@ -209,6 +209,9 @@ static func request_parent_to_rebuild(node: Node, deferred := true) -> void:
 		return
 
 	if parent and parent is ProtonScatter:
+		if not parent.is_ready:
+			return
+
 		if deferred:
 			parent.rebuild.call_deferred(true)
 		else:
