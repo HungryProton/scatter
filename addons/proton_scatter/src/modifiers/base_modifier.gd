@@ -8,6 +8,7 @@ extends Resource
 
 
 signal warning_changed
+signal modifier_changed
 
 const TransformList = preload("../common/transform_list.gd")
 const Domain = preload("../common/domain.gd")
@@ -76,7 +77,6 @@ func get_copy():
 	for p in get_property_list():
 		var value = get(p.name)
 		copy.set(p.name, value)
-
 	return copy
 
 

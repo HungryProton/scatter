@@ -17,17 +17,19 @@ const BaseModifier := preload("../modifiers/base_modifier.gd")
 var just_created := false
 
 
-func start_update(scatter_node: ProtonScatter, domain) -> void:
+func start_update(scatter_node: ProtonScatter, domain):
 	var transforms = TransformList.new()
 
 	for modifier in stack:
 		await modifier.process_transforms(transforms, domain, scatter_node.global_seed)
 
 	transforms_ready.emit(transforms)
+	return transforms
 
 
 func add(modifier: BaseModifier) -> void:
 	stack.push_back(modifier)
+	modifier.modifier_changed.connect(_on_modifier_changed)
 	stack_changed.emit()
 
 
@@ -60,7 +62,7 @@ func duplicate_modifier(modifier: BaseModifier) -> void:
 func get_copy():
 	var copy = get_script().new()
 	for modifier in stack:
-		copy.stack.push_back(modifier.duplicate())
+		copy.add(modifier.duplicate())
 	return copy
 
 
@@ -84,3 +86,7 @@ func does_not_require_shapes() -> bool:
 			return true
 
 	return false
+
+
+func _on_modifier_changed() -> void:
+	stack_changed.emit()

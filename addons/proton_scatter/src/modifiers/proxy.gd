@@ -2,13 +2,35 @@
 extends "base_modifier.gd"
 
 
-const Scatter = preload("../scatter.gd")
+const ProtonScatter := preload("../scatter.gd")
+const ModifierStack := preload("../stack/modifier_stack.gd")
 
 
 @export_node_path var scatter_node: NodePath
-#@export var auto_sync_changes := true # TODO: find a solution to this.
+@export var auto_rebuild := true:
+	set(val):
+		auto_rebuild = val
+		if not is_instance_valid(_source_node) or not _source_node is ProtonScatter:
+			return
 
-var _reference_node
+		if auto_rebuild: # Connect signal if not already connected
+			if not _source_node.build_completed.is_connected(_on_source_changed):
+				_source_node.build_completed.connect(_on_source_changed)
+
+		# Auto rebuild disabled, disconnect signal if connected
+		elif _source_node.build_completed.is_connected(_on_source_changed):
+			_source_node.build_completed.disconnect(_on_source_changed)
+
+var _source_node: ProtonScatter:
+	set(val):
+		# Disconnect signals from previous scatter node if any
+		if is_instance_valid(_source_node) and _source_node is ProtonScatter:
+			if _source_node.build_completed.is_connected(_on_source_changed):
+				_source_node.build_completed.disconnect(_on_source_changed)
+
+		# Replace reference and retrigger the auto_rebuild setter
+		_source_node = val
+		auto_rebuild = auto_rebuild
 
 
 func _init() -> void:
@@ -37,14 +59,17 @@ func _init() -> void:
 
 
 func _process_transforms(transforms, domain, _seed) -> void:
-	var reference_node = domain.get_root().get_node_or_null(scatter_node)
+	_source_node = domain.get_root().get_node_or_null(scatter_node)
 
-	if not reference_node or not reference_node is Scatter:
+	if not _source_node or not _source_node is ProtonScatter:
 		warning += "You need to select a valid ProtonScatter node."
 		return
 
-	if reference_node.modifier_stack:
-		var stack = reference_node.modifier_stack.get_copy()
-		stack.start_update(domain.get_root(), domain)
-		var result = await stack.transforms_ready
-		transforms.append(result.list)
+	if _source_node.modifier_stack:
+		var stack: ModifierStack = _source_node.modifier_stack.get_copy()
+		var results = await stack.start_update(domain.get_root(), domain)
+		transforms.append(results.list)
+
+
+func _on_source_changed() -> void:
+	modifier_changed.emit()
