@@ -20,6 +20,10 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 @export_category("ProtonScatter")
 
 @export_group("General")
+@export var enabled := true:
+	set(val):
+		enabled = val
+		rebuild()
 @export var global_seed := 0:
 	set(val):
 		global_seed = val
@@ -320,6 +324,11 @@ func rebuild(force_discover := false) -> void:
 # Scattered objects are stored under a Marker3D node called "ScatterOutput"
 # DON'T call this function directly outside of the 'rebuild()' function above.
 func _rebuild(force_discover) -> void:
+	if not enabled:
+		_clear_collision_data()
+		clear_output()
+		return
+
 	_perform_sanity_check()
 
 	if force_discover:
