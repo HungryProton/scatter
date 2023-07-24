@@ -23,7 +23,8 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 @export var enabled := true:
 	set(val):
 		enabled = val
-		rebuild()
+		if is_ready:
+			rebuild()
 @export var global_seed := 0:
 	set(val):
 		global_seed = val
