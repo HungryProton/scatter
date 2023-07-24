@@ -327,6 +327,7 @@ func _rebuild(force_discover) -> void:
 	if not enabled:
 		_clear_collision_data()
 		clear_output()
+		build_completed.emit()
 		return
 
 	_perform_sanity_check()
