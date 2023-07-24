@@ -126,6 +126,7 @@ var _dependency_parent
 var _physics_helper: ProtonScatterPhysicsHelper
 var _body_rid: RID
 var _collision_shapes: Array[RID]
+var _ignore_transform_notification = false
 
 
 func _ready() -> void:
@@ -193,11 +194,18 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 
 func _notification(what):
+	if not is_ready:
+		return
 	match what:
 		NOTIFICATION_TRANSFORM_CHANGED:
+			if _ignore_transform_notification:
+				_ignore_transform_notification = false
+				return
 			_perform_sanity_check()
 			domain.compute_bounds()
 			rebuild.call_deferred()
+		NOTIFICATION_ENTER_WORLD:
+			_ignore_transform_notification = true
 
 
 func _set(property, value):
