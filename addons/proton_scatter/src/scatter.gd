@@ -20,6 +20,11 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 @export_category("ProtonScatter")
 
 @export_group("General")
+@export var enabled := true:
+	set(val):
+		enabled = val
+		if is_ready:
+			rebuild()
 @export var global_seed := 0:
 	set(val):
 		global_seed = val
@@ -126,6 +131,7 @@ var _dependency_parent
 var _physics_helper: ProtonScatterPhysicsHelper
 var _body_rid: RID
 var _collision_shapes: Array[RID]
+var _ignore_transform_notification = false
 
 
 func _ready() -> void:
@@ -193,11 +199,18 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 
 func _notification(what):
+	if not is_ready:
+		return
 	match what:
 		NOTIFICATION_TRANSFORM_CHANGED:
+			if _ignore_transform_notification:
+				_ignore_transform_notification = false
+				return
 			_perform_sanity_check()
 			domain.compute_bounds()
 			rebuild.call_deferred()
+		NOTIFICATION_ENTER_WORLD:
+			_ignore_transform_notification = true
 
 
 func _set(property, value):
@@ -312,6 +325,12 @@ func rebuild(force_discover := false) -> void:
 # Scattered objects are stored under a Marker3D node called "ScatterOutput"
 # DON'T call this function directly outside of the 'rebuild()' function above.
 func _rebuild(force_discover) -> void:
+	if not enabled:
+		_clear_collision_data()
+		clear_output()
+		build_completed.emit()
+		return
+
 	_perform_sanity_check()
 
 	if force_discover:

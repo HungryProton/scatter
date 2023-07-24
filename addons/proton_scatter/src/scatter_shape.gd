@@ -25,6 +25,8 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		update_gizmos()
 		ScatterUtil.request_parent_to_rebuild(self)
 
+var _ignore_transform_notification = false
+
 
 func _ready() -> void:
 	set_notify_transform(true)
@@ -33,7 +35,12 @@ func _ready() -> void:
 func _notification(what):
 	match what:
 		NOTIFICATION_TRANSFORM_CHANGED:
+			if _ignore_transform_notification:
+				_ignore_transform_notification = false
+				return
 			ScatterUtil.request_parent_to_rebuild(self)
+		NOTIFICATION_ENTER_WORLD:
+			_ignore_transform_notification = true
 
 
 func _set(property, _value):
