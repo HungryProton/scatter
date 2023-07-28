@@ -61,6 +61,20 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 #TODO what is a nicer way to expose this?
 @export_enum("Disabled:0", "Self:1") var visibility_range_fade_mode = 0
 
+@export_group("Level Of Detail", "lod_")
+@export var lod_generate := true:
+	set(val):
+		lod_generate = val
+		ScatterUtil.request_parent_to_rebuild(self)
+@export_range(0.0, 180.0) var lod_merge_angle := 25.0:
+	set(val):
+		lod_merge_angle = val
+		ScatterUtil.request_parent_to_rebuild(self)
+@export_range(0.0, 180.0) var lod_split_angle := 60.0:
+	set(val):
+		lod_split_angle = val
+		ScatterUtil.request_parent_to_rebuild(self)
+
 var path: String:
 	set(val):
 		path = val

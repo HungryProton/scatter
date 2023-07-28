@@ -243,7 +243,7 @@ static func get_all_mesh_instances_from(node: Node3D) -> Array[MeshInstance3D]:
 #   this returns a single instance with all the surfaces.
 #
 # + If more than 8 surfaces are found, but some shares the same material,
-#   these surface will be merged together if there's less than 8 unique materials.
+#   these surfaces will be merged together if there's less than 8 unique materials.
 #
 # + If there's more than 8 unique materials, everything will be merged into
 #   a single surface. Material and custom data will NOT be preserved on the new mesh.
@@ -316,7 +316,7 @@ static func get_merged_meshes_from(item: ProtonScatterItem) -> MeshInstance3D:
 	# Less than 8 surfaces, merge in a single MeshInstance
 	# ------
 	if total_surfaces <= 8:
-		var array_mesh := ArrayMesh.new()
+		var mesh := ImporterMesh.new()
 
 		for mi in mesh_instances:
 			var inverse_transform := mi.transform.affine_inverse()
@@ -337,15 +337,17 @@ static func get_merged_meshes_from(item: ProtonScatterItem) -> MeshInstance3D:
 					vertex = arrays[ArrayMesh.ARRAY_VERTEX][index] * inverse_transform
 					arrays[ArrayMesh.ARRAY_VERTEX][index] = vertex
 
-				# Store updated surface data in the new mesh
-				array_mesh.add_surface_from_arrays(primitive_type, arrays, [], {}, format)
-
-				# Restore material if any
+				# Get the material if any
 				var material: Material = get_material_for_surface.call(mi, surface_index)
-				array_mesh.surface_set_material(array_mesh.get_surface_count() - 1, material)
+
+				# Store updated surface data in the new mesh
+				mesh.add_surface(primitive_type, arrays, [], {}, material, "", format)
+
+		if item.lod_generate:
+			mesh.generate_lods(item.lod_merge_angle, item.lod_split_angle, [])
 
 		var instance := MeshInstance3D.new()
-		instance.mesh = array_mesh
+		instance.mesh = mesh.get_mesh()
 		return instance
 
 	# ------
@@ -362,14 +364,20 @@ static func get_merged_meshes_from(item: ProtonScatterItem) -> MeshInstance3D:
 			for surface_i in mesh.get_surface_count():
 				surface_tool.append_from(mesh, surface_i, mi.transform)
 
+		var mesh := ImporterMesh.new()
+		mesh.add_surface(surface_tool.get_primitive_type(), surface_tool.commit_to_arrays())
+
+		if item.lod_generate:
+			mesh.generate_lods(item.lod_merge_angle, item.lod_split_angle, [])
+
 		var instance = MeshInstance3D.new()
-		instance.mesh = surface_tool.commit()
+		instance.mesh = mesh.get_mesh()
 		return instance
 
 	# ------
 	# Merge surfaces grouped by their materials
 	# ------
-	var array_mesh := ArrayMesh.new()
+	var mesh := ImporterMesh.new()
 
 	for material in surfaces_map.keys():
 		var surface_tool := SurfaceTool.new()
@@ -382,11 +390,17 @@ static func get_merged_meshes_from(item: ProtonScatterItem) -> MeshInstance3D:
 
 			surface_tool.append_from(mi.mesh, idx, mi.transform)
 
-		array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_tool.commit_to_arrays())
-		array_mesh.surface_set_material(array_mesh.get_surface_count() - 1, material)
+		mesh.add_surface(
+			surface_tool.get_primitive_type(),
+			surface_tool.commit_to_arrays(),
+			[], {},
+			material)
+
+	if item.lod_generate:
+		mesh.generate_lods(item.lod_merge_angle, item.lod_split_angle, [])
 
 	var instance := MeshInstance3D.new()
-	instance.mesh = array_mesh
+	instance.mesh = mesh.get_mesh()
 	return instance
 
 
