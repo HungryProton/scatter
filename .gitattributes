@@ -7,4 +7,6 @@
 /README.md          export-ignore
 /project.godot      export-ignore
 /icon.png 	    export-ignore
-/*.import 	    export-ignore
+/logo.svg	export-ignore
+/logo.png	export-ignore
+/.github	export-ignore
