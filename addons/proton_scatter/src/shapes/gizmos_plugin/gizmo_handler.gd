@@ -16,27 +16,27 @@ func set_editor_plugin(plugin: EditorPlugin) -> void:
 	_plugin = plugin
 
 
-func get_handle_name(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool) -> String:
+func get_handle_name(_gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool) -> String:
 	return ""
 
 
-func get_handle_value(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool) -> Variant:
+func get_handle_value(_gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool) -> Variant:
 	return null
 
 
-func set_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, camera: Camera3D, screen_pos: Vector2) -> void:
+func set_handle(_gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, _camera: Camera3D, _screen_pos: Vector2) -> void:
 	pass
 
 
-func commit_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, restore: Variant, cancel: bool) -> void:
+func commit_handle(_gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, _restore: Variant, _cancel: bool) -> void:
 	pass
 
 
-func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
+func redraw(_gizmo_plugin: EditorNode3DGizmoPlugin, _gizmo: EditorNode3DGizmo):
 	pass
 
 
-func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> bool:
+func forward_3d_gui_input(_viewport_camera: Camera3D, _event: InputEvent) -> bool:
 	return false
 
 

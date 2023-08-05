@@ -11,8 +11,8 @@ extends EditorNode3DGizmoPlugin
 const ProtonScatter := preload("./scatter.gd")
 const LoadingAnimation := preload("../icons/loading/m_loading.tres")
 
-var _panel: Control
 var _loading_mesh: Mesh
+var _editor_plugin: EditorPlugin
 
 
 func _init():
@@ -42,7 +42,7 @@ func _redraw(gizmo: EditorNode3DGizmo):
 	if node.is_thread_running():
 		gizmo.add_mesh(_loading_mesh, get_material("loading"))
 
-	if node.modifier_stack.is_using_edge_data():
+	if node.modifier_stack.is_using_edge_data() and _is_selected(node):
 		var curves: Array[Curve3D] = node.domain.get_edges()
 
 		for curve in curves:
@@ -57,8 +57,8 @@ func _redraw(gizmo: EditorNode3DGizmo):
 			gizmo.add_lines(lines, get_material("line"))
 
 
-func set_path_gizmo_panel(panel: Control) -> void:
-	_panel = panel
+func set_editor_plugin(plugin: EditorPlugin) -> void:
+	_editor_plugin = plugin
 
 
 # WORKAROUND
@@ -73,3 +73,10 @@ func create_custom_material(name, color := Color.WHITE):
 	material.render_priority = 100
 
 	add_material(name, material)
+
+
+func _is_selected(node: Node) -> bool:
+	if ProjectSettings.get_setting(_editor_plugin.GIZMO_SETTING):
+		return true
+
+	return node in _editor_plugin.get_custom_selection()

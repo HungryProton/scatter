@@ -13,6 +13,8 @@ extends EditorNode3DGizmoPlugin
 const ScatterShape = preload("../../scatter_shape.gd")
 const GizmoHandler = preload("./gizmo_handler.gd")
 
+
+var _editor_plugin: EditorPlugin
 var _handlers: Dictionary
 
 
@@ -65,7 +67,10 @@ func _commit_handle(gizmo: EditorNode3DGizmo, handle_id: int, secondary: bool, r
 
 
 func _redraw(gizmo: EditorNode3DGizmo):
-	_get_handler(gizmo).redraw(self, gizmo)
+	if _is_node_selected(gizmo):
+		_get_handler(gizmo).redraw(self, gizmo)
+	else:
+		gizmo.clear()
 
 
 func forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> int:
@@ -87,13 +92,14 @@ func set_path_gizmo_panel(panel: Control) -> void:
 
 
 func set_editor_plugin(plugin: EditorPlugin) -> void:
+	_editor_plugin = plugin
 	for handler_type in _handlers:
 		_handlers[handler_type].set_editor_plugin(plugin)
 
 
 # Creates a standard material displayed on top of everything.
 # Only exists because 'create_material() on_top' parameter doesn't seem to work.
-func create_custom_material(name, color := Color.WHITE):
+func create_custom_material(name: String, color := Color.WHITE):
 	var material := StandardMaterial3D.new()
 	material.set_blend_mode(StandardMaterial3D.BLEND_MODE_ADD)
 	material.set_shading_mode(StandardMaterial3D.SHADING_MODE_UNSHADED)
@@ -104,7 +110,7 @@ func create_custom_material(name, color := Color.WHITE):
 	add_material(name, material)
 
 
-func _get_handler(gizmo) -> GizmoHandler:
+func _get_handler(gizmo: EditorNode3DGizmo) -> GizmoHandler:
 	var null_handler = GizmoHandler.new() # Only so we don't have to check existence later
 
 	var shape_node = gizmo.get_node_3d()
@@ -120,3 +126,11 @@ func _get_handler(gizmo) -> GizmoHandler:
 		return null_handler
 
 	return _handlers[shape_type]
+
+
+func _is_node_selected(gizmo: EditorNode3DGizmo) -> bool:
+	if ProjectSettings.get_setting(_editor_plugin.GIZMO_SETTING):
+		return true
+
+	var selected_nodes: Array[Node] = _editor_plugin.get_custom_selection()
+	return gizmo.get_node_3d() in selected_nodes

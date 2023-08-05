@@ -39,6 +39,7 @@ func _notification(what):
 				_ignore_transform_notification = false
 				return
 			ScatterUtil.request_parent_to_rebuild(self)
+
 		NOTIFICATION_ENTER_WORLD:
 			_ignore_transform_notification = true
 
@@ -49,7 +50,7 @@ func _set(property, _value):
 
 	# Workaround to detect when the node was duplicated from the editor.
 	if property == "transform":
-		call_deferred("_on_node_duplicated")
+		_on_node_duplicated.call_deferred()
 
 	return false
 

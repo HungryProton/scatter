@@ -43,6 +43,7 @@ func commit_handle(gizmo: EditorNode3DGizmo, _handle_id: int, _secondary: bool, 
 
 func redraw(plugin: EditorNode3DGizmoPlugin, gizmo: EditorNode3DGizmo):
 	gizmo.clear()
+
 	var scatter_shape = gizmo.get_node_3d()
 	var shape: SphereShape = scatter_shape.shape
 

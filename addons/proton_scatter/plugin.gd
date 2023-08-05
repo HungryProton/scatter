@@ -10,11 +10,14 @@ const ShapeGizmoPlugin := preload("./src/shapes/gizmos_plugin/shape_gizmo_plugin
 const PathPanel := preload("./src/shapes/gizmos_plugin/components/path_panel.tscn")
 const ScatterCachePlugin := preload("./src/cache/inspector_plugin/scatter_cache_plugin.gd")
 
+const GIZMO_SETTING := "addons/proton_scatter/always_show_gizmos"
+
 var _modifier_stack_plugin := ModifierStackPlugin.new()
 var _scatter_gizmo_plugin := ScatterGizmoPlugin.new()
 var _shape_gizmo_plugin := ShapeGizmoPlugin.new()
 var _scatter_cache_plugin := ScatterCachePlugin.new()
 var _path_panel
+var _selected_scatter_group: Array[Node] = []
 
 
 func _get_plugin_name():
@@ -22,6 +25,11 @@ func _get_plugin_name():
 
 
 func _enter_tree():
+	if not ProjectSettings.has_setting(GIZMO_SETTING):
+		ProjectSettings.set_setting(GIZMO_SETTING, false)
+		ProjectSettings.set_initial_value(GIZMO_SETTING, false)
+		ProjectSettings.set_as_basic(GIZMO_SETTING, true)
+
 	add_inspector_plugin(_modifier_stack_plugin)
 	add_inspector_plugin(_scatter_cache_plugin)
 
@@ -30,6 +38,7 @@ func _enter_tree():
 	_path_panel.visible = false
 
 	add_node_3d_gizmo_plugin(_scatter_gizmo_plugin)
+	_scatter_gizmo_plugin.set_editor_plugin(self)
 
 	add_node_3d_gizmo_plugin(_shape_gizmo_plugin)
 	_shape_gizmo_plugin.set_undo_redo(get_undo_redo())
@@ -90,17 +99,62 @@ func _forward_3d_gui_input(viewport_camera: Camera3D, event: InputEvent) -> int:
 	return _shape_gizmo_plugin.forward_3d_gui_input(viewport_camera, event)
 
 
+func get_custom_selection() -> Array[Node]:
+	return _selected_scatter_group
+
+
+func _refresh_scatter_gizmos(nodes: Array[Node]) -> void:
+	for node in nodes:
+		if not is_instance_valid(node):
+			continue
+
+		if node is ProtonScatterShape:
+			_refresh_scatter_gizmos([node.get_parent()])
+			continue
+
+		if node is ProtonScatter:
+			node.update_gizmos()
+			for c in node.get_children():
+				c.update_gizmos()
+
+
 func _on_selection_changed() -> void:
+	# Clean the gizmos on the previous node selection
+	_refresh_scatter_gizmos(_selected_scatter_group)
+	_selected_scatter_group.clear()
+
+	# Get the currently selected nodes
 	var selected = get_editor_interface().get_selection().get_selected_nodes()
 	_path_panel.selection_changed(selected)
 
 	if selected.is_empty():
 		return
 
-	var selected_node = selected[0]
-	if selected_node is ProtonScatter:
-		selected_node.undo_redo = get_undo_redo()
-		selected_node.editor_plugin = self
+	# Update the selected local scatter group.
+	# If the user selects a shape, the scatter group will contain the ScatterShape,
+	# all the sibling shapes, and the parent scatter node, even if they are not
+	# selected. This is required to make their gizmos appear.
+	for node in selected:
+		var scatter_node
+
+		if node is ProtonScatter:
+			scatter_node = node
+
+		elif node is ProtonScatterShape and is_instance_valid(node):
+			scatter_node = node.get_parent()
+
+		if not is_instance_valid(scatter_node):
+			continue
+
+		_selected_scatter_group.push_back(scatter_node)
+		scatter_node.undo_redo = get_undo_redo()
+		scatter_node.editor_plugin = self
+
+		for c in scatter_node.get_children():
+			if c is ProtonScatterShape:
+				_selected_scatter_group.push_back(c)
+
+	_refresh_scatter_gizmos(_selected_scatter_group)
 
 
 func _on_scene_changed(_scene_root) -> void:
