@@ -18,7 +18,6 @@ var _results: Array[Dictionary]
 
 func _ready() -> void:
 	set_physics_process(false)
-	_space_state = get_tree().get_root().get_world_3d().get_direct_space_state()
 	_is_ready = true
 
 
@@ -42,6 +41,9 @@ func execute(queries: Array) -> Array[Dictionary]:
 func _physics_process(_delta: float) -> void:
 	if _queries.is_empty():
 		return
+
+	if not _space_state:
+		_space_state = get_tree().get_root().get_world_3d().get_direct_space_state()
 
 	var steps = min(MAX_QUERIES_PER_FRAME, _queries.size())
 	for i in steps:
