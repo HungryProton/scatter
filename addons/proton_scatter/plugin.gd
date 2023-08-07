@@ -11,6 +11,7 @@ const PathPanel := preload("./src/shapes/gizmos_plugin/components/path_panel.tsc
 const ScatterCachePlugin := preload("./src/cache/inspector_plugin/scatter_cache_plugin.gd")
 
 const GIZMO_SETTING := "addons/proton_scatter/always_show_gizmos"
+const MAX_PHYSICS_QUERIES_SETTING := "addons/proton_scatter/max_physics_queries_per_frame"
 
 var _modifier_stack_plugin := ModifierStackPlugin.new()
 var _scatter_gizmo_plugin := ScatterGizmoPlugin.new()
@@ -29,6 +30,11 @@ func _enter_tree():
 		ProjectSettings.set_setting(GIZMO_SETTING, false)
 		ProjectSettings.set_initial_value(GIZMO_SETTING, false)
 		ProjectSettings.set_as_basic(GIZMO_SETTING, true)
+
+	if not ProjectSettings.has_setting(MAX_PHYSICS_QUERIES_SETTING):
+		ProjectSettings.set_setting(MAX_PHYSICS_QUERIES_SETTING, 500)
+		ProjectSettings.set_initial_value(MAX_PHYSICS_QUERIES_SETTING, 500)
+		ProjectSettings.set_as_basic(MAX_PHYSICS_QUERIES_SETTING, true)
 
 	add_inspector_plugin(_modifier_stack_plugin)
 	add_inspector_plugin(_scatter_cache_plugin)

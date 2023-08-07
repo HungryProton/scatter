@@ -130,10 +130,10 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		exclude_query.collision_mask = exclude_mask
 		exclude_queries.push_back(exclude_query)
 
-
 	# Run the queries in the physics helper since we can't access the PhysicsServer
 	# from outside the _physics_process while also being in a separate thread.
-	var physics_helper: ProtonScatterPhysicsHelper = await domain.get_root().get_physics_helper()
+	var physics_helper: ProtonScatterPhysicsHelper = domain.get_root().get_physics_helper()
+
 	var ray_hits := await physics_helper.execute(queries)
 
 	if ray_hits.is_empty():

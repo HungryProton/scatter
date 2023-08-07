@@ -250,12 +250,6 @@ func is_thread_running() -> bool:
 
 # Used by some modifiers to retrieve a physics helper node
 func get_physics_helper() -> ProtonScatterPhysicsHelper:
-	if not is_instance_valid(_physics_helper):
-		_physics_helper = ProtonScatterPhysicsHelper.new()
-		_physics_helper.name = "PhysicsHelper"
-		add_child.bind(_physics_helper, true, INTERNAL_MODE_BACK).call_deferred()
-		await get_tree().process_frame
-
 	return _physics_helper
 
 
@@ -666,6 +660,11 @@ func _perform_sanity_check() -> void:
 		domain = ProtonScatterDomain.new()
 
 	domain.discover_shapes(self)
+
+	if not is_instance_valid(_physics_helper):
+		_physics_helper = ProtonScatterPhysicsHelper.new()
+		_physics_helper.name = "PhysicsHelper"
+		add_child(_physics_helper, true, INTERNAL_MODE_BACK)
 
 	# Retrigger the parent setter, in case the parent node no longer exists or changed type.
 	scatter_parent = scatter_parent
