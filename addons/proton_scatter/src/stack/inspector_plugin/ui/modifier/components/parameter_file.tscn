@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://cvgj4rdc0mxxq"]
+[gd_scene load_steps=3 format=3 uid="uid://cvgj4rdc0mxxq"]
 
 [ext_resource type="Texture2D" uid="uid://bosx22dy64f11" path="res://addons/proton_scatter/icons/clear.svg" id="1"]
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/modifier/components/parameter_file.gd" id="2"]
-[ext_resource type="Texture2D" uid="uid://sa8p08dfcnwc" path="res://materials/textures/noise/t_simplex_noise_1.jpg" id="3_wyi6e"]
 
 [node name="ParameterFile" type="VBoxContainer"]
 anchors_preset = 10
@@ -48,7 +47,6 @@ size_flags_horizontal = 3
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
-icon = ExtResource("3_wyi6e")
 flat = true
 expand_icon = true
 

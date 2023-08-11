@@ -26,15 +26,8 @@ func _get_plugin_name():
 
 
 func _enter_tree():
-	if not ProjectSettings.has_setting(GIZMO_SETTING):
-		ProjectSettings.set_setting(GIZMO_SETTING, false)
-		ProjectSettings.set_initial_value(GIZMO_SETTING, false)
-		ProjectSettings.set_as_basic(GIZMO_SETTING, true)
-
-	if not ProjectSettings.has_setting(MAX_PHYSICS_QUERIES_SETTING):
-		ProjectSettings.set_setting(MAX_PHYSICS_QUERIES_SETTING, 500)
-		ProjectSettings.set_initial_value(MAX_PHYSICS_QUERIES_SETTING, 500)
-		ProjectSettings.set_as_basic(MAX_PHYSICS_QUERIES_SETTING, true)
+	_ensure_setting_exists(GIZMO_SETTING, true)
+	_ensure_setting_exists(MAX_PHYSICS_QUERIES_SETTING, 500)
 
 	add_inspector_plugin(_modifier_stack_plugin)
 	add_inspector_plugin(_scatter_cache_plugin)
@@ -122,6 +115,15 @@ func _refresh_scatter_gizmos(nodes: Array[Node]) -> void:
 			node.update_gizmos()
 			for c in node.get_children():
 				c.update_gizmos()
+
+
+func _ensure_setting_exists(setting: String, default_value) -> void:
+	if not ProjectSettings.has_setting(setting):
+		ProjectSettings.set_setting(setting, default_value)
+		ProjectSettings.set_initial_value(setting, default_value)
+
+		if ProjectSettings.has_method("set_as_basic"): # 4.0 backward compatibility
+			ProjectSettings.call("set_as_basic", setting, true)
 
 
 func _on_selection_changed() -> void:

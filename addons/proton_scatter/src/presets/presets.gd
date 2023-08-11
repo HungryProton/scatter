@@ -135,6 +135,7 @@ func _on_load_full_preset(path: String) -> void:
 		return
 
 	var preset = preset_scene.instantiate()
+
 	if preset:
 		_scatter_node.modifier_stack = preset.modifier_stack.get_copy()
 		preset.global_transform = _scatter_node.get_global_transform()
@@ -151,8 +152,6 @@ func _on_load_full_preset(path: String) -> void:
 			_scatter_node.add_child(c, true)
 
 		ProtonScatterUtil.set_owner_recursive(_scatter_node, get_tree().get_edited_scene_root())
-
-		_scatter_node.full_rebuild.call_deferred()
 		preset.queue_free()
 
 	hide()
