@@ -10,14 +10,14 @@ func clear() -> void:
 	data.clear()
 
 
-func store(node_name: String, transforms: Array[Transform3D]) -> void:
-	data[node_name] = transforms
+func store(node_path: String, transforms: Array[Transform3D]) -> void:
+	data[node_path] = transforms
 
 
-func get_transforms(node_name: String) -> Array[Transform3D]:
+func get_transforms(node_path: String) -> Array[Transform3D]:
 	var res: Array[Transform3D]
 
-	if node_name in data:
-		res.assign(data[node_name])
+	if node_path in data:
+		res.assign(data[node_path])
 
 	return res
