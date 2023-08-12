@@ -88,7 +88,7 @@ func rebuild_cache() -> void:
 			continue # Move on to the next if still no results.
 
 		# Store the transforms in the cache.
-		_local_cache.store(s.name, s.transforms.list)
+		_local_cache.store(_scene_root.get_path_to(s), s.transforms.list)
 
 	ResourceSaver.save(_local_cache, cache_file)
 
@@ -109,7 +109,7 @@ func restore_cache(force_restore := false) -> void:
 
 		# Send the cached transforms to the scatter node.
 		var transforms = ProtonScatterTransformList.new()
-		transforms.list = _local_cache.get_transforms(s.name)
+		transforms.list = _local_cache.get_transforms(_scene_root.get_path_to(s))
 		s._perform_sanity_check()
 		s._on_transforms_ready(transforms)
 
