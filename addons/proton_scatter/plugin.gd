@@ -114,7 +114,8 @@ func _refresh_scatter_gizmos(nodes: Array[Node]) -> void:
 		if node is ProtonScatter:
 			node.update_gizmos()
 			for c in node.get_children():
-				c.update_gizmos()
+				if c is Node3D:
+					c.update_gizmos()
 
 
 func _ensure_setting_exists(setting: String, default_value) -> void:

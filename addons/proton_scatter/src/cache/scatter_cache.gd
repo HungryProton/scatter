@@ -32,6 +32,8 @@ func _ready() -> void:
 	if not is_inside_tree():
 		return
 
+	_ensure_cache_folder_exists()
+
 	_scene_root = _get_local_scene_root(self)
 
 	# By default, set the cache path to the cache folder, with a unique recognizable name
@@ -50,6 +52,7 @@ func _ready() -> void:
 		return
 
 	restore_cache.call_deferred()
+
 
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -90,7 +93,10 @@ func rebuild_cache() -> void:
 		# Store the transforms in the cache.
 		_local_cache.store(_scene_root.get_path_to(s), s.transforms.list)
 
-	ResourceSaver.save(_local_cache, cache_file)
+	var err = ResourceSaver.save(_local_cache, cache_file)
+
+	if err != OK:
+		printerr("ProtonScatter error: Failed to save the cache file. Code: ", err)
 
 
 func restore_cache(force_restore := false) -> void:
@@ -133,3 +139,8 @@ func _discover_scatter_nodes(root: Node) -> void:
 
 	for c in root.get_children():
 		_discover_scatter_nodes(c)
+
+
+func _ensure_cache_folder_exists() -> void:
+	if not DirAccess.dir_exists_absolute(DEFAULT_CACHE_FOLDER):
+		DirAccess.make_dir_recursive_absolute(DEFAULT_CACHE_FOLDER)
