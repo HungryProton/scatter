@@ -453,6 +453,8 @@ func _update_split_multimeshes() -> void:
 
 		static_body.queue_free()
 
+		# Cache the mesh instance to be used for the chunks
+		var mesh_instance: MeshInstance3D = ProtonScatterUtil.get_merged_meshes_from(item)
 		# The relevant transforms are now ordered in chunks
 		for xi in splits.x:
 			for yi in splits.y:
@@ -460,7 +462,11 @@ func _update_split_multimeshes() -> void:
 					var chunk_elements = transform_chunks[xi][yi][zi].size()
 					if chunk_elements == 0:
 						continue
-					var mmi = ProtonScatterUtil.get_or_create_multimesh_chunk(item, Vector3i(xi, yi, zi), chunk_elements)
+					var mmi = ProtonScatterUtil.get_or_create_multimesh_chunk(
+													item, 
+													mesh_instance, 
+													Vector3i(xi, yi, zi), 
+													chunk_elements)
 					if not mmi:
 						continue
 
@@ -475,7 +481,7 @@ func _update_split_multimeshes() -> void:
 						t = transform_chunks[xi][yi][zi][i]
 						t.origin -= center
 						mmi.multimesh.set_instance_transform(i, t)
-
+		mesh_instance.queue_free()
 		offset += count
 
 

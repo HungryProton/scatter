@@ -79,7 +79,6 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 		item_root.add_child(mmi, true)
 
 		mmi.set_owner(item_root.owner)
-
 	if not mmi.multimesh:
 		mmi.multimesh = MultiMesh.new()
 
@@ -108,10 +107,16 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 	return mmi
 
 
-static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector3i, count) -> MultiMeshInstance3D:
+static func get_or_create_multimesh_chunk(item: ProtonScatterItem,
+										mesh_instance: MeshInstance3D,
+										index: Vector3i,
+										count: int)\
+										 -> MultiMeshInstance3D:
 	var item_root := get_or_create_item_root(item)
 	var chunk_name = "MultiMeshInstance3D" + "_%s_%s_%s"%[index.x, index.y, index.z]
 	var mmi: MultiMeshInstance3D = item_root.get_node_or_null(chunk_name)
+	if not mesh_instance:
+		return
 
 	if not mmi:
 		mmi = MultiMeshInstance3D.new()
@@ -119,9 +124,7 @@ static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector
 		# if set_name is used after add_child it is crazy slow
 		# This doesn't make much sense but it is definitely the case.
 		# About a 100x slowdown was observed in this case
-		item_root.add_child(mmi, true)
-
-		mmi.set_owner(item_root.owner)
+		item_root.add_child.bind(mmi, true).call_deferred()
 
 	if not mmi.multimesh:
 		mmi.multimesh = MultiMesh.new()
@@ -129,10 +132,6 @@ static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector
 	mmi.position = Vector3.ZERO
 	mmi.set_cast_shadows_setting(item.override_cast_shadow)
 	mmi.set_material_override(item.override_material)
-
-	var mesh_instance: MeshInstance3D = get_merged_meshes_from(item)
-	if not mesh_instance:
-		return
 
 	mmi.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
 	mmi.multimesh.mesh = mesh_instance.mesh
@@ -145,8 +144,6 @@ static func get_or_create_multimesh_chunk(item: ProtonScatterItem, index: Vector
 	mmi.visibility_range_fade_mode 		= item.visibility_range_fade_mode
 
 	mmi.multimesh.instance_count = count
-
-	mesh_instance.queue_free()
 
 	return mmi
 
