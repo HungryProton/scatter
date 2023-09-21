@@ -7,7 +7,7 @@
 
 ## What is it?
 
-This is an add-on for Godot 4, which automate the positioning of assets in a scene. If you have a lot of props to place, and you would rather not do it by hand, ProtonScatter may be useful to you.
+This is an add-on for Godot 4, which automates the positioning of assets in a scene. If you have a lot of props to place, and you would rather not do it by hand, ProtonScatter may be useful to you.
 
 
 | <video src="https://user-images.githubusercontent.com/52043844/232777856-c364eb48-a001-4b36-a33d-5551bab4c4e9.mp4"> | <video src="https://user-images.githubusercontent.com/52043844/232777949-836c744b-7df7-4d67-8f6e-f176db913d32.mp4"> |
@@ -17,17 +17,17 @@ This is an add-on for Godot 4, which automate the positioning of assets in a sce
 The showcase scene composition was entirely done using ProtonScatter. First, large rocks are randomly placed within an area, then trees, grass and other details are projected onto the rocks' colliders surface.
 
 
-## How does it works?
+## How does it work?
 
-The basic setup is as followed:
+The basic setup is as follows:
 
 ![setup](https://user-images.githubusercontent.com/52043844/232782868-83c14fde-eee2-4553-b2a4-42961769f4cf.png)
 
 
-+ A `ProtonScatter` (1) node holds the `positionning rules` (2) that can be edited in the inspector. This panel is very similar to Blender's modifier stack panel. Some modifiers create points, other changes their transforms. You mix different modifiers in order to obtain the result you need.
++ A `ProtonScatter` (1) node holds the `positionning rules` (2) that can be edited in the inspector. This panel is very similar to Blender's modifier stack panel. Some modifiers create points, others change their transforms. You mix different modifiers in order to obtain the result you need.
 
-+ One or more `ScatterItem` node to select which asset you want to place.
-+ One or more `ScatterShape` item to define the area where the scattering happens.
++ One or more `ScatterItem` nodes to select which asset you want to place.
++ One or more `ScatterShape` items to define the area where the scattering happens.
 
 ### Creating points
 
@@ -37,7 +37,7 @@ The basic setup is as followed:
 
 ### Defining the domain
 
-Scatter currently ships with three shape types: Box, Sphere and Path. They can be combined to create more complex shapes. Notice how in the last example, the box is showed in red. This means the shape is marked as 'negative' and new items won't appear inside.
+Scatter currently ships with three shape types: Box, Sphere and Path. They can be combined to create more complex shapes. Notice how in the last example, the box is shown in red. This means the shape is marked as 'negative' and new items won't appear inside.
 
 | ![box](https://user-images.githubusercontent.com/52043844/232786126-649e70b6-95cb-45c2-9b7c-05b2151a1f4e.png) | ![sphere](https://user-images.githubusercontent.com/52043844/232786140-c170ac21-d2d9-4c7e-b4dd-63635b034415.png) | ![path](https://user-images.githubusercontent.com/52043844/232786175-7fb3acaa-f557-4890-a200-cb9333971280.png) | ![combined_shapes](https://user-images.githubusercontent.com/52043844/232786205-0f0bac90-763b-4373-bdfd-82c63b63bb32.png) |
 |---------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
