@@ -266,7 +266,7 @@ func _multiplayer_call(fn: Callable, arg = null):
 			fn.call()
 
 # Deletes what the Scatter node generated.
-@rpc("call_local")
+@rpc("call_local", "reliable")
 func clear_output() -> void:
 	if not output_root:
 		output_root = get_node_or_null("ScatterOutput")
@@ -279,7 +279,7 @@ func clear_output() -> void:
 	ProtonScatterUtil.ensure_output_root_exists(self)
 	_clear_collision_data()
 
-@rpc("call_local")
+@rpc("call_local", "reliable")
 func _clear_collision_data() -> void:
 	if _body_rid.is_valid():
 		PhysicsServer3D.free_rid(_body_rid)
@@ -700,7 +700,7 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		_thread = null
 	_multiplayer_call(_do_transforms_ready, new_transforms.list)
 
-@rpc("call_local")
+@rpc("call_local", "reliable")
 func _do_transforms_ready(new_trs: Array):
 	var new_transforms = ProtonScatterTransformList.new()
 	new_transforms.list.assign(new_trs)
