@@ -345,7 +345,7 @@ func _rebuild(force_discover) -> void:
 		domain.discover_shapes(self)
 
 	if items.is_empty() or (domain.is_empty() and not modifier_stack.does_not_require_shapes()):
-		clear_output()
+		_multiplayer_call(clear_output)
 		push_warning("ProtonScatter warning: No items or shapes, abort")
 		return
 
