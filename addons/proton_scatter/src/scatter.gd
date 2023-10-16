@@ -253,11 +253,17 @@ func is_thread_running() -> bool:
 func get_physics_helper() -> ProtonScatterPhysicsHelper:
 	return _physics_helper
 
-func _multiplayer_call(fn: Callable):
+func _multiplayer_call(fn: Callable, arg = null):
 	if multiplayer_sync && is_multiplayer_authority() && !Engine.is_editor_hint():
-		fn.rpc()
+		if arg != null:
+			fn.rpc(arg)
+		else:
+			fn.rpc()
 	else:
-		fn.call()
+		if arg != null:
+			fn.call(arg)
+		else:
+			fn.call()
 
 # Deletes what the Scatter node generated.
 @rpc("call_local")
@@ -692,7 +698,7 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 	if is_thread_running():
 		await _thread.wait_to_finish()
 		_thread = null
-	_multiplayer_call(_do_transforms_ready.bind(new_transforms.list))
+	_multiplayer_call(_do_transforms_ready, new_transforms.list)
 
 @rpc("call_local")
 func _do_transforms_ready(new_trs: Array):
