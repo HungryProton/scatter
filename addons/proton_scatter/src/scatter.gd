@@ -253,6 +253,11 @@ func is_thread_running() -> bool:
 func get_physics_helper() -> ProtonScatterPhysicsHelper:
 	return _physics_helper
 
+func _multiplayer_call(fn: Callable):
+	if multiplayer_sync && is_multiplayer_authority() && !Engine.is_editor_hint():
+		fn.rpc()
+	else:
+		fn.call()
 
 # Deletes what the Scatter node generated.
 @rpc("call_local")
@@ -294,10 +299,7 @@ func full_rebuild():
 		await _thread.wait_to_finish()
 		_thread = null
 
-	if _should_use_multiplayer_sync():
-		clear_output.rpc()
-	else:
-		clear_output()
+	_multiplayer_call(clear_output)
 	_rebuild(true)
 
 
@@ -325,12 +327,8 @@ func rebuild(force_discover := false) -> void:
 # DON'T call this function directly outside of the 'rebuild()' function above.
 func _rebuild(force_discover) -> void:
 	if not enabled:
-		if _should_use_multiplayer_sync():
-			_clear_collision_data.rpc()
-			clear_output.rpc()
-		else:
-			_clear_collision_data()
-			clear_output()
+		_multiplayer_call(_clear_collision_data)
+		_multiplayer_call(clear_output)
 		build_completed.emit()
 		return
 
@@ -346,16 +344,10 @@ func _rebuild(force_discover) -> void:
 		return
 
 	if render_mode == 1:
-		if _should_use_multiplayer_sync():
-			clear_output.rpc() # TMP, prevents raycasts in modifier to self intersect with previous output
-		else:
-			clear_output() # TMP, prevents raycasts in modifier to self intersect with previous output
+		_multiplayer_call(clear_output) # TMP, prevents raycasts in modifier to self intersect with previous output
 
 	if keep_static_colliders:
-		if _should_use_multiplayer_sync():
-			_clear_collision_data.rpc()
-		else:
-			_clear_collision_data()
+		_multiplayer_call(_clear_collision_data)
 
 	if dbg_disable_thread:
 		modifier_stack.start_update(self, domain)
@@ -695,19 +687,12 @@ func _on_child_exiting_tree(node: Node) -> void:
 	if node is ProtonScatterShape or node is ProtonScatterItem:
 		rebuild.bind(true).call_deferred()
 
-func _should_use_multiplayer_sync() -> bool:
-	return multiplayer_sync && is_multiplayer_authority() && !Engine.is_editor_hint()
-
 # Called when the modifier stack is done generating the full transform list
 func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 	if is_thread_running():
 		await _thread.wait_to_finish()
 		_thread = null
-
-	if _should_use_multiplayer_sync():
-		_do_transforms_ready.rpc(new_transforms.list)
-	else:
-		_do_transforms_ready(new_transforms.list)
+	_multiplayer_call(_do_transforms_ready.bind(new_transforms.list))
 
 @rpc("call_local")
 func _do_transforms_ready(new_trs: Array):
