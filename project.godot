@@ -8,6 +8,10 @@
 
 config_version=5
 
+[addons]
+
+proton_scatter/always_show_gizmos=false
+
 [application]
 
 config/name="ProtonScatter"

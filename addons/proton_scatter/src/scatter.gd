@@ -123,6 +123,7 @@ var output_root: Marker3D
 var transforms: ProtonScatterTransformList
 var editor_plugin # Holds a reference to the EditorPlugin. Used by other parts.
 var is_ready := false
+var build_version := 0
 
 # Internal variables
 var _thread: Thread
@@ -719,5 +720,6 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 			_update_particles_system()
 
 	update_gizmos()
+	build_version += 1
 	await get_tree().process_frame
 	build_completed.emit()

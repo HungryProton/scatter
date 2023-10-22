@@ -1,10 +1,12 @@
-[gd_scene load_steps=4 format=3 uid="uid://dilbceex72g24"]
+[gd_scene load_steps=5 format=3 uid="uid://dilbceex72g24"]
 
 [ext_resource type="Script" path="res://addons/proton_scatter/src/cache/inspector_plugin/cache_panel.gd" id="1_h1g4a"]
 [ext_resource type="Texture2D" uid="uid://yqlpvcmb7mfi" path="res://addons/proton_scatter/icons/rebuild.svg" id="2_0ml76"]
 [ext_resource type="Texture2D" uid="uid://ddjrq1h4mkn6a" path="res://addons/proton_scatter/icons/load.svg" id="3_i6mdl"]
+[ext_resource type="Texture2D" uid="uid://btb6rqhhi27mx" path="res://addons/proton_scatter/icons/remove.svg" id="4_bfbdy"]
 
 [node name="CachePanel" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 82.5)
 offset_right = 161.0
 offset_bottom = 66.0
 size_flags_horizontal = 3
@@ -21,7 +23,7 @@ alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-text = "Rebuild cache"
+text = "Update Cache"
 icon = ExtResource("2_0ml76")
 
 [node name="RestoreButton" type="Button" parent="MarginContainer/VBoxContainer"]
@@ -30,3 +32,18 @@ layout_mode = 2
 size_flags_vertical = 3
 text = "Restore Transforms"
 icon = ExtResource("3_i6mdl")
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ClearButton" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "Clear Cache"
+icon = ExtResource("4_bfbdy")
+
+[node name="EnableForAllButton" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Enable Cache For All"

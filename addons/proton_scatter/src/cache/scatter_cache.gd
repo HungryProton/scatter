@@ -17,15 +17,23 @@ const ProtonScatter := preload("res://addons/proton_scatter/src/scatter.gd")
 const ProtonScatterTransformList := preload("../common/transform_list.gd")
 
 
+signal cache_restored
+
+
 @export_file("*.res", "*.tres") var cache_file := "":
 	set(val):
 		cache_file = val
 		update_configuration_warnings()
+@export var auto_rebuild_cache_when_saving := true
+
+@export_group("Debug", "dbg_")
+@export var dbg_disable_thread := false
 
 # The resource where transforms are actually stored
 var _local_cache: ProtonScatterCacheResource
 var _scene_root: Node
-var _scatter_nodes: Array[ProtonScatter]
+var _scatter_nodes: Dictionary #Key: ProtonScatter, Value: cached version
+var _local_cache_changed := false
 
 
 func _ready() -> void:
@@ -48,11 +56,10 @@ func _ready() -> void:
 			scene_name = scene_path.get_file().get_basename()
 			scene_name += "_" + str(scene_path.hash()) # Prevents name collisions
 
-		cache_file = DEFAULT_CACHE_FOLDER.get_basename().path_join(scene_name + "_scatter_cache.tres")
+		cache_file = DEFAULT_CACHE_FOLDER.get_basename().path_join(scene_name + "_scatter_cache.res")
 		return
 
 	restore_cache.call_deferred()
-
 
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -64,24 +71,31 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 
 func _notification(what):
-	if what == NOTIFICATION_EDITOR_PRE_SAVE:
-		rebuild_cache()
+	if what == NOTIFICATION_EDITOR_PRE_SAVE and auto_rebuild_cache_when_saving:
+		update_cache()
 
 
-func rebuild_cache() -> void:
+func clear_cache() -> void:
+	_scatter_nodes.clear()
+	_local_cache = null
+
+
+func update_cache() -> void:
 	if cache_file.is_empty():
 		printerr("Cache file path is empty.")
 		return
-
-	_scatter_nodes.clear()
+	
+	_purge_outdated_nodes()
 	_discover_scatter_nodes(_scene_root)
 
 	if not _local_cache:
 		_local_cache = ProtonScatterCacheResource.new()
-
-	_local_cache.clear()
-
 	for s in _scatter_nodes:
+		# Ignore this node if its cache is already up to date
+		var cached_version: int = _scatter_nodes[s]
+		if s.build_version == cached_version:
+			continue
+		
 		# If transforms are not available, try to rebuild once.
 		if not s.transforms:
 			s.rebuild.call_deferred()
@@ -92,16 +106,41 @@ func rebuild_cache() -> void:
 
 		# Store the transforms in the cache.
 		_local_cache.store(_scene_root.get_path_to(s), s.transforms.list)
+		_scatter_nodes[s] = s.build_version
+		_local_cache_changed = true
 
+	# Only save the cache on disk if there's something new to save
+	if not _local_cache_changed:
+		return
+
+	# TODO: Save large files on a thread
 	var err = ResourceSaver.save(_local_cache, cache_file)
+	_local_cache_changed = false
 
 	if err != OK:
 		printerr("ProtonScatter error: Failed to save the cache file. Code: ", err)
 
 
-func restore_cache(force_restore := false) -> void:
+func restore_cache() -> void:
 	# Load the cache file if it exists
-	_local_cache = load(cache_file)
+	if not FileAccess.file_exists(cache_file):
+		printerr("Could not find cache file ", cache_file)
+		return
+	
+	# Cache files are large, load on a separate thread
+	ResourceLoader.load_threaded_request(cache_file)
+	while true:
+		match ResourceLoader.load_threaded_get_status(cache_file):
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_INVALID_RESOURCE:
+				return
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
+				await get_tree().process_frame
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_FAILED:
+				return
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
+				break
+	
+	_local_cache = ResourceLoader.load_threaded_get(cache_file)
 	if not _local_cache:
 		printerr("Could not load cache: ", cache_file)
 		return
@@ -110,7 +149,7 @@ func restore_cache(force_restore := false) -> void:
 	_discover_scatter_nodes(_scene_root)
 
 	for s in _scatter_nodes:
-		if s.force_rebuild_on_load and not force_restore:
+		if s.force_rebuild_on_load:
 			continue # Ignore the cache if the scatter node is about to rebuild anyway.
 
 		# Send the cached transforms to the scatter node.
@@ -118,6 +157,17 @@ func restore_cache(force_restore := false) -> void:
 		transforms.list = _local_cache.get_transforms(_scene_root.get_path_to(s))
 		s._perform_sanity_check()
 		s._on_transforms_ready(transforms)
+		s.build_version = 0
+		_scatter_nodes[s] = 0
+	
+	cache_restored.emit()
+
+
+func enable_for_all_nodes() -> void:
+	_purge_outdated_nodes()
+	_discover_scatter_nodes(_scene_root)
+	for s in _scatter_nodes:
+		s.force_rebuild_on_load = false
 
 
 # If the node comes from an instantiated scene, returns the root of that
@@ -133,12 +183,24 @@ func _get_local_scene_root(node: Node) -> Node:
 	return _get_local_scene_root(parent)
 
 
-func _discover_scatter_nodes(root: Node) -> void:
-	if root is ProtonScatter:
-		_scatter_nodes.push_back(root)
+func _discover_scatter_nodes(node: Node) -> void:
+	if node is ProtonScatter and not _scatter_nodes.has(node):
+		_scatter_nodes[node] = node.build_version
 
-	for c in root.get_children():
+	for c in node.get_children():
 		_discover_scatter_nodes(c)
+
+
+func _purge_outdated_nodes() -> void:
+	var nodes_to_remove: Array[ProtonScatter] = []
+	for node in _scatter_nodes:
+		if not is_instance_valid(node):
+			nodes_to_remove.push_back(node)
+			_local_cache.erase(_scene_root.get_path_to(node))
+			_local_cache_changed = true
+	
+	for node in nodes_to_remove:
+		_scatter_nodes.erase(node)
 
 
 func _ensure_cache_folder_exists() -> void:
