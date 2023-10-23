@@ -22,11 +22,23 @@ var curve: Curve
 var gt: Transform2D
 
 var _hover_point := -1:
-	set(val): set_hover(val)
+	set(val):
+		if val != _hover_point:
+			_hover_point = val
+			queue_redraw()
+
 var _selected_point := -1:
-	set(val): set_selected_point(val)
+	set(val):
+		if val != _selected_point:
+			_selected_point = val
+			queue_redraw()
+
 var _selected_tangent := -1:
-	set(val): set_selected_tangent(val)
+	set(val):
+		if val != _selected_tangent:
+			_selected_tangent = val
+			queue_redraw()
+
 var _dragging := false
 var _hover_radius := 50.0 # Squared
 var _tangents_length := 30.0
@@ -36,8 +48,11 @@ var _font: Font
 func _ready() -> void:
 	#rect_min_size.y *= EditorUtil.get_editor_scale()
 	var plugin := EditorPlugin.new()
-	var theme := plugin.get_editor_interface().get_base_control().get_theme()
-	_font = theme.get_font("Main", "EditorFonts")
+	var editor_theme := plugin.get_editor_interface().get_base_control().get_theme()
+	if editor_theme:
+		_font = editor_theme.get_font("Main", "EditorFonts")
+	else:
+		_font = ThemeDB.fallback_font
 	plugin.queue_free()
 
 	queue_redraw()
@@ -59,7 +74,7 @@ func _gui_input(event) -> void:
 			remove_point(_selected_point)
 
 	elif event is InputEventMouseButton:
-		if event.doubleclick:
+		if event.double_click:
 			add_point(_to_curve_space(event.position))
 
 		elif event.pressed and event.button_index == MOUSE_BUTTON_MIDDLE:
@@ -86,7 +101,7 @@ func _gui_input(event) -> void:
 			# Snap to "round" coordinates when holding Ctrl.
 			# Be more precise when holding Shift as well.
 			var snap_threshold: float
-			if event.control:
+			if event.ctrl_pressed:
 				snap_threshold = 0.025 if event.shift else 0.1
 			else:
 				snap_threshold = 0.0
