@@ -721,5 +721,11 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 
 	update_gizmos()
 	build_version += 1
-	await get_tree().process_frame
+	
+	var tree = get_tree()
+
+	if not tree:
+		return
+
+	await tree.process_frame
 	build_completed.emit()
