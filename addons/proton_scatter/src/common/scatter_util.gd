@@ -221,7 +221,7 @@ static func request_parent_to_rebuild(node: Node, deferred := true) -> void:
 # Recursively search for all MeshInstances3D in the node's children and
 # returns them all in an array. If node is a MeshInstance, it will also be
 # added to the array
-static func get_all_mesh_instances_from(node: Node3D) -> Array[MeshInstance3D]:
+static func get_all_mesh_instances_from(node: Node) -> Array[MeshInstance3D]:
 	var res: Array[MeshInstance3D] = []
 
 	if node is MeshInstance3D:
@@ -427,7 +427,7 @@ static func get_merged_meshes_from(item: ProtonScatterItem) -> MeshInstance3D:
 	return instance
 
 
-static func get_all_static_bodies_from(node: Node3D) -> Array[StaticBody3D]:
+static func get_all_static_bodies_from(node: Node) -> Array[StaticBody3D]:
 	var res: Array[StaticBody3D] = []
 
 	if node is StaticBody3D:

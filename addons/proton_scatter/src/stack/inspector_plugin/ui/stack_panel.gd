@@ -73,6 +73,7 @@ func _validate_stack_connections() -> void:
 	if _modifier_stack.just_created:
 		%Presets.load_default(_scatter)
 		_modifier_stack.just_created = false
+		rebuild_ui()
 
 
 func _set_children_owner(new_owner: Node, node: Node):
