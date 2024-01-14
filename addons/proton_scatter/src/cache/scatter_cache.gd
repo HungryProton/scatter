@@ -40,22 +40,26 @@ func _ready() -> void:
 	if not is_inside_tree():
 		return
 
-	_ensure_cache_folder_exists()
-
 	_scene_root = _get_local_scene_root(self)
 
-	# By default, set the cache path to the cache folder, with a unique recognizable name
+	# Check if cache_file is empty, indicating the default case
 	if cache_file.is_empty():
+		# Ensure the cache folder exists
+		_ensure_cache_folder_exists()
+
+		# Retrieve the scene name to create a unique recognizable name
 		var scene_path: String = _scene_root.get_scene_file_path()
 		var scene_name: String
 
-		# Set a random name if we can't find the current scene
+		# If the scene path is not available, set a random name
 		if scene_path.is_empty():
 			scene_name = str(randi())
 		else:
+			# Use the base name of the scene file and append a hash to avoid collisions
 			scene_name = scene_path.get_file().get_basename()
-			scene_name += "_" + str(scene_path.hash()) # Prevents name collisions
+			scene_name += "_" + str(scene_path.hash())
 
+		# Set the cache path to the cache folder, incorporating the scene name
 		cache_file = DEFAULT_CACHE_FOLDER.get_basename().path_join(scene_name + "_scatter_cache.res")
 		return
 
