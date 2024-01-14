@@ -1,0 +1,14 @@
+{
+  "regexManagers": [
+    {
+      "fileMatch": ["^plug\\.gd$"],
+      "matchStrings": [
+          "\\s+plug\\(\"(?<gitUrl>.*?)\",\\ \\{\\s*\"tag\":\\ \"(?<currentValue>.*)\""
+      ],
+      "depNameTemplate": "{{{gitUrl}}}",
+      "packageNameTemplate": "https://github.com/{{{gitUrl}}}",
+      "versioningTemplate": "git",
+      "datasourceTemplate": "git-tags"
+    }
+  ]
+}
