@@ -123,7 +123,7 @@ func update_cache() -> void:
 
 func restore_cache() -> void:
 	# Load the cache file if it exists
-	if not FileAccess.file_exists(cache_file):
+	if not ResourceLoader.exists(cache_file):
 		printerr("Could not find cache file ", cache_file)
 		return
 	
