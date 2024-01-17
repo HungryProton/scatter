@@ -44,8 +44,12 @@ func _ready() -> void:
 
 	# Check if cache_file is empty, indicating the default case
 	if cache_file.is_empty():
-		# Ensure the cache folder exists
-		_ensure_cache_folder_exists()
+		if Editor.is_editor_hint():
+			# Ensure the cache folder exists
+			_ensure_cache_folder_exists()
+		else:
+			printerr("ProtonScatter error: You load a ScatterCache node with an empty cache file attribute. Outside of the editor, the addon can't set a default value. Please open the scene in the editor and set a default value.")
+			return
 
 		# Retrieve the scene name to create a unique recognizable name
 		var scene_path: String = _scene_root.get_scene_file_path()
