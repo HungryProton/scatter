@@ -1,4 +1,5 @@
 @tool
+class_name ProtonScatter
 extends Node3D
 
 
@@ -9,10 +10,7 @@ signal build_completed
 
 # Includes
 const ProtonScatterDomain := preload("./common/domain.gd")
-const ProtonScatterItem := preload("./scatter_item.gd")
-const ProtonScatterModifierStack := preload("./stack/modifier_stack.gd")
 const ProtonScatterPhysicsHelper := preload("./common/physics_helper.gd")
-const ProtonScatterShape := preload("./scatter_shape.gd")
 const ProtonScatterTransformList := preload("./common/transform_list.gd")
 const ProtonScatterUtil := preload('./common/scatter_util.gd')
 

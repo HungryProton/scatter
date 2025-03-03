@@ -5,8 +5,6 @@ extends Popup
 const PRESETS_PATH = "res://addons/proton_scatter/presets"
 const PresetEntry := preload("./preset_entry.tscn")
 const ProtonScatterUtil := preload('../common/scatter_util.gd')
-const ProtonScatterItem := preload('../scatter_item.gd')
-const ProtonScatterShape := preload('../scatter_shape.gd')
 
 var _scatter_node
 var _ideal_popup_size: Vector2i

@@ -2,10 +2,6 @@
 extends "base_modifier.gd"
 
 
-const ProtonScatter := preload("../scatter.gd")
-const ModifierStack := preload("../stack/modifier_stack.gd")
-
-
 @export_node_path var scatter_node: NodePath
 @export var auto_rebuild := true:
 	set(val):
@@ -66,7 +62,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 		return
 
 	if _source_node.modifier_stack:
-		var stack: ModifierStack = _source_node.modifier_stack.get_copy()
+		var stack: ProtonScatterModifierStack = _source_node.modifier_stack.get_copy()
 		var results = await stack.start_update(domain.get_root(), domain)
 		transforms.append(results.list)
 

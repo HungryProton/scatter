@@ -4,11 +4,6 @@ extends Node
 # utility functions are written here (only the functions that don't disturb
 # reading the core code, mostly data validation and other verbose checks).
 
-
-const ProtonScatter := preload("../scatter.gd")
-const ProtonScatterItem := preload("../scatter_item.gd")
-const ModifierStack := preload("../stack/modifier_stack.gd")
-
 ### SCATTER UTILITY FUNCTIONS ###
 
 
