@@ -147,7 +147,7 @@ func restore_cache() -> void:
 		return
 
 	if is_inside_tree():
-		_load_cache_threaded(cache_file)
+		await _load_cache_threaded(cache_file)
 	else:
 		_local_cache = load(cache_file)
 	if not _local_cache:
