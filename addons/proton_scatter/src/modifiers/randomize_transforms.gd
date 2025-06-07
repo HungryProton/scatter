@@ -56,8 +56,15 @@ func _process_transforms(transforms, domain, random_seed) -> void:
 		basis = basis.rotated(axis_y, deg_to_rad(_random_float() * rotation.y))
 		basis = basis.rotated(axis_z, deg_to_rad(_random_float() * rotation.z))
 
+		var physics_engine = ProjectSettings.get_setting("physics/3d/physics_engine")
+		
 		# Apply scale
-		random_scale = Vector3.ONE + (_rng.randf() * scale)
+		if physics_engine == "GodotPhysics3D":
+			random_scale = Vector3.ONE + (_rng.randf() * scale)
+		else:
+			# Uniform scale to ensure compatibility with Jolt Physics
+			var uniform_scale := _rng.randf() * scale.x  # Or average of x, y, z if you want balanced input
+			random_scale = Vector3.ONE * (1.0 + uniform_scale)
 
 		if is_using_individual_instances_space():
 			basis.x *= random_scale.x
