@@ -24,17 +24,9 @@ signal cache_restored
 	set(val):
 		cache_file = val
 		update_configuration_warnings()
-
-
-## Determines whether the cache should be automatically updated when the scene is saved.
-## If this is set to off, you will need to manually use the Update Cache button to ensure the
-## cache is up-to-date.
 @export var auto_rebuild_cache_when_saving := true
 
 @export_group("Debug", "dbg_")
-
-## This parameter is primarily intended for debugging purposes, as loading large cache
-## files on the main thread can cause the editor to become unresponsive.
 @export var dbg_disable_thread := false
 
 # The resource where transforms are actually stored
@@ -74,8 +66,9 @@ func _ready() -> void:
 		# Set the cache path to the cache folder, incorporating the scene name
 		cache_file = DEFAULT_CACHE_FOLDER.get_basename().path_join(scene_name + "_scatter_cache.res")
 		return
-
-	restore_cache.call_deferred()
+	
+	
+	call_deferred("_try_restore_cache")
 
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -94,27 +87,24 @@ func _notification(what):
 func clear_cache() -> void:
 	_scatter_nodes.clear()
 	_local_cache = null
-	for s in _scatter_nodes:
-		_scatter_nodes[s] -= 1
 
 
 func update_cache() -> void:
 	if cache_file.is_empty():
 		printerr("Cache file path is empty.")
 		return
-
+	
 	_purge_outdated_nodes()
 	_discover_scatter_nodes(_scene_root)
 
 	if not _local_cache:
 		_local_cache = ProtonScatterCacheResource.new()
-
 	for s in _scatter_nodes:
 		# Ignore this node if its cache is already up to date
 		var cached_version: int = _scatter_nodes[s]
 		if s.build_version == cached_version:
 			continue
-
+		
 		# If transforms are not available, try to rebuild once.
 		if not s.transforms:
 			s.rebuild.call_deferred()
@@ -139,17 +129,41 @@ func update_cache() -> void:
 	if err != OK:
 		printerr("ProtonScatter error: Failed to save the cache file. Code: ", err)
 
+func _try_restore_cache() -> void:
+	if get_tree() == null:
+		call_deferred("_try_restore_cache")
+		return
+	restore_cache()
 
 func restore_cache() -> void:
 	# Load the cache file if it exists
 	if not ResourceLoader.exists(cache_file):
 		printerr("Could not find cache file ", cache_file)
 		return
-
-	if is_inside_tree():
-		await _load_cache_threaded(cache_file)
-	else:
-		_local_cache = load(cache_file)
+	
+	# Cache files are large, load on a separate thread
+	ResourceLoader.load_threaded_request(cache_file)
+	var max_wait_frames = 300  # e.g., 5 seconds at 60fps
+	var wait_frames = 0
+	while true:
+		if get_tree() == null:
+			printerr("Scene tree not ready during cache restore.")
+			return
+		match ResourceLoader.load_threaded_get_status(cache_file):
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_INVALID_RESOURCE:
+				return
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
+				await get_tree().process_frame
+				wait_frames += 1
+				if wait_frames > max_wait_frames:
+					printerr("Timeout while loading cache file: ", cache_file)
+					return
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_FAILED:
+				return
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
+				break
+	
+	_local_cache = ResourceLoader.load_threaded_get(cache_file)
 	if not _local_cache:
 		printerr("Could not load cache: ", cache_file)
 		return
@@ -168,7 +182,7 @@ func restore_cache() -> void:
 		s._on_transforms_ready(transforms)
 		s.build_version = 0
 		_scatter_nodes[s] = 0
-
+	
 	cache_restored.emit()
 
 
@@ -194,7 +208,7 @@ func _get_local_scene_root(node: Node) -> Node:
 
 func _discover_scatter_nodes(node: Node) -> void:
 	if node is ProtonScatter and not _scatter_nodes.has(node):
-		_scatter_nodes[node] = -1
+		_scatter_nodes[node] = node.build_version
 
 	for c in node.get_children():
 		_discover_scatter_nodes(c)
@@ -207,7 +221,7 @@ func _purge_outdated_nodes() -> void:
 			nodes_to_remove.push_back(node)
 			_local_cache.erase(_scene_root.get_path_to(node))
 			_local_cache_changed = true
-
+	
 	for node in nodes_to_remove:
 		_scatter_nodes.erase(node)
 
@@ -215,20 +229,3 @@ func _purge_outdated_nodes() -> void:
 func _ensure_cache_folder_exists() -> void:
 	if not DirAccess.dir_exists_absolute(DEFAULT_CACHE_FOLDER):
 		DirAccess.make_dir_recursive_absolute(DEFAULT_CACHE_FOLDER)
-
-
-func _load_cache_threaded(cache_file_path: String) -> void:
-	# Cache files are large, load on a separate thread when possible
-	ResourceLoader.load_threaded_request(cache_file)
-	while true:
-		match ResourceLoader.load_threaded_get_status(cache_file):
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_INVALID_RESOURCE:
-				return
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
-				await get_tree().process_frame
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_FAILED:
-				return
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
-				break
-
-	_local_cache = ResourceLoader.load_threaded_get(cache_file)
