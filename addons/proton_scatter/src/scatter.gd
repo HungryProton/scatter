@@ -57,15 +57,15 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 		var render_mode := 0:
 	set(val):
 		render_mode = val
-		notify_property_list_changed()
 		if is_ready:
+			notify_property_list_changed()
 			full_rebuild.call_deferred()
 
 var use_chunks : bool = true:
 	set(val):
 		use_chunks = val
-		notify_property_list_changed()
 		if is_ready:
+			notify_property_list_changed()
 			full_rebuild.call_deferred()
 
 var chunk_dimensions := Vector3.ONE * 15.0:
