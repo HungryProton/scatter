@@ -35,7 +35,7 @@ const ProtonScatterUtil := preload('./common/scatter_util.gd')
 	set(val):
 		global_seed = val
 		rebuild()
-		
+
 ## scattered objects will be visible in the scene tree.
 ## Useful for debugging but may impact editor performance with large numbers of objects.
 @export var show_output_in_tree := false:
@@ -89,6 +89,14 @@ var chunk_dimensions := Vector3.ONE * 15.0:
 ## Disable this in production to prevent unnecessary updates and improve performance,
 ## since scattered objects typically don't need to change after the scene is loaded.
 @export var enable_updates_in_game := false
+
+@export_group("Compatibility")
+
+@export var force_uniform_scale: bool = false:
+	set(val):
+		force_uniform_scale = val
+		if is_ready:
+			rebuild.call_deferred()
 
 @export_group("Dependency")
 
@@ -172,13 +180,15 @@ var _physics_helper: ProtonScatterPhysicsHelper
 var _body_rid: RID
 var _collision_shapes: Array[RID]
 var _ignore_transform_notification = false
+var _is_using_jolt: bool = false
 
 
 func _ready() -> void:
 	if Engine.is_editor_hint() or enable_updates_in_game:
 		set_notify_transform(true)
 		child_exiting_tree.connect(_on_child_exiting_tree)
-
+		
+	_is_using_jolt = ProjectSettings.get_setting("physics/3d/physics_engine") == "Jolt Physics"
 	_perform_sanity_check()
 	_discover_items()
 	update_configuration_warnings.call_deferred()
@@ -747,6 +757,9 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		return
 
 	transforms = new_transforms
+	
+	if force_uniform_scale or _is_using_jolt:
+		transforms.enforce_uniform_scale()
 
 	if not transforms or transforms.is_empty():
 		clear_output()

@@ -64,3 +64,11 @@ func is_empty() -> bool:
 
 func size() -> int:
 	return list.size()
+
+
+func enforce_uniform_scale() -> void:
+	for i: int in list.size():
+		var t: Transform3D = list[i]
+		var current_scale: Vector3 = t.basis.get_scale()
+		var scale := Vector3.ONE * (current_scale.x + current_scale.y + current_scale.z) / 3.0
+		list[i] = list[i].orthonormalized().scaled_local(scale)
