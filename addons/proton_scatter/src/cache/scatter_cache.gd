@@ -23,7 +23,8 @@ signal cache_restored
 @export_file("*.res", "*.tres") var cache_file := "":
 	set(val):
 		cache_file = val
-		update_configuration_warnings()
+		if is_inside_tree():
+			update_configuration_warnings()
 
 
 ## Determines whether the cache should be automatically updated when the scene is saved.
@@ -94,8 +95,6 @@ func _notification(what):
 func clear_cache() -> void:
 	_scatter_nodes.clear()
 	_local_cache = null
-	for s in _scatter_nodes:
-		_scatter_nodes[s] -= 1
 
 
 func update_cache() -> void:
