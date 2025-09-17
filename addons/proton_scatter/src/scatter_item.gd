@@ -27,6 +27,14 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		source = val
 		property_list_changed.emit()
 
+## Applies a script to the generated multimeshes.
+## ProtonScatter creates one or more MultimMeshInstance3D objects parenting the scenes in ScatterItems.
+## This property allows to set the generated MMI script entry, so that the parent MMI can control 
+## the instances via multimesh.instance_count and the family of methods multimesh.get_instance_*.
+## For example, a custom script could iterate in _ready over each instance and prepare 
+## instance-specific data for the shader via multimesh.set_instance_custom_data.
+## Another example, the MMI _process method could check the collision of every instance taking their 
+## transform, instead of delegating the logic to the _process of each instance.
 @export var custom_script: Script:
 	set(val):
 		custom_script = val

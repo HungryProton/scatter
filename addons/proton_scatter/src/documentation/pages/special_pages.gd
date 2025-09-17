@@ -49,7 +49,7 @@ static func get_scatter_documentation() -> DocumentationInfo:
 		instead of duplicating the source nodes. This allows the GPU to render
 		thousands of meshes in a single draw call.")
 	p.add_warning("Collisions and attached scripts are ignored when this
-		option is enabled.", 1)
+		option is enabled, but see ScatterItem.custom_script.", 1)
 
 	return info
 
