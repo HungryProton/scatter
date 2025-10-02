@@ -2,8 +2,6 @@
 extends EditorPlugin
 
 
-const ProtonScatter := preload("./src/scatter.gd")
-const ProtonScatterShape := preload("./src/scatter_shape.gd")
 const ModifierStackPlugin := preload("./src/stack/inspector_plugin/modifier_stack_plugin.gd")
 const ScatterGizmoPlugin := preload("./src/scatter_gizmo_plugin.gd")
 const ShapeGizmoPlugin := preload("./src/shapes/gizmos_plugin/shape_gizmo_plugin.gd")

@@ -8,7 +8,6 @@ extends EditorNode3DGizmoPlugin
 # Also displays the domain edges if one of its modifiers is using this data.
 
 
-const ProtonScatter := preload("./scatter.gd")
 const LoadingAnimation := preload("../icons/loading/m_loading.tres")
 
 var _loading_mesh: Mesh

@@ -11,8 +11,6 @@ extends RefCounted
 # An instance of this class is passed to the modifiers during a rebuild.
 
 
-const ProtonScatter := preload("../scatter.gd")
-const ProtonScatterShape := preload("../scatter_shape.gd")
 const BaseShape := preload("../shapes/base_shape.gd")
 const Bounds := preload("../common/bounds.gd")
 

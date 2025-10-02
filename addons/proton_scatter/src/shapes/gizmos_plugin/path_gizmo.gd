@@ -2,8 +2,6 @@
 extends "gizmo_handler.gd"
 
 
-const ProtonScatter := preload("res://addons/proton_scatter/src/scatter.gd")
-const ProtonScatterShape := preload("res://addons/proton_scatter/src/scatter_shape.gd")
 const ProtonScatterEventHelper := preload("res://addons/proton_scatter/src/common/event_helper.gd")
 const PathPanel := preload("./components/path_panel.gd")
 

@@ -13,7 +13,6 @@ extends Node
 
 const DEFAULT_CACHE_FOLDER := "res://addons/proton_scatter/cache/"
 
-const ProtonScatter := preload("res://addons/proton_scatter/src/scatter.gd")
 const ProtonScatterTransformList := preload("../common/transform_list.gd")
 
 
