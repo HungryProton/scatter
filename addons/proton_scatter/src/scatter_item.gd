@@ -107,8 +107,6 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 ## Specifies which 3D render layers the scattered instances will be visible on.
 ## Uses the standard Godot layer system where each bit represents a layer.
 ## Useful for controlling which instances are visible to different cameras.
-@export_flags_3d_render var visibility_layers: int = 1
-
 @export_flags_3d_render var visibility_layers: int = 1:
 	set(val):
 		visibility_layers = val
