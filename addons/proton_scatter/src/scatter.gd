@@ -72,6 +72,7 @@ var chunk_dimensions := Vector3.ONE * 15.0:
 		chunk_dimensions.y = max(val.y, 1.0)
 		chunk_dimensions.z = max(val.z, 1.0)
 		if is_ready:
+			notify_property_list_changed()
 			rebuild.call_deferred()
 
 ## If enabled, creates static collision shapes for scattered objects.
@@ -263,18 +264,20 @@ func _notification(what):
 
 
 func _set(property, value):
+	# use_chunks and chunk_dimensions need to be updated regardless of being in-editor
+	# or not, otherwise they will always use their defaults ingame (on, [15.0, 15.0, 15.0])
+	if property == "Performance/use_chunks":
+		use_chunks = value
+
+	elif property == "Performance/chunk_dimensions":
+		chunk_dimensions = value
+
 	if not Engine.is_editor_hint():
 		return false
 
 	# Workaround to detect when the node was duplicated from the editor.
 	if property == "transform":
 		_on_node_duplicated.call_deferred()
-
-	elif property == "Performance/use_chunks":
-		use_chunks = value
-
-	elif property == "Performance/chunk_dimensions":
-		chunk_dimensions = value
 
 	# Backward compatibility.
 	# Convert the value of previous property "use_instancing" into the proper render_mode.
