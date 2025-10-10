@@ -107,14 +107,31 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 ## Specifies which 3D render layers the scattered instances will be visible on.
 ## Uses the standard Godot layer system where each bit represents a layer.
 ## Useful for controlling which instances are visible to different cameras.
-@export_flags_3d_render var visibility_layers: int = 1
-
-@export var visibility_range_begin : float = 0
-@export var visibility_range_begin_margin : float = 0
-@export var visibility_range_end : float = 0
-@export var visibility_range_end_margin : float = 0
+@export_flags_3d_render var visibility_layers: int = 1:
+	set(val):
+		visibility_layers = val
+		ScatterUtil.request_parent_to_rebuild(self)
+@export var visibility_range_begin : float = 0:
+	set(val):
+		visibility_range_begin = val
+		ScatterUtil.request_parent_to_rebuild(self)
+@export var visibility_range_begin_margin : float = 0:
+	set(val):
+		visibility_range_begin_margin = val
+		ScatterUtil.request_parent_to_rebuild(self)
+@export var visibility_range_end : float = 0:
+	set(val):
+		visibility_range_end = val
+		ScatterUtil.request_parent_to_rebuild(self)
+@export var visibility_range_end_margin : float = 0:
+	set(val):
+		visibility_range_end_margin = val
+		ScatterUtil.request_parent_to_rebuild(self)
 #TODO what is a nicer way to expose this?
-@export_enum("Disabled:0", "Self:1") var visibility_range_fade_mode = 0
+@export_enum("Disabled:0", "Self:1") var visibility_range_fade_mode = 0:
+	set(val):
+		visibility_range_fade_mode = val
+		ScatterUtil.request_parent_to_rebuild(self)
 
 @export_group("Level Of Detail", "lod_")
 
