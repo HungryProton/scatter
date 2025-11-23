@@ -43,7 +43,7 @@ var _scene_root: Node
 var _scatter_nodes: Dictionary #Key: ProtonScatter, Value: cached version
 var _local_cache_changed := false
 
-var saveThread = Thread.new()
+var _save_thread = Thread.new()
 
 func _ready() -> void:
 	if not is_inside_tree():
@@ -99,9 +99,10 @@ func clear_cache() -> void:
 	if dbg_disable_thread:
 		save_cache()
 	else:
-		if !saveThread.is_alive():
-			saveThread.wait_to_finish()
-			saveThread.start(save_cache)
+		if !_save_thread.is_alive():
+			if _save_thread.is_started():
+				_save_thread.wait_to_finish()
+			_save_thread.start(save_cache)
 
 
 func update_cache() -> void:
@@ -141,9 +142,10 @@ func update_cache() -> void:
 	if dbg_disable_thread:
 		save_cache()
 	else:
-		if !saveThread.is_alive():
-			saveThread.wait_to_finish()
-			saveThread.start(save_cache)
+		if !_save_thread.is_alive():
+			if _save_thread.is_started():
+				_save_thread.wait_to_finish()
+			_save_thread.start(save_cache)
 
 	_local_cache_changed = false
 
@@ -256,4 +258,5 @@ func save_cache() -> void:
 
 
 func _exit_tree():
-	saveThread.wait_to_finish()
+	if _save_thread.is_started():
+		_save_thread.wait_to_finish()
