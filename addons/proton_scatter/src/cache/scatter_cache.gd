@@ -33,8 +33,8 @@ signal cache_restored
 
 @export_group("Debug", "dbg_")
 
-## This parameter is primarily intended for debugging purposes, as loading large cache
-## files on the main thread can cause the editor to become unresponsive.
+## This parameter is primarily intended for debugging purposes, as saving/loading 
+## large cache files on the main thread will cause the editor to become unresponsive.
 @export var dbg_disable_thread := false
 
 # The resource where transforms are actually stored
@@ -43,6 +43,7 @@ var _scene_root: Node
 var _scatter_nodes: Dictionary #Key: ProtonScatter, Value: cached version
 var _local_cache_changed := false
 
+var _save_thread = Thread.new()
 
 func _ready() -> void:
 	if not is_inside_tree():
@@ -56,7 +57,7 @@ func _ready() -> void:
 			# Ensure the cache folder exists
 			_ensure_cache_folder_exists()
 		else:
-			printerr("ProtonScatter error: You load a ScatterCache node with an empty cache file attribute. Outside of the editor, the addon can't set a default value. Please open the scene in the editor and set a default value.")
+			printerr("ProtonScatter error: You loaded a ScatterCache node with an empty cache file attribute. Outside of the editor, the addon can't set a default value. Please open the scene in the editor and set a default value.")
 			return
 
 		# Retrieve the scene name to create a unique recognizable name
@@ -93,7 +94,15 @@ func _notification(what):
 
 func clear_cache() -> void:
 	_scatter_nodes.clear()
-	_local_cache = null
+	_local_cache.clear()
+	
+	if dbg_disable_thread:
+		save_cache()
+	else:
+		if !_save_thread.is_alive():
+			if _save_thread.is_started():
+				_save_thread.wait_to_finish()
+			_save_thread.start(save_cache)
 
 
 func update_cache() -> void:
@@ -130,12 +139,15 @@ func update_cache() -> void:
 	if not _local_cache_changed:
 		return
 
-	# TODO: Save large files on a thread
-	var err = ResourceSaver.save(_local_cache, cache_file)
-	_local_cache_changed = false
+	if dbg_disable_thread:
+		save_cache()
+	else:
+		if !_save_thread.is_alive():
+			if _save_thread.is_started():
+				_save_thread.wait_to_finish()
+			_save_thread.start(save_cache)
 
-	if err != OK:
-		printerr("ProtonScatter error: Failed to save the cache file. Code: ", err)
+	_local_cache_changed = false
 
 
 func restore_cache() -> void:
@@ -145,7 +157,10 @@ func restore_cache() -> void:
 		return
 
 	if is_inside_tree():
-		await _load_cache_threaded(cache_file)
+		if dbg_disable_thread:
+			_load_cache(cache_file)
+		else:
+			await _load_cache_threaded(cache_file)
 	else:
 		_local_cache = load(cache_file)
 	if not _local_cache:
@@ -215,6 +230,9 @@ func _ensure_cache_folder_exists() -> void:
 		DirAccess.make_dir_recursive_absolute(DEFAULT_CACHE_FOLDER)
 
 
+func _load_cache(cache_file_path: String) -> void:
+	_local_cache = ResourceLoader.load(cache_file)
+
 func _load_cache_threaded(cache_file_path: String) -> void:
 	# Cache files are large, load on a separate thread when possible
 	ResourceLoader.load_threaded_request(cache_file)
@@ -230,3 +248,15 @@ func _load_cache_threaded(cache_file_path: String) -> void:
 				break
 
 	_local_cache = ResourceLoader.load_threaded_get(cache_file)
+
+
+func save_cache() -> void:
+	var err = ResourceSaver.save(_local_cache, cache_file)
+
+	if err != OK:
+		printerr("ProtonScatter error: Failed to save the cache file. Code: ", err)
+
+
+func _exit_tree():
+	if _save_thread.is_started():
+		_save_thread.wait_to_finish()
