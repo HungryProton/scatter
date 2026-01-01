@@ -1,10 +1,9 @@
 @tool
+@icon("../icons/scatter.svg")
 class_name ProtonScatter
 extends Node3D
 
 
-signal shape_changed
-signal thread_completed
 signal build_completed
 
 
@@ -13,9 +12,6 @@ const ProtonScatterDomain := preload("./common/domain.gd")
 const ProtonScatterPhysicsHelper := preload("./common/physics_helper.gd")
 const ProtonScatterTransformList := preload("./common/transform_list.gd")
 const ProtonScatterUtil := preload('./common/scatter_util.gd')
-
-
-@export_category("ProtonScatter")
 
 @export_group("General")
 
@@ -186,7 +182,7 @@ func _ready() -> void:
 	if Engine.is_editor_hint() or enable_updates_in_game:
 		set_notify_transform(true)
 		child_exiting_tree.connect(_on_child_exiting_tree)
-		
+
 	_is_using_jolt = ProjectSettings.get_setting("physics/3d/physics_engine") == "Jolt Physics"
 	_perform_sanity_check()
 	_discover_items()
@@ -758,7 +754,7 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		return
 
 	transforms = new_transforms
-	
+
 	if force_uniform_scale or _is_using_jolt:
 		transforms.enforce_uniform_scale()
 

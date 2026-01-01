@@ -1,4 +1,5 @@
 @tool
+@icon("../icons/shape.svg")
 class_name ProtonScatterShape
 extends Node3D
 

@@ -1,4 +1,5 @@
 @tool
+@icon("../icons/item.svg")
 class_name ProtonScatterItem
 extends Node3D
 
@@ -18,7 +19,7 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		ScatterUtil.request_parent_to_rebuild(self)
 
 
-## Controls where the item to be scattered comes from. 
+## Controls where the item to be scattered comes from.
 ## From current scene (0): Uses a node from the current scene as the source
 ## From disk (1): Loads the source item from a saved scene file
 ## This affects how the 'path' property is interpreted - either as a NodePath
@@ -143,11 +144,11 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 	set(val):
 		lod_generate = val
 		ScatterUtil.request_parent_to_rebuild(self)
-		
 
-## Determines the angle threshold at which the mesh for a single ProtonScatterItem 
+
+## Determines the angle threshold at which the mesh for a single ProtonScatterItem
 ## will be merged with other instances to create a lower polygon count version of the mesh.
-## Setting a lower lod_merge_angle value will result in more aggressive merging, reducing 
+## Setting a lower lod_merge_angle value will result in more aggressive merging, reducing
 ## the overall number of mesh instances
 @export_range(0.0, 180.0) var lod_merge_angle := 25.0:
 	set(val):
@@ -155,7 +156,7 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		ScatterUtil.request_parent_to_rebuild(self)
 
 
-## determines the angle threshold at which the mesh for a single ProtonScatterItem 
+## determines the angle threshold at which the mesh for a single ProtonScatterItem
 ## will be split into a higher polygon count version of the mesh.
 ## generally more useful for higher polygon count models.
 @export_range(0.0, 180.0) var lod_split_angle := 60.0:

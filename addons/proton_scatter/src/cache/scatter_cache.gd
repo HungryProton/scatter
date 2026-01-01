@@ -1,4 +1,6 @@
 @tool
+@icon("../../icons/cache.svg")
+class_name ProtonScatterCache
 extends Node
 
 # ProtonScatterCacheNode
@@ -33,7 +35,7 @@ signal cache_restored
 
 @export_group("Debug", "dbg_")
 
-## This parameter is primarily intended for debugging purposes, as saving/loading 
+## This parameter is primarily intended for debugging purposes, as saving/loading
 ## large cache files on the main thread will cause the editor to become unresponsive.
 @export var dbg_disable_thread := false
 
@@ -95,7 +97,7 @@ func _notification(what):
 func clear_cache() -> void:
 	_scatter_nodes.clear()
 	_local_cache.clear()
-	
+
 	if dbg_disable_thread:
 		save_cache()
 	else:

@@ -42,31 +42,6 @@ func _enter_tree():
 	_shape_gizmo_plugin.set_path_gizmo_panel(_path_panel)
 	_shape_gizmo_plugin.set_editor_plugin(self)
 
-	add_custom_type(
-		"ProtonScatter",
-		"Node3D",
-		preload("./src/scatter.gd"),
-		preload("./icons/scatter.svg")
-	)
-	add_custom_type(
-		"ScatterItem",
-		"Node3D",
-		preload("./src/scatter_item.gd"),
-		preload("./icons/item.svg")
-	)
-	add_custom_type(
-		"ScatterShape",
-		"Node3D",
-		preload("./src/scatter_shape.gd"),
-		preload("./icons/shape.svg")
-	)
-	add_custom_type(
-		"ScatterCache",
-		"Node3D",
-		preload("./src/cache/scatter_cache.gd"),
-		preload("./icons/cache.svg")
-	)
-
 	var editor_selection = get_editor_interface().get_selection()
 	editor_selection.selection_changed.connect(_on_selection_changed)
 
@@ -74,10 +49,6 @@ func _enter_tree():
 
 
 func _exit_tree():
-	remove_custom_type("ProtonScatter")
-	remove_custom_type("ScatterItem")
-	remove_custom_type("ScatterShape")
-	remove_custom_type("ScatterCache")
 	remove_inspector_plugin(_modifier_stack_plugin)
 	remove_inspector_plugin(_scatter_cache_plugin)
 	remove_node_3d_gizmo_plugin(_shape_gizmo_plugin)
