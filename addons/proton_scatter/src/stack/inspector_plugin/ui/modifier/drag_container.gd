@@ -19,7 +19,7 @@ var _map := [] # Stores the y top position of each child in the stack
 
 
 func _ready() -> void:
-	_separation = get_theme_constant("separation", "VBoxContainer")
+	_separation = get_theme_constant("separation", "VBoxContainer") + 2
 
 
 func _notification(what):
