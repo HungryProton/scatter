@@ -19,6 +19,7 @@ const ProtonScatterTransformList := preload("../common/transform_list.gd")
 
 
 signal cache_restored
+signal cache_load_threaded_finished
 
 
 @export_file("*.res", "*.tres") var cache_file := "":
@@ -42,8 +43,9 @@ signal cache_restored
 # The resource where transforms are actually stored
 var _local_cache: ProtonScatterCacheResource
 var _scene_root: Node
-var _scatter_nodes: Dictionary #Key: ProtonScatter, Value: cached version
+var _scatter_nodes: Dictionary # Key: ProtonScatter, Value: cached version
 var _local_cache_changed := false
+var _cache_load_threaded_in_progress := false
 
 var _save_thread = Thread.new()
 
@@ -59,7 +61,9 @@ func _ready() -> void:
 			# Ensure the cache folder exists
 			_ensure_cache_folder_exists()
 		else:
-			printerr("ProtonScatter error: You loaded a ScatterCache node with an empty cache file attribute. Outside of the editor, the addon can't set a default value. Please open the scene in the editor and set a default value.")
+			printerr("ProtonScatter error: You loaded a ScatterCache node with an empty cache file attribute.
+								ProtonScatter cannot set a default value outside of the editor. 
+								Please open the scene in the editor and set a default value.")
 			return
 
 		# Retrieve the scene name to create a unique recognizable name
@@ -235,20 +239,10 @@ func _ensure_cache_folder_exists() -> void:
 func _load_cache(cache_file_path: String) -> void:
 	_local_cache = ResourceLoader.load(cache_file)
 
-func _load_cache_threaded(cache_file_path: String) -> void:
-	# Cache files are large, load on a separate thread when possible
+func _load_cache_threaded(cache_file: String) -> void:
 	ResourceLoader.load_threaded_request(cache_file)
-	while true:
-		match ResourceLoader.load_threaded_get_status(cache_file):
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_INVALID_RESOURCE:
-				return
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
-				await get_tree().process_frame
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_FAILED:
-				return
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
-				break
-
+	_cache_load_threaded_in_progress = true
+	await cache_load_threaded_finished
 	_local_cache = ResourceLoader.load_threaded_get(cache_file)
 
 
@@ -262,3 +256,20 @@ func save_cache() -> void:
 func _exit_tree():
 	if _save_thread.is_started():
 		_save_thread.wait_to_finish()
+
+
+func _process(_delta: float) -> void:
+	if _cache_load_threaded_in_progress:
+		if cache_file.is_empty():
+			printerr("Cache file path is empty.")
+			_cache_load_threaded_in_progress = false
+
+		match ResourceLoader.load_threaded_get_status(cache_file):
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
+				return
+
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_INVALID_RESOURCE, \
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_FAILED, \
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
+				_cache_load_threaded_in_progress = false
+				cache_load_threaded_finished.emit()
