@@ -50,6 +50,7 @@ var _cache_load_threaded_in_progress := false
 var _save_thread = Thread.new()
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_DISABLED
 	if not is_inside_tree():
 		return
 
@@ -241,8 +242,10 @@ func _load_cache(cache_file_path: String) -> void:
 
 func _load_cache_threaded(cache_file: String) -> void:
 	ResourceLoader.load_threaded_request(cache_file)
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_cache_load_threaded_in_progress = true
 	await cache_load_threaded_finished
+	process_mode = Node.PROCESS_MODE_DISABLED
 	_local_cache = ResourceLoader.load_threaded_get(cache_file)
 
 
@@ -263,6 +266,8 @@ func _process(_delta: float) -> void:
 		if cache_file.is_empty():
 			printerr("Cache file path is empty.")
 			_cache_load_threaded_in_progress = false
+			cache_load_threaded_finished.emit()
+			return
 
 		match ResourceLoader.load_threaded_get_status(cache_file):
 			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
