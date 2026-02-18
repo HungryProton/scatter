@@ -134,10 +134,11 @@ func _static_body_node_to_shapes_template(static_body: StaticBody3D) -> Array:
 
 	for c in static_body.get_children():
 		var shape = _node_to_shape(c)
+		if not shape:
+			continue
+			
 		shape.layers_bin = _get_or_create_layer_body_bin(static_body.collision_layer)
-
-		if shape:
-			shapes.append(shape)
+		shapes.append(shape)
 		
 	return shapes
 	
