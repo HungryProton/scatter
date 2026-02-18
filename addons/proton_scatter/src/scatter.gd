@@ -390,11 +390,6 @@ func _rebuild(force_discover) -> void:
 
 	if keep_static_colliders:
 		_colliders.clear()
-		
-	if Engine.is_editor_hint() and not enable_colliders_in_editor:
-		_colliders.enable = false
-	else:
-		_colliders.enable = keep_static_colliders and render_mode != 1
 
 	if dbg_disable_thread:
 		modifier_stack.start_update(self, domain)
@@ -674,6 +669,11 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		_thread = null
 
 	_colliders.clear()
+
+	if Engine.is_editor_hint() and not enable_colliders_in_editor:
+		_colliders.enable = false
+	else:
+		_colliders.enable = keep_static_colliders and render_mode != 1
 
 	if _rebuild_queued:
 		_rebuild_queued = false
