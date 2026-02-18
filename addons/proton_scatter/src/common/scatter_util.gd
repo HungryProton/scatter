@@ -119,18 +119,19 @@ static func get_or_create_multimesh_chunk(item: ProtonScatterItem,
 										count: int)\
 										 -> MultiMeshInstance3D:
 	var item_root := get_or_create_item_root(item)
-	var chunk_name = "MultiMeshInstance3D" + "_%s_%s_%s"%[index.x, index.y, index.z]
+	var chunk_name = "MultiMeshInstance3D" + "_%s_%s_%s_%s"%[index.x, index.y, index.z, mesh_instance.get_instance_id()]
 	var mmi: MultiMeshInstance3D = item_root.get_node_or_null(chunk_name)
 	if not mesh_instance:
 		return
 
 	if not mmi:
 		mmi = MultiMeshInstance3D.new()
+		# Dont use add_child for 'readable name' suffix, as (a) it requires costly defering
+		# and (b) it 'potentionally' can cause the lookup above to fail due to the prefixes added.
+		# The prefix should be const per set, and is now instance ID above.
+		# This saves seconds on test with 50k and 100k items.
 		mmi.set_name(chunk_name)
-		# if set_name is used after add_child it is crazy slow
-		# This doesn't make much sense but it is definitely the case.
-		# About a 100x slowdown was observed in this case
-		item_root.add_child.bind(mmi, true).call_deferred()
+		item_root.add_child(mmi)
 
 	if not mmi.multimesh:
 		mmi.multimesh = MultiMesh.new()
@@ -445,40 +446,6 @@ static func get_merged_meshes_from(item: ProtonScatterItem) -> MeshInstance3D:
 	var instance := MeshInstance3D.new()
 	instance.mesh = mesh.get_mesh()
 	return instance
-
-
-static func get_all_static_bodies_from(node: Node) -> Array[StaticBody3D]:
-	var res: Array[StaticBody3D] = []
-
-	if node is StaticBody3D:
-		res.push_back(node)
-
-	for c in node.get_children():
-		res.append_array(get_all_static_bodies_from(c))
-
-	return res
-
-
-# Grab every static bodies from the source item and merge them in a single
-# one with multiple collision shapes.
-static func get_collision_data(item: ProtonScatterItem) -> StaticBody3D:
-	var static_body := StaticBody3D.new()
-	var source: Node3D = item.get_item()
-	if not is_instance_valid(source):
-		return static_body
-
-	source.transform = Transform3D()
-
-	for body in get_all_static_bodies_from(source):
-		for child in body.get_children():
-			if child is CollisionShape3D:
-				# Don't use reparent() here or the child transform gets reset.
-				body.remove_child(child)
-				child.owner = null
-				static_body.add_child(child)
-
-	source.queue_free()
-	return static_body
 
 
 static func set_owner_recursive(node: Node, new_owner) -> void:
