@@ -455,7 +455,6 @@ func _update_multimeshes() -> void:
 			t = item.process_transform(transforms.list[offset + i])
 			mmi.multimesh.set_instance_transform(i, t)
 
-			# TODO: Layers
 			_colliders.create_collider_instance_from_template(self, shapes_template, t)
 
 		offset += count
