@@ -39,12 +39,13 @@ class LayerBodies extends RefCounted:
 		# Adding shapes becomes exponentially slower as more shapes are added
 		# as JOLT (now default physics backend) has no batch or lazy updates
 		# and merges the shapes on each add.
-		# Using 100 max, limits that effect on loading, while also keeping
-		# the body RID's in check (for 1 million, thats 10k RID's, assuming 1 layer)
+		# Using 50 max, limits that effect on loading, while also keeping
+		# the body RID's in check (for 1 million, thats 20k RID's, assuming 1 layer)
 		# Ideally, bins would be spatial coherent which might be
 		# beneficial to raycast/physics performance, but using
-		# 500.000 trees, I did not see any issues with it, so lets keep it simple.
-		const MAX_SHAPES_PER_BODY: int = 250
+		# 250.000 trees, I did not see any issues with it, so lets keep it simple.
+		# Setting this to 100 nearly doubles the time, but uses less RIDs
+		const MAX_SHAPES_PER_BODY: int = 50
 		
 		if not _bodies.is_empty() and _shape_bin_count < MAX_SHAPES_PER_BODY:
 			_shape_bin_count += 1
