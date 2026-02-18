@@ -6,9 +6,6 @@ var enable: bool = false
 var _layers_bodies: Dictionary[int, LayerBodies] = {}
 var _shapes: Array[RID] = []
 
-var _body_shape_count: int = 0
-var _total_shape_instance_count: int = 0
-
 
 # Reuse shapes over instances, reducing memory and RID set footprints
 class ShapeData extends RefCounted:
@@ -101,9 +98,6 @@ func clear() -> void:
 			PhysicsServer3D.free_rid(shape)
 
 	_shapes.clear()
-	
-	_total_shape_instance_count = 0
-	_body_shape_count = 0
 
 
 # Grab every static bodies from the source item with local transforms for the shapes
