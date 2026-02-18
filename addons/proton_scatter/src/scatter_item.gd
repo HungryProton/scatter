@@ -103,6 +103,15 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		override_cast_shadow = val
 		ScatterUtil.request_parent_to_rebuild(self) # TODO - Only change the multimesh flag instead
 
+## [b]If not empty[/b] overrides the collision layers for all static bodies in this item.[br][br]
+## [b]If empty (0 layers selected)[/b] static colliders in this item will retain
+## their set collision layer.[br][br]
+## This is usefull when using directly imported items using -col suffixes to automatically
+## create colliders on import, but Godot currently doesnt allow configuring what layers
+## they land on (default to 1 now I believe).
+@export_flags_3d_physics var override_static_collision_layers: int = 0
+
+
 @export_group("Visibility", "visibility")
 
 ## Specifies which 3D render layers the scattered instances will be visible on.
