@@ -182,6 +182,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			if hit.is_empty():
 				# this point is empty anyway, we dont care
 				rays_from_to_point_pairs[pair_at] = Vector3.INF
+				pair_at += 2
 				continue
 		
 			# only cast up to hit point for correct ordering
