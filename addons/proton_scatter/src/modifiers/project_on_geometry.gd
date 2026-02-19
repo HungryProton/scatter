@@ -163,7 +163,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	# from outside the _physics_process while also being in a separate thread.
 	var physics_helper: ProtonScatterPhysicsHelper = domain.get_root().get_physics_helper()
 
-	var ray_hits := await physics_helper.execute(rays_from_to_point_pairs, collision_mask)
+	var ray_hits := await physics_helper.execute_raycasts(rays_from_to_point_pairs, collision_mask)
 
 	if ray_hits.is_empty():
 		return
@@ -189,7 +189,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			rays_from_to_point_pairs[pair_at + 1] = hit.position 
 			pair_at += 2
 			
-		exclude_hits = await physics_helper.execute(rays_from_to_point_pairs, exclude_mask)
+		exclude_hits = await physics_helper.execute_raycasts(rays_from_to_point_pairs, exclude_mask)
 
 	# Apply the results
 	var d: float

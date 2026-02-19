@@ -41,7 +41,7 @@ func _exit_tree():
 		job_completed.emit()
 
 
-func execute(rays_from_to_pairs: Array[Vector3], collision_mask: int) -> Array[Dictionary]:
+func execute_raycasts(rays_from_to_pairs: Array[Vector3], collision_mask: int) -> Array[Dictionary]:
 	if not _is_ready:
 		printerr("ProtonScatter error: Calling execute on a PhysicsHelper before it's ready, this should not happen.")
 		return []
