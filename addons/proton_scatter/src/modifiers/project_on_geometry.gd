@@ -97,7 +97,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	if transforms.is_empty():
 		return
 	
-#	var perf_start: int = Time.get_ticks_msec()
+	#var perf_start: int = Time.get_ticks_msec()
 
 	# Create all the physics ray queries
 	#
@@ -106,9 +106,13 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	# - Using value-type array, preventing memory management overhead of allocs and refcounted's
 	# - Using 1 contiguous memory array (of value types), allow more cpu cache hits
 	#
-	# On 100k items, this reduces (on Ryzen 7600) gives 10-30% gains, depending on case.
+	# This gives (on Ryzen 7600 non-X) gives 10-30% gains, depending on case.
 	# Note those %s are *only noticable* when using large (2500+) batch sizes in the project settings
 	# which improves performance dramatically at the cost of longer mainthread stalls.
+	# This accumulates to noticable differences on larger projects.
+	# Traced timings (Ryzen 7600 non-X batch size 5000):
+	# Current: Raycasts took 2143ms for count: 500000
+	# Old: Raycasts took 2966ms for count: 500000
 	
 	var rays_from_to_point_pairs: Array[Vector3] = [] # Alternate from-to pairs
 
@@ -164,63 +168,64 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	if ray_hits.is_empty():
 		return
 
-	# Create exclude queries from the hit points
-	var index: int = -1
-	for hit: Dictionary in ray_hits:
-		index += 1
-		var pair_index: int = index * 2 
-		if hit.is_empty():
-			# this point is empty anyway, we dont care
-			rays_from_to_point_pairs[pair_index] = Vector3.INF
-			continue
-		
-		# only cast up to hit point for correct ordering
-		rays_from_to_point_pairs[index * 2 + 1] = hit.position 
 
+	var has_exclude: bool = exclude_mask != 0
 	var exclude_hits : Array[Dictionary] = []
-	if exclude_mask != 0: # Only cast the rays if it makes any sense
+
+	var hit: Dictionary
+
+	if has_exclude: # Only cast the rays if it makes any sense
+		# Create exclude queries from the hit points
+		pair_at = 0
+		for i: int in transforms_count:
+			hit = ray_hits[i]
+			if hit.is_empty():
+				# this point is empty anyway, we dont care
+				rays_from_to_point_pairs[pair_at] = Vector3.INF
+				continue
+		
+			# only cast up to hit point for correct ordering
+			rays_from_to_point_pairs[pair_at + 1] = hit.position 
+			pair_at += 2
+			
 		exclude_hits = await physics_helper.execute(rays_from_to_point_pairs, exclude_mask)
 
 	# Apply the results
-	index = 0
 	var d: float
 	var t: Transform3D
 	var remapped_max_slope = remap(max_slope, 0.0, 90.0, 0.0, 1.0)
 	var is_point_valid := false
 	var new_transforms_array : Array[Transform3D] = []
 
-	var has_exclude: bool = exclude_mask > 0
+	var no_exclude: bool = not has_exclude
+	for i in ray_hits.size():
+		hit = ray_hits[i]
+		
+		is_point_valid = not hit.is_empty() and (no_exclude or exclude_hits[i].is_empty())
 
-	for hit in ray_hits:
-		is_point_valid = true
-
-		if hit.is_empty():
-			is_point_valid = false
-		else:
+		if is_point_valid:
 			d = abs(Vector3.UP.dot(hit.normal))
 			is_point_valid = d >= (1.0 - remapped_max_slope)
 
-			if has_exclude and not exclude_hits[index].is_empty():
-				is_point_valid = false
+		# lookup 't' only if needed
+		if not is_point_valid:
+			if not remove_points_on_miss:
+				new_transforms_array.push_back(transforms.list[i])
+			continue
 
-		t = transforms.list[index]
-		
-		if is_point_valid:
-			if align_with_collision_normal:
-				t = _align_with(t, gt_inverse.basis * hit.normal)
+		t = transforms.list[i]
+		if align_with_collision_normal:
+			t = _align_with(t, gt_inverse.basis * hit.normal)
 
-			t.origin = gt_inverse * hit.position
-			new_transforms_array.push_back(t)
-		elif not remove_points_on_miss:
-			new_transforms_array.push_back(t)
+		t.origin = gt_inverse * hit.position
+		new_transforms_array.push_back(t)
 
-		index += 1
 
 	# All done, store the transforms in the original array
 	transforms.list.clear()
 	transforms.list.append_array(new_transforms_array) # this avoids memory leak
 
-#	print("Raycasts took " + str(Time.get_ticks_msec() - perf_start) + " for count: " + str(transforms_count))
+	#print("Raycasts took " + str(Time.get_ticks_msec() - perf_start) + " for count: " + str(transforms_count))
 
 
 	if transforms.is_empty():
