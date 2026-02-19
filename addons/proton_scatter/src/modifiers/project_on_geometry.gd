@@ -96,62 +96,90 @@ func _init() -> void:
 func _process_transforms(transforms, domain, _seed) -> void:
 	if transforms.is_empty():
 		return
+	
+#	var perf_start: int = Time.get_ticks_msec()
 
 	# Create all the physics ray queries
+	#
+	# This is a 'massive-loop' when working with larger sets, so removed as much as possible 
+	# indirections, multiplications and stackframes on the inner-side of the loop.
+	# - Using value-type array, preventing memory management overhead of allocs and refcounted's
+	# - Using 1 contiguous memory array (of value types), allow more cpu cache hits
+	#
+	# On 100k items, this reduces (on Ryzen 7600) gives 10-30% gains, depending on case.
+	# Note those %s are *only noticable* when using large (2500+) batch sizes in the project settings
+	# which improves performance dramatically at the cost of longer mainthread stalls.
+	
+	var rays_from_to_point_pairs: Array[Vector3] = [] # Alternate from-to pairs
+
 	var gt: Transform3D = domain.get_global_transform()
 	var gt_inverse := gt.affine_inverse()
-	var queries: Array[PhysicsRayQueryParameters3D] = []
-	var exclude_queries: Array[PhysicsRayQueryParameters3D] = []
+		
+	var transforms_list: Array[Transform3D] = transforms.list
+	var transforms_count: int = transforms_list.size()
 
-	for t in transforms.list:
+	rays_from_to_point_pairs.resize(transforms_count * 2)
+
+	# Save 2x stack frame and a lot if elifs for most common cases
+	var is_space_individual: bool = is_using_individual_instances_space()
+	var is_space_local: bool = is_using_local_space()
+	var is_default: bool = (not is_space_individual) and (not is_space_local)
+
+	# Save on multiplications for most common cases
+	var ray_direction_normalized: Vector3 = ray_direction.normalized()
+	var default_ray_offset_dir: Vector3 = ray_offset * ray_direction_normalized 
+	var default_ray_length_dir: Vector3 = ray_length * ray_direction_normalized 
+
+	var pair_at: int = 0 # Use addition over multiplication (+2 instead of i * 2)
+	for i in transforms_count:
+		var t: Transform3D = transforms_list[i] # Sequential read of valuetype
 		var start = gt * t.origin
 		var end = start
-		var dir = ray_direction.normalized()
 
-		if is_using_individual_instances_space():
+		if is_default: # Most common case first
+			start -= default_ray_offset_dir
+			end += default_ray_length_dir
+		elif is_space_individual:
+			var dir = ray_direction_normalized
 			dir = t.basis * dir
-
-		elif is_using_local_space():
+			start -= ray_offset * dir
+			end += ray_length * dir
+		else: # is_space_local:
+			var dir = ray_direction_normalized
 			dir = gt.basis * dir
+			start -= ray_offset * dir
+			end += ray_length * dir
 
-		start -= ray_offset * dir
-		end += ray_length * dir
-
-		var ray_query := PhysicsRayQueryParameters3D.new()
-		ray_query.from = start
-		ray_query.to = end
-		ray_query.collision_mask = collision_mask
-
-		queries.push_back(ray_query)
-
-		var exclude_query := PhysicsRayQueryParameters3D.new()
-		exclude_query.from = start
-		exclude_query.to = end
-		exclude_query.collision_mask = exclude_mask
-		exclude_queries.push_back(exclude_query)
+		# Sequential write of value type
+		rays_from_to_point_pairs[pair_at] = start
+		rays_from_to_point_pairs[pair_at + 1] = end
+		pair_at += 2
 
 	# Run the queries in the physics helper since we can't access the PhysicsServer
 	# from outside the _physics_process while also being in a separate thread.
 	var physics_helper: ProtonScatterPhysicsHelper = domain.get_root().get_physics_helper()
 
-	var ray_hits := await physics_helper.execute(queries)
+	var ray_hits := await physics_helper.execute(rays_from_to_point_pairs, collision_mask)
 
 	if ray_hits.is_empty():
 		return
 
-	# Create queries from the hit points
-	var index := -1
-	for ray_hit in ray_hits:
+	# Create exclude queries from the hit points
+	var index: int = -1
+	for hit: Dictionary in ray_hits:
 		index += 1
-		var hit : Dictionary = ray_hit
+		var pair_index: int = index * 2 
 		if hit.is_empty():
-			exclude_queries[index].collision_mask = 0 # this point is empty anyway, we dont care
+			# this point is empty anyway, we dont care
+			rays_from_to_point_pairs[pair_index] = Vector3.INF
 			continue
-		exclude_queries[index].to = hit.position # only cast up to hit point for correct ordering
+		
+		# only cast up to hit point for correct ordering
+		rays_from_to_point_pairs[index * 2 + 1] = hit.position 
 
 	var exclude_hits : Array[Dictionary] = []
 	if exclude_mask != 0: # Only cast the rays if it makes any sense
-		exclude_hits = await physics_helper.execute(exclude_queries)
+		exclude_hits = await physics_helper.execute(rays_from_to_point_pairs, exclude_mask)
 
 	# Apply the results
 	index = 0
@@ -159,8 +187,9 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	var t: Transform3D
 	var remapped_max_slope = remap(max_slope, 0.0, 90.0, 0.0, 1.0)
 	var is_point_valid := false
-	exclude_hits.reverse() # makes it possible to use pop_back which is much faster
 	var new_transforms_array : Array[Transform3D] = []
+
+	var has_exclude: bool = exclude_mask > 0
 
 	for hit in ray_hits:
 		is_point_valid = true
@@ -171,12 +200,11 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			d = abs(Vector3.UP.dot(hit.normal))
 			is_point_valid = d >= (1.0 - remapped_max_slope)
 
-		var exclude_hit = exclude_hits.pop_back()
-		if exclude_hit != null:
-			if not exclude_hit.is_empty():
+			if has_exclude and not exclude_hits[index].is_empty():
 				is_point_valid = false
 
 		t = transforms.list[index]
+		
 		if is_point_valid:
 			if align_with_collision_normal:
 				t = _align_with(t, gt_inverse.basis * hit.normal)
@@ -191,6 +219,9 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	# All done, store the transforms in the original array
 	transforms.list.clear()
 	transforms.list.append_array(new_transforms_array) # this avoids memory leak
+
+#	print("Raycasts took " + str(Time.get_ticks_msec() - perf_start) + " for count: " + str(transforms_count))
+
 
 	if transforms.is_empty():
 		warning += """Every points have been removed. Possible reasons include: \n

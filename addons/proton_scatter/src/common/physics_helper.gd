@@ -11,12 +11,21 @@ signal job_completed
 const MAX_PHYSICS_QUERIES_SETTING := "addons/proton_scatter/max_physics_queries_per_frame"
 
 
-var _is_ready := false
-var _job_in_progress := false
-var _max_queries_per_frame := 400
+var _is_ready: bool = false
+var _job_in_progress: bool = false
+var _max_queries_per_frame: int = 400
 var _main_thread_id: int
-var _queries: Array
-var _results: Array[Dictionary]
+
+var _rays_from_to_pairs: Array[Vector3]:
+	set(value):
+		_rays_from_to_pairs = value
+		_ray_count = value.size() / 2 if value else 0
+		_ray_cursor = 0
+		
+var _ray_count: int
+var _ray_cursor: int
+
+var _results: Array[Dictionary] = []
 var _space_state: PhysicsDirectSpaceState3D
 
 
@@ -32,7 +41,7 @@ func _exit_tree():
 		job_completed.emit()
 
 
-func execute(queries: Array) -> Array[Dictionary]:
+func execute(rays_from_to_pairs: Array[Vector3], collision_mask: int) -> Array[Dictionary]:
 	if not _is_ready:
 		printerr("ProtonScatter error: Calling execute on a PhysicsHelper before it's ready, this should not happen.")
 		return []
@@ -45,13 +54,16 @@ func execute(queries: Array) -> Array[Dictionary]:
 		return []
 
 	# Clear previous job if any
-	_queries.clear()
+	_rays_from_to_pairs.clear()
 
 	if _job_in_progress:
 		await _until(get_tree().physics_frame, func(): return _job_in_progress)
 
-	_results.clear()
-	_queries = queries
+	_rays_from_to_pairs = rays_from_to_pairs
+	_results.resize(_ray_count)
+	
+	_query.collision_mask = collision_mask
+	
 	_max_queries_per_frame = ProjectSettings.get_setting(MAX_PHYSICS_QUERIES_SETTING, 500)
 	_job_in_progress = true
 	set_physics_process.bind(true).call_deferred()
@@ -60,25 +72,40 @@ func execute(queries: Array) -> Array[Dictionary]:
 
 	return _results.duplicate()
 
+var _query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
 
 func _physics_process(_delta: float) -> void:
-	if _queries.is_empty():
+	if _rays_from_to_pairs.is_empty() or _ray_cursor > _ray_count:
 		return
 
 	if not _space_state:
 		_space_state = get_tree().get_root().get_world_3d().get_direct_space_state()
 
-	var steps = min(_max_queries_per_frame, _queries.size())
-	for i in steps:
-		var q = _queries.pop_back()
-		var hit := _space_state.intersect_ray(q) # TODO: Add support for other operations
-		_results.push_back(hit)
+	var pair_index: int = _ray_cursor * 2
+	var batch_remaining: int = _max_queries_per_frame
 
-	if _queries.is_empty():
-		set_physics_process(false)
-		_results.reverse()
-		_job_in_progress = false
-		job_completed.emit()
+	while _ray_cursor < _ray_count:
+		_query.from = _rays_from_to_pairs[pair_index]
+		
+		if Vector3.INF == _query.from:
+			pair_index += 2
+			_ray_cursor += 1
+			continue
+		
+		_query.to = _rays_from_to_pairs[pair_index + 1]
+
+		_results[_ray_cursor] = _space_state.intersect_ray(_query) # TODO: Add support for other operations
+
+		pair_index += 2
+		_ray_cursor += 1
+		
+		batch_remaining -= 1
+		if batch_remaining <= 0:
+			return
+
+	set_physics_process(false)
+	_job_in_progress = false
+	job_completed.emit()
 
 
 func _in_main_thread() -> bool:
