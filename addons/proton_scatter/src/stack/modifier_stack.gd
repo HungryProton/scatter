@@ -29,10 +29,10 @@ func start_update(scatter_node: ProtonScatter, domain):
 	# Above a 1000 items, that becomes more unlikely.
 	# Notice this can cause the start of the sequence to 'jump' (be different)
 	# when switching between 4999 and 5000 items.
-	const USE_WORKERTHREADS_THRESHOLD: int = 1#5000
+	const USE_WORKERTHREADS_THRESHOLD: int = 5000
 
 	for modifier in stack:
-		if not modifier.allow_parallel() or transforms.size() < USE_WORKERTHREADS_THRESHOLD:
+		if not modifier.allow_parallel():
 			await modifier.process_transforms(transforms, domain, scatter_node.global_seed)
 		else:
 			var parallel: ProtonScatterParallel = ProtonScatterParallel.new()
