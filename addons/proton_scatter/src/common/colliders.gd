@@ -37,7 +37,6 @@ class LayerBodies extends RefCounted:
 	
 	func add_shape_instance(scatter: Node3D, shape, t: Transform3D) -> void:
 		PhysicsServer3D.body_add_shape(_get_body_RID(scatter), shape.rid, t * shape.trans)
-		pass
 
 	func _get_body_RID(owner: Node3D) -> RID:
 		
