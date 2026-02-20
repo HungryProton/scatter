@@ -16,15 +16,55 @@ const TransformList := preload("../common/transform_list.gd")
 var just_created := false
 var parent: ProtonScatter
 
+var _transforms_parts: Array[TransformList]
+
+var _task_scatter_node: ProtonScatter
+var _task_domain
+var _task_modifiers: Array
 
 func start_update(scatter_node: ProtonScatter, domain):
-	var transforms = TransformList.new()
+	var transforms: TransformList = TransformList.new()
+
+	_task_scatter_node = scatter_node
+	_task_domain = domain
+
+	# Below 5000 there is little chance that the workerthreads overhead is worth it
+	# Additionally; where specific seeds are used, the resulting
+	# sequence can be different compared to older non-threading versions.
+	# This would 'break' (or rather: change) existing scenes with little
+	# volume, where a dev might rely on the specific result item placements.
+	# Above a 1000 items, that becomes more unlikely.
+	# Notice this can cause the start of the sequence to 'jump' (be different)
+	# when switching between 4999 and 5000 items.
+	const USE_WORKERTHREADS_THRESHOLD: int = 5000
 
 	for modifier in stack:
-		await modifier.process_transforms(transforms, domain, scatter_node.global_seed)
+		if transforms.size() < USE_WORKERTHREADS_THRESHOLD or not modifier.allow_parallel():
+			await modifier.process_transforms(transforms, domain, scatter_node.global_seed)
+		else:
+			var core_count: int = max(1, OS.get_processor_count() - 2)
+			_transforms_parts = _split_transforms_list(transforms, core_count)
+			
+			_task_modifiers.clear()
+			for i: int in range(_transforms_parts.size()):
+				_task_modifiers.append(modifier.duplicate())
+			
+			WorkerThreadPool.wait_for_group_task_completion(
+				WorkerThreadPool.add_group_task(_parallel_part, _transforms_parts.size(), core_count)
+			)
+			
+			transforms.clear()
+			for result_part in _transforms_parts:
+				transforms.append(result_part.list)
+			
+	_task_scatter_node = null
+	_task_domain = null
 
 	transforms_ready.emit(transforms)
 	return transforms
+
+func _parallel_part(part_index: int) -> void:
+	await _task_modifiers[part_index].process_transforms(_transforms_parts[part_index], _task_domain, _task_scatter_node.global_seed)
 
 
 func stop_update() -> void:
@@ -95,3 +135,21 @@ func does_not_require_shapes() -> bool:
 
 func _on_modifier_changed() -> void:
 	stack_changed.emit()
+
+
+func _split_transforms_list(list: TransformList, part_count: int) -> Array[TransformList]:
+	var result: Array[TransformList] = []
+	var part_size: int = max(1000, list.size() / part_count)
+	
+	var cursor: int = 0
+	var remaining: int = list.size()
+	
+	while remaining > 0:
+		var to: int = cursor + min(remaining, part_size)
+		var part_list: TransformList = TransformList.new()
+	
+		part_list.append(list.list.slice(cursor, to))
+		result.append(part_list)
+		remaining -= to - cursor
+		cursor = to
+	return result
