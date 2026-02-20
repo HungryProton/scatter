@@ -15,18 +15,24 @@ var _is_ready: bool = false
 var _job_in_progress: bool = false
 var _max_queries_per_frame: int = 400
 var _main_thread_id: int
+var _space_state: PhysicsDirectSpaceState3D
 
+# Input
+var _collision_mask: int
 var _rays_from_to_pairs: Array[Vector3]:
 	set(value):
 		_rays_from_to_pairs = value
 		_ray_count = value.size() / 2 if value else 0
 		_ray_cursor = 0
-		
+
 var _ray_count: int
 var _ray_cursor: int
 
+# Outputs
 var _results: Array[Dictionary] = []
-var _space_state: PhysicsDirectSpaceState3D
+
+# Worker data distribution
+var _physics_task_segments: Array[Dictionary] = []
 
 
 func _ready() -> void:
@@ -59,10 +65,10 @@ func execute_raycasts(rays_from_to_pairs: Array[Vector3], collision_mask: int) -
 	if _job_in_progress:
 		await _until(get_tree().physics_frame, func(): return _job_in_progress)
 
+	_collision_mask = collision_mask
 	_rays_from_to_pairs = rays_from_to_pairs
 	_results.resize(_ray_count)
-	
-	_query.collision_mask = collision_mask
+
 	
 	_max_queries_per_frame = ProjectSettings.get_setting(MAX_PHYSICS_QUERIES_SETTING, 500)
 	_job_in_progress = true
@@ -72,7 +78,6 @@ func execute_raycasts(rays_from_to_pairs: Array[Vector3], collision_mask: int) -
 
 	return _results.duplicate()
 
-var _query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
 
 func _physics_process(_delta: float) -> void:
 	if _rays_from_to_pairs.is_empty() or _ray_cursor > _ray_count:
@@ -81,31 +86,63 @@ func _physics_process(_delta: float) -> void:
 	if not _space_state:
 		_space_state = get_tree().get_root().get_world_3d().get_direct_space_state()
 
-	var pair_index: int = _ray_cursor * 2
-	var batch_remaining: int = _max_queries_per_frame
-
-	while _ray_cursor < _ray_count:
-		_query.from = _rays_from_to_pairs[pair_index]
-		
-		if Vector3.INF == _query.from:
-			pair_index += 2
-			_ray_cursor += 1
-			continue
-		
-		_query.to = _rays_from_to_pairs[pair_index + 1]
-
-		_results[_ray_cursor] = _space_state.intersect_ray(_query) # TODO: Add support for other operations
-
-		pair_index += 2
-		_ray_cursor += 1
-		
-		batch_remaining -= 1
-		if batch_remaining <= 0:
-			return
+	_parallel_raycasts()
+	
+	var done: bool = _ray_count - _ray_cursor <= 0
+	if not done:
+		return
 
 	set_physics_process(false)
 	_job_in_progress = false
 	job_completed.emit()
+
+
+# Do the max_queries, on N cores in parallel; this keeps the setting backward compatible
+# while improving performance by as much as the used CPU allows.
+func _parallel_raycasts() -> void:
+	var work_remaining: int = _ray_count - _ray_cursor
+	var core_count: int = max(1, OS.get_processor_count() - 2)
+	var batch_size: int = min(work_remaining, core_count * _max_queries_per_frame)
+
+	_physics_task_segments.clear()
+	
+	# Define indexable segements for worker tasks
+	var batch_remaining: int = batch_size
+	while batch_remaining > 0:
+		var to: int = _ray_cursor + (min(batch_remaining, _max_queries_per_frame))
+		_physics_task_segments.append( {
+			"from": _ray_cursor,
+			"to": to
+		})
+		batch_remaining -= to - _ray_cursor
+		_ray_cursor = to
+	
+	# Execute in parallel as a group
+	WorkerThreadPool.wait_for_group_task_completion(
+		WorkerThreadPool.add_group_task(_raycasts_worker_task, _physics_task_segments.size(), core_count)
+	)
+
+
+func _raycasts_worker_task(segment_index: int) -> void:
+	var task_segment: Dictionary = _physics_task_segments[segment_index] 
+	var from_ray: int = task_segment["from"] 
+	var to_ray: int = task_segment["to"] 
+
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
+	query.collision_mask = _collision_mask
+	
+	var pair_index: int = from_ray * 2
+	for i: int in range(from_ray, to_ray):
+		query.from = _rays_from_to_pairs[pair_index]
+		
+		if Vector3.INF == query.from:
+			pair_index += 2
+			continue
+		
+		query.to = _rays_from_to_pairs[pair_index + 1]
+		_results[i] = _space_state.intersect_ray(query)
+		pair_index += 2
+
 
 
 func _in_main_thread() -> bool:

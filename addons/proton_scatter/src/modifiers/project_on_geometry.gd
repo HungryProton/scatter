@@ -97,7 +97,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	if transforms.is_empty():
 		return
 	
-	#var perf_start: int = Time.get_ticks_msec()
+	var perf_start: int = Time.get_ticks_msec()
 
 	# Create all the physics ray queries
 	#
@@ -106,14 +106,9 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	# - Using value-type array, preventing memory management overhead of allocs and refcounted's
 	# - Using 1 contiguous memory array (of value types), allow more cpu cache hits
 	#
-	# This gives (on Ryzen 7600 non-X) gives 10-30% gains, depending on case.
-	# Note those %s are *only noticable* when using large (2500+) batch sizes in the project settings
-	# which improves performance dramatically at the cost of longer mainthread stalls.
+	# This gives (on Ryzen 7600 non-X) about 25-30% gains, depending on case.
 	# This accumulates to noticable differences on larger projects.
-	# Traced timings (Ryzen 7600 non-X batch size 5000):
-	# Current: Raycasts took 2143ms for count: 500000
-	# Old: Raycasts took 2966ms for count: 500000
-	
+		
 	var rays_from_to_point_pairs: Array[Vector3] = [] # Alternate from-to pairs
 
 	var gt: Transform3D = domain.get_global_transform()
@@ -226,7 +221,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	transforms.list.clear()
 	transforms.list.append_array(new_transforms_array) # this avoids memory leak
 
-	#print("Raycasts took " + str(Time.get_ticks_msec() - perf_start) + " for count: " + str(transforms_count))
+	print("Raycasts took " + str(Time.get_ticks_msec() - perf_start) + " for count: " + str(transforms_count))
 
 
 	if transforms.is_empty():
