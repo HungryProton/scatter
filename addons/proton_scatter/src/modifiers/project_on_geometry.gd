@@ -111,6 +111,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 
 	var gt: Transform3D = domain.get_global_transform()
 	var gt_inverse := gt.affine_inverse()
+	var gt_basis := gt.basis
 		
 	var transforms_list: Array[Transform3D] = transforms.list
 	var transforms_count: int = transforms_list.size()
@@ -143,7 +144,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			end += ray_length * dir
 		else: # is_space_local:
 			var dir = ray_direction_normalized
-			dir = gt.basis * dir
+			dir = gt_basis * dir
 			start -= ray_offset * dir
 			end += ray_length * dir
 
@@ -174,7 +175,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			hit = ray_hits[i]
 			if hit.is_empty():
 				# this point is empty anyway, we dont care
-				rays_from_to_point_pairs[pair_at] = Vector3.INF
+				rays_from_to_point_pairs[pair_at] = ProtonScatterPhysicsHelper.SKIP_RAY
 				pair_at += 2
 				continue
 		
@@ -190,15 +191,18 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	var remapped_max_slope = remap(max_slope, 0.0, 90.0, 0.0, 1.0)
 	var is_point_valid := false
 	var new_transforms_array : Array[Transform3D] = []
-
 	var no_exclude: bool = not has_exclude
+	var gt_inverse_basis: Basis= gt_inverse.basis
+	var hit_normal: Vector3
+	
 	for i in ray_hits.size():
 		hit = ray_hits[i]
 		
 		is_point_valid = not hit.is_empty() and (no_exclude or exclude_hits[i].is_empty())
 
 		if is_point_valid:
-			d = abs(Vector3.UP.dot(hit.normal))
+			hit_normal = hit.normal
+			d = abs(Vector3.UP.dot(hit_normal))
 			is_point_valid = d >= (1.0 - remapped_max_slope)
 
 		# lookup transform only if needed
@@ -209,7 +213,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 
 		t = transforms_list[i]
 		if align_with_collision_normal:
-			t = _align_with(t, gt_inverse.basis * hit.normal)
+			t = _align_with(t, gt_inverse_basis * hit_normal)
 
 		t.origin = gt_inverse * hit.position
 		new_transforms_array.push_back(t)

@@ -10,6 +10,7 @@ signal job_completed
 
 const MAX_PHYSICS_QUERIES_SETTING := "addons/proton_scatter/max_physics_queries_per_frame"
 
+const SKIP_RAY: Vector3 = Vector3.INF
 
 var _is_ready: bool = false
 var _job_in_progress: bool = false
@@ -138,7 +139,7 @@ func _raycasts_worker_task(segment_index: int) -> void:
 	for i: int in range(from_ray, to_ray):
 		query.from = _rays_from_to_pairs[pair_index]
 		
-		if Vector3.INF == query.from:
+		if SKIP_RAY == query.from:
 			pair_index += 2
 			continue
 		
