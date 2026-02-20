@@ -97,8 +97,6 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	if transforms.is_empty():
 		return
 	
-	var perf_start: int = Time.get_ticks_msec()
-
 	# Create all the physics ray queries
 	#
 	# This is a 'massive-loop' when working with larger sets, so removed as much as possible 
@@ -106,7 +104,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	# - Using value-type array, preventing memory management overhead of allocs and refcounted's
 	# - Using 1 contiguous memory array (of value types), allow more cpu cache hits
 	#
-	# This gives (on Ryzen 7600 non-X) about 25-30% gains, depending on case.
+	# This gives (on Ryzen 7600 non-X) about 20-30% gains, depending on case.
 	# This accumulates to noticable differences on larger projects.
 		
 	var rays_from_to_point_pairs: Array[Vector3] = [] # Alternate from-to pairs
@@ -203,13 +201,13 @@ func _process_transforms(transforms, domain, _seed) -> void:
 			d = abs(Vector3.UP.dot(hit.normal))
 			is_point_valid = d >= (1.0 - remapped_max_slope)
 
-		# lookup 't' only if needed
+		# lookup transform only if needed
 		if not is_point_valid:
 			if not remove_points_on_miss:
-				new_transforms_array.push_back(transforms.list[i])
+				new_transforms_array.push_back(transforms_list[i])
 			continue
 
-		t = transforms.list[i]
+		t = transforms_list[i]
 		if align_with_collision_normal:
 			t = _align_with(t, gt_inverse.basis * hit.normal)
 
@@ -218,11 +216,8 @@ func _process_transforms(transforms, domain, _seed) -> void:
 
 
 	# All done, store the transforms in the original array
-	transforms.list.clear()
-	transforms.list.append_array(new_transforms_array) # this avoids memory leak
-
-	print("Raycasts took " + str(Time.get_ticks_msec() - perf_start) + " for count: " + str(transforms_count))
-
+	transforms_list.clear()
+	transforms_list.append_array(new_transforms_array) # this avoids memory leak
 
 	if transforms.is_empty():
 		warning += """Every points have been removed. Possible reasons include: \n

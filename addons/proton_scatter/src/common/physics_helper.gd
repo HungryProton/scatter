@@ -25,8 +25,8 @@ var _rays_from_to_pairs: Array[Vector3]:
 		_ray_count = value.size() / 2 if value else 0
 		_ray_cursor = 0
 
-var _ray_count: int
-var _ray_cursor: int
+var _ray_count: int = 0
+var _ray_cursor: int = 0
 
 # Outputs
 var _results: Array[Dictionary] = []
@@ -34,6 +34,9 @@ var _results: Array[Dictionary] = []
 # Worker data distribution
 var _physics_task_segments: Array[Dictionary] = []
 
+var is_done: bool:
+	get():
+		return _ray_cursor >= _ray_count
 
 func _ready() -> void:
 	set_physics_process(false)
@@ -80,7 +83,7 @@ func execute_raycasts(rays_from_to_pairs: Array[Vector3], collision_mask: int) -
 
 
 func _physics_process(_delta: float) -> void:
-	if _rays_from_to_pairs.is_empty() or _ray_cursor > _ray_count:
+	if is_done:
 		return
 
 	if not _space_state:
@@ -88,8 +91,7 @@ func _physics_process(_delta: float) -> void:
 
 	_parallel_raycasts()
 	
-	var done: bool = _ray_count - _ray_cursor <= 0
-	if not done:
+	if not is_done:
 		return
 
 	set_physics_process(false)
@@ -117,7 +119,8 @@ func _parallel_raycasts() -> void:
 		batch_remaining -= to - _ray_cursor
 		_ray_cursor = to
 	
-	# Execute in parallel as a group
+	# Execute in parallel as a group; since we are in physics_process, and are not
+	# mutating anything in the space state, it is safe to query in parallel.
 	WorkerThreadPool.wait_for_group_task_completion(
 		WorkerThreadPool.add_group_task(_raycasts_worker_task, _physics_task_segments.size(), core_count)
 	)
