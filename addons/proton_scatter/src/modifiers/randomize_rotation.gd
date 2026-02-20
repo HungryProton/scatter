@@ -7,6 +7,8 @@ extends "base_modifier.gd"
 
 var _rng: RandomNumberGenerator
 
+func allow_parallel() -> bool:
+	return true
 
 func _init() -> void:
 	display_name = "Randomize Rotation"

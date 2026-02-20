@@ -4,7 +4,6 @@ extends "base_modifier.gd"
 
 @export var negative_shapes_only := false
 
-
 func _init() -> void:
 	display_name = "Remove Outside"
 	category = "Remove"

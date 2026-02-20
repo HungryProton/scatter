@@ -5,6 +5,8 @@ extends "base_modifier.gd"
 @export_enum("Offset:0", "Multiply:1", "Override:2") var operation: int = 1
 @export var scale := Vector3(1, 1, 1)
 
+func allow_parallel() -> bool:
+	return true
 
 func _init() -> void:
 	display_name = "Edit Scale"

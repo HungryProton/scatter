@@ -454,6 +454,7 @@ func _update_multimeshes() -> void:
 
 		offset += count
 		
+	_colliders.commit(self)
 
 func _update_split_multimeshes() -> void:
 	var size = domain.bounds_local.size
@@ -534,8 +535,12 @@ func _update_split_multimeshes() -> void:
 						t = transform_chunks[xi][yi][zi][i]
 						t.origin -= center
 						mmi.multimesh.set_instance_transform(i, t)
+						
 		mesh_instance.queue_free()
 		offset += count
+		
+	_colliders.commit(self)
+
 
 
 func _update_duplicates() -> void:
@@ -605,6 +610,9 @@ func _update_particles_system() -> void:
 			_colliders.create_collider_instance_from_template(self, shapes_template, t)
 
 		offset += count
+		
+	_colliders.commit(self)
+
 
 
 

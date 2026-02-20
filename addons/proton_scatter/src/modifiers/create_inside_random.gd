@@ -1,10 +1,10 @@
 @tool
 extends "base_modifier.gd"
 
+const ProtonScatterParallel: = preload("../common/parallel.gd")
+const ProtonScatterDomain := preload("../common/domain.gd")
 
 @export var amount := 10
-
-var _rng: RandomNumberGenerator
 
 
 func _init() -> void:
@@ -33,52 +33,86 @@ func _init() -> void:
 		valid space, like a curved and narrow path.")
 
 
-# TODO:
-# + Multithreading
-# + Spatial partionning to discard areas outside the domain earlier
+# TODO: + Spatial partionning to discard areas outside the domain earlier
 func _process_transforms(transforms, domain, random_seed) -> void:
-	_rng = RandomNumberGenerator.new()
-	_rng.set_seed(random_seed)
+	var rng = RandomNumberGenerator.new()
+	rng.set_seed(random_seed)
 
-	var gt: Transform3D = domain.get_global_transform()
+	# Prepare parts for parallel processing
+	# Note this operation is very light, and thus the gains are pretty much negligable
+	# (saves about 1/6th of the time on my system, but even with 500k items, 
+	# thats just about 60ms). However, when transforming items in 3D view, 
+	# every ounce of responsiveness counts.
+	var outputs: Array
+	
+	var _parallel: ProtonScatterParallel = ProtonScatterParallel.new()
+	
+	_parallel.prepare("create_inside_random", amount, -1, _generate_randoms, 
+		func(index: int, task: Dictionary):
+			var output: Array[Transform3D] = []
+			outputs.append(output)
+			task["domain"] = domain
+			task["output"] = output
+		
+			# Prevent calling global transform from non-main thread, resuling in identity
+			task["basis"] = domain.get_global_transform().affine_inverse().basis
+			
+			# Prevent taking the same sequence, but base sequences on the same root
+			task["rng"] = RandomNumberGenerator.new()
+			task["rng"].set_seed(rng.randi())
+	)
+	
+	await _parallel.execute_all()
+
+	for new_transforms: Array[Transform3D] in outputs:
+		transforms.append(new_transforms)
+	
+	
+func _generate_randoms(task: Dictionary) -> void:
+	var from: int = task["from"]
+	var to: int = task["to"]
+	var rng: RandomNumberGenerator = task["rng"]
+	var output: Array[Transform3D] = task["output"] 
+	var domain: ProtonScatterDomain = task["domain"]
+
 	var center: Vector3 = domain.bounds_local.center
 	var half_size: Vector3 = domain.bounds_local.size / 2.0
 	var height: float = domain.bounds_local.center.y
+	var basis: Basis = task["basis"]
+
+	var count: int = to - from
+	var generated: int = 0
 
 	# Generate a random point in the bounding box. Store if it's inside the
 	# domain, or discard if invalid. Repeat until enough valid points are found.
 	var t: Transform3D
 	var pos: Vector3
-	var new_transforms: Array[Transform3D] = []
-	var max_retries = amount * 10 # TODO: expose this parameter?
-	var tries := 0
 
-	while new_transforms.size() != amount:
+	var max_retries = count * 10 # TODO: expose this parameter?
+
+	var tries = 0
+	while generated < count:
 		t = Transform3D()
-		pos = _random_vec3() * half_size + center
+
+		pos = Vector3(rng.randf_range(-1.0, 1.0), 
+					  rng.randf_range(-1.0, 1.0), 
+					  rng.randf_range(-1.0, 1.0))
+					
+		pos = pos * half_size + center
 
 		if restrict_height:
 			pos.y = height
 
 		if is_using_global_space():
-			t.basis = gt.affine_inverse().basis
+			t.basis = basis
 
 		if domain.is_point_inside(pos):
 			t.origin = pos
-			new_transforms.push_back(t)
+			output.append(t)
+			generated += 1
 			continue
 
 		# Prevents an infinite loop
 		tries += 1
 		if tries > max_retries:
-			break
-
-	transforms.append(new_transforms)
-
-
-func _random_vec3() -> Vector3:
-	var vec3 = Vector3.ZERO
-	vec3.x = _rng.randf_range(-1.0, 1.0)
-	vec3.y = _rng.randf_range(-1.0, 1.0)
-	vec3.z = _rng.randf_range(-1.0, 1.0)
-	return vec3
+			break	

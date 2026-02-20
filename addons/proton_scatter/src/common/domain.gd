@@ -15,14 +15,25 @@ const BaseShape := preload("../shapes/base_shape.gd")
 const Bounds := preload("../common/bounds.gd")
 
 
-class DomainShapeInfo:
+class DomainShapeInfo extends RefCounted:
 	var node: Node3D
 	var shape: BaseShape
 
+	# Allow worker thread access on transforms
+	var _local_transform: Transform3D 
+	var _global_transform: Transform3D 
+
+	func _init(node_: Node) -> void:
+		node = node_
+		if not is_instance_valid(node):
+			return
+		_local_transform = node.transform
+		_global_transform = node.global_transform
+		
 	func is_point_inside(point: Vector3, local: bool) -> bool:
 		var t: Transform3D
 		if is_instance_valid(node):
-			t = node.get_transform() if local else node.get_global_transform()
+			t = _local_transform if local else _global_transform
 			return shape.is_point_inside(point, t)
 		else:
 			return false	
@@ -31,7 +42,7 @@ class DomainShapeInfo:
 		return shape.get_corners_global(node.get_global_transform())
 
 # A polygon made of one outer boundary and one or multiple holes (inner polygons)
-class ComplexPolygon:
+class ComplexPolygon extends RefCounted:
 	var inner: Array[PackedVector2Array] = []
 	var outer: PackedVector2Array
 
@@ -278,14 +289,12 @@ func get_copy():
 	copy.bounds_local = bounds_local
 
 	for s in positive_shapes:
-		var s_copy = DomainShapeInfo.new()
-		s_copy.node = s.node
+		var s_copy = DomainShapeInfo.new(s.node)
 		s_copy.shape = s.shape.get_copy()
 		copy.positive_shapes.push_back(s_copy)
 
 	for s in negative_shapes:
-		var s_copy = DomainShapeInfo.new()
-		s_copy.node = s.node
+		var s_copy = DomainShapeInfo.new(s.node)
 		s_copy.shape = s.shape.get_copy()
 		copy.negative_shapes.push_back(s_copy)
 
@@ -297,8 +306,7 @@ func _discover_shapes_recursive(node: Node) -> void:
 		return
 
 	if node is ProtonScatterShape and node.shape != null:
-		var info := DomainShapeInfo.new()
-		info.node = node
+		var info: DomainShapeInfo= DomainShapeInfo.new(node)
 		info.shape = node.shape
 
 		if node.negative:

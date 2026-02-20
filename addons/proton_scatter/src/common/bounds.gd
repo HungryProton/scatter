@@ -47,4 +47,3 @@ func _minv(v1: Vector3, v2: Vector3) -> Vector3:
 # Returns a vector with the highest values in each of the 2 input vectors
 func _maxv(v1: Vector3, v2: Vector3) -> Vector3:
 	return Vector3(max(v1.x, v2.x), max(v1.y, v2.y), max(v1.z, v2.z))
-

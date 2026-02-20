@@ -7,17 +7,26 @@ extends Node
 
 signal job_completed
 
+const ProtonScatterParallel: = preload("res://addons/proton_scatter/src/common/parallel.gd")
 
 const MAX_PHYSICS_QUERIES_SETTING := "addons/proton_scatter/max_physics_queries_per_frame"
 
+const SKIP_RAY: Vector3 = Vector3.INF
 
-var _is_ready := false
-var _job_in_progress := false
-var _max_queries_per_frame := 400
+var _is_ready: bool = false
+var _job_in_progress: bool = false
+var _max_queries_per_frame: int = 400
 var _main_thread_id: int
-var _queries: Array
-var _results: Array[Dictionary]
 var _space_state: PhysicsDirectSpaceState3D
+var _parallel: ProtonScatterParallel = ProtonScatterParallel.new()
+
+# Input
+var _collision_mask: int
+var _rays_from_to_pairs: Array[Vector3]
+
+# Output
+var _results: Array[Dictionary] = []
+
 
 
 func _ready() -> void:
@@ -32,7 +41,7 @@ func _exit_tree():
 		job_completed.emit()
 
 
-func execute(queries: Array) -> Array[Dictionary]:
+func execute_raycasts(rays_from_to_pairs: Array[Vector3], collision_mask: int) -> Array[Dictionary]:
 	if not _is_ready:
 		printerr("ProtonScatter error: Calling execute on a PhysicsHelper before it's ready, this should not happen.")
 		return []
@@ -45,14 +54,21 @@ func execute(queries: Array) -> Array[Dictionary]:
 		return []
 
 	# Clear previous job if any
-	_queries.clear()
+	_rays_from_to_pairs.clear()
 
 	if _job_in_progress:
 		await _until(get_tree().physics_frame, func(): return _job_in_progress)
 
-	_results.clear()
-	_queries = queries
-	_max_queries_per_frame = ProjectSettings.get_setting(MAX_PHYSICS_QUERIES_SETTING, 500)
+	var ray_count: int = rays_from_to_pairs.size() / 2
+
+	_collision_mask = collision_mask
+	_rays_from_to_pairs = rays_from_to_pairs
+	_results.resize(ray_count)
+
+	var max_queries_per_frame: int = ProjectSettings.get_setting(MAX_PHYSICS_QUERIES_SETTING, 500)
+
+	_parallel.prepare("raycasts", ray_count, max_queries_per_frame, _raycasts_worker_task)
+
 	_job_in_progress = true
 	set_physics_process.bind(true).call_deferred()
 
@@ -62,23 +78,38 @@ func execute(queries: Array) -> Array[Dictionary]:
 
 
 func _physics_process(_delta: float) -> void:
-	if _queries.is_empty():
-		return
-
 	if not _space_state:
 		_space_state = get_tree().get_root().get_world_3d().get_direct_space_state()
 
-	var steps = min(_max_queries_per_frame, _queries.size())
-	for i in steps:
-		var q = _queries.pop_back()
-		var hit := _space_state.intersect_ray(q) # TODO: Add support for other operations
-		_results.push_back(hit)
+	# Do the max_queries, on N cores in parallel; this keeps the setting backward compatible
+	# while improving performance by as much as the used CPU allows.
+	if await _parallel.execute_batch():
+		return
 
-	if _queries.is_empty():
-		set_physics_process(false)
-		_results.reverse()
-		_job_in_progress = false
-		job_completed.emit()
+	set_physics_process(false)
+	_job_in_progress = false
+	job_completed.emit()
+
+
+func _raycasts_worker_task(task: Dictionary) -> void:
+	var from_ray: int = task["from"] 
+	var to_ray: int = task["to"] 
+
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
+	query.collision_mask = _collision_mask
+	
+	var pair_index: int = from_ray * 2
+	for i: int in range(from_ray, to_ray):
+		query.from = _rays_from_to_pairs[pair_index]
+		
+		if SKIP_RAY == query.from:
+			pair_index += 2
+			continue
+		
+		query.to = _rays_from_to_pairs[pair_index + 1]
+		_results[i] = _space_state.intersect_ray(query)
+		pair_index += 2
+
 
 
 func _in_main_thread() -> bool:

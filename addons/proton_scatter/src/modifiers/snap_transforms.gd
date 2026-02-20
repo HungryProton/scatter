@@ -8,7 +8,9 @@ extends "base_modifier.gd"
 @export var rotation_step := Vector3.ZERO
 @export var scale_step := Vector3.ZERO
 
-
+func allow_parallel() -> bool:
+	return true
+	
 func _init() -> void:
 	display_name = "Snap Transforms"
 	category = "Edit"

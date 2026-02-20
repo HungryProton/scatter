@@ -7,7 +7,6 @@ extends "base_modifier.gd"
 
 var _current_offset = 0.0
 
-
 func _init() -> void:
 	display_name = "Create Along Edge (Continuous)"
 	category = "Create"

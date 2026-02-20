@@ -5,6 +5,9 @@ extends "base_modifier.gd"
 @export var target := Vector3.ZERO
 @export var up := Vector3.UP
 
+func allow_parallel() -> bool:
+	return true
+	
 
 func _init() -> void:
 	display_name = "Look At"

@@ -6,6 +6,8 @@ extends "base_modifier.gd"
 @export var rotation := Vector3(0.0, 0.0, 0.0)
 @export var scale := Vector3.ONE
 
+func allow_parallel() -> bool:
+	return true
 
 func _init() -> void:
 	display_name = "Edit Transform"

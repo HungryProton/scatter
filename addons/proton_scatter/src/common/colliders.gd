@@ -25,6 +25,10 @@ class LayerBodies extends RefCounted:
 	func _init(layers: int) -> void:
 		_layers = layers
 	
+	func commit(scatter: Node3D) -> void:
+		for body_rid: RID in _bodies:
+			PhysicsServer3D.body_set_space(body_rid, scatter.get_world_3d().space)
+	
 	func clear() -> void:
 		for body: RID in _bodies:
 			if body.is_valid():
@@ -33,19 +37,16 @@ class LayerBodies extends RefCounted:
 	
 	func add_shape_instance(scatter: Node3D, shape, t: Transform3D) -> void:
 		PhysicsServer3D.body_add_shape(_get_body_RID(scatter), shape.rid, t * shape.trans)
-		pass
 
 	func _get_body_RID(owner: Node3D) -> RID:
-		# Adding shapes becomes exponentially slower as more shapes are added
-		# as JOLT (now default physics backend) has no batch or lazy updates
-		# and merges the shapes on each add.
-		# Using 50 max, limits that effect on loading, while also keeping
-		# the body RID's in check (for 1 million, thats 20k RID's, assuming 1 layer)
-		# Ideally, bins would be spatial coherent which might be
-		# beneficial to raycast/physics performance, but using
-		# 250.000 trees, I did not see any issues with it, so lets keep it simple.
-		# Setting this to 100 nearly doubles the time, but uses less RIDs
-		const MAX_SHAPES_PER_BODY: int = 50
+		
+		# Now that succeeded in preventing the update-on-insert on the server side
+		# its not really needed to aggregate anymore; but it saves in used RID's
+		# I expected decreased (raycast) performance due to spatial not coherent
+		# but so far with moderate scenes (100k trees), did not see any performance issue
+		# with raycasts or physics. (kodus to Jolt!)
+		 
+		const MAX_SHAPES_PER_BODY: int = 500
 		
 		if not _bodies.is_empty() and _shape_bin_count < MAX_SHAPES_PER_BODY:
 			_shape_bin_count += 1
@@ -55,8 +56,11 @@ class LayerBodies extends RefCounted:
 		var body_rid: RID = PhysicsServer3D.body_create()
 		PhysicsServer3D.body_set_mode(body_rid, PhysicsServer3D.BODY_MODE_STATIC)
 		PhysicsServer3D.body_set_state(body_rid, PhysicsServer3D.BODY_STATE_TRANSFORM, owner.global_transform)
-		PhysicsServer3D.body_set_space(body_rid, owner.get_world_3d().space)
 		PhysicsServer3D.body_set_collision_layer(body_rid, _layers)
+		
+		# NOTE: Postpone setting space until commit; this prevents PhysicsServer
+		#       from updating on each shape add; which caused exponential insert time increase.
+		
 		_bodies.append(body_rid)
 		return body_rid
 
@@ -99,6 +103,11 @@ func clear() -> void:
 			PhysicsServer3D.free_rid(shape)
 
 	_shapes.clear()
+
+
+func commit(scatter: Node3D) -> void:
+	for bin: LayerBodies in _layers_bodies.values():
+		bin.commit(scatter)
 
 
 # Grab every static bodies from the source item with local transforms for the shapes

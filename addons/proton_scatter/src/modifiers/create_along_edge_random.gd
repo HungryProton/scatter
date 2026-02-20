@@ -10,7 +10,6 @@ const MAX_TRIES := 100
 
 var _rng: RandomNumberGenerator
 
-
 func _init() -> void:
 	display_name = "Create Along Edge (Random)"
 	category = "Create"
