@@ -32,7 +32,7 @@ func start_update(scatter_node: ProtonScatter, domain):
 	const USE_WORKERTHREADS_THRESHOLD: int = 5000
 
 	for modifier in stack:
-		if not modifier.allow_parallel():
+		if not modifier.allow_parallel() or transforms.size() < USE_WORKERTHREADS_THRESHOLD:
 			await modifier.process_transforms(transforms, domain, scatter_node.global_seed)
 		else:
 			var parallel: ProtonScatterParallel = ProtonScatterParallel.new()
