@@ -110,8 +110,8 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	var rays_from_to_point_pairs: Array[Vector3] = [] # Alternate from-to pairs
 
 	var gt: Transform3D = domain.get_global_transform()
-	var gt_inverse := gt.affine_inverse()
-	var gt_basis := gt.basis
+	var gt_inverse: Transform3D = gt.affine_inverse()
+	var gt_basis: Basis = gt.basis
 		
 	var transforms_list: Array[Transform3D] = transforms.list
 	var transforms_count: int = transforms_list.size()
@@ -131,8 +131,8 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	var pair_at: int = 0 # Use addition over multiplication (+2 instead of i * 2)
 	for i in transforms_count:
 		var t: Transform3D = transforms_list[i] # Sequential read of valuetype
-		var start = gt * t.origin
-		var end = start
+		var start: Vector3 = gt * t.origin
+		var end: Vector3 = start
 
 		if is_default: # Most common case first
 			start -= default_ray_offset_dir
@@ -157,7 +157,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	# from outside the _physics_process while also being in a separate thread.
 	var physics_helper: ProtonScatterPhysicsHelper = domain.get_root().get_physics_helper()
 
-	var ray_hits := await physics_helper.execute_raycasts(rays_from_to_point_pairs, collision_mask)
+	var ray_hits: Array[Dictionary] = await physics_helper.execute_raycasts(rays_from_to_point_pairs, collision_mask)
 
 	if ray_hits.is_empty():
 		return
@@ -189,8 +189,8 @@ func _process_transforms(transforms, domain, _seed) -> void:
 	var d: float
 	var t: Transform3D
 	var remapped_max_slope = remap(max_slope, 0.0, 90.0, 0.0, 1.0)
-	var is_point_valid := false
-	var new_transforms_array : Array[Transform3D] = []
+	var is_point_valid: bool = false
+	var new_transforms_array: Array[Transform3D] = []
 	var no_exclude: bool = not has_exclude
 	var gt_inverse_basis: Basis= gt_inverse.basis
 	var hit_normal: Vector3

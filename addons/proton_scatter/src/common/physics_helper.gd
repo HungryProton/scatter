@@ -29,7 +29,7 @@ var _rays_from_to_pairs: Array[Vector3]:
 var _ray_count: int = 0
 var _ray_cursor: int = 0
 
-# Outputs
+# Output
 var _results: Array[Dictionary] = []
 
 # Worker data distribution
