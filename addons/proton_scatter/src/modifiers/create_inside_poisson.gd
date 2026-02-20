@@ -30,7 +30,6 @@ var _cell_x: int
 var _cell_y: int
 var _cell_z: int
 
-
 func _init() -> void:
 	display_name = "Create Inside (Poisson)"
 	category = "Create"

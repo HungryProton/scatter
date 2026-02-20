@@ -4,7 +4,6 @@ extends "base_modifier.gd"
 
 @export_range(0.0, 100.0) var probability: float = 50.0
 
-
 func _init() -> void:
 	display_name = "Remove Random"
 	category = "Remove"

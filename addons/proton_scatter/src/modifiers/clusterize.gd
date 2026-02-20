@@ -11,7 +11,6 @@ extends "base_modifier.gd"
 @export_range(0.0, 1.0) var remove_above = 1.0
 @export var scale_transforms := true
 
-
 func _init() -> void:
 	display_name = "Clusterize"
 	category = "Edit"

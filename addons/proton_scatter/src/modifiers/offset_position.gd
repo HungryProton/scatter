@@ -5,6 +5,8 @@ extends "base_modifier.gd"
 @export_enum("Offset:0", "Multiply:1", "Override:2") var operation: int
 @export var position := Vector3.ZERO
 
+func allow_parallel() -> bool:
+	return true
 
 
 func _init() -> void:

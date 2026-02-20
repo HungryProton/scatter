@@ -15,7 +15,6 @@ const Util := preload("../common/util.gd")
 
 var _min_spacing := 0.05
 
-
 func _init() -> void:
 	display_name = "Create Along Edge (Even)"
 	category = "Create"

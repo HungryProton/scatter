@@ -6,7 +6,6 @@ extends "base_modifier.gd"
 
 var _min_spacing := 0.05
 
-
 func _init() -> void:
 	display_name = "Create Inside (Grid)"
 	category = "Create"

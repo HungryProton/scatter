@@ -17,7 +17,6 @@ const ProtonScatterPhysicsHelper := preload("res://addons/proton_scatter/src/com
 @export_flags_3d_physics var collision_mask = 1
 @export_flags_3d_physics var exclude_mask = 0
 
-
 func _init() -> void:
 	display_name = "Project On Colliders"
 	category = "Edit"

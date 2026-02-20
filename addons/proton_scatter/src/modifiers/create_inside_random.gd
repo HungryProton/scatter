@@ -6,6 +6,10 @@ extends "base_modifier.gd"
 
 var _rng: RandomNumberGenerator
 
+var _gt_affine_inverse_basis: Basis
+var _tasks: Array[Dictionary] = []
+var _new_transforms: Array[Transform3D]
+var _domain
 
 func _init() -> void:
 	display_name = "Create Inside (Random)"
@@ -33,52 +37,84 @@ func _init() -> void:
 		valid space, like a curved and narrow path.")
 
 
-# TODO:
-# + Multithreading
-# + Spatial partionning to discard areas outside the domain earlier
+# TODO: + Spatial partionning to discard areas outside the domain earlier
 func _process_transforms(transforms, domain, random_seed) -> void:
 	_rng = RandomNumberGenerator.new()
 	_rng.set_seed(random_seed)
 
-	var gt: Transform3D = domain.get_global_transform()
-	var center: Vector3 = domain.bounds_local.center
-	var half_size: Vector3 = domain.bounds_local.size / 2.0
-	var height: float = domain.bounds_local.center.y
+	_gt_affine_inverse_basis = domain.get_global_transform().affine_inverse().basis
+	_domain = domain
+	_new_transforms.clear()
+	
+	# Prepare parts for parallel processing
+	# Note this operation is very light, and thus the gains are pretty much negligable
+	# (saves about 1/6th of the time on my system, but even with 500k items, 
+	# thats just about 60ms; not very noticable).  
+	var part_count: int = max(1, OS.get_processor_count() - 2)
+	var part_size: int = max(5000, amount / part_count)
+	
+	_tasks.clear()
+	var from: = 0
+	var remaining: int = amount
+	while remaining > 0:
+		var to = from + min(remaining, part_size)
+		var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+		rng.set_seed(_rng.randi())
+		_tasks.append( { "from" : from, "to": to, "rng" : rng } )
+		remaining -= to - from
+		from = to
+
+	_new_transforms.resize(amount)
+
+	WorkerThreadPool.wait_for_group_task_completion(
+		WorkerThreadPool.add_group_task(_generate_randoms, _tasks.size())
+	)
+
+	transforms.append(_new_transforms)
+	_new_transforms.clear()
+	_domain = null
+	
+	
+func _generate_randoms(task_index: int) -> void:
+	var task: Dictionary = _tasks[task_index]
+
+	var from: int = task["from"]
+	var to: int = task["to"]
+	var rng: RandomNumberGenerator = task["rng"]
+	var count: int = to - from
+	var generated: int = 0
 
 	# Generate a random point in the bounding box. Store if it's inside the
 	# domain, or discard if invalid. Repeat until enough valid points are found.
 	var t: Transform3D
 	var pos: Vector3
-	var new_transforms: Array[Transform3D] = []
-	var max_retries = amount * 10 # TODO: expose this parameter?
-	var tries := 0
+	
+	var center = _domain.bounds_local.center
+	var half_size = _domain.bounds_local.size / 2.0
+	var height = _domain.bounds_local.center.y
 
-	while new_transforms.size() != amount:
+	var max_retries = count * 10 # TODO: expose this parameter?
+
+	var tries = 0
+	while generated < count:
 		t = Transform3D()
-		pos = _random_vec3() * half_size + center
+		
+		pos = Vector3(rng.randf_range(-1.0, 1.0), rng.randf_range(-1.0, 1.0), rng.randf_range(-1.0, 1.0))
+		pos = pos * half_size + center
 
 		if restrict_height:
 			pos.y = height
 
 		if is_using_global_space():
-			t.basis = gt.affine_inverse().basis
+			t.basis = _gt_affine_inverse_basis
 
-		if domain.is_point_inside(pos):
+		if _domain.is_point_inside(pos):
 			t.origin = pos
-			new_transforms.push_back(t)
+			_new_transforms[from + generated] = t
+			generated += 1
 			continue
 
 		# Prevents an infinite loop
 		tries += 1
 		if tries > max_retries:
-			break
-
-	transforms.append(new_transforms)
-
-
-func _random_vec3() -> Vector3:
-	var vec3 = Vector3.ZERO
-	vec3.x = _rng.randf_range(-1.0, 1.0)
-	vec3.y = _rng.randf_range(-1.0, 1.0)
-	vec3.z = _rng.randf_range(-1.0, 1.0)
-	return vec3
+			break	

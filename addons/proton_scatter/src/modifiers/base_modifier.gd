@@ -124,3 +124,6 @@ func _clear_warning() -> void:
 # Override in inherited class
 func _process_transforms(_transforms: TransformList, _domain: Domain, _seed: int) -> void:
 	pass
+	
+func allow_parallel() -> bool:
+	return false
