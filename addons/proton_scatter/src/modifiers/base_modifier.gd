@@ -9,6 +9,8 @@ extends Resource
 
 
 signal warning_changed
+
+@warning_ignore("unused_signal") # Emitted from the inherited classes
 signal modifier_changed
 
 const TransformList = preload("../common/transform_list.gd")

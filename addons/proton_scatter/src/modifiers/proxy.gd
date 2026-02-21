@@ -1,5 +1,5 @@
 @tool
-extends "base_modifier.gd"
+extends ScatterBaseModifier
 
 
 @export_node_path var scatter_node: NodePath

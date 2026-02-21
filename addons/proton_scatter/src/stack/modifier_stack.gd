@@ -75,6 +75,10 @@ func get_index(modifier: ScatterBaseModifier) -> int:
 	return stack.find(modifier)
 
 
+func notify_value_changed() -> void:
+	value_changed.emit()
+
+
 func is_using_edge_data() -> bool:
 	for modifier in stack:
 		if modifier.use_edge_data:

@@ -106,7 +106,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 				candidate_accepted = true
 
 				# Add new points to the lists
-				var t = Transform3D()
+				var t := Transform3D()
 				t.origin = candidate
 
 				if is_using_global_space():

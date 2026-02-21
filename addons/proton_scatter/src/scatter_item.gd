@@ -24,7 +24,7 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 ## From disk (1): Loads the source item from a saved scene file
 ## This affects how the 'path' property is interpreted - either as a NodePath
 ## or as a filesystem path to a scene file.
-@export_enum("From current scene:0", "From disk:1") var source = 1:
+@export_enum("From current scene:0", "From disk:1") var source: int = 1:
 	set(val):
 		source = val
 		property_list_changed.emit()
@@ -129,7 +129,7 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		visibility_range_end_margin = val
 		ScatterUtil.request_parent_to_rebuild(self)
 #TODO what is a nicer way to expose this?
-@export_enum("Disabled:0", "Self:1") var visibility_range_fade_mode = 0:
+@export_enum("Disabled:0", "Self:1") var visibility_range_fade_mode: int = 0:
 	set(val):
 		visibility_range_fade_mode = val
 		ScatterUtil.request_parent_to_rebuild(self)
@@ -230,7 +230,7 @@ func process_transform(t: Transform3D) -> Transform3D:
 	if not source_data_ready:
 		_update_source_data()
 
-	var origin = t.origin
+	var origin: Vector3 = t.origin
 	t.origin = Vector3.ZERO
 
 	t = t.scaled(Vector3.ONE * source_scale_multiplier)
@@ -262,6 +262,6 @@ func _save_source_data(node: Node3D) -> void:
 
 
 func _update_source_data() -> void:
-	var node = get_item()
+	var node: Node3D = get_item()
 	if node:
 		node.queue_free()

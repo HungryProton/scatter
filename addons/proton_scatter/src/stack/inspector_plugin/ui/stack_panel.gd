@@ -139,7 +139,7 @@ func _on_stack_changed() -> void:
 
 
 func _on_value_changed() -> void:
-	_modifier_stack.value_changed.emit()
+	_modifier_stack.notify_value_changed()
 
 
 func _on_rebuild_pressed() -> void:

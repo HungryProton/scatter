@@ -2,16 +2,19 @@
 extends EditorInspectorPlugin
 
 
-const CachePanel = preload("./cache_panel.tscn")
-const ScatterCache = preload("../../cache/scatter_cache.gd")
+const CachePanel: GDScript = preload("./cache_panel.gd")
+const CachePanelScene: PackedScene = preload("./cache_panel.tscn")
 
 
-func _can_handle(object):
-	return is_instance_of(object, ScatterCache)
+func _can_handle(object: Object) -> bool:
+	return is_instance_of(object, ProtonScatterCache)
 
 
-func _parse_category(object, category: String):
+func _parse_category(object: Object, category: String) -> void:
+	var cache: ProtonScatterCache = object
+	if not cache:
+		return
 	if category == "ScatterCache" or category == "scatter_cache.gd":
-		var ui = CachePanel.instantiate()
-		ui.set_object(object)
+		var ui: CachePanel = CachePanelScene.instantiate()
+		ui.set_object(cache)
 		add_custom_control(ui)

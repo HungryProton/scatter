@@ -687,11 +687,11 @@ func _create_collision(body: StaticBody3D, t: Transform3D) -> void:
 			_collision_shapes.push_back(shape_rid)
 
 
-func _create_instance(item: ProtonScatterItem, root: Node3D):
+func _create_instance(item: ProtonScatterItem, root: Node3D) -> Node3D:
 	if not item:
 		return null
 
-	var instance = item.get_item()
+	var instance: Node3D = item.get_item()
 	if not instance:
 		return null
 
@@ -699,12 +699,7 @@ func _create_instance(item: ProtonScatterItem, root: Node3D):
 	root.add_child.bind(instance, true).call_deferred()
 
 	if show_output_in_tree:
-		# We have to use a lambda here because ProtonScatterUtil isn't an
-		# actual class_name, it's a const, which makes it impossible to reference
-		# the callable, (but we can still call it)
-		var defer_ownership := func(i, o):
-			ProtonScatterUtil.set_owner_recursive(i, o)
-		defer_ownership.bind(instance, get_tree().get_edited_scene_root()).call_deferred()
+		ProtonScatterUtil.set_owner_recursive.bind(instance, get_tree().get_edited_scene_root()).call_deferred()
 
 	return instance
 
