@@ -49,8 +49,9 @@ var _cache_load_threaded_in_progress := false
 
 var _save_thread = Thread.new()
 
+
 func _ready() -> void:
-	process_mode = Node.PROCESS_MODE_DISABLED
+	set_process(false)
 	if not is_inside_tree():
 		return
 
@@ -63,7 +64,7 @@ func _ready() -> void:
 			_ensure_cache_folder_exists()
 		else:
 			printerr("ProtonScatter error: You loaded a ScatterCache node with an empty cache file attribute.
-								ProtonScatter cannot set a default value outside of the editor. 
+								ProtonScatter cannot set a default value outside of the editor.
 								Please open the scene in the editor and set a default value.")
 			return
 
@@ -84,6 +85,20 @@ func _ready() -> void:
 		return
 
 	restore_cache.call_deferred()
+
+
+func _process(_delta: float) -> void:
+	if _cache_load_threaded_in_progress:
+		match ResourceLoader.load_threaded_get_status(cache_file):
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
+				return
+
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_INVALID_RESOURCE, \
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_FAILED, \
+			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
+				_cache_load_threaded_in_progress = false
+				cache_load_threaded_finished.emit()
+				set_process(false)
 
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -240,12 +255,16 @@ func _ensure_cache_folder_exists() -> void:
 func _load_cache(cache_file_path: String) -> void:
 	_local_cache = ResourceLoader.load(cache_file)
 
+
 func _load_cache_threaded(cache_file: String) -> void:
+	if cache_file.is_empty():
+		printerr("Cache file path is empty.")
+		return
+
 	ResourceLoader.load_threaded_request(cache_file)
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	set_process(true)
 	_cache_load_threaded_in_progress = true
 	await cache_load_threaded_finished
-	process_mode = Node.PROCESS_MODE_DISABLED
 	_local_cache = ResourceLoader.load_threaded_get(cache_file)
 
 
@@ -259,22 +278,3 @@ func save_cache() -> void:
 func _exit_tree():
 	if _save_thread.is_started():
 		_save_thread.wait_to_finish()
-
-
-func _process(_delta: float) -> void:
-	if _cache_load_threaded_in_progress:
-		if cache_file.is_empty():
-			printerr("Cache file path is empty.")
-			_cache_load_threaded_in_progress = false
-			cache_load_threaded_finished.emit()
-			return
-
-		match ResourceLoader.load_threaded_get_status(cache_file):
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
-				return
-
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_INVALID_RESOURCE, \
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_FAILED, \
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
-				_cache_load_threaded_in_progress = false
-				cache_load_threaded_finished.emit()
