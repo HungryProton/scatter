@@ -3,7 +3,7 @@ extends RandomNumberGenerator
 
 # Allow jumping to a position in the sequence of the current seed
 # Note this this is a rare case of where I used AI to help out.
-# Prompt involved giving the C++ implementation backend of 
+# Prompt involved giving it the C++ implementation backend of 
 # gdscript RandomNumberGenerator.
 
 const MULT: int = 6364136223846793005

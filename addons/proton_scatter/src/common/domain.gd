@@ -19,7 +19,7 @@ class DomainShapeInfo extends RefCounted:
 	var node: Node3D
 	var shape: BaseShape
 
-	# Allow worker thread access on transforms
+	# Allow worker thread access on transforms through is_point_inside(...)
 	var _local_transform: Transform3D 
 	var _global_transform: Transform3D 
 
@@ -308,6 +308,9 @@ func _discover_shapes_recursive(node: Node) -> void:
 	if node is ProtonScatterShape and node.shape != null:
 		var info: DomainShapeInfo= DomainShapeInfo.new(node)
 		info.shape = node.shape
+
+		# warmup any lazy initialisation of things required or is point inside
+		info.is_point_inside(Vector3(), true)
 
 		if node.negative:
 			negative_shapes.push_back(info)

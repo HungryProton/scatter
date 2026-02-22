@@ -63,6 +63,7 @@ func _process_transforms(transforms, domain, _rng) -> void:
 
 	if _source_node.modifier_stack:
 		var stack: ProtonScatterModifierStack = _source_node.modifier_stack.get_copy()
+		stack.parent = domain.get_root() # TODO: See question in start_update(....)
 		var results = await stack.start_update(domain.get_root(), domain)
 		transforms.append(results.list)
 

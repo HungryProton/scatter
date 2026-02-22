@@ -45,7 +45,9 @@ func _process_transforms(transforms, domain, rng) -> void:
 	var parallel: ProtonScatterParallel = ProtonScatterParallel.new()
 	parallel.set_rng_seed(rng.seed)
 	
-	parallel.prepare("create_inside_random", amount, -1, _generate_randoms, 
+	var name: String = domain.root.name + " create_inside_random %s" % [ amount ]
+	
+	parallel.prepare(name, amount, -1, _generate_randoms, 
 		func(index: int, task: Dictionary):
 			var output: Array[Transform3D] = []
 			outputs.append(output)
@@ -54,10 +56,6 @@ func _process_transforms(transforms, domain, rng) -> void:
 		
 			# Prevent calling global transform from non-main thread, resuling in identity
 			task["basis"] = domain.get_global_transform().affine_inverse().basis
-			
-			# Prevent taking the same sequence, but base sequences on the same root
-			task["rng"] = RandomNumberGenerator.new()
-			task["rng"].set_seed(rng.randi())
 	)
 	
 	await parallel.execute_all()

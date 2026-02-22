@@ -24,6 +24,10 @@ const Bounds := preload("../common/bounds.gd")
 			curve.changed.disconnect(_on_curve_changed)
 
 		curve = val
+		
+		# Make sure its resolved early, so that worker threads can use is_point_inside safely
+		_update_polygon_from_curve()
+		
 		curve.changed.connect(_on_curve_changed)
 		emit_changed()
 
@@ -34,7 +38,7 @@ var _bounds: Bounds
 
 
 func is_point_inside(point: Vector3, global_transform: Transform3D) -> bool:
-	if not _polygon:
+	if not _polygon: # TODO: is this block still needed now that curve setter updates?
 		_update_polygon_from_curve()
 
 	if not _polygon:

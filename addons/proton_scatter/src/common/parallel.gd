@@ -18,14 +18,17 @@ var _name: String # Convinient for debugging
 var _tasks: Array[Dictionary] = []
 var _executor: Callable = NO_EXECUTOR_PREPARED
 var _rng_seed = 0
-var _rng_steps_per_iteration = 0
+var _rng_steps_per_iteration = 1
 
 var _run_threaded: bool:
-	get():
+	get(): 
 		return enabled and ENABLE_PARALLELISATION and _tasks.size() > 1
 
 var _core_count: int:
 	get():
+		if !_run_threaded:
+			return 1
+			
 		var reserved_cores: int = 1 # Main thread
 		
 		var rendering_thread_mode = ProjectSettings.get_setting("rendering/driver/threads/thread_model")
@@ -60,7 +63,7 @@ func prepare(name: String, total_item_count: int, max_items_per_task: int, execu
 	_core_count = max(1, OS.get_processor_count() - 2)
 
 	if max_items_per_task < 0:
-		max_items_per_task = total_item_count / _core_count
+		max_items_per_task = max(1, total_item_count / _core_count)
 
 	max_items_per_task = max(max_items_per_task, MINIMUM_ITEMS_PER_TASK)
 	
@@ -70,7 +73,7 @@ func prepare(name: String, total_item_count: int, max_items_per_task: int, execu
 		var task_length: int = min(distribute_remaining, max_items_per_task)
 		var to: int = from + task_length
 		
-		# Keep rng sequence consistent regardless of work distribution/order
+		# Keep rng sequence consistent regardless of split distribution and order
 		var rng: JumpableRNG = JumpableRNG.new()
 		rng.seed = _rng_seed
 		rng.jump(from * _rng_steps_per_iteration)
@@ -95,11 +98,14 @@ func prepare(name: String, total_item_count: int, max_items_per_task: int, execu
 	
 	_executor = executor
 
+
 func is_done() -> bool:
 	return _tasks.is_empty()
 
+
 func get_num_parallel() -> int:
 	return _core_count
+
 
 ## Run all work in 1 go
 func execute_all() -> void:
@@ -138,15 +144,18 @@ func execute_batch() -> bool:
 	await _execute_blocking(1)
 	return not is_done()
 
-func _worker_task(task_index: int) -> void:
-	await _executor.call(_tasks[task_index])
 
+func _worker_task(task_index: int) -> void:
+	var task: Dictionary = _tasks[task_index]
+	#print("task %s start, range %s to %s" % [ _name, task['from'], task['to']])
+	await _executor.call(task)
+	#print("task %s finished" % [ _name ])
 
 # Used when parallel disabled, or just 1 task (only gives thread sync overhead)
 func _execute_blocking(task_count: int) -> void:
 	if is_done():
 		return
-	
+
 	var execute_count: int = min(task_count, _tasks.size())
 	for i: int in execute_count:
 		await _worker_task(i)
@@ -168,9 +177,14 @@ func _remove_done_tasks(executed_count: int) -> void:
 	if is_done():
 		_executor = NO_EXECUTOR_PREPARED
 
-## Sets the RNG seed, and how many randoms per iterations
+
+## Sets the RNG seed, and how many randoms consumed per iteration (int = 1, float = 2)
 ## Must be called before prepare
-func set_rng_seed(seed: int, steps_per_iteration: int = 1) -> void:
+##
+## Note that currently just using the default of 1000, to ensure no overlaps occur;
+## Considered adding it as a property to the modifiers but unfortunatly they
+## dont consume in a deterministic way; so thats really too bad.
+func set_rng_seed(seed: int, steps_per_iteration: int = 1000) -> void:
 	assert(_executor == NO_EXECUTOR_PREPARED)
 	_rng_seed = seed
 	_rng_steps_per_iteration = steps_per_iteration

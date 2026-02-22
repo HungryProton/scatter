@@ -178,4 +178,4 @@ func _process_transforms(transforms, domain, rng) -> void:
 	transforms.list = new_transforms
 
 	if randomize_indices:
-		transforms.shuffle(random_seed)
+		transforms.shuffle(rng)

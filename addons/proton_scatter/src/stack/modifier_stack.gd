@@ -4,55 +4,61 @@ extends Resource
 
 const ProtonScatterParallel: = preload("res://addons/proton_scatter/src/common/parallel.gd")
 const TransformList := preload("../common/transform_list.gd")
+const JumpableRNG = preload("../common/random.gd")
 
 signal stack_changed
 signal value_changed
 signal transforms_ready
 
-
-
-
 @export var stack: Array[ScatterBaseModifier] = []
+
+# Below 5000 there is little chance that the workerthreads overhead is worth it
+# Note that above 5000 result of scatter is different from older pre-parallel
+# versions.
+const USE_WORKERTHREADS_THRESHOLD: int = 5000
 
 var just_created := false
 var parent: ProtonScatter
 
 
 func start_update(scatter_node: ProtonScatter, domain):
-	var transforms: TransformList = TransformList.new()
+	assert(parent)
+	
+	# TODO: Question: This doesnt fire in demo or unit tests; so either the argument or member can go?
+	# (I suppose the member, as its only used locally here)
+	assert(parent == scatter_node)
 
-	# Below 5000 there is little chance that the workerthreads overhead is worth it
-	# Additionally; where specific seeds are used, the resulting
-	# sequence can be different compared to older non-threading versions.
-	# This would 'break' (or rather: change) existing scenes with little
-	# volume, where a dev might rely on the specific result item placements.
-	# Above a 1000 items, that becomes more unlikely.
-	# Notice this can cause the start of the sequence to 'jump' (be different)
-	# when switching between 4999 and 5000 items.
-	const USE_WORKERTHREADS_THRESHOLD: int = 5000
+	var transforms: TransformList = TransformList.new()
+	var rng: JumpableRNG = JumpableRNG.new()
+	var parallel: ProtonScatterParallel = ProtonScatterParallel.new()
 
 	for modifier in stack:
-		if not modifier.allow_parallel() or transforms.size() < USE_WORKERTHREADS_THRESHOLD:
-			await modifier.process_transforms(transforms, domain, scatter_node.global_seed)
-		else:
-			var parallel: ProtonScatterParallel = ProtonScatterParallel.new()
+		var name: String = "%s_%s" % [ parent.name, modifier.display_name]
+		
+		rng.seed = modifier.get_rng_seed(scatter_node.global_seed)
+		
+		var run_parallel: bool = modifier.allow_parallel() and transforms.size() > USE_WORKERTHREADS_THRESHOLD
+		if not run_parallel:
+			await modifier.process_transforms(transforms, domain, rng)
+			continue
 
-			var splits: Array[TransformList] = _split_transforms_list(transforms, parallel.get_num_parallel())
+		parallel.set_rng_seed(rng.seed)
+
+		var splits: Array[TransformList] = _split_transforms_list(transforms, parallel.get_num_parallel())
+	
+		parallel.prepare(name, transforms.size(), splits[0].size(), _process_transforms_split, 
+			func(index: int, task: Dictionary):
+				task["split"] = splits[index]
+				task["modifier"] = modifier.duplicate() # duplicate Still needed? not sure TODO: test without
+				task["domain"] = domain
+		)
 		
-			assert(splits.size() > 0)
-			parallel.prepare("stack_" + modifier.display_name,transforms.size(), splits[0].size(), _process_transforms_split, 
-				func(index: int, task: Dictionary):
-					task["split"] = splits[index]
-					task["modifier"] = modifier.duplicate() # Still needed?
-					task["domain"] = domain
-					task["global_seed"] = scatter_node.global_seed
-			)
-			
-			await parallel.execute_all()
-		
-			transforms.clear()
-			for result_part in splits:
-				transforms.append(result_part.list)
+		await parallel.execute_all()
+
+		transforms.clear()
+		for result_part in splits:
+			transforms.append(result_part.list)
+
 			
 	transforms_ready.emit(transforms)
 	return transforms
@@ -61,7 +67,7 @@ func start_update(scatter_node: ProtonScatter, domain):
 func _process_transforms_split(task: Dictionary) -> void:
 	var modifier: ScatterBaseModifier = task["modifier"]
 	var split: TransformList = task['split']
-	await modifier.process_transforms(split, task['domain'], task['global_seed'])
+	await modifier.process_transforms(split, task['domain'], task['rng'])
 
 
 func stop_update() -> void:
@@ -136,7 +142,7 @@ func _on_modifier_changed() -> void:
 
 func _split_transforms_list(list: TransformList, part_count: int) -> Array[TransformList]:
 	var result: Array[TransformList] = []
-	var part_size: int = max(1000, list.size() / part_count)
+	var part_size: int = max(1000, max(1, list.size() / part_count))
 	
 	var cursor: int = 0
 	var remaining: int = list.size()
@@ -149,4 +155,5 @@ func _split_transforms_list(list: TransformList, part_count: int) -> Array[Trans
 		result.append(part_list)
 		remaining -= to - cursor
 		cursor = to
+
 	return result
