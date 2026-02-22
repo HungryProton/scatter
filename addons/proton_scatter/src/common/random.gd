@@ -5,6 +5,18 @@ extends RandomNumberGenerator
 # Note this this is a rare case of where I used AI to help out.
 # Prompt involved giving it the C++ implementation backend of 
 # gdscript RandomNumberGenerator.
+#
+# Why is this needed? :
+#
+# First parallelisation edition used a 'root' rng, and assigned
+# a sub-rgn using a seed pulled from root.randi() to each worker task.
+# This made the outcome consistent between *runs* but not
+# between *machines* (different CPU core count = different task counts).
+# This is problematic when used with multiplayer levels; as users
+# with different CPU's could get a different scene.
+#
+# Now, using this jumpable-RNG, scatter can ensure outcome is the same
+# regardless of work split counts.
 
 const MULT: int = 6364136223846793005
 const INC_DEFAULT: int = 1442695040888963407
