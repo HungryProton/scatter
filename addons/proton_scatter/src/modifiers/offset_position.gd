@@ -25,7 +25,7 @@ func _init() -> void:
 	p.set_description("How far each transforms are moved.")
 
 
-func _process_transforms(transforms, domain, _seed) -> void:
+func _process_transforms(transforms, domain, _rng) -> void:
 	var s_gt: Transform3D = domain.get_global_transform()
 	var s_gt_inverse: Transform3D = s_gt.affine_inverse()
 	var t: Transform3D

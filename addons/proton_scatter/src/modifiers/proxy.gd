@@ -54,7 +54,7 @@ func _init() -> void:
 	p.set_description("The Scatter node to use as a reference.")
 
 
-func _process_transforms(transforms, domain, _seed) -> void:
+func _process_transforms(transforms, domain, _rng) -> void:
 	_source_node = domain.get_root().get_node_or_null(scatter_node)
 
 	if not _source_node or not _source_node is ProtonScatter:
@@ -63,6 +63,7 @@ func _process_transforms(transforms, domain, _seed) -> void:
 
 	if _source_node.modifier_stack:
 		var stack: ProtonScatterModifierStack = _source_node.modifier_stack.get_copy()
+		stack.parent = domain.get_root() # TODO: See question in start_update(....)
 		var results = await stack.start_update(domain.get_root(), domain)
 		transforms.append(results.list)
 

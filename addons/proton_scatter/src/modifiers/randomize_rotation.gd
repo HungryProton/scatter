@@ -36,10 +36,8 @@ func _init() -> void:
 		offsets around an axis will be among [0, 90, 180, 360].")
 
 
-func _process_transforms(transforms, domain, random_seed) -> void:
-	_rng = RandomNumberGenerator.new()
-	_rng.set_seed(random_seed)
-
+func _process_transforms(transforms, domain, rng) -> void:
+	_rng = rng
 	var t: Transform3D
 	var b: Basis
 

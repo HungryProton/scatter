@@ -35,13 +35,10 @@ func resize(count: int) -> void:
 
 # TODO: Faster algorithm probably exists for this, research an alternatives
 # if this ever becomes a performance bottleneck.
-func shuffle(random_seed := 0) -> void:
+func shuffle(rng) -> void:
 	var n = list.size()
 	if n < 2:
 		return
-
-	var rng = RandomNumberGenerator.new()
-	rng.set_seed(random_seed)
 
 	var i = n - 1
 	var j

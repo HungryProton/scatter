@@ -102,9 +102,8 @@ func _init() -> void:
 		repetitive patterns if you're using multiple ScatterItem nodes.")
 
 
-func _process_transforms(transforms, domain, random_seed: int) -> void:
-	_rng = RandomNumberGenerator.new()
-	_rng.set_seed(random_seed)
+func _process_transforms(transforms, domain, rng) -> void:
+	_rng = rng
 
 	var new_transforms: Array[Transform3D] = []
 	var rotation_rad := Vector3.ZERO
@@ -179,4 +178,4 @@ func _process_transforms(transforms, domain, random_seed: int) -> void:
 	transforms.list = new_transforms
 
 	if randomize_indices:
-		transforms.shuffle(random_seed)
+		transforms.shuffle(rng)

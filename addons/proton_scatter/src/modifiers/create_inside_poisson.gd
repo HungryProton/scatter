@@ -70,9 +70,8 @@ func _init() -> void:
 		quite slow.")
 
 
-func _process_transforms(transforms, domain, seed) -> void:
-	_rng = RandomNumberGenerator.new()
-	_rng.set_seed(seed)
+func _process_transforms(transforms, domain, rng) -> void:
+	_rng = rng
 	_domain = domain
 	_bounds = _domain.bounds_local
 	_gt = domain.get_global_transform()
@@ -131,7 +130,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 			spawn_points.remove_at(spawn_index)
 
 	transforms.append(_points)
-	transforms.shuffle(seed)
+	transforms.shuffle(rng)
 
 
 func _init_grid() -> void:

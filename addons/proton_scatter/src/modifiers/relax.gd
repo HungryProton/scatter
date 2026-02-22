@@ -56,7 +56,7 @@ func _init() -> void:
 		"This parameter can't be enabled when using the OpenGL backend or running
 		in headless mode.", 2)
 
-func _process_transforms(transforms, _domain, _seed) -> void:
+func _process_transforms(transforms, _domain, _rng) -> void:
 	var offset := offset_step
 	if transforms.size() < 2:
 		return

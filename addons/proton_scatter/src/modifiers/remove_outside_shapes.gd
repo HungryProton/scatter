@@ -23,7 +23,7 @@ func _init() -> void:
 		in red). Transforms outside any shapes will still remain.")
 
 
-func _process_transforms(transforms, domain, seed) -> void:
+func _process_transforms(transforms, domain, rng_) -> void:
 	var i := 0
 	var point: Vector3
 	var to_remove := false

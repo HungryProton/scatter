@@ -19,7 +19,7 @@ class DomainShapeInfo extends RefCounted:
 	var node: Node3D
 	var shape: BaseShape
 
-	# Allow worker thread access on transforms
+	# Allow worker thread access on transforms through is_point_inside(...)
 	var _local_transform: Transform3D 
 	var _global_transform: Transform3D 
 

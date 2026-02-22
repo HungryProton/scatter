@@ -40,7 +40,7 @@ func _init() -> void:
 		at least.")
 
 
-func _process_transforms(transforms, domain, seed) -> void:
+func _process_transforms(transforms, domain, rng) -> void:
 	spacing.x = max(_min_spacing, spacing.x)
 	spacing.y = max(_min_spacing, spacing.y)
 	spacing.z = max(_min_spacing, spacing.z)
@@ -93,4 +93,4 @@ func _process_transforms(transforms, domain, seed) -> void:
 		new_transforms.resize(t_index)
 
 	transforms.append(new_transforms)
-	transforms.shuffle(seed)
+	transforms.shuffle(rng)

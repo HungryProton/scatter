@@ -43,7 +43,7 @@ func get_warning() -> String:
 	return warning
 
 
-func process_transforms(transforms: TransformList, domain: Domain, global_seed: int) -> void:
+func process_transforms(transforms: TransformList, domain: Domain, rng: RandomNumberGenerator) -> void:
 	if not domain.get_root().is_inside_tree():
 		return
 
@@ -67,16 +67,18 @@ func process_transforms(transforms: TransformList, domain: Domain, global_seed: 
 			Make sure you have a Create modifier before this one.\n
 			"""
 
-	var random_seed: int = global_seed
-	if can_override_seed and override_global_seed:
-		random_seed = custom_seed
 	interrupt_update = false
 
 	@warning_ignore("redundant_await") # Not redundant as child classes could use the await keyword here.
-	await _process_transforms(transforms, domain, random_seed)
+	await _process_transforms(transforms, domain, rng)
 
 	warning_changed.emit()
 
+func get_rng_seed(global_seed: int) -> int:
+	var random_seed: int = global_seed
+	if can_override_seed and override_global_seed:
+		random_seed = custom_seed
+	return random_seed
 
 func get_copy():
 	var script: Script = get_script()
@@ -122,7 +124,7 @@ func _clear_warning() -> void:
 
 
 # Override in inherited class
-func _process_transforms(_transforms: TransformList, _domain: Domain, _seed: int) -> void:
+func _process_transforms(_transforms: TransformList, _domain: Domain, rng: RandomNumberGenerator) -> void:
 	pass
 	
 func allow_parallel() -> bool:

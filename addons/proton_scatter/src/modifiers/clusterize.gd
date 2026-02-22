@@ -56,7 +56,7 @@ func _init() -> void:
 	p.set_type("Float")
 	p.set_description("Threshold above which the transforms are removed.")
 
-func _process_transforms(transforms, domain, _seed) -> void:
+func _process_transforms(transforms, domain, _rng) -> void:
 	if not ResourceLoader.exists(mask):
 		warning += "The specified file " + mask + " could not be loaded."
 		return

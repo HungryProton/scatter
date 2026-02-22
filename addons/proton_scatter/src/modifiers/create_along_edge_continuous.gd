@@ -50,7 +50,7 @@ func _init() -> void:
 
 
 # TODO: Use dichotomic search instead of fixed step length?
-func _process_transforms(transforms, domain, seed) -> void:
+func _process_transforms(transforms, domain, rng) -> void:
 	var new_transforms: Array[Transform3D] = []
 	var curves: Array[Curve3D] = domain.get_edges()
 
@@ -85,7 +85,7 @@ func _process_transforms(transforms, domain, seed) -> void:
 					break
 
 	transforms.append(new_transforms)
-	transforms.shuffle(seed)
+	transforms.shuffle(rng)
 
 
 func get_projected_curve(curve: Curve3D, t: Transform3D) -> Curve3D:
