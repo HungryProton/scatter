@@ -644,7 +644,6 @@ func _perform_sanity_check() -> void:
 	if not modifier_stack:
 		modifier_stack = ProtonScatterModifierStack.new()
 		modifier_stack.just_created = true
-		assert(modifier_stack.parent)
 
 	if not domain:
 		domain = ProtonScatterDomain.new()

@@ -309,9 +309,6 @@ func _discover_shapes_recursive(node: Node) -> void:
 		var info: DomainShapeInfo= DomainShapeInfo.new(node)
 		info.shape = node.shape
 
-		# warmup any lazy initialisation of things required or is point inside
-		info.is_point_inside(Vector3(), true)
-
 		if node.negative:
 			negative_shapes.push_back(info)
 		else:

@@ -62,8 +62,8 @@ func prepare(name: String, total_item_count: int, max_items_per_task: int, execu
 	var distribute_remaining: int = total_item_count
 	_core_count = max(1, OS.get_processor_count() - 2)
 
-	if max_items_per_task < 0:
-		max_items_per_task = max(1, total_item_count / _core_count)
+	if max_items_per_task <= 0:
+		max_items_per_task = total_item_count / _core_count
 
 	max_items_per_task = max(max_items_per_task, MINIMUM_ITEMS_PER_TASK)
 	
@@ -183,7 +183,9 @@ func _remove_done_tasks(executed_count: int) -> void:
 ##
 ## Note that currently just using the default of 1000, to ensure no overlaps occur;
 ## Considered adding it as a property to the modifiers but unfortunatly they
-## dont consume in a deterministic way; so thats really too bad.
+## dont consume in a deterministic way; so thats really too bad; otherwise
+## exact-match scene compatibility with older versions would have been kept
+## for >=5000 amount scatters as well. "got so close, but no sigar...."
 func set_rng_seed(seed: int, steps_per_iteration: int = 1000) -> void:
 	assert(_executor == NO_EXECUTOR_PREPARED)
 	_rng_seed = seed
