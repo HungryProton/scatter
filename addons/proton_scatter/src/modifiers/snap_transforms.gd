@@ -41,7 +41,7 @@ func _init() -> void:
 	p.set_description("Snap the current scale to the nearest multiple.")
 
 
-func _process_transforms(transforms, domain, _seed) -> void:
+func _process_transforms(transforms, domain, _rng) -> void:
 	var s_gt: Transform3D = domain.get_global_transform()
 	var s_lt: Transform3D = domain.get_local_transform()
 	var s_gt_inverse := s_gt.affine_inverse()

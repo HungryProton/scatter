@@ -23,7 +23,7 @@ func _init() -> void:
 		"Rotation angle (in degrees) along each axes (X, Y, Z)")
 
 
-func _process_transforms(transforms, domain, _seed : int) -> void:
+func _process_transforms(transforms, domain, _rng) -> void:
 	var rotation_rad := Vector3.ZERO
 	rotation_rad.x = deg_to_rad(rotation.x)
 	rotation_rad.y = deg_to_rad(rotation.y)

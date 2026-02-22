@@ -54,7 +54,7 @@ func _init() -> void:
 	p.set_description("The Scatter node to use as a reference.")
 
 
-func _process_transforms(transforms, domain, _seed) -> void:
+func _process_transforms(transforms, domain, _rng) -> void:
 	_source_node = domain.get_root().get_node_or_null(scatter_node)
 
 	if not _source_node or not _source_node is ProtonScatter:

@@ -34,10 +34,7 @@ func _init() -> void:
 
 
 # TODO: + Spatial partionning to discard areas outside the domain earlier
-func _process_transforms(transforms, domain, random_seed) -> void:
-	var rng = RandomNumberGenerator.new()
-	rng.set_seed(random_seed)
-
+func _process_transforms(transforms, domain, rng) -> void:
 	# Prepare parts for parallel processing
 	# Note this operation is very light, and thus the gains are pretty much negligable
 	# (saves about 1/6th of the time on my system, but even with 500k items, 
@@ -45,9 +42,10 @@ func _process_transforms(transforms, domain, random_seed) -> void:
 	# every ounce of responsiveness counts.
 	var outputs: Array
 	
-	var _parallel: ProtonScatterParallel = ProtonScatterParallel.new()
+	var parallel: ProtonScatterParallel = ProtonScatterParallel.new()
+	parallel.set_rng_seed(rng.seed)
 	
-	_parallel.prepare("create_inside_random", amount, -1, _generate_randoms, 
+	parallel.prepare("create_inside_random", amount, -1, _generate_randoms, 
 		func(index: int, task: Dictionary):
 			var output: Array[Transform3D] = []
 			outputs.append(output)
@@ -62,7 +60,7 @@ func _process_transforms(transforms, domain, random_seed) -> void:
 			task["rng"].set_seed(rng.randi())
 	)
 	
-	await _parallel.execute_all()
+	await parallel.execute_all()
 
 	for new_transforms: Array[Transform3D] in outputs:
 		transforms.append(new_transforms)

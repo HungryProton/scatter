@@ -20,7 +20,7 @@ func _init() -> void:
 	use_local_space_by_default()
 
 
-func _process_transforms(transforms, domain, _seed) -> void:
+func _process_transforms(transforms, domain, _rng) -> void:
 	var gt: Transform3D = domain.get_global_transform()
 	var gt_inverse: Transform3D = gt.affine_inverse()
 

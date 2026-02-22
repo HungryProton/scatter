@@ -37,7 +37,7 @@ func _init() -> void:
 	p.set_description("How much to scale the transform along each axes (X, Y, Z)")
 
 
-func _process_transforms(transforms, domain, _seed) -> void:
+func _process_transforms(transforms, domain, _rng) -> void:
 	var t: Transform3D
 	var local_t: Transform3D
 	var basis: Basis

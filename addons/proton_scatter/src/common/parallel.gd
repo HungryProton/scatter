@@ -1,18 +1,24 @@
+@tool
 extends RefCounted
+
+const JumpableRNG = preload("../common/random.gd")
+
 
 const MINIMUM_ITEMS_PER_TASK: int = 500
 
 # Master kill switch for quick check if any issue is due to paralellisation or not
 const ENABLE_PARALLELISATION: bool = true  
 
+const NO_EXECUTOR_PREPARED: Callable = Callable()
 
 # Optionally can be used to toggle on per case if needed (might link to UI)
 var enabled: bool = true
 
-
 var _name: String # Convinient for debugging
 var _tasks: Array[Dictionary] = []
-var _executor: Callable = Callable()
+var _executor: Callable = NO_EXECUTOR_PREPARED
+var _rng_seed = 0
+var _rng_steps_per_iteration = 0
 
 var _run_threaded: bool:
 	get():
@@ -64,7 +70,13 @@ func prepare(name: String, total_item_count: int, max_items_per_task: int, execu
 		var task_length: int = min(distribute_remaining, max_items_per_task)
 		var to: int = from + task_length
 		
+		# Keep rng sequence consistent regardless of work distribution/order
+		var rng: JumpableRNG = JumpableRNG.new()
+		rng.seed = _rng_seed
+		rng.jump(from * _rng_steps_per_iteration)
+		
 		var task: Dictionary = {
+			"rng": rng,
 			"from": from,
 			"to": to
 		}
@@ -93,16 +105,17 @@ func get_num_parallel() -> int:
 func execute_all() -> void:
 	if is_done():
 		return
+	
+	var task_count: int = _tasks.size()
 		
 	if _run_threaded:
 		WorkerThreadPool.wait_for_group_task_completion(
-			WorkerThreadPool.add_group_task(_worker_task, _tasks.size())
+			WorkerThreadPool.add_group_task(_worker_task, task_count, _core_count)
 		)
-		_tasks.clear()
-		_executor = Callable()
+		_remove_done_tasks(task_count)
 		return
 	
-	await _execute_blocking(_tasks.size())
+	await _execute_blocking(task_count)
 
 
 ## Run 1 batch of work
@@ -115,17 +128,12 @@ func execute_batch() -> bool:
 
 	if _run_threaded:
 		WorkerThreadPool.wait_for_group_task_completion(
-			WorkerThreadPool.add_group_task(_worker_task, batch_size)
+			WorkerThreadPool.add_group_task(_worker_task, batch_size, _core_count)
 		)
 
-		var remaining: int = _tasks.size() - batch_size
-		if remaining > 0:
-			_tasks = _tasks.slice(batch_size, _tasks.size())
-			return true
-			
-		_tasks.clear()
-		_executor = Callable()
-		return false
+		_remove_done_tasks(batch_size)
+
+		return not is_done()
 
 	await _execute_blocking(1)
 	return not is_done()
@@ -143,10 +151,26 @@ func _execute_blocking(task_count: int) -> void:
 	for i: int in execute_count:
 		await _worker_task(i)
 
-	if is_done():
-		_tasks.clear()
+	_remove_done_tasks(execute_count)
+
+
+func _remove_done_tasks(executed_count: int) -> void:
+	if executed_count <= 0:
 		return
 		
-	_tasks = _tasks.slice(execute_count, _tasks.size())
-
+	assert(executed_count <= _tasks.size())
 	
+	if executed_count == _tasks.size():
+		_tasks.clear()
+	else:
+		_tasks = _tasks.slice(executed_count, _tasks.size())
+	
+	if is_done():
+		_executor = NO_EXECUTOR_PREPARED
+
+## Sets the RNG seed, and how many randoms per iterations
+## Must be called before prepare
+func set_rng_seed(seed: int, steps_per_iteration: int = 1) -> void:
+	assert(_executor == NO_EXECUTOR_PREPARED)
+	_rng_seed = seed
+	_rng_steps_per_iteration = steps_per_iteration

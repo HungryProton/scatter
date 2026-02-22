@@ -26,7 +26,7 @@ func _init() -> void:
 		"Up axes (X, Y, Z)")
 
 
-func _process_transforms(transforms, domain, _seed : int) -> void:
+func _process_transforms(transforms, domain, _rng) -> void:
 	var st: Transform3D = domain.get_global_transform()
 
 	for i in transforms.size():

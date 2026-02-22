@@ -92,7 +92,7 @@ func _init() -> void:
 		If it collides, the point will be excluded from the list.")
 
 
-func _process_transforms(transforms, domain, _seed) -> void:
+func _process_transforms(transforms, domain, _rng) -> void:
 	if transforms.is_empty():
 		return
 	

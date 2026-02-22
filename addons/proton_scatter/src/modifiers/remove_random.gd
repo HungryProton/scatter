@@ -23,10 +23,8 @@ func _init() -> void:
 		At 0, nothing is removed. At 100, everything is removed.")
 
 
-func _process_transforms(transforms: TransformList, _domain: Domain, seed: int) -> void:
+func _process_transforms(transforms: TransformList, _domain: Domain, rng: RandomNumberGenerator) -> void:
 	var i := 0
-	var rng := RandomNumberGenerator.new()
-	rng.seed = seed
 	var threshold: float = probability / 100.0
 
 	while i < transforms.size():
