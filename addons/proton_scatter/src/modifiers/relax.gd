@@ -135,9 +135,12 @@ func compute_closest(transforms) -> PackedVector3Array:
 	input.resize(padded_num_floats) # indexing in the compute shader requires padding
 	var input_bytes := input.to_byte_array()
 	var output_bytes := input_bytes.duplicate()
+	var params := PackedInt32Array([transforms.size()])
+	var params_bytes := params.to_byte_array()
 	# Create a storage buffer that can hold our float values.
 	var buffer_in := rd.storage_buffer_create(input_bytes.size(), input_bytes)
 	var buffer_out := rd.storage_buffer_create(output_bytes.size(), output_bytes)
+	var buffer_params := rd.storage_buffer_create(params_bytes.size(), params_bytes)
 
 	# Create a uniform to assign the buffer to the rendering device
 	var uniform_in := RDUniform.new()
@@ -149,8 +152,12 @@ func compute_closest(transforms) -> PackedVector3Array:
 	uniform_out.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
 	uniform_out.binding = 1 # this needs to match the "binding" in our shader file
 	uniform_out.add_id(buffer_out)
+	var uniform_params := RDUniform.new()
+	uniform_params.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	uniform_params.binding = 2 # this needs to match the "binding" in our shader file
+	uniform_params.add_id(buffer_params)
 	# the last parameter (the 0) needs to match the "set" in our shader file
-	var uniform_set := rd.uniform_set_create([uniform_in, uniform_out], shader, 0)
+	var uniform_set := rd.uniform_set_create([uniform_in, uniform_out, uniform_params], shader, 0)
 
 	# Create a compute pipeline
 	var pipeline := rd.compute_pipeline_create(shader)
@@ -179,6 +186,7 @@ func compute_closest(transforms) -> PackedVector3Array:
 		rd.free_rid(shader)
 		rd.free_rid(buffer_in)
 		rd.free_rid(buffer_out)
+		rd.free_rid(buffer_params)
 		rd.free()
 		rd = null
 	return retval
