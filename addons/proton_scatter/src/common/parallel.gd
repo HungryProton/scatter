@@ -3,32 +3,41 @@ extends RefCounted
 
 const JumpableRNG = preload("../common/random.gd")
 
+const WORK_AMOUNT_ALL: int = 0
+const TASK_ITEM_LIMIT_AUTO: int = 0
 
-const MINIMUM_ITEMS_PER_TASK: int = 500
+# Low lower limit to allow respecting max_rays_per_limit if set lower than default
+const _MINIMUM_ITEMS_PER_TASK: int = 50
+# Limit tasks to small pieces; this prevents dragging out completion time by one or more
+# workers that happen to become available late (they start later).
+const _MAXIMUM_ITEMS_PER_TASK: int = 1000
 
 # Master kill switch for quick check if any issue is due to paralellisation or not
-const ENABLE_PARALLELISATION: bool = true  
+const _ENABLE_PARALLELISATION: bool = true  
 
-const NO_EXECUTOR_PREPARED: Callable = Callable()
+const _NO_EXECUTOR_PREPARED: Callable = Callable()
+
+const _PARALLEL_MINIMUM_ITEMS_THRESHOLD = 1000
+
 
 # Optionally can be used to toggle on per case if needed (might link to UI)
 var enabled: bool = true
 
 var _name: String # Convinient for debugging
 var _tasks: Array[Dictionary] = []
-var _executor: Callable = NO_EXECUTOR_PREPARED
+var _executor: Callable = _NO_EXECUTOR_PREPARED
 var _rng_seed = 0
 var _rng_steps_per_iteration = 1
 
-var _run_threaded: bool:
+var _enabled: bool:
 	get(): 
-		return enabled and ENABLE_PARALLELISATION and _tasks.size() > 1
+		return enabled and _ENABLE_PARALLELISATION 
 
-var _core_count: int:
+var _max_parallel: int:
 	get():
-		if !_run_threaded:
+		if not _enabled:
 			return 1
-			
+		
 		var reserved_cores: int = 1 # Main thread
 		
 		var rendering_thread_mode = ProjectSettings.get_setting("rendering/driver/threads/thread_model")
@@ -47,30 +56,49 @@ var _core_count: int:
 		return max(1, OS.get_processor_count() - reserved_cores)
 
 
+## Get the task size that will be used given the count and per task limit
+## Use this if need to pre-fab splits before preparing
+func get_task_size(total_item_count: int, task_item_limit: int = TASK_ITEM_LIMIT_AUTO) -> int:
+	
+	# To keep older scenes placement exact match compatible dont split small amounts
+	# as the RNG jumps using fixed consumption offset will change the sequence.
+	# Only relevant for smaller sets, as its very unlikely someone relies on 
+	# exact placement on bulk items. Doing this here instead on calling side
+	# ensures the stack and all modifiers adhere to it.
+	if !_enabled or total_item_count <= _PARALLEL_MINIMUM_ITEMS_THRESHOLD:
+		# This will cause 1 task, and having just 1 task will run in same thread
+		return total_item_count
+	
+	var items_per_task: int = total_item_count / _max_parallel
+
+	if task_item_limit > TASK_ITEM_LIMIT_AUTO:
+		items_per_task = min(items_per_task, task_item_limit)
+
+	items_per_task = min(items_per_task, _MAXIMUM_ITEMS_PER_TASK)
+	items_per_task = max(items_per_task, _MINIMUM_ITEMS_PER_TASK)
+	return items_per_task
+
+
 ## Prepare parallel processing
 ## If max_items_per_task < 0, distribution size is automatic
-## Executor is func executor(task: Dictionary)
+## Executor is func executor(from: int, to: int, task: Dictionary)
 ## Task initializer is func task_initializer(index: int, task: Dictionary)
 ## Task dict has 'from' and 'to' indexes, relating to the total item count
 ## Task initializer can be used to enrich the task data
-func prepare(name: String, total_item_count: int, max_items_per_task: int, executor: Callable, task_initializer: Callable= Callable()) -> void:
-	assert(not executor.is_null() and executor.get_argument_count() == 1)
+func prepare(name: String, total_item_count: int, task_item_limit: int, executor: Callable, task_initializer: Callable= Callable()) -> void:
+	assert(not executor.is_null() and executor.get_argument_count() == 3)
 	assert(task_initializer.is_null() or task_initializer.get_argument_count() == 2)
 
 	_name = name
 
 	var distribute_remaining: int = total_item_count
-	_core_count = max(1, OS.get_processor_count() - 2)
 
-	if max_items_per_task <= 0:
-		max_items_per_task = total_item_count / _core_count
+	var items_per_task: int = get_task_size(total_item_count, task_item_limit)
 
-	max_items_per_task = max(max_items_per_task, MINIMUM_ITEMS_PER_TASK)
-	
 	var from: int = 0
 	_tasks.clear()
 	while distribute_remaining > 0:
-		var task_length: int = min(distribute_remaining, max_items_per_task)
+		var task_length: int = min(distribute_remaining, items_per_task)
 		var to: int = from + task_length
 		
 		# Keep rng sequence consistent regardless of split distribution and order
@@ -95,72 +123,72 @@ func prepare(name: String, total_item_count: int, max_items_per_task: int, execu
 
 	if _tasks.is_empty():
 		return
-	
+
 	_executor = executor
 
-
+## Returns true if work is completed; false if tasks (and thus items) left
 func is_done() -> bool:
 	return _tasks.is_empty()
 
 
-func get_num_parallel() -> int:
-	return _core_count
+## Get the max parallel threads used to complete tasks
+func get_max_parallel() -> int:
+	return _max_parallel
 
 
-## Run all work in 1 go
-func execute_all() -> void:
-	if is_done():
-		return
-	
-	var task_count: int = _tasks.size()
-		
-	if _run_threaded:
-		WorkerThreadPool.wait_for_group_task_completion(
-			WorkerThreadPool.add_group_task(_worker_task, task_count, _core_count)
-		)
-		_remove_done_tasks(task_count)
-		return
-	
-	await _execute_blocking(task_count)
-
-
-## Run 1 batch of work
-## Returns true if there is more work, false when done
-func execute_batch() -> bool:
+## Execute the given amount of work (which is rounded up to the task needed)
+## returns true if there is more work, false if done
+func execute_work(item_amount: int = WORK_AMOUNT_ALL) -> bool:
 	if is_done():
 		return false
-
-	var batch_size: int = min(_tasks.size(), _core_count)
-
-	if _run_threaded:
+	
+	if _enabled and _tasks.size() > 1:
+		var task_count: int = _get_task_count_for_work(item_amount)
 		WorkerThreadPool.wait_for_group_task_completion(
-			WorkerThreadPool.add_group_task(_worker_task, batch_size, _core_count)
+			WorkerThreadPool.add_group_task(_worker_task, task_count, _max_parallel)
 		)
+		_remove_done_tasks(task_count)
+		return true
+	
+	return await _execute_in_current_thread(item_amount)
 
-		_remove_done_tasks(batch_size)
-
-		return not is_done()
-
-	await _execute_blocking(1)
-	return not is_done()
-
-
+## Invoke executor to complete the task
 func _worker_task(task_index: int) -> void:
 	var task: Dictionary = _tasks[task_index]
 	#print("task %s start, range %s to %s" % [ _name, task['from'], task['to']])
-	await _executor.call(task)
-	#print("task %s finished" % [ _name ])
+	await _executor.call(task['from'], task['to'], task)
+	#print("task %s finished, range %s to %s" % [ _name, task['from'], task['to']])
 
-# Used when parallel disabled, or just 1 task (only gives thread sync overhead)
-func _execute_blocking(task_count: int) -> void:
+
+## Execute in current thread
+## Used when parallel disabled, or just 1 task (only gives thread sync overhead)
+## Returns true if there is more work left
+func _execute_in_current_thread(item_amount: int = WORK_AMOUNT_ALL) -> bool:
 	if is_done():
-		return
+		return false
 
-	var execute_count: int = min(task_count, _tasks.size())
-	for i: int in execute_count:
-		await _worker_task(i)
+	var task_count: int = _get_task_count_for_work(item_amount)
 
-	_remove_done_tasks(execute_count)
+	for t: int in task_count:
+		await _worker_task(t)
+		
+	_remove_done_tasks(task_count)
+
+	return not is_done()
+
+## Get the amount of tasks to complete to work the given item count.
+## Note this will not split tasks, so will round up to nearest.
+func _get_task_count_for_work(item_count: int = WORK_AMOUNT_ALL) -> int:
+	if item_count <= WORK_AMOUNT_ALL:
+		return _tasks.size()
+		
+	var task_count: int = 0
+	while item_count > 0 and task_count < _tasks.size():
+		var task: Dictionary = _tasks[task_count]
+		item_count -= task['to'] - task['from']
+		task_count += 1
+		
+	return task_count
 
 
 func _remove_done_tasks(executed_count: int) -> void:
@@ -175,7 +203,7 @@ func _remove_done_tasks(executed_count: int) -> void:
 		_tasks = _tasks.slice(executed_count, _tasks.size())
 	
 	if is_done():
-		_executor = NO_EXECUTOR_PREPARED
+		_executor = _NO_EXECUTOR_PREPARED
 
 
 ## Sets the RNG seed, and how many randoms consumed per iteration (int = 1, float = 2)
@@ -185,8 +213,8 @@ func _remove_done_tasks(executed_count: int) -> void:
 ## Considered adding it as a property to the modifiers but unfortunatly they
 ## dont consume in a deterministic way; so thats really too bad; otherwise
 ## exact-match scene compatibility with older versions would have been kept
-## for >=5000 amount scatters as well. "got so close, but no sigar...."
+## for >=_PARALLEL_MINIMUM_ITEMS_THRESHOLD amount scatters as well. "got so close, but no sigar...."
 func set_rng_seed(seed: int, steps_per_iteration: int = 1000) -> void:
-	assert(_executor == NO_EXECUTOR_PREPARED)
+	assert(_executor == _NO_EXECUTOR_PREPARED)
 	_rng_seed = seed
 	_rng_steps_per_iteration = steps_per_iteration

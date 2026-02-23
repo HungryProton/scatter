@@ -81,9 +81,10 @@ func _physics_process(_delta: float) -> void:
 	if not _space_state:
 		_space_state = get_tree().get_root().get_world_3d().get_direct_space_state()
 
-	# Do the max_queries, on N cores in parallel; this keeps the setting backward compatible
+	# Do the max_queries x parallel; this keeps the setting backward compatible
 	# while improving performance by as much as the used CPU allows.
-	if await _parallel.execute_batch():
+	var items: int = _max_queries_per_frame * _parallel.get_max_parallel()
+	if await _parallel.execute_work(items):
 		return
 
 	set_physics_process(false)
@@ -91,9 +92,7 @@ func _physics_process(_delta: float) -> void:
 	job_completed.emit()
 
 
-func _raycasts_worker_task(task: Dictionary) -> void:
-	var from_ray: int = task["from"] 
-	var to_ray: int = task["to"] 
+func _raycasts_worker_task(from_ray: int, to_ray: int, task: Dictionary) -> void:
 
 	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
 	query.collision_mask = _collision_mask

@@ -40,33 +40,32 @@ func _process_transforms(transforms, domain, rng) -> void:
 	# (saves about 1/6th of the time on my system, but even with 500k items, 
 	# thats just about 60ms). However, when transforming items in 3D view, 
 	# every ounce of responsiveness counts.
-	var outputs: Array
+	var outputs: Array = []
 	
 	var parallel: ProtonScatterParallel = ProtonScatterParallel.new()
 	parallel.set_rng_seed(rng.seed)
 	
-	var name: String = domain.root.name + " create_inside_random %s" % [ amount ]
+	# Prevent calling global transform from non-main thread, resuling in identity
+	var basis: Basis = domain.get_global_transform().affine_inverse().basis
 	
-	parallel.prepare(name, amount, -1, _generate_randoms, 
+	var name: String = domain.root.name + " create_inside_random %s" % [ amount ]
+
+	parallel.prepare(name, amount, parallel.TASK_ITEM_LIMIT_AUTO, _generate_randoms, 
 		func(index: int, task: Dictionary):
 			var output: Array[Transform3D] = []
 			outputs.append(output)
 			task["domain"] = domain
 			task["output"] = output
-		
-			# Prevent calling global transform from non-main thread, resuling in identity
-			task["basis"] = domain.get_global_transform().affine_inverse().basis
+			task["basis"] = basis
 	)
 	
-	await parallel.execute_all()
+	await parallel.execute_work()
 
 	for new_transforms: Array[Transform3D] in outputs:
 		transforms.append(new_transforms)
+
 	
-	
-func _generate_randoms(task: Dictionary) -> void:
-	var from: int = task["from"]
-	var to: int = task["to"]
+func _generate_randoms(from: int, to: int, task: Dictionary) -> void:
 	var rng: RandomNumberGenerator = task["rng"]
 	var output: Array[Transform3D] = task["output"] 
 	var domain: ProtonScatterDomain = task["domain"]

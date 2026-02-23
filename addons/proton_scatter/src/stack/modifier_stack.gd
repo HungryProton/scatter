@@ -12,11 +12,6 @@ signal transforms_ready
 
 @export var stack: Array[ScatterBaseModifier] = []
 
-# Below 5000 there is little chance that the workerthreads overhead is worth it
-# Note that above 5000 result of scatter is different from older pre-parallel
-# versions.
-const USE_WORKERTHREADS_THRESHOLD: int = 5000
-
 var just_created := false
 var parent: ProtonScatter
 
@@ -29,42 +24,46 @@ func start_update(scatter_node: ProtonScatter, domain):
 	assert(parent == scatter_node)
 
 	var transforms: TransformList = TransformList.new()
+
 	var rng: JumpableRNG = JumpableRNG.new()
 	var parallel: ProtonScatterParallel = ProtonScatterParallel.new()
 
 	for modifier in stack:
-		var name: String = "%s_%s" % [ parent.name, modifier.display_name]
+		var seed: int = modifier.get_rng_seed(scatter_node.global_seed)
 		
-		rng.seed = modifier.get_rng_seed(scatter_node.global_seed)
-		
-		var run_parallel: bool = modifier.allow_parallel() and transforms.size() > USE_WORKERTHREADS_THRESHOLD
-		if not run_parallel:
+		if not modifier.allow_parallel():
+			rng.seed = seed
 			await modifier.process_transforms(transforms, domain, rng)
 			continue
 
-		parallel.set_rng_seed(rng.seed)
+		parallel.set_rng_seed(seed)
 
-		var splits: Array[TransformList] = _split_transforms_list(transforms, parallel.get_num_parallel())
-	
-		parallel.prepare(name, transforms.size(), splits[0].size(), _process_transforms_split, 
+		var split_size: int = parallel.get_task_size(transforms.size())
+		var splits: Array[TransformList] = _split_transforms_list(transforms, split_size)
+		
+		var name: String = "%s_%s" % [ parent.name, modifier.display_name]
+		parallel.prepare(name, transforms.size(), parallel.TASK_ITEM_LIMIT_AUTO, _process_transforms_split, 
 			func(index: int, task: Dictionary):
 				task["split"] = splits[index]
-				task["modifier"] = modifier.duplicate() # duplicate Still needed? not sure TODO: test without
 				task["domain"] = domain
+
+				# Duplicate *is needed* as some modifiers set the RNG as a member
+				# and otherwise would all share the same RNG, causing duplicate transforms
+				task["modifier"] = modifier.duplicate() 
 		)
 		
-		await parallel.execute_all()
+		await parallel.execute_work()
 
 		transforms.clear()
 		for result_part in splits:
 			transforms.append(result_part.list)
 
-			
 	transforms_ready.emit(transforms)
+	
 	return transforms
 
 
-func _process_transforms_split(task: Dictionary) -> void:
+func _process_transforms_split(from_: int, to_: int, task: Dictionary) -> void:
 	var modifier: ScatterBaseModifier = task["modifier"]
 	var split: TransformList = task['split']
 	await modifier.process_transforms(split, task['domain'], task['rng'])
@@ -140,9 +139,8 @@ func _on_modifier_changed() -> void:
 	stack_changed.emit()
 
 
-func _split_transforms_list(list: TransformList, part_count: int) -> Array[TransformList]:
+func _split_transforms_list(list: TransformList, part_size: int) -> Array[TransformList]:
 	var result: Array[TransformList] = []
-	var part_size: int = max(1000, max(1, list.size() / part_count))
 	
 	var cursor: int = 0
 	var remaining: int = list.size()
