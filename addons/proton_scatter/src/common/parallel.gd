@@ -82,8 +82,8 @@ func get_task_size(total_item_count: int, task_item_limit: int = TASK_ITEM_LIMIT
 ## If max_items_per_task < 0, distribution size is automatic
 ## Executor is func executor(from: int, to: int, task: Dictionary)
 ## Task initializer is func task_initializer(index: int, task: Dictionary)
-## Task dict has 'from' and 'to' indexes, relating to the total item count
-## Task initializer can be used to enrich the task data
+## Task dict has a 'rng': RandomNumberGenerator, which is jumped to the from position
+## Task initializer can be used to enrich the task data further
 func prepare(name: String, total_item_count: int, task_item_limit: int, executor: Callable, task_initializer: Callable= Callable()) -> void:
 	assert(not executor.is_null() and executor.get_argument_count() == 3)
 	assert(task_initializer.is_null() or task_initializer.get_argument_count() == 2)

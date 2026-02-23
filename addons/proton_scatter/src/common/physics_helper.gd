@@ -83,6 +83,8 @@ func _physics_process(_delta: float) -> void:
 
 	# Do the max_queries x parallel; this keeps the setting backward compatible
 	# while improving performance by as much as the used CPU allows.
+	# Note that the server is not threadsafe, however we are in the space-state's
+	# owning thread, and we block here while only doing read-only ops, so its fine.
 	var items: int = _max_queries_per_frame * _parallel.get_max_parallel()
 	if await _parallel.execute_work(items):
 		return
