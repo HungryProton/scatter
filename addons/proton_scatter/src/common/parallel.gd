@@ -6,11 +6,10 @@ const JumpableRNG = preload("../common/random.gd")
 const WORK_AMOUNT_ALL: int = 0
 const TASK_ITEM_LIMIT_AUTO: int = 0
 
-# Low lower limit to allow respecting max_rays_per_limit if set lower than default
-const _MINIMUM_ITEMS_PER_TASK: int = 50
+const _MINIMUM_ITEMS_PER_TASK: int = 250
 # Limit tasks to small pieces; this prevents dragging out completion time by one or more
 # workers that happen to become available late (they start later).
-const _MAXIMUM_ITEMS_PER_TASK: int = 1000
+const _MAXIMUM_ITEMS_PER_TASK: int = 2000
 
 # Master kill switch for quick check if any issue is due to paralellisation or not
 const _ENABLE_PARALLELISATION: bool = true  
@@ -133,7 +132,7 @@ func is_done() -> bool:
 
 ## Get the max parallel threads used to complete tasks
 func get_max_parallel() -> int:
-	return _max_parallel
+	return _max_parallel if _enabled else 1
 
 
 ## Execute the given amount of work (which is rounded up to the task needed)
