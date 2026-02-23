@@ -48,7 +48,8 @@ const ProtonScatterColliders := preload('./common/colliders.gd')
 ## Use Particles (2): Uses GPU particles system for very large numbers of objects.
 @export_enum("Use Instancing:0",
 			"Create Copies:1",
-			"Use Particles:2")\
+			"Use Particles:2",
+			"Custom:3")\
 		var render_mode := 0:
 	set(val):
 		render_mode = val
@@ -94,7 +95,15 @@ var chunk_dimensions := Vector3.ONE * 15.0:
 ## editing performance can be greatly improved by disabling this.
 @export var enable_colliders_in_editor := true
 
-
+## Custom render script; only used when Render Mode is set to Custom.
+## See the sample script in the demo folder.
+@export var custom_render_script: Script:
+	set(val):
+		custom_render_script = val
+		if is_ready:
+			notify_property_list_changed()
+			full_rebuild.call_deferred()
+			
 @export_group("Compatibility")
 
 @export var force_uniform_scale: bool = false:
@@ -708,6 +717,8 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 			_update_duplicates()
 		2:
 			_update_particles_system()
+		3:
+			_update_custom()
 
 	update_gizmos()
 	build_version += 1
@@ -716,3 +727,19 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		await get_tree().process_frame
 
 	build_completed.emit()
+
+
+func _update_custom() -> void:
+	clear_output()
+	
+	if not custom_render_script:
+		push_error("ProtonScatter: Render mode 'Custom' requires custom render script to be set.")
+		return
+
+	var custom_render: Object = custom_render_script.new()
+	
+	if not custom_render.has_method("protonscatter_custom_render"):
+		push_error("ProtonScatter: Custom render script must have protonscatter_custom_render(...) function.")
+	
+	custom_render.protonscatter_custom_render(self)
+	pass
