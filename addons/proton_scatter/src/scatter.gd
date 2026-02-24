@@ -778,6 +778,7 @@ func _update_custom() -> void:
 			
 		items_to_render.append( {
 			"item": item,
+			"root": root,
 			"mesh": ProtonScatterUtil.get_merged_meshes_from(item),
 			"transforms": item_transforms
 		})

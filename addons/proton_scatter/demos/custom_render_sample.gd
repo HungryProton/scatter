@@ -15,7 +15,14 @@ extends RefCounted
 ##             By creating your own resource type; this allows to have custom configuration
 ##             properties inside of the scatter node inspector panel.
 ##
-## items:      [ { "item" : ProtonScatterItem, "mesh": Mesh, "transforms": Array[Transform3d] } ]
+## items:      [ 
+##					{ 
+##						"item" : ProtonScatterItem, 
+##                 		"mesh": Mesh,
+##                 		"root": Node3D 
+##                 		"transforms": Array[Transform3d] 
+##					}, ... 
+##				]
 ##
 ## Note that item.process_transform already has been applied to the transforms
 func protonscatter_custom_render(scatter: ProtonScatter, config: Resource, items: Array[Dictionary]) -> void:
