@@ -103,7 +103,12 @@ var chunk_dimensions := Vector3.ONE * 15.0:
 		if is_ready:
 			notify_property_list_changed()
 			full_rebuild.call_deferred()
-			
+
+## Custom render resource that will be passed to the custom render script.
+## This allows custom configuration parameters to be set/passed.
+@export var custom_render_resource: Resource
+
+
 @export_group("Compatibility")
 
 @export var force_uniform_scale: bool = false:
@@ -741,5 +746,5 @@ func _update_custom() -> void:
 	if not custom_render.has_method("protonscatter_custom_render"):
 		push_error("ProtonScatter: Custom render script must have protonscatter_custom_render(...) function.")
 	
-	custom_render.protonscatter_custom_render(self)
+	custom_render.protonscatter_custom_render(self, transforms.list, custom_render_resource)
 	pass
