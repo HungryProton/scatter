@@ -746,5 +746,39 @@ func _update_custom() -> void:
 	if not custom_render.has_method("protonscatter_custom_render"):
 		push_error("ProtonScatter: Custom render script must have protonscatter_custom_render(...) function.")
 	
-	custom_render.protonscatter_custom_render(self, transforms.list, custom_render_resource)
-	pass
+	if items.is_empty():
+		_discover_items()
+		
+	var transforms_count: int = transforms.size()
+	var t_offset: int = 0
+	var items_to_render: Array[Dictionary] = []
+	for item: ProtonScatterItem in items:
+		
+		var root: Node3D = ProtonScatterUtil.get_or_create_item_root(item)
+		if not is_instance_valid(root):
+			continue
+
+		# Consume transforms for this item
+		var item_transforms: Array[Transform3D] = []
+		
+		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
+		var t_list = transforms.list.slice(t_offset)		
+
+		for i in count:
+			if (t_offset + i) >= transforms_count:
+				continue
+
+			var t: Transform3D = item.process_transform(transforms.list[t_offset + i])
+			item_transforms.append(t)
+
+		t_offset += count
+		
+		if item_transforms.is_empty():
+			continue
+			
+		items_to_render.append( {
+			"item": item,
+			"transforms": item_transforms
+		})
+
+	custom_render.protonscatter_custom_render(self, custom_render_resource, items_to_render)

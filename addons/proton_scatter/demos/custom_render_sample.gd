@@ -11,14 +11,16 @@ extends RefCounted
 ## scatter:    The scatter node; note using this introduces higher chance if incompatibility
 ##             of your script with future versions of ProtonScatter
 ##
-## transforms: The transforms result from the modifier stack
-##
 ## config:     The custom render resource set on the node, cast this to what you expect (if any)
 ##             By creating your own resource type; this allows to have custom configuration
 ##             properties inside of the scatter node inspector panel.
 ##
-func protonscatter_custom_render(scatter: ProtonScatter, transforms: Array[Transform3D], config: Resource) -> void:
+## items:      [ { "item" : ProtonScatterItem, "transforms": Array[Transform3d] } ]
+##
+## Note that item.process_transform already has been applied to the transforms
+func protonscatter_custom_render(scatter: ProtonScatter, config: Resource, items: Array[Dictionary]) -> void:
 	print("Using sample protonscatter_custom_render")
+	#print(items)
+	# Replace this below with your custom render-instancing code
 	
-	# Just use one of the standard ones; replace this with your custom render-instancing code
 	scatter._update_multimeshes()
