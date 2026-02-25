@@ -1,4 +1,4 @@
-extends RefCounted
+extends ScatterRender
 
 ## Custom render sample
 ## 1. Open the demo scene, select a Scatter node
@@ -25,9 +25,20 @@ extends RefCounted
 ##				]
 ##
 ## Note that item.process_transform already has been applied to the transforms
-func protonscatter_custom_render(scatter: ProtonScatter, config: Resource, items: Array[Dictionary]) -> void:
+func render(scatter: ProtonScatter, 
+			config: Resource, 
+			item: ProtonScatterItem, 
+			root: Node3D, 
+			mesh_instance: MeshInstance3D, 
+			transforms: Array[Transform3D]
+			):
+
 	print("Using sample protonscatter_custom_render")
-	#print(items)
-	# Replace this below with your custom render-instancing code
+
+	if config and config is DemoScatterRenderConfig:
+		print(config.greetings)
+
+	# replace this with your render implementation
+	# See /render directory for the existing modes for examples
+
 	
-	scatter._update_multimeshes()
