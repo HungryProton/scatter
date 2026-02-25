@@ -593,6 +593,9 @@ func _invoke_render(render: ScatterRender) -> void:
 	
 	for item: ProtonScatterItem in items:
 		
+		if not item.visible:
+			continue
+		
 		var root: Node3D = ProtonScatterUtil.get_or_create_item_root(item)
 		if not is_instance_valid(root):
 			continue
@@ -617,4 +620,4 @@ func _invoke_render(render: ScatterRender) -> void:
 		if render.wants_item_merged_mesh_instance():
 			mesh_instance = ProtonScatterUtil.get_merged_meshes_from(item)
 		
-		render.render(self, custom_render_config, item, root, mesh_instance, transforms.list)
+		render.render(self, custom_render_config, item, root, mesh_instance, item_transforms)
