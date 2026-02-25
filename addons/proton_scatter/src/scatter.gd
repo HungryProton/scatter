@@ -13,6 +13,7 @@ const ProtonScatterPhysicsHelper := preload("./common/physics_helper.gd")
 const ProtonScatterTransformList := preload("./common/transform_list.gd")
 const ProtonScatterUtil := preload('./common/scatter_util.gd')
 const ProtonScatterColliders := preload('./common/colliders.gd')
+const ProtonScatterParallel := preload('./common/parallel.gd')
 
 const InstancingRender := preload('./render/render_instances.gd')
 const CopiesRender := preload('./render/render_copies.gd')
@@ -587,6 +588,7 @@ func _invoke_render(render: ScatterRender) -> void:
 		_discover_items()
 		
 	var transforms_count: int = transforms.size()
+	var transforms_list: Array[Transform3D] = transforms.list
 	var t_offset: int = 0
 
 	_colliders.clear()
@@ -604,16 +606,24 @@ func _invoke_render(render: ScatterRender) -> void:
 
 		# Consume transforms for this item
 		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		var item_transforms: Array[Transform3D] = transforms.list.slice(t_offset, t_offset + count)
+
+		var item_transforms: ProtonScatterTransformList = ProtonScatterTransformList.new()
+		item_transforms.list = transforms_list.slice(t_offset, t_offset + count)
+		var item_transforms_list: Array[Transform3D] =  item_transforms.list
 		t_offset += count
 
-		# Process to final transform and make colliders
+		# Process to final transform (parallel = not profitable)
 		for i in item_transforms.size():
-			var t: Transform3D = item.process_transform(transforms.list[i])
-			transforms.list[i] = t
-			_colliders.create_collider_instance_from_template(self, shapes_template, t)
+			var t: Transform3D = item.process_transform(item_transforms_list[i])
+			item_transforms_list[i] = t
 
-		_colliders.commit(self)
+		# Colliders:
+		# Having seperate loop saves 1 call stack frame, but costs the loop and lookup
+		# However the save saves x count when colliders are not enabled.
+		if _colliders.enable:
+			for i in item_transforms.size():
+				_colliders.create_collider_instance_from_template(self, shapes_template, item_transforms_list[i])
+			_colliders.commit(self)
 		
 		var mesh_instance: MeshInstance3D
 		

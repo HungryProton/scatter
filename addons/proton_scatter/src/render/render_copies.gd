@@ -1,6 +1,7 @@
 extends ScatterRender
 
 const ProtonScatterUtil := preload('./../common/scatter_util.gd')
+const ProtonScatterTransformList := preload('./../common/transform_list.gd')
 
 func wants_item_merged_mesh_instance() -> bool:
 	return false
@@ -10,7 +11,7 @@ func render(scatter: ProtonScatter,
 			item: ProtonScatterItem, 
 			root: Node3D, 
 			mesh_instance: MeshInstance3D, 
-			transforms: Array[Transform3D]
+			transforms: ProtonScatterTransformList
 			):
 				
 	assert(mesh_instance == null) # Clones item instead
@@ -18,7 +19,7 @@ func render(scatter: ProtonScatter,
 	var transforms_count: int = transforms.size()
 
 	var child_count := root.get_child_count()
-	
+	var transforms_list:= transforms.list
 	for i: int in transforms.size():
 		
 		var instance: Node3D 
@@ -31,7 +32,7 @@ func render(scatter: ProtonScatter,
 		if not instance:
 			break
 
-		instance.transform = transforms[i]
+		instance.transform = transforms_list[i]
 		ProtonScatterUtil.set_visibility_layers(instance, item.visibility_layers)
 		i += 1
 	

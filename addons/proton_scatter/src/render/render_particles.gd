@@ -1,13 +1,14 @@
 extends ScatterRender
 
 const ProtonScatterUtil := preload('./../common/scatter_util.gd')
+const ProtonScatterTransformList := preload('./../common/transform_list.gd')
 
 func render(scatter: ProtonScatter, 
 			config: Resource, 
 			item: ProtonScatterItem, 
 			root: Node3D, 
 			mesh_instance: MeshInstance3D, 
-			transforms: Array[Transform3D]
+			transforms: ProtonScatterTransformList
 			):
 
 	var transforms_count: int = transforms.size()
@@ -20,7 +21,7 @@ func render(scatter: ProtonScatter,
 	particles.visibility_aabb = AABB(domain.bounds_local.min, domain.bounds_local.size)
 	particles.amount = transforms_count
 
-	for t in transforms:
+	for t in transforms.list:
 		particles.emit_particle(
 			t,
 			Vector3.ZERO,

@@ -1,17 +1,16 @@
 extends ScatterRender
 
 const ProtonScatterUtil := preload('./../common/scatter_util.gd')
+const ProtonScatterTransformList := preload('./../common/transform_list.gd')
 
 func render(scatter: ProtonScatter, 
 			config: Resource, 
 			item: ProtonScatterItem, 
 			root: Node3D, 
 			mesh_instance: MeshInstance3D, 
-			transforms: Array[Transform3D]
+			transforms: ProtonScatterTransformList
 			):
 				
-	print("Instancing render")
-
 	var domain := scatter.domain
 	var chunk_dimensions := scatter.chunk_dimensions
 	
@@ -35,10 +34,10 @@ func render(scatter: ProtonScatter,
 			for zi in splits.z:
 				transform_chunks[xi][yi].append([])
 
-	var aabb = ProtonScatterUtil.get_aabb_from_transforms(transforms)
+	var aabb = transforms.aabb
 	aabb = aabb.grow(0.1) # avoid degenerate cases
 	
-	for t in transforms:
+	for t in transforms.list:
 		
 		# If this fires, a modifier misbehaved
 		assert(aabb.has_point(t.origin))
@@ -70,7 +69,7 @@ func render(scatter: ProtonScatter,
 				# Use the eventual aabb as origin
 				# The multimeshinstance needs to be centered where the transforms are
 				# This matters because otherwise the visibility range fading is messed up
-				var center =  ProtonScatterUtil.get_aabb_from_transforms(transform_chunks[xi][yi][zi]).get_center()
+				var center =  TransformList.aabb_from_array(transform_chunks[xi][yi][zi]).get_center()
 				mmi.transform.origin = center
 
 				var t: Transform3D

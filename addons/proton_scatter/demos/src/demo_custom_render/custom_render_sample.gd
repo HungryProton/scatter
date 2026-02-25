@@ -2,6 +2,8 @@ extends ScatterRender
 
 ## Custom render sample
 
+const TransformList := preload("res://addons/proton_scatter/src/common/transform_list.gd")
+
 ## scatter:    The ProtonScatter node
 ##
 ## config:     The ScatterRenderConfig set on the node.
@@ -22,7 +24,7 @@ func render(scatter: ProtonScatter,
 			item: ProtonScatterItem, 
 			root: Node3D, 
 			mesh_instance: MeshInstance3D, 
-			transforms: Array[Transform3D]
+			transforms: TransformList
 			):
 
 	print("Using sample protonscatter_custom_render")

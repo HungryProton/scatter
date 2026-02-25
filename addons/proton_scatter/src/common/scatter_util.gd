@@ -362,15 +362,6 @@ static func set_owner_recursive(node: Node, new_owner) -> void:
 		set_owner_recursive(c, new_owner)
 
 
-static func get_aabb_from_transforms(transforms : Array) -> AABB:
-	if transforms.size() < 1:
-		return AABB(Vector3.ZERO, Vector3.ZERO)
-	var aabb = AABB(transforms[0].origin, Vector3.ZERO)
-	for t in transforms:
-		aabb = aabb.expand(t.origin)
-	return aabb
-
-
 static func set_visibility_layers(node: Node, layers: int) -> void:
 	if node is VisualInstance3D:
 		node.layers = layers
