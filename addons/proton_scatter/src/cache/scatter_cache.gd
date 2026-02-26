@@ -84,7 +84,7 @@ func _ready() -> void:
 		cache_file = DEFAULT_CACHE_FOLDER.get_basename().path_join(scene_name + "_scatter_cache.res")
 		return
 
-	restore_cache.call_deferred()
+	restore_cache()
 
 
 func _process(_delta: float) -> void:
