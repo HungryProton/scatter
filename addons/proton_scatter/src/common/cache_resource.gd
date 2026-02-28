@@ -10,6 +10,10 @@ func clear() -> void:
 	data.clear()
 
 
+func has_transforms(node_path: String) -> bool:
+	return data.has(node_path) or data.has(NodePath(node_path))
+
+
 func store(node_path: String, transforms: Array[Transform3D]) -> void:
 	data[node_path] = transforms
 
@@ -23,5 +27,10 @@ func get_transforms(node_path: String) -> Array[Transform3D]:
 
 	if node_path in data:
 		res.assign(data[node_path])
+		return res
+
+	var as_node_path := NodePath(node_path)
+	if as_node_path in data:
+		res.assign(data[as_node_path])
 
 	return res

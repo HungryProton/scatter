@@ -82,7 +82,6 @@ func _ready() -> void:
 
 		# Set the cache path to the cache folder, incorporating the scene name
 		cache_file = DEFAULT_CACHE_FOLDER.get_basename().path_join(scene_name + "_scatter_cache.res")
-		return
 
 	restore_cache.call_deferred()
 
@@ -153,7 +152,7 @@ func update_cache() -> void:
 			continue # Move on to the next if still no results.
 
 		# Store the transforms in the cache.
-		_local_cache.store(_scene_root.get_path_to(s), s.transforms.list)
+		_local_cache.store(str(_scene_root.get_path_to(s)), s.transforms.list)
 		_scatter_nodes[s] = s.build_version
 		_local_cache_changed = true
 
@@ -173,36 +172,50 @@ func update_cache() -> void:
 
 
 func restore_cache() -> void:
-	# Load the cache file if it exists
-	if not ResourceLoader.exists(cache_file):
-		printerr("Could not find cache file ", cache_file)
-		return
-
-	if is_inside_tree():
-		if dbg_disable_thread:
-			_load_cache(cache_file)
-		else:
-			await _load_cache_threaded(cache_file)
-	else:
-		_local_cache = load(cache_file)
-	if not _local_cache:
-		printerr("Could not load cache: ", cache_file)
-		return
-
 	_scatter_nodes.clear()
 	_discover_scatter_nodes(_scene_root)
+
+	var cache_loaded := false
+
+	# Load the cache file if it exists
+	if ResourceLoader.exists(cache_file):
+		if is_inside_tree():
+			if dbg_disable_thread:
+				_load_cache(cache_file)
+			else:
+				await _load_cache_threaded(cache_file)
+		else:
+			_local_cache = load(cache_file)
+
+		if not _local_cache:
+			printerr("Could not load cache: ", cache_file)
+		else:
+			cache_loaded = true
+	else:
+		push_warning("ProtonScatter warning: Could not find cache file %s. Falling back to rebuilding scatter nodes." % cache_file)
 
 	for s in _scatter_nodes:
 		if s.force_rebuild_on_load:
 			continue # Ignore the cache if the scatter node is about to rebuild anyway.
 
-		# Send the cached transforms to the scatter node.
-		var transforms = ProtonScatterTransformList.new()
-		transforms.list = _local_cache.get_transforms(_scene_root.get_path_to(s))
-		s._perform_sanity_check()
-		s._on_transforms_ready(transforms)
-		s.build_version = 0
-		_scatter_nodes[s] = 0
+		var node_path := str(_scene_root.get_path_to(s))
+
+		if cache_loaded and _local_cache.has_transforms(node_path):
+			# Send the cached transforms to the scatter node.
+			var transforms = ProtonScatterTransformList.new()
+			transforms.list = _local_cache.get_transforms(node_path)
+			s._perform_sanity_check()
+			s._on_transforms_ready(transforms)
+			s.build_version = 0
+			_scatter_nodes[s] = 0
+			continue
+
+		if cache_loaded:
+			push_warning("ProtonScatter warning: Cache miss for node %s. Rebuilding node output." % node_path)
+
+		s.rebuild.call_deferred()
+		await s.build_completed
+		_scatter_nodes[s] = s.build_version
 
 	cache_restored.emit()
 
@@ -253,7 +266,7 @@ func _ensure_cache_folder_exists() -> void:
 
 
 func _load_cache(cache_file_path: String) -> void:
-	_local_cache = ResourceLoader.load(cache_file)
+	_local_cache = ResourceLoader.load(cache_file_path)
 
 
 func _load_cache_threaded(cache_file: String) -> void:
