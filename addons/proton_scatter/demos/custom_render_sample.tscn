@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://d0c1m2owtgyiy"]
+
+[ext_resource type="Script" uid="uid://ds7kytqp3ba58" path="res://addons/proton_scatter/src/scatter.gd" id="1_ikmku"]
+[ext_resource type="Script" uid="uid://dw6m3jbj7vrew" path="res://addons/proton_scatter/src/stack/modifier_stack.gd" id="2_1iydl"]
+[ext_resource type="Script" uid="uid://cuybm152elpv3" path="res://addons/proton_scatter/src/modifiers/base_modifier.gd" id="3_wacqb"]
+[ext_resource type="Script" uid="uid://c13d7fvu1xstt" path="res://addons/proton_scatter/src/modifiers/create_inside_random.gd" id="4_p3qjn"]
+[ext_resource type="Script" uid="uid://cs7nqwwpssvw8" path="res://addons/proton_scatter/src/modifiers/randomize_transforms.gd" id="5_xjfy4"]
+[ext_resource type="Script" uid="uid://duvu1x70vl16m" path="res://addons/proton_scatter/src/modifiers/relax.gd" id="6_6t8vl"]
+[ext_resource type="Script" uid="uid://ca0f4xxjd4yp1" path="res://addons/proton_scatter/src/modifiers/project_on_geometry.gd" id="7_hgsa7"]
+[ext_resource type="Script" uid="uid://c0a7oc7lbsl74" path="res://addons/proton_scatter/demos/src/demo_custom_render/custom_render_sample.gd" id="8_fh35a"]
+[ext_resource type="Script" uid="uid://bv3uwmu3cwkfu" path="res://addons/proton_scatter/demos/src/demo_custom_render/demo_scatter_render_config.gd" id="9_x6n07"]
+[ext_resource type="Script" uid="uid://cca0nxw7hbdnr" path="res://addons/proton_scatter/src/scatter_item.gd" id="10_wrwdb"]
+[ext_resource type="Script" uid="uid://ff2s8og1xgru" path="res://addons/proton_scatter/demos/src/demo_custom_render/demo_scatter_item_render_config.gd" id="11_1iydl"]
+[ext_resource type="Script" uid="uid://c8xhy78vll746" path="res://addons/proton_scatter/src/scatter_shape.gd" id="11_te5lu"]
+[ext_resource type="Script" uid="uid://d1sds6irxs32i" path="res://addons/proton_scatter/src/shapes/sphere_shape.gd" id="12_0cdy2"]
+
+[sub_resource type="Resource" id="Resource_87g7e"]
+script = ExtResource("4_p3qjn")
+amount = 75
+restrict_height = true
+reference_frame = 1
+
+[sub_resource type="Resource" id="Resource_i3rq1"]
+script = ExtResource("5_xjfy4")
+position = Vector3(0.15, 0.15, 0.15)
+rotation = Vector3(20, 360, 20)
+scale = Vector3(0.1, 0.1, 0.1)
+reference_frame = 2
+
+[sub_resource type="Resource" id="Resource_se4gn"]
+script = ExtResource("6_6t8vl")
+offset_step = 0.2
+consecutive_step_multiplier = 0.75
+restrict_height = true
+
+[sub_resource type="Resource" id="Resource_6kvgv"]
+script = ExtResource("7_hgsa7")
+ray_length = 5.0
+ray_offset = 5.0
+remove_points_on_miss = false
+
+[sub_resource type="Resource" id="Resource_essyy"]
+script = ExtResource("2_1iydl")
+stack = Array[ExtResource("3_wacqb")]([SubResource("Resource_87g7e"), SubResource("Resource_i3rq1"), SubResource("Resource_se4gn"), SubResource("Resource_6kvgv")])
+
+[sub_resource type="Resource" id="Resource_v3gx6"]
+script = ExtResource("9_x6n07")
+metadata/_custom_type_script = "uid://bv3uwmu3cwkfu"
+
+[sub_resource type="Resource" id="Resource_wacqb"]
+script = ExtResource("11_1iydl")
+metadata/_custom_type_script = "uid://ff2s8og1xgru"
+
+[sub_resource type="Resource" id="Resource_g8bsm"]
+script = ExtResource("12_0cdy2")
+radius = 2.0
+
+[node name="CustomRenderSample" type="Node3D" unique_id=114105714]
+
+[node name="ProtonScatter" type="Node3D" parent="." unique_id=983745505]
+script = ExtResource("1_ikmku")
+render_mode = 3
+modifier_stack = SubResource("Resource_essyy")
+Performance/custom_render_script = ExtResource("8_fh35a")
+Performance/custom_render_config = SubResource("Resource_v3gx6")
+Performance/use_chunks = true
+Performance/chunk_dimensions = Vector3(15, 15, 15)
+metadata/_custom_type_script = "uid://ds7kytqp3ba58"
+
+[node name="ScatterItem" type="Node3D" parent="ProtonScatter" unique_id=1103344217]
+script = ExtResource("10_wrwdb")
+custom_item_render_config = SubResource("Resource_wacqb")
+path = "res://addons/proton_scatter/demos/assets/brick.tscn"
+
+[node name="ScatterShape" type="Node3D" parent="ProtonScatter" unique_id=788882633]
+transform = Transform3D(1, 0, -2.98023e-08, 0, 1, 0, 2.98023e-08, 0, 1, 0, 0, 0)
+script = ExtResource("11_te5lu")
+shape = SubResource("Resource_g8bsm")

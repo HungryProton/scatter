@@ -2,37 +2,43 @@ extends ScatterRender
 
 ## Custom render sample
 
-const TransformList := preload("res://addons/proton_scatter/src/common/transform_list.gd")
+## This will be auto-set if present; used here just to pass through to default instancing render
+var merged_mesh_instance: MeshInstance3D 
 
-## scatter:    The ProtonScatter node
-##
-## config:     The ScatterRenderConfig set on the node.
-##             By creating your own resource type; this allows to have custom configuration
-##             properties inside of the scatter node inspector panel.
-##
-## item:      ScatterItem node being rendered
-##
-## root:      Output node to generate your render items under
-##
-## mesh_instance: Merged version of meshes found in the item source 
-##                (null if wants_item_merged_mesh_instance is overriden to indicate false) 
-##
-## transforms: The transforms 
-##
+
+## This will be called, per item
+## For each ProtonScatter render (refresh of scattering); a new instance of your renderer will be used.
+## It will get N render calls (N = number of items under the ProtonScatter node). 
 func render(scatter: ProtonScatter, 
-			config: Resource, 
 			item: ProtonScatterItem, 
 			root: Node3D, 
-			mesh_instance: MeshInstance3D, 
 			transforms: TransformList
 			):
 
-	print("Using sample protonscatter_custom_render")
+	print("Using example custom renderer")
+	
+	var render_config: DemoScatterRenderConfig = scatter.custom_render_config as DemoScatterRenderConfig 
+	print(render_config.greetings)
 
-	if config and config is DemoScatterRenderConfig:
-		print(config.greetings)
+	var item_config: DemoScatterItemRenderconfig = item.custom_item_render_config as DemoScatterItemRenderconfig 
+	print(item_config.example)
 
 	# replace this with your render implementation
 	# See /render directory for the existing modes for examples
-
 	
+	# Example of pass-through to one of proton's build in render modes
+	scatter.default_render(ProtonScatter.RENDER_MODE_INSTANCING, scatter, item, root, transforms, merged_mesh_instance)
+
+	# Just render some extra spheres
+	for t: Transform3D in transforms.list:
+		var sphere: CSGSphere3D = CSGSphere3D.new()
+		sphere.radius = 0.25
+		sphere.top_level = true # The transforms are global
+		sphere.transform = t
+
+		# Root is where you add whatever nodes (if any) you need to render the item
+		root.add_child(sphere)
+
+		# Do this if you want to support baking / showing output in tree of your generated nodes
+		if scatter.show_output_in_tree:
+			sphere.owner = root.get_tree().edited_scene_root

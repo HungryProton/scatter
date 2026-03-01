@@ -34,6 +34,10 @@ const ScatterUtil := preload('./common/scatter_util.gd')
 		custom_script = val
 		ScatterUtil.request_parent_to_rebuild(self)
 
+## Custom item render config; for configuration passable to custom render modes
+@export var custom_item_render_config: ScatterItemRenderConfig
+
+
 @export_group("Source options", "source_")
 
 ## Global scale multiplier applied to the source item before scattering.

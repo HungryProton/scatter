@@ -3,18 +3,18 @@ extends ScatterRender
 const ProtonScatterUtil := preload('./../common/scatter_util.gd')
 const ProtonScatterTransformList := preload('./../common/transform_list.gd')
 
+var merged_mesh_instance: MeshInstance3D
+
 func render(scatter: ProtonScatter, 
-			config: Resource, 
 			item: ProtonScatterItem, 
 			root: Node3D, 
-			mesh_instance: MeshInstance3D, 
 			transforms: ProtonScatterTransformList
 			):
 
 	var transforms_count: int = transforms.size()
 	var domain := scatter.domain
 
-	var particles = _get_or_create_particles(item, root, mesh_instance)
+	var particles = _get_or_create_particles(item, root, merged_mesh_instance)
 	if not particles:
 		return
 

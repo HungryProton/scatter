@@ -3,11 +3,11 @@ extends ScatterRender
 const ProtonScatterUtil := preload('./../common/scatter_util.gd')
 const ProtonScatterTransformList := preload('./../common/transform_list.gd')
 
+var merged_mesh_instance: MeshInstance3D
+
 func render(scatter: ProtonScatter, 
-			config: Resource, 
 			item: ProtonScatterItem, 
 			root: Node3D, 
-			mesh_instance: MeshInstance3D, 
 			transforms: ProtonScatterTransformList
 			):
 				
@@ -57,7 +57,7 @@ func render(scatter: ProtonScatter,
 					
 				var mmi = _get_or_create_multimesh_chunk(
 												item, root,
-												mesh_instance,
+												merged_mesh_instance,
 												Vector3i(xi, yi, zi),
 												chunk_elements)
 				if not mmi:
@@ -77,8 +77,7 @@ func render(scatter: ProtonScatter,
 					t = transform_chunks[xi][yi][zi][i]
 					t.origin -= center
 					mmi.multimesh.set_instance_transform(i, t)
-						
-		mesh_instance.queue_free()
+
 
 func _get_or_create_multimesh_chunk(item: ProtonScatterItem, item_root: Node3D,
 										mesh_instance: MeshInstance3D,

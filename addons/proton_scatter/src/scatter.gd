@@ -543,14 +543,7 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		update_gizmos()
 		return
 
-	var renderer: ScatterRender
-	match render_mode:
-		0: renderer = InstancingRender.new()
-		1: renderer = CopiesRender.new()
-		2: renderer = ParticlesRender.new()
-		3: renderer = _create_custom_renderer()
-
-	_invoke_render(renderer)
+	_invoke_render(_create_renderer_instance(render_mode))
 	
 	update_gizmos()
 	build_version += 1
@@ -560,6 +553,17 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 
 	build_completed.emit()
 
+
+func _create_renderer_instance(render_mode: int) -> ScatterRender:
+	var renderer: ScatterRender
+	match render_mode:
+		0: renderer = InstancingRender.new()
+		1: renderer = CopiesRender.new()
+		2: renderer = ParticlesRender.new()
+		3: renderer = _create_custom_renderer()
+		_: assert(false)
+
+	return renderer
 
 func _create_custom_renderer() -> ScatterRender:
 	if render_mode != RENDER_MODE_CUSTOM:
@@ -572,11 +576,30 @@ func _create_custom_renderer() -> ScatterRender:
 	var custom_render: Object = custom_render_script.new()
 	
 	if not custom_render.has_method("render"):
-		push_error("ProtonScatter: Custom render script must have protonscatter_custom_render(...) function.")
+		push_error("ProtonScatter: Custom render script must have render(...) function.")
+		return null
+
+	if not custom_render.has_method("post_render"):
+		push_error("ProtonScatter: Custom render script must have post_render(...) function.")
 		return null
 		
 	return custom_render as ScatterRender
 
+
+## Invoke a default renderer; this can be used to include a existing render mode's fuction as 
+## a render pass from a custom renderer 
+func default_render(mode: int, scatter: ProtonScatter, item: ProtonScatterItem, root: Node3D, transforms: ProtonScatterTransformList, merged: MeshInstance3D) -> void:
+	if RENDER_MODE_CUSTOM == mode:
+		push_warning("ProtonScatter: default_render(...) ignored because called with mode RENDER_MODE_CUSTOM; infinite recursion prevented")
+		return
+
+	var render: ScatterRender = _create_renderer_instance(mode)
+	var want_merged_mesh: bool = _script_has_property(render, "merged_mesh_instance")
+	if want_merged_mesh:
+		render.merged_mesh_instance = merged
+	
+	render.render(scatter, item, root, transforms)
+	
 
 func _invoke_render(render: ScatterRender) -> void:
 	clear_output()
@@ -592,6 +615,8 @@ func _invoke_render(render: ScatterRender) -> void:
 	var t_offset: int = 0
 
 	_colliders.clear()
+	
+	var want_merged_mesh: bool = _script_has_property(render, "merged_mesh_instance")
 	
 	for item: ProtonScatterItem in items:
 		
@@ -627,7 +652,21 @@ func _invoke_render(render: ScatterRender) -> void:
 		
 		var mesh_instance: MeshInstance3D
 		
-		if render.wants_item_merged_mesh_instance():
-			mesh_instance = ProtonScatterUtil.get_merged_meshes_from(item)
+		if want_merged_mesh:
+			render.merged_mesh_instance = ProtonScatterUtil.get_merged_meshes_from(item)
+			assert(render.merged_mesh_instance)
 		
-		render.render(self, custom_render_config, item, root, mesh_instance, item_transforms)
+		render.render(self, item, root, item_transforms)
+
+		if want_merged_mesh:
+			render.merged_mesh_instance.queue_free()
+			render.merged_mesh_instance = null
+			
+	render.post_render(self, output_root)
+
+
+func _script_has_property(obj: Object, name: String) -> bool:
+	for p in obj.get_property_list():
+		if p.name == name:
+			return true
+	return false

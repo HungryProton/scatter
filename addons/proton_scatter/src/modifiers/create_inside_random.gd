@@ -44,10 +44,9 @@ func _process_transforms(transforms, domain, rng) -> void:
 	
 	var parallel: ProtonScatterParallel = ProtonScatterParallel.new()
 	parallel.set_rng_seed(rng.seed)
-	
+
 	# Prevent calling global transform from non-main thread, resuling in identity
 	var basis: Basis = domain.get_global_transform().affine_inverse().basis
-	
 	var name: String = domain.root.name + " create_inside_random %s" % [ amount ]
 
 	parallel.prepare(name, amount, parallel.TASK_ITEM_LIMIT_AUTO, _generate_randoms, 

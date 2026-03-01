@@ -3,19 +3,12 @@ extends ScatterRender
 const ProtonScatterUtil := preload('./../common/scatter_util.gd')
 const ProtonScatterTransformList := preload('./../common/transform_list.gd')
 
-func wants_item_merged_mesh_instance() -> bool:
-	return false
-	
 func render(scatter: ProtonScatter, 
-			config: Resource, 
 			item: ProtonScatterItem, 
 			root: Node3D, 
-			mesh_instance: MeshInstance3D, 
 			transforms: ProtonScatterTransformList
 			):
 				
-	assert(mesh_instance == null) # Clones item instead
-		
 	var transforms_count: int = transforms.size()
 
 	var child_count := root.get_child_count()
