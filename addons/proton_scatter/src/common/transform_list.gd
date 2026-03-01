@@ -1,9 +1,29 @@
 @tool
 extends RefCounted
 
+const ProtonScatterParallel: = preload("res://addons/proton_scatter/src/common/parallel.gd")
 
-var list: Array[Transform3D] = []
+var list: Array[Transform3D]:
+	set(value):
+		list = value
+		_aabb = _INVALID_AABB
+		
+		
 var max_count := -1
+
+
+
+var aabb: AABB = AABB():
+	get():
+		if _INVALID_AABB !=_aabb:
+			return _aabb
+		
+		_aabb = aabb_from_array(list)
+		return _aabb
+		
+
+const _INVALID_AABB: AABB = AABB()
+var _aabb: AABB = _INVALID_AABB
 
 
 func add(count: int) -> void:
@@ -69,3 +89,49 @@ func enforce_uniform_scale() -> void:
 		var current_scale: Vector3 = t.basis.get_scale()
 		var scale := Vector3.ONE * (current_scale.x + current_scale.y + current_scale.z) / 3.0
 		list[i] = list[i].orthonormalized().scaled_local(scale)
+
+## Call when having modifies list members; this ensures AABB is reevaluated if accessed
+func invalidate() -> void:
+	_aabb = _INVALID_AABB
+
+# Multidimensional array as used by instancing grid cannot be typed AFAIK
+static func aabb_from_array(transforms: Array) -> AABB:
+	if transforms.is_empty():
+		return AABB()
+
+	var result: AABB = AABB(transforms[0].origin, Vector3.ZERO)
+
+	for t: Transform3D in transforms:
+		result = result.expand(t.origin)
+
+	return result
+	
+# Parallel AABB works, but aint worth it (timed it, the operation is too light)	
+#static func _aabb_from_array_parallel(transforms: Array) -> AABB:
+	#var result: AABB = AABB(transforms[0].origin, Vector3.ZERO)
+	#var parallel: ProtonScatterParallel = ProtonScatterParallel.new()
+	#
+	#parallel.prepare("transforms_aabb", transforms.size(), ProtonScatterParallel.TASK_ITEM_LIMIT_AUTO,_aabb_worker,
+		#func(index: int, task: Dictionary):
+			#task["transforms"] = transforms
+			#task["aabb"] = result
+	#)
+#
+	#parallel.execute_work()
+	#
+	#for results: Dictionary in parallel.completed_tasks:
+		#result = result.merge(results['aabb'])
+#
+	#assert(result != AABB(transforms[0].origin, Vector3.ZERO))
+	#
+	#return result
+#
+#
+#static func _aabb_worker(from: int, to: int, task: Dictionary) -> void:
+	#var result: AABB = task["aabb"]
+	#var transforms: Array = task['transforms']
+	#
+	#for i: int in range(from, to):
+		#result = result.expand(transforms[i].origin)
+	#
+	#task["aabb"] = result

@@ -35,19 +35,18 @@ func _init() -> void:
 
 # TODO: + Spatial partionning to discard areas outside the domain earlier
 func _process_transforms(transforms, domain, rng) -> void:
-	# Prepare parts for parallel processing
-	# Note this operation is very light, and thus the gains are pretty much negligable
-	# (saves about 1/6th of the time on my system, but even with 500k items, 
-	# thats just about 60ms). However, when transforming items in 3D view, 
-	# every ounce of responsiveness counts.
+	# Prepare parts for parallel processing;
+	# If it profits performance depends on the complexity (and holes)
+	# and number of shapes involved. For simple cases it will take
+	# slightly longer (but these are fast anyway); for more complex cases
+	# the befit odds are better as the volume of data goes up.
 	var outputs: Array = []
 	
 	var parallel: ProtonScatterParallel = ProtonScatterParallel.new()
 	parallel.set_rng_seed(rng.seed)
-	
+
 	# Prevent calling global transform from non-main thread, resuling in identity
 	var basis: Basis = domain.get_global_transform().affine_inverse().basis
-	
 	var name: String = domain.root.name + " create_inside_random %s" % [ amount ]
 
 	parallel.prepare(name, amount, parallel.TASK_ITEM_LIMIT_AUTO, _generate_randoms, 
@@ -83,7 +82,8 @@ func _generate_randoms(from: int, to: int, task: Dictionary) -> void:
 	var t: Transform3D
 	var pos: Vector3
 
-	var max_retries = count * 10 # TODO: expose this parameter?
+	# Set a max to the retries, to prevent endless loop in case of empty shapes
+	var max_retries = count * 10
 
 	var tries = 0
 	while generated < count:
@@ -110,4 +110,4 @@ func _generate_randoms(from: int, to: int, task: Dictionary) -> void:
 		# Prevents an infinite loop
 		tries += 1
 		if tries > max_retries:
-			break	
+			break

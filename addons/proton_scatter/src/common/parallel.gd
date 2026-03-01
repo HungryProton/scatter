@@ -6,17 +6,18 @@ const JumpableRNG = preload("../common/random.gd")
 const WORK_AMOUNT_ALL: int = 0
 const TASK_ITEM_LIMIT_AUTO: int = 0
 
-const _MINIMUM_ITEMS_PER_TASK: int = 250
-# Limit tasks to small pieces; this prevents dragging out completion time by one or more
+const _MINIMUM_ITEMS_PER_TASK: int = 1000
+# Limit tasks; this prevents dragging out completion time by one or more
 # workers that happen to become available late (they start later).
-const _MAXIMUM_ITEMS_PER_TASK: int = 2000
+const _MAXIMUM_ITEMS_PER_TASK: int = 5000
 
 # Master kill switch for quick check if any issue is due to paralellisation or not
 const _ENABLE_PARALLELISATION: bool = true  
 
 const _NO_EXECUTOR_PREPARED: Callable = Callable()
 
-const _PARALLEL_MINIMUM_ITEMS_THRESHOLD = 1000
+# Limit overhead to 1 task unless there is substantial work to gain from parallel
+const _PARALLEL_MINIMUM_ITEMS_THRESHOLD = _MINIMUM_ITEMS_PER_TASK * 5
 
 
 # Optionally can be used to toggle on per case if needed (might link to UI)
@@ -70,11 +71,13 @@ func get_task_size(total_item_count: int, task_item_limit: int = TASK_ITEM_LIMIT
 	
 	var items_per_task: int = total_item_count / _max_parallel
 
+	items_per_task = min(items_per_task, _MAXIMUM_ITEMS_PER_TASK)
+	items_per_task = max(items_per_task, _MINIMUM_ITEMS_PER_TASK)
+
+	# Provided overrides internal constraints
 	if task_item_limit > TASK_ITEM_LIMIT_AUTO:
 		items_per_task = min(items_per_task, task_item_limit)
 
-	items_per_task = min(items_per_task, _MAXIMUM_ITEMS_PER_TASK)
-	items_per_task = max(items_per_task, _MINIMUM_ITEMS_PER_TASK)
 	return items_per_task
 
 
@@ -106,6 +109,7 @@ func prepare(name: String, total_item_count: int, task_item_limit: int, executor
 		rng.jump(from * _rng_steps_per_iteration)
 		
 		var task: Dictionary = {
+			"index": _tasks.size(),
 			"rng": rng,
 			"from": from,
 			"to": to
@@ -122,7 +126,9 @@ func prepare(name: String, total_item_count: int, task_item_limit: int, executor
 
 	if _tasks.is_empty():
 		return
-
+		
+	#print(name + str(_tasks))
+	
 	_executor = executor
 
 ## Returns true if work is completed; false if tasks (and thus items) left
@@ -156,7 +162,7 @@ func _worker_task(task_index: int) -> void:
 	var task: Dictionary = _tasks[task_index]
 	#print("task %s start, range %s to %s" % [ _name, task['from'], task['to']])
 	await _executor.call(task['from'], task['to'], task)
-	#print("task %s finished, range %s to %s" % [ _name, task['from'], task['to']])
+	#print("task %s end, range %s to %s" % [ _name, task['from'], task['to']])
 
 
 ## Execute in current thread

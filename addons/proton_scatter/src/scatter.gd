@@ -13,6 +13,16 @@ const ProtonScatterPhysicsHelper := preload("./common/physics_helper.gd")
 const ProtonScatterTransformList := preload("./common/transform_list.gd")
 const ProtonScatterUtil := preload('./common/scatter_util.gd')
 const ProtonScatterColliders := preload('./common/colliders.gd')
+const ProtonScatterParallel := preload('./common/parallel.gd')
+
+const InstancingRender := preload('./render/render_instances.gd')
+const CopiesRender := preload('./render/render_copies.gd')
+const ParticlesRender := preload('./render/render_particles.gd')
+ 
+const RENDER_MODE_INSTANCING: int = 0
+const RENDER_MODE_COPIES: int = 1
+const RENDER_MODE_PARTICLES: int = 2
+const RENDER_MODE_CUSTOM: int = 3
 
 @export_group("General")
 
@@ -48,8 +58,9 @@ const ProtonScatterColliders := preload('./common/colliders.gd')
 ## Use Particles (2): Uses GPU particles system for very large numbers of objects.
 @export_enum("Use Instancing:0",
 			"Create Copies:1",
-			"Use Particles:2")\
-		var render_mode := 0:
+			"Use Particles:2",
+			"Custom:3")\
+		var render_mode := RENDER_MODE_INSTANCING:
 	set(val):
 		render_mode = val
 		if is_ready:
@@ -93,6 +104,19 @@ var chunk_dimensions := Vector3.ONE * 15.0:
 ## If not using that, but having large amounts of items (10k+ trees for example)
 ## editing performance can be greatly improved by disabling this.
 @export var enable_colliders_in_editor := true
+
+## Custom render script; only used when Render Mode is set to Custom.
+## See the sample script in the demo folder.
+var custom_render_script: Script:
+	set(val):
+		custom_render_script = val
+		if is_ready:
+			notify_property_list_changed()
+			full_rebuild.call_deferred()
+
+## Custom render resource that will be passed to the custom render script.
+## This allows custom configuration parameters to be set/passed.
+var custom_render_config: ScatterRenderConfig
 
 
 @export_group("Compatibility")
@@ -220,9 +244,32 @@ func _get_property_list() -> Array:
 		hint_string = "ScatterModifierStack",
 	})
 
+	var custom_render_usage := PROPERTY_USAGE_NO_EDITOR
+	if render_mode == RENDER_MODE_CUSTOM:
+		custom_render_usage = PROPERTY_USAGE_DEFAULT
+
+	list.push_back({
+		name = "Performance/custom_render_script",
+		type = TYPE_OBJECT,
+		hint = PROPERTY_HINT_RESOURCE_TYPE,
+		hint_string = "Script",
+		usage = custom_render_usage
+	})
+	list.push_back({
+		name = "Performance/custom_render_config",
+		type = TYPE_OBJECT,
+		hint = PROPERTY_HINT_RESOURCE_TYPE,
+		hint_string = "ScatterRenderConfig",
+		usage = custom_render_usage
+	})
+	
 	var chunk_usage := PROPERTY_USAGE_NO_EDITOR
 	var dimensions_usage := PROPERTY_USAGE_NO_EDITOR
-	if render_mode == 0 or render_mode == 2:
+	
+	if render_mode == RENDER_MODE_INSTANCING or \
+		render_mode == RENDER_MODE_PARTICLES or \
+		render_mode == RENDER_MODE_CUSTOM:
+			
 		chunk_usage = PROPERTY_USAGE_DEFAULT
 		if use_chunks:
 			dimensions_usage = PROPERTY_USAGE_DEFAULT
@@ -278,6 +325,12 @@ func _set(property, value):
 	elif property == "Performance/chunk_dimensions":
 		chunk_dimensions = value
 
+	elif property == "Performance/custom_render_script":
+		custom_render_script = value
+
+	elif property == "Performance/custom_render_config":
+		custom_render_config = value
+
 	if not Engine.is_editor_hint():
 		return false
 
@@ -301,6 +354,11 @@ func _get(property):
 	elif property == "Performance/chunk_dimensions":
 		return chunk_dimensions
 
+	elif property == "Performance/custom_render_script":
+		return custom_render_script
+
+	elif property == "Performance/custom_render_config":
+		return custom_render_config
 
 func is_thread_running() -> bool:
 	return _thread != null and _thread.is_started()
@@ -424,219 +482,6 @@ func _discover_items() -> void:
 	update_configuration_warnings()
 
 
-# Creates one MultimeshInstance3D for each ScatterItem node.
-func _update_multimeshes() -> void:
-	if items.is_empty():
-		_discover_items()
-
-	var offset := 0
-	var transforms_count: int = transforms.size()
-
-	for item in items:
-		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		var mmi = ProtonScatterUtil.get_or_create_multimesh(item, count)
-		if not mmi:
-			continue
-			
-		var shapes_template: Array = _colliders.get_collider_shapes_template(item)
-
-		var t: Transform3D
-		for i in count:
-			# Extra check because of how 'count' is calculated
-			if (offset + i) >= transforms_count:
-				mmi.multimesh.instance_count = i - 1
-				continue
-
-			t = item.process_transform(transforms.list[offset + i])
-			mmi.multimesh.set_instance_transform(i, t)
-
-			_colliders.create_collider_instance_from_template(self, shapes_template, t)
-
-		offset += count
-		
-	_colliders.commit(self)
-
-func _update_split_multimeshes() -> void:
-	var size = domain.bounds_local.size
-
-	var splits := Vector3i.ONE
-	splits.x = max(1, ceil(size.x / chunk_dimensions.x))
-	splits.y = max(1, ceil(size.y / chunk_dimensions.y))
-	splits.z = max(1, ceil(size.z / chunk_dimensions.z))
-
-	if items.is_empty():
-		_discover_items()
-
-	var offset := 0 # this many transforms have been used up
-	var transforms_count: int = transforms.size()
-	clear_output()
-
-	for item in items:
-		var root: Node3D = ProtonScatterUtil.get_or_create_item_root(item)
-		if not is_instance_valid(root):
-			continue
-
-		# use count number of transforms for this item
-		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
-
-		# create 3d array with dimensions of split_size to store the chunks' transforms
-		var transform_chunks : Array = []
-		for xi in splits.x:
-			transform_chunks.append([])
-			for yi in splits.y:
-				transform_chunks[xi].append([])
-				for zi in splits.z:
-					transform_chunks[xi][yi].append([])
-
-		var t_list = transforms.list.slice(offset)
-		var aabb = ProtonScatterUtil.get_aabb_from_transforms(t_list)
-		aabb = aabb.grow(0.1) # avoid degenerate cases
-		
-		var shapes_template: Array = _colliders.get_collider_shapes_template(item)
-
-		for i in count:
-			if (offset + i) >= transforms_count:
-				continue
-			# both aabb and t are in mmi's local coordinates
-			var t = item.process_transform(transforms.list[offset + i])
-			var p_rel = (t.origin - aabb.position) / aabb.size
-			# Chunk index
-			var ci = (p_rel * Vector3(splits)).floor()
-			# Store the transform to the appropriate array
-			transform_chunks[ci.x][ci.y][ci.z].append(t)
-			
-			_colliders.create_collider_instance_from_template(self, shapes_template, t)
-
-		# Cache the mesh instance to be used for the chunks
-		var mesh_instance: MeshInstance3D = ProtonScatterUtil.get_merged_meshes_from(item)
-		# The relevant transforms are now ordered in chunks
-		for xi in splits.x:
-			for yi in splits.y:
-				for zi in splits.z:
-					var chunk_elements = transform_chunks[xi][yi][zi].size()
-					if chunk_elements == 0:
-						continue
-					var mmi = ProtonScatterUtil.get_or_create_multimesh_chunk(
-													item,
-													mesh_instance,
-													Vector3i(xi, yi, zi),
-													chunk_elements)
-					if not mmi:
-						continue
-
-					# Use the eventual aabb as origin
-					# The multimeshinstance needs to be centered where the transforms are
-					# This matters because otherwise the visibility range fading is messed up
-					var center =  ProtonScatterUtil.get_aabb_from_transforms(transform_chunks[xi][yi][zi]).get_center()
-					mmi.transform.origin = center
-
-					var t: Transform3D
-					for i in chunk_elements:
-						t = transform_chunks[xi][yi][zi][i]
-						t.origin -= center
-						mmi.multimesh.set_instance_transform(i, t)
-						
-		mesh_instance.queue_free()
-		offset += count
-		
-	_colliders.commit(self)
-
-
-
-func _update_duplicates() -> void:
-	var offset := 0
-	var transforms_count: int = transforms.size()
-
-	for item in items:
-		var count := int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		var root: Node3D = ProtonScatterUtil.get_or_create_item_root(item)
-		var child_count := root.get_child_count()
-
-		for i in count:
-			if (offset + i) >= transforms_count:
-				return
-
-			var instance
-			if i < child_count: # Grab an instance from the pool if there's one available
-				instance = root.get_child(i)
-			else:
-				instance = _create_instance(item, root)
-
-			if not instance:
-				break
-
-			var t: Transform3D = item.process_transform(transforms.list[offset + i])
-			instance.transform = t
-			ProtonScatterUtil.set_visibility_layers(instance, item.visibility_layers)
-
-		# Delete the unused instances left in the pool if any
-		if count < child_count:
-			for i in (child_count - count):
-				root.get_child(-1).queue_free()
-
-		offset += count
-
-
-func _update_particles_system() -> void:
-	var offset := 0
-	var transforms_count: int = transforms.size()
-
-	for item in items:
-		var count := int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		var particles = ProtonScatterUtil.get_or_create_particles(item)
-		if not particles:
-			continue
-
-		particles.visibility_aabb = AABB(domain.bounds_local.min, domain.bounds_local.size)
-		particles.amount = count
-
-		var shapes_template: Array = _colliders.get_collider_shapes_template(item)
-		
-		var t: Transform3D
-
-		for i in count:
-			if (offset + i) >= transforms_count:
-				particles.amount = i - 1
-				return
-
-			t = item.process_transform(transforms.list[offset + i])
-			particles.emit_particle(
-				t,
-				Vector3.ZERO,
-				Color.WHITE,
-				Color.BLACK,
-				GPUParticles3D.EMIT_FLAG_POSITION | GPUParticles3D.EMIT_FLAG_ROTATION_SCALE)
-				
-			_colliders.create_collider_instance_from_template(self, shapes_template, t)
-
-		offset += count
-		
-	_colliders.commit(self)
-
-
-
-
-
-func _create_instance(item: ProtonScatterItem, root: Node3D):
-	if not item:
-		return null
-
-	var instance = item.get_item()
-	if not instance:
-		return null
-
-	instance.visible = true
-	root.add_child.bind(instance, true).call_deferred()
-
-	if show_output_in_tree:
-		# We have to use a lambda here because ProtonScatterUtil isn't an
-		# actual class_name, it's a const, which makes it impossible to reference
-		# the callable, (but we can still call it)
-		var defer_ownership := func(i, o):
-			ProtonScatterUtil.set_owner_recursive(i, o)
-		defer_ownership.bind(instance, get_tree().get_edited_scene_root()).call_deferred()
-
-	return instance
 
 
 # Enforce the Scatter node has its required variables set.
@@ -698,17 +543,8 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		update_gizmos()
 		return
 
-	match render_mode:
-		0:
-			if use_chunks:
-				_update_split_multimeshes()
-			else:
-				_update_multimeshes()
-		1:
-			_update_duplicates()
-		2:
-			_update_particles_system()
-
+	_invoke_render(_create_renderer_instance(render_mode))
+	
 	update_gizmos()
 	build_version += 1
 
@@ -716,3 +552,122 @@ func _on_transforms_ready(new_transforms: ProtonScatterTransformList) -> void:
 		await get_tree().process_frame
 
 	build_completed.emit()
+
+
+func _create_renderer_instance(render_mode: int) -> ScatterRender:
+	var renderer: ScatterRender
+	match render_mode:
+		0: renderer = InstancingRender.new()
+		1: renderer = CopiesRender.new()
+		2: renderer = ParticlesRender.new()
+		3: renderer = _create_custom_renderer()
+		_: assert(false)
+
+	return renderer
+
+func _create_custom_renderer() -> ScatterRender:
+	if render_mode != RENDER_MODE_CUSTOM:
+		return null
+	
+	if not custom_render_script:
+		push_error("ProtonScatter: Render mode 'Custom' requires custom render script to be set.")
+		return null
+
+	var custom_render: Object = custom_render_script.new()
+	
+	if not custom_render.has_method("render"):
+		push_error("ProtonScatter: Custom render script must have render(...) function.")
+		return null
+
+	if not custom_render.has_method("post_render"):
+		push_error("ProtonScatter: Custom render script must have post_render(...) function.")
+		return null
+		
+	return custom_render as ScatterRender
+
+
+## Invoke a default renderer; this can be used to include a existing render mode's fuction as 
+## a render pass from a custom renderer 
+func default_render(mode: int, scatter: ProtonScatter, item: ProtonScatterItem, root: Node3D, transforms: ProtonScatterTransformList, merged: MeshInstance3D) -> void:
+	if RENDER_MODE_CUSTOM == mode:
+		push_warning("ProtonScatter: default_render(...) ignored because called with mode RENDER_MODE_CUSTOM; infinite recursion prevented")
+		return
+
+	var render: ScatterRender = _create_renderer_instance(mode)
+	var want_merged_mesh: bool = _script_has_property(render, "merged_mesh_instance")
+	if want_merged_mesh:
+		render.merged_mesh_instance = merged
+	
+	render.render(scatter, item, root, transforms)
+	
+
+func _invoke_render(render: ScatterRender) -> void:
+	clear_output()
+
+	if not render:
+		return
+	
+	if items.is_empty():
+		_discover_items()
+		
+	var transforms_count: int = transforms.size()
+	var transforms_list: Array[Transform3D] = transforms.list
+	var t_offset: int = 0
+
+	_colliders.clear()
+	
+	var want_merged_mesh: bool = _script_has_property(render, "merged_mesh_instance")
+	
+	for item: ProtonScatterItem in items:
+		
+		if not item.visible:
+			continue
+		
+		var root: Node3D = ProtonScatterUtil.get_or_create_item_root(item)
+		if not is_instance_valid(root):
+			continue
+
+		var shapes_template: Array = _colliders.get_collider_shapes_template(item)
+
+		# Consume transforms for this item
+		var count = int(round(float(item.proportion) / total_item_proportion * transforms_count))
+
+		var item_transforms: ProtonScatterTransformList = ProtonScatterTransformList.new()
+		item_transforms.list = transforms_list.slice(t_offset, t_offset + count)
+		var item_transforms_list: Array[Transform3D] =  item_transforms.list
+		t_offset += count
+
+		# Process to final transform (parallel = not profitable)
+		for i in item_transforms.size():
+			var t: Transform3D = item.process_transform(item_transforms_list[i])
+			item_transforms_list[i] = t
+
+		# Colliders:
+		# Having seperate loop saves 1 call stack frame, but costs the loop and lookup
+		# However the save saves x count when colliders are not enabled.
+		if _colliders.enable:
+			for i in item_transforms.size():
+				_colliders.create_collider_instance_from_template(self, shapes_template, item_transforms_list[i])
+			_colliders.commit(self)
+		
+		var mesh_instance: MeshInstance3D
+		
+		if want_merged_mesh:
+			render.merged_mesh_instance = ProtonScatterUtil.get_merged_meshes_from(item)
+			assert(render.merged_mesh_instance)
+		
+		render.render(self, item, root, item_transforms)
+
+		if want_merged_mesh:
+			render.merged_mesh_instance.queue_free()
+			render.merged_mesh_instance = null
+	
+	if render.has_method("post_render"):
+		render.post_render(self, output_root)
+
+
+func _script_has_property(obj: Object, name: String) -> bool:
+	for p in obj.get_property_list():
+		if p.name == name:
+			return true
+	return false

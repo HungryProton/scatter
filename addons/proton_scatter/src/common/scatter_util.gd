@@ -113,104 +113,8 @@ static func get_or_create_multimesh(item: ProtonScatterItem, count: int) -> Mult
 	return mmi
 
 
-static func get_or_create_multimesh_chunk(item: ProtonScatterItem,
-										mesh_instance: MeshInstance3D,
-										index: Vector3i,
-										count: int)\
-										 -> MultiMeshInstance3D:
-	var item_root := get_or_create_item_root(item)
-	var chunk_name = "MultiMeshInstance3D" + "_%s_%s_%s_%s"%[index.x, index.y, index.z, mesh_instance.get_instance_id()]
-	var mmi: MultiMeshInstance3D = item_root.get_node_or_null(chunk_name)
-	if not mesh_instance:
-		return
-
-	if not mmi:
-		mmi = MultiMeshInstance3D.new()
-		# Dont use add_child for 'readable name' suffix, as (a) it requires costly defering
-		# and (b) it 'potentionally' can cause the lookup above to fail due to the prefixes added.
-		# The prefix should be const per set, and is now instance ID above.
-		# This saves seconds on test with 50k and 100k items.
-		mmi.set_name(chunk_name)
-		item_root.add_child(mmi)
-
-	if not mmi.multimesh:
-		mmi.multimesh = MultiMesh.new()
-		if item.custom_script:
-			mmi.multimesh.use_colors = true
-			mmi.multimesh.use_custom_data = true
-			mmi.set_script(item.custom_script)
-	elif not item.custom_script:
-		# We should reset the use_* props of the multimesh, which fails if instance_count > 0. 
-		mmi.multimesh.instance_count = 0
-		mmi.multimesh.use_colors = false
-		mmi.multimesh.use_custom_data = false
-
-	mmi.position = Vector3.ZERO
-	mmi.material_override = get_final_material(item, mesh_instance)
-	mmi.set_cast_shadows_setting(item.override_cast_shadow)
-
-	mmi.multimesh.instance_count = 0 # Set this to zero or you can't change the other values
-	mmi.multimesh.mesh = mesh_instance.mesh
-	mmi.multimesh.transform_format = MultiMesh.TRANSFORM_3D
-
-	mmi.visibility_range_begin 			= item.visibility_range_begin
-	mmi.visibility_range_begin_margin 	= item.visibility_range_begin_margin
-	mmi.visibility_range_end 			= item.visibility_range_end
-	mmi.visibility_range_end_margin 	= item.visibility_range_end_margin
-	mmi.visibility_range_fade_mode 		= item.visibility_range_fade_mode
-	mmi.layers = item.visibility_layers
-
-	mmi.multimesh.instance_count = count
-	copy_instance_shader_parameters(mesh_instance, mmi)
-
-	return mmi
 
 
-static func get_or_create_particles(item: ProtonScatterItem) -> GPUParticles3D:
-	var item_root := get_or_create_item_root(item)
-	var particles: GPUParticles3D = item_root.get_node_or_null("GPUParticles3D")
-
-	if not particles:
-		particles = GPUParticles3D.new()
-		particles.set_name("GPUParticles3D")
-		item_root.add_child(particles)
-
-		particles.set_owner(item_root.owner)
-
-	var mesh_instance: MeshInstance3D = get_merged_meshes_from(item)
-	if not mesh_instance:
-		return
-
-	particles.material_override = get_final_material(item, mesh_instance)
-	particles.set_draw_pass_mesh(0, mesh_instance.mesh)
-	particles.position = Vector3.ZERO
-	particles.local_coords = true
-	particles.layers = item.visibility_layers
-
-	# Use the user provided material if it exists.
-	var process_material: Material = item.override_process_material
-
-	# Or load the default one if there's nothing.
-	if not process_material:
-		process_material = ShaderMaterial.new()
-		process_material.shader = preload("../particles/static.gdshader")
-
-	if process_material is ShaderMaterial:
-		process_material.set_shader_parameter("global_transform", item_root.get_global_transform())
-
-	particles.set_process_material(process_material)
-
-	# TMP: Workaround to get infinite life time.
-	# Should be fine, but extensive testing is required.
-	# I can't get particles to restart when using emit_particle() from a script, so it's either
-	# that, or encoding the transform array in a texture an read that data from the particle
-	# shader, which is significantly harder.
-	particles.lifetime = 1.79769e308
-
-	# Kill previous particles or new ones will not spawn.
-	particles.restart()
-
-	return particles
 
 
 # Called from child nodes who affect the rebuild process (like ScatterShape)
@@ -456,15 +360,6 @@ static func set_owner_recursive(node: Node, new_owner) -> void:
 
 	for c in node.get_children():
 		set_owner_recursive(c, new_owner)
-
-
-static func get_aabb_from_transforms(transforms : Array) -> AABB:
-	if transforms.size() < 1:
-		return AABB(Vector3.ZERO, Vector3.ZERO)
-	var aabb = AABB(transforms[0].origin, Vector3.ZERO)
-	for t in transforms:
-		aabb = aabb.expand(t.origin)
-	return aabb
 
 
 static func set_visibility_layers(node: Node, layers: int) -> void:
