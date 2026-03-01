@@ -661,8 +661,9 @@ func _invoke_render(render: ScatterRender) -> void:
 		if want_merged_mesh:
 			render.merged_mesh_instance.queue_free()
 			render.merged_mesh_instance = null
-			
-	render.post_render(self, output_root)
+	
+	if render.has_method("post_render"):
+		render.post_render(self, output_root)
 
 
 func _script_has_property(obj: Object, name: String) -> bool:
