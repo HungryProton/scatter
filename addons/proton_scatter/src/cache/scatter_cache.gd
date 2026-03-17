@@ -22,11 +22,13 @@ signal cache_restored
 signal cache_load_threaded_finished
 
 
-@export_file("*.res", "*.tres") var cache_file := "":
+@export var cache_resource: ProtonScatterCacheResource:
 	set(val):
-		cache_file = val
+		cache_resource = val
 		if is_inside_tree():
 			update_configuration_warnings()
+
+@export_storage var cache_file := ""
 
 
 ## Determines whether the cache should be automatically updated when the scene is saved.
@@ -56,39 +58,14 @@ func _ready() -> void:
 		return
 
 	_scene_root = _get_local_scene_root(self)
-
-	# Check if cache_file is empty, indicating the default case
-	if cache_file.is_empty():
-		if Engine.is_editor_hint():
-			# Ensure the cache folder exists
-			_ensure_cache_folder_exists()
-		else:
-			printerr("ProtonScatter error: You loaded a ScatterCache node with an empty cache file attribute.
-								ProtonScatter cannot set a default value outside of the editor.
-								Please open the scene in the editor and set a default value.")
-			return
-
-		# Retrieve the scene name to create a unique recognizable name
-		var scene_path: String = _scene_root.get_scene_file_path()
-		var scene_name: String
-
-		# If the scene path is not available, set a random name
-		if scene_path.is_empty():
-			scene_name = str(randi())
-		else:
-			# Use the base name of the scene file and append a hash to avoid collisions
-			scene_name = scene_path.get_file().get_basename()
-			scene_name += "_" + str(scene_path.hash())
-
-		# Set the cache path to the cache folder, incorporating the scene name
-		cache_file = DEFAULT_CACHE_FOLDER.get_basename().path_join(scene_name + "_scatter_cache.res")
+	_migrate_legacy_cache_file()
 
 	restore_cache.call_deferred()
 
 
 func _process(_delta: float) -> void:
 	if _cache_load_threaded_in_progress:
-		match ResourceLoader.load_threaded_get_status(cache_file):
+		match ResourceLoader.load_threaded_get_status(_get_cache_path()):
 			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
 				return
 
@@ -102,8 +79,10 @@ func _process(_delta: float) -> void:
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings = PackedStringArray()
-	if cache_file.is_empty():
-		warnings.push_back("No path set for the cache file. Select where to store the cache in the inspector.")
+	if not cache_resource:
+		warnings.push_back("No cache resource assigned. Create or load a ProtonScatterCacheResource in the inspector.")
+	elif cache_resource.resource_path.is_empty():
+		warnings.push_back("The cache resource is embedded in the scene. Save it as an external resource to persist cache data across sessions.")
 
 	return warnings
 
@@ -115,27 +94,20 @@ func _notification(what):
 
 func clear_cache() -> void:
 	_scatter_nodes.clear()
+	_ensure_cache_resource_exists()
+	_local_cache = cache_resource
 	_local_cache.clear()
-
-	if dbg_disable_thread:
-		save_cache()
-	else:
-		if !_save_thread.is_alive():
-			if _save_thread.is_started():
-				_save_thread.wait_to_finish()
-			_save_thread.start(save_cache)
+	_request_save_cache()
 
 
 func update_cache() -> void:
-	if cache_file.is_empty():
-		printerr("Cache file path is empty.")
-		return
+	_ensure_cache_resource_exists()
 
 	_purge_outdated_nodes()
 	_discover_scatter_nodes(_scene_root)
 
 	if not _local_cache:
-		_local_cache = ProtonScatterCacheResource.new()
+		_local_cache = cache_resource
 
 	for s in _scatter_nodes:
 		# Ignore this node if its cache is already up to date
@@ -160,13 +132,7 @@ func update_cache() -> void:
 	if not _local_cache_changed:
 		return
 
-	if dbg_disable_thread:
-		save_cache()
-	else:
-		if !_save_thread.is_alive():
-			if _save_thread.is_started():
-				_save_thread.wait_to_finish()
-			_save_thread.start(save_cache)
+	_request_save_cache()
 
 	_local_cache_changed = false
 
@@ -176,23 +142,28 @@ func restore_cache() -> void:
 	_discover_scatter_nodes(_scene_root)
 
 	var cache_loaded := false
+	var cache_path := _get_cache_path()
+	if cache_resource:
+		_local_cache = cache_resource
+		cache_loaded = true
 
 	# Load the cache file if it exists
-	if ResourceLoader.exists(cache_file):
+	if not cache_loaded and ResourceLoader.exists(cache_path):
 		if is_inside_tree():
 			if dbg_disable_thread:
-				_load_cache(cache_file)
+				_load_cache(cache_path)
 			else:
-				await _load_cache_threaded(cache_file)
+				await _load_cache_threaded(cache_path)
 		else:
-			_local_cache = load(cache_file)
+			_local_cache = load(cache_path)
 
 		if not _local_cache:
-			printerr("Could not load cache: ", cache_file)
+			printerr("Could not load cache: ", cache_path)
 		else:
+			cache_resource = _local_cache
 			cache_loaded = true
-	else:
-		push_warning("ProtonScatter warning: Could not find cache file %s. Falling back to rebuilding scatter nodes." % cache_file)
+	elif not cache_loaded and not cache_path.is_empty():
+		push_warning("ProtonScatter warning: Could not find cache file %s. Falling back to rebuilding scatter nodes." % cache_path)
 
 	for s in _scatter_nodes:
 		if s.force_rebuild_on_load:
@@ -240,6 +211,79 @@ func _get_local_scene_root(node: Node) -> Node:
 	return _get_local_scene_root(parent)
 
 
+func _migrate_legacy_cache_file() -> void:
+	if cache_resource:
+		return
+
+	if cache_file.is_empty():
+		return
+
+	if ResourceLoader.exists(cache_file):
+		var loaded_resource = load(cache_file)
+		if loaded_resource is ProtonScatterCacheResource:
+			cache_resource = loaded_resource
+			return
+
+	cache_resource = ProtonScatterCacheResource.new()
+
+
+func _ensure_cache_resource_exists() -> void:
+	if cache_resource:
+		return
+
+	cache_resource = ProtonScatterCacheResource.new()
+	update_configuration_warnings()
+
+
+func _request_save_cache() -> void:
+	_ensure_cache_resource_exists()
+	var save_path := _get_cache_path()
+	if save_path.is_empty():
+		printerr("ProtonScatter error: Cache resource has no save path.")
+		return
+
+	var cache_dir := save_path.get_base_dir()
+	if not _ensure_cache_directory_exists(cache_dir):
+		return
+
+	if dbg_disable_thread or not ResourceLoader.exists(save_path):
+		save_cache()
+		return
+
+	if !_save_thread.is_alive():
+		if _save_thread.is_started():
+			_save_thread.wait_to_finish()
+		_save_thread.start(save_cache)
+
+
+func _get_default_cache_path() -> String:
+	if not is_instance_valid(_scene_root):
+		return ""
+
+	_ensure_cache_folder_exists()
+
+	var scene_path: String = _scene_root.get_scene_file_path()
+	var scene_name: String
+
+	if scene_path.is_empty():
+		scene_name = str(randi())
+	else:
+		scene_name = scene_path.get_file().get_basename()
+		scene_name += "_" + str(scene_path.hash())
+
+	return DEFAULT_CACHE_FOLDER.get_basename().path_join(scene_name + "_scatter_cache.res")
+
+
+func _get_cache_path() -> String:
+	if cache_resource and not cache_resource.resource_path.is_empty():
+		return cache_resource.resource_path
+
+	if not cache_file.is_empty():
+		return cache_file
+
+	return _get_default_cache_path()
+
+
 func _discover_scatter_nodes(node: Node) -> void:
 	if node is ProtonScatter and not _scatter_nodes.has(node):
 		_scatter_nodes[node] = -1
@@ -253,7 +297,8 @@ func _purge_outdated_nodes() -> void:
 	for node in _scatter_nodes:
 		if not is_instance_valid(node):
 			nodes_to_remove.push_back(node)
-			_local_cache.erase(_scene_root.get_path_to(node))
+			if _local_cache:
+				_local_cache.erase(str(_scene_root.get_path_to(node)))
 			_local_cache_changed = true
 
 	for node in nodes_to_remove:
@@ -261,8 +306,23 @@ func _purge_outdated_nodes() -> void:
 
 
 func _ensure_cache_folder_exists() -> void:
-	if not DirAccess.dir_exists_absolute(DEFAULT_CACHE_FOLDER):
-		DirAccess.make_dir_recursive_absolute(DEFAULT_CACHE_FOLDER)
+	_ensure_cache_directory_exists(DEFAULT_CACHE_FOLDER)
+
+
+func _ensure_cache_directory_exists(dir_path: String) -> bool:
+	if dir_path.is_empty():
+		return false
+
+	var absolute_dir := ProjectSettings.globalize_path(dir_path)
+	if DirAccess.dir_exists_absolute(absolute_dir):
+		return true
+
+	var err := DirAccess.make_dir_recursive_absolute(absolute_dir)
+	if err != OK:
+		printerr("ProtonScatter error: Failed to create cache directory ", dir_path, ". Code: ", err)
+		return false
+
+	return true
 
 
 func _load_cache(cache_file_path: String) -> void:
@@ -282,10 +342,29 @@ func _load_cache_threaded(cache_file: String) -> void:
 
 
 func save_cache() -> void:
-	var err = ResourceSaver.save(_local_cache, cache_file)
+	_ensure_cache_resource_exists()
+	_local_cache = cache_resource
+
+	var save_path := _get_cache_path()
+	if save_path.is_empty():
+		printerr("ProtonScatter error: Cache resource has no save path.")
+		return
+
+	var cache_dir := save_path.get_base_dir()
+	if not _ensure_cache_directory_exists(cache_dir):
+		return
+
+	var err = ResourceSaver.save(_local_cache, save_path)
 
 	if err != OK:
-		printerr("ProtonScatter error: Failed to save the cache file. Code: ", err)
+		printerr("ProtonScatter error: Failed to save the cache file ", save_path, ". Code: ", err)
+		return
+
+	cache_file = save_path
+	if cache_resource.resource_path.is_empty() and ResourceLoader.exists(save_path):
+		var saved_resource = load(save_path)
+		if saved_resource is ProtonScatterCacheResource:
+			cache_resource = saved_resource
 
 
 func _exit_tree():
