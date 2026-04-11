@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/presets/load_preset.gd" id="1"]
 
-[node name="LoadPresetPopup" type="WindowDialog"]
+[node name="LoadPresetPopup" type="Window"]
 visible = true
 anchor_left = 0.5
 anchor_top = 0.5

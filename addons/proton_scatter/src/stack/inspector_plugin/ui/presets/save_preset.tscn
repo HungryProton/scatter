@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://addons/proton_scatter/src/stack/inspector_plugin/ui/presets/save_preset.gd" id="1"]
 
-[node name="SavePresetPopup" type="WindowDialog"]
+[node name="SavePresetPopup" type="Window"]
 visible = true
 anchor_left = 0.5
 anchor_top = 0.5
@@ -48,7 +48,7 @@ modulate = Color( 1, 0.513726, 0.278431, 1 )
 margin_right = 312.0
 margin_bottom = 48.0
 text = "Preset name must be a valid file name.
-It cannot contain the following characters: 
+It cannot contain the following characters:
 : / \\\\ ? * \" | % < >"
 valign = 2
 autowrap = true
