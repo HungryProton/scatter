@@ -48,6 +48,7 @@ var _scene_root: Node
 var _scatter_nodes: Dictionary # Key: ProtonScatter, Value: cached version
 var _local_cache_changed := false
 var _cache_load_threaded_in_progress := false
+var _save_pending := false
 
 var _save_thread = Thread.new()
 
@@ -59,6 +60,11 @@ func _ready() -> void:
 
 	_scene_root = _get_local_scene_root(self)
 	_migrate_legacy_cache_file()
+
+	# The presence of this node signals "use cached transforms at load time".
+	# Flip force_rebuild_on_load off on every scatter under our scope so
+	# restore_cache actually applies the cache instead of being skipped.
+	enable_for_all_nodes()
 
 	restore_cache.call_deferred()
 
@@ -89,7 +95,9 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 func _notification(what):
 	if what == NOTIFICATION_EDITOR_PRE_SAVE and auto_rebuild_cache_when_saving:
-		update_cache()
+		# Must be synchronous: _notification does not wait for coroutines,
+		# so the scene would otherwise be written before the cache is flushed.
+		_update_cache_sync()
 
 
 func clear_cache() -> void:
@@ -137,6 +145,40 @@ func update_cache() -> void:
 	_local_cache_changed = false
 
 
+# Synchronous variant used from NOTIFICATION_EDITOR_PRE_SAVE. Must not await,
+# because Godot proceeds with the scene save as soon as _notification returns.
+# Only stores transforms that are already available; cold nodes are skipped
+# with a warning so the next save (after the node has built) picks them up.
+func _update_cache_sync() -> void:
+	_ensure_cache_resource_exists()
+
+	_purge_outdated_nodes()
+	_discover_scatter_nodes(_scene_root)
+
+	if not _local_cache:
+		_local_cache = cache_resource
+
+	for s in _scatter_nodes:
+		var cached_version: int = _scatter_nodes[s]
+		if s.build_version == cached_version:
+			continue
+
+		if not s.transforms:
+			push_warning("ProtonScatter: node %s has no transforms yet; skipping in save-time cache. Use 'Update Cache' to force a build." % str(_scene_root.get_path_to(s)))
+			continue
+
+		_local_cache.store(str(_scene_root.get_path_to(s)), s.transforms.list)
+		_scatter_nodes[s] = s.build_version
+		_local_cache_changed = true
+
+	if not _local_cache_changed:
+		return
+
+	# Flush synchronously so the .res is on disk before the scene is written.
+	save_cache()
+	_local_cache_changed = false
+
+
 func restore_cache() -> void:
 	_scatter_nodes.clear()
 	_discover_scatter_nodes(_scene_root)
@@ -166,18 +208,16 @@ func restore_cache() -> void:
 		push_warning("ProtonScatter warning: Could not find cache file %s. Falling back to rebuilding scatter nodes." % cache_path)
 
 	for s in _scatter_nodes:
-		if s.force_rebuild_on_load:
-			continue # Ignore the cache if the scatter node is about to rebuild anyway.
-
 		var node_path := str(_scene_root.get_path_to(s))
 
 		if cache_loaded and _local_cache.has_transforms(node_path):
-			# Send the cached transforms to the scatter node.
+			# Apply the cached transforms synchronously, bypassing the build
+			# thread. apply_cached_transforms leaves build_version at 0 so
+			# the next update_cache sees no work to do until the user edits.
 			var transforms = ProtonScatterTransformList.new()
 			transforms.list = _local_cache.get_transforms(node_path)
 			s._perform_sanity_check()
-			s._on_transforms_ready(transforms)
-			s.build_version = 0
+			s.apply_cached_transforms(transforms)
 			_scatter_nodes[s] = 0
 			continue
 
@@ -239,7 +279,7 @@ func _request_save_cache() -> void:
 	_ensure_cache_resource_exists()
 	var save_path := _get_cache_path()
 	if save_path.is_empty():
-		printerr("ProtonScatter error: Cache resource has no save path.")
+		push_warning("ProtonScatter: cache not saved — scene has no file path yet. Save the scene first.")
 		return
 
 	var cache_dir := save_path.get_base_dir()
@@ -250,27 +290,37 @@ func _request_save_cache() -> void:
 		save_cache()
 		return
 
-	if !_save_thread.is_alive():
-		if _save_thread.is_started():
-			_save_thread.wait_to_finish()
-		_save_thread.start(save_cache)
+	if _save_thread.is_alive():
+		# A save is already running. Flag that another pass is needed; the
+		# running thread body will pick it up instead of dropping the request.
+		_save_pending = true
+		return
+
+	if _save_thread.is_started():
+		_save_thread.wait_to_finish()
+	_save_thread.start(_save_cache_thread_body)
+
+
+func _save_cache_thread_body() -> void:
+	save_cache()
+	while _save_pending:
+		_save_pending = false
+		save_cache()
 
 
 func _get_default_cache_path() -> String:
 	if not is_instance_valid(_scene_root):
 		return ""
 
+	var scene_path: String = _scene_root.get_scene_file_path()
+	if scene_path.is_empty():
+		# Scene has not been saved yet. Returning empty prevents creating
+		# orphan cache files under a randomized name on every save attempt.
+		return ""
+
 	_ensure_cache_folder_exists()
 
-	var scene_path: String = _scene_root.get_scene_file_path()
-	var scene_name: String
-
-	if scene_path.is_empty():
-		scene_name = str(randi())
-	else:
-		scene_name = scene_path.get_file().get_basename()
-		scene_name += "_" + str(scene_path.hash())
-
+	var scene_name := scene_path.get_file().get_basename() + "_" + str(scene_path.hash())
 	return DEFAULT_CACHE_FOLDER.get_basename().path_join(scene_name + "_scatter_cache.res")
 
 
@@ -334,6 +384,14 @@ func _load_cache_threaded(cache_file: String) -> void:
 		printerr("Cache file path is empty.")
 		return
 
+	# A previous load may still be in flight (e.g. rapid scene reloads).
+	# Wait for it to finish and piggyback on its result instead of racing
+	# the shared signal.
+	if _cache_load_threaded_in_progress:
+		await cache_load_threaded_finished
+		_local_cache = ResourceLoader.load_threaded_get(cache_file)
+		return
+
 	ResourceLoader.load_threaded_request(cache_file)
 	set_process(true)
 	_cache_load_threaded_in_progress = true
@@ -361,10 +419,20 @@ func save_cache() -> void:
 		return
 
 	cache_file = save_path
+	# save_cache may run on a worker thread; bounce property assignment back
+	# to the main thread so the cache_resource setter and its
+	# update_configuration_warnings() call don't touch the scene tree
+	# off-thread.
 	if cache_resource.resource_path.is_empty() and ResourceLoader.exists(save_path):
-		var saved_resource = load(save_path)
-		if saved_resource is ProtonScatterCacheResource:
-			cache_resource = saved_resource
+		_refresh_cache_resource_from_disk.call_deferred(save_path)
+
+
+func _refresh_cache_resource_from_disk(save_path: String) -> void:
+	if not ResourceLoader.exists(save_path):
+		return
+	var saved_resource = load(save_path)
+	if saved_resource is ProtonScatterCacheResource:
+		cache_resource = saved_resource
 
 
 func _exit_tree():

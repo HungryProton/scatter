@@ -189,8 +189,17 @@ func _ready() -> void:
 	update_configuration_warnings.call_deferred()
 	is_ready = true
 
-	if force_rebuild_on_load and not is_instance_valid(_dependency_parent):
-		full_rebuild.call_deferred()
+	if not is_instance_valid(_dependency_parent):
+		# Deferred so a ProtonScatterCache further up the tree has a chance to
+		# flip force_rebuild_on_load off in its own _ready before the rebuild
+		# actually runs. Otherwise the rebuild would fire and overwrite the
+		# cache-applied transforms a moment later.
+		_maybe_initial_rebuild.call_deferred()
+
+
+func _maybe_initial_rebuild() -> void:
+	if force_rebuild_on_load:
+		full_rebuild()
 
 
 func _exit_tree():
@@ -738,6 +747,38 @@ func _on_node_duplicated() -> void:
 func _on_child_exiting_tree(node: Node) -> void:
 	if node is ProtonScatterShape or node is ProtonScatterItem:
 		rebuild.bind(true).call_deferred()
+
+
+# Synchronous variant used by ProtonScatterCache to apply cached transforms
+# without spinning up the build thread or waiting on a process frame. Leaves
+# build_version at 0 so the cache treats the node as "in cached state".
+func apply_cached_transforms(list: ProtonScatterTransformList) -> void:
+	_clear_collision_data()
+
+	transforms = list
+
+	if force_uniform_scale or _is_using_jolt:
+		transforms.enforce_uniform_scale()
+
+	if not transforms or transforms.is_empty():
+		clear_output()
+		update_gizmos()
+		build_version = 0
+		return
+
+	match render_mode:
+		0:
+			if use_chunks:
+				_update_split_multimeshes()
+			else:
+				_update_multimeshes()
+		1:
+			_update_duplicates()
+		2:
+			_update_particles_system()
+
+	update_gizmos()
+	build_version = 0
 
 
 # Called when the modifier stack is done generating the full transform list
