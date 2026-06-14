@@ -168,7 +168,7 @@ var path: String:
 	set(val):
 		path = val
 		source_data_ready = false
-		_target_scene = load(path) if source != 0 else null
+		_source_resource = load(path) if source != 0 else null
 		ScatterUtil.request_parent_to_rebuild(self)
 
 var source_position: Vector3
@@ -176,7 +176,7 @@ var source_rotation: Vector3
 var source_scale: Vector3
 var source_data_ready := false
 
-var _target_scene: PackedScene
+var _source_resource: Resource
 
 
 func _get_property_list() -> Array:
@@ -206,7 +206,15 @@ func get_item() -> Node3D:
 	if source == 0 and has_node(path):
 		node = get_node(path).duplicate() # Never expose the original node
 	elif source == 1:
-		node = _target_scene.instantiate()
+		if _source_resource is PackedScene:
+			node = _source_resource.instantiate()
+		elif _source_resource is Mesh:
+			var mi := MeshInstance3D.new()
+			mi.mesh = _source_resource
+			node = mi
+		elif _source_resource != null:
+			push_error("ProtonScatterItem: unsupported resource type '%s' loaded from '%s'" % [_source_resource.get_class(), path])
+			return null
 
 	if node:
 		_save_source_data(node)
