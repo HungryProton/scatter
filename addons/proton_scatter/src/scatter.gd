@@ -186,7 +186,7 @@ func _ready() -> void:
 	_is_using_jolt = ProjectSettings.get_setting("physics/3d/physics_engine") == "Jolt Physics"
 	_perform_sanity_check()
 	_discover_items()
-	update_configuration_warnings.call_deferred()
+	call_deferred("update_configuration_warnings")
 	is_ready = true
 
 	if force_rebuild_on_load and not is_instance_valid(_dependency_parent):
@@ -257,6 +257,7 @@ func _notification(what):
 			rebuild.call_deferred()
 		NOTIFICATION_ENTER_WORLD:
 			_ignore_transform_notification = true
+	return null
 
 
 func _set(property, value):
