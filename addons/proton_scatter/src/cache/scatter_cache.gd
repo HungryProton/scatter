@@ -45,7 +45,6 @@ var _local_cache: ProtonScatterCacheResource
 var _scene_root: Node
 var _scatter_nodes: Dictionary # Key: ProtonScatter, Value: cached version
 var _local_cache_changed: bool = false
-var _cache_load_threaded_in_progress: bool = false
 var _save_thread: Thread = Thread.new()
 
 
@@ -86,24 +85,25 @@ func _ready() -> void:
 	restore_cache()
 
 
+## Process will only run when there is something to load in a thread, otherwise it's disabled.
 func _process(_delta: float) -> void:
-	if _cache_load_threaded_in_progress:
-		match ResourceLoader.load_threaded_get_status(cache_file):
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
-				return
-
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_INVALID_RESOURCE, \
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_FAILED, \
-			ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
-				_cache_load_threaded_in_progress = false
-				cache_load_threaded_finished.emit()
-				set_process(false)
+	match ResourceLoader.load_threaded_get_status(cache_file):
+		ResourceLoader.ThreadLoadStatus.THREAD_LOAD_IN_PROGRESS:
+			return
+		ResourceLoader.ThreadLoadStatus.THREAD_LOAD_INVALID_RESOURCE, \
+		ResourceLoader.ThreadLoadStatus.THREAD_LOAD_FAILED, \
+		ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
+			set_process(false)
+			cache_load_threaded_finished.emit()
 
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings: PackedStringArray = PackedStringArray()
 	if cache_file.is_empty():
 		warnings.push_back("No path set for the cache file. Select where to store the cache in the inspector.")
+
+	if not can_process():
+		warnings.push_back("Process mode is disabled. Threaded loading will not work.")
 
 	return warnings
 
@@ -184,6 +184,7 @@ func restore_cache() -> void:
 			await _load_cache_threaded()
 	else:
 		_local_cache = load(cache_file)
+
 	if not _local_cache:
 		printerr("Could not load cache: ", cache_file)
 		return
@@ -259,17 +260,14 @@ func _load_cache_threaded() -> void:
 	if cache_file.is_empty():
 		printerr("Cache file path is empty.")
 		return
-
 	ResourceLoader.load_threaded_request(cache_file)
 	set_process(true)
-	_cache_load_threaded_in_progress = true
 	await cache_load_threaded_finished
 	_local_cache = ResourceLoader.load_threaded_get(cache_file)
 
 
 func save_cache() -> void:
 	var err: Error = ResourceSaver.save(_local_cache, cache_file)
-
 	if err != OK:
 		printerr("ProtonScatter error: Failed to save the cache file. Code: ", err)
 
