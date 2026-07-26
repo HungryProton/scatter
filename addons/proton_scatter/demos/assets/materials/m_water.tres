@@ -1,26 +1,28 @@
-[gd_resource type="ShaderMaterial" load_steps=6 format=3 uid="uid://c7mw5tryqfggw"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://c7mw5tryqfggw"]
 
-[ext_resource type="Shader" path="res://addons/proton_scatter/demos/assets/materials/m_water.gdshader" id="1_j8rl3"]
+[ext_resource type="Shader" uid="uid://cb8q0nbmy2syr" path="res://addons/proton_scatter/demos/assets/materials/m_water.gdshader" id="1_j8rl3"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_7bjdc"]
 noise_type = 2
 fractal_type = 3
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_wxuht"]
-seamless = true
 noise = SubResource("FastNoiseLite_7bjdc")
+seamless = true
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_dx86n"]
 noise_type = 2
 domain_warp_enabled = true
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_1j0ob"]
-seamless = true
 noise = SubResource("FastNoiseLite_dx86n")
+seamless = true
 
 [resource]
 render_priority = 0
 shader = ExtResource("1_j8rl3")
+shader_parameter/surfaceNoise = SubResource("NoiseTexture2D_1j0ob")
+shader_parameter/distortNoise = SubResource("NoiseTexture2D_wxuht")
 shader_parameter/beer_factor = 4.0
 shader_parameter/foam_distance = 0.01
 shader_parameter/foam_max_distance = 0.345
@@ -36,5 +38,3 @@ shader_parameter/_DepthMaxDistance = 1.0
 shader_parameter/_DepthFactor = 1.0
 shader_parameter/roughness = 0.001
 shader_parameter/specular = 0.5
-shader_parameter/surfaceNoise = SubResource("NoiseTexture2D_1j0ob")
-shader_parameter/distortNoise = SubResource("NoiseTexture2D_wxuht")

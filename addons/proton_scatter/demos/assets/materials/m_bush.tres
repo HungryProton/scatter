@@ -1,6 +1,6 @@
-[gd_resource type="ShaderMaterial" load_steps=7 format=3 uid="uid://bn3fr3m3glrnp"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://bn3fr3m3glrnp"]
 
-[ext_resource type="Shader" path="res://addons/proton_scatter/demos/assets/materials/grass.gdshader" id="1_peshr"]
+[ext_resource type="Shader" uid="uid://dfhcj0io07kr8" path="res://addons/proton_scatter/demos/assets/materials/grass.gdshader" id="1_peshr"]
 [ext_resource type="Texture2D" uid="uid://b2a6ylo2enm4g" path="res://addons/proton_scatter/demos/assets/textures/t_bush.png" id="2_mbhvd"]
 
 [sub_resource type="Gradient" id="Gradient_122hb"]
@@ -15,14 +15,17 @@ seed = 1
 frequency = 0.002
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_7l0n1"]
-in_3d_space = true
-seamless = true
-seamless_blend_skirt = 0.65
 noise = SubResource("FastNoiseLite_eeqpx")
+seamless = true
+in_3d_space = true
+seamless_blend_skirt = 0.65
 
 [resource]
 render_priority = 0
 shader = ExtResource("1_peshr")
+shader_parameter/texture_albedo = ExtResource("2_mbhvd")
+shader_parameter/texture_gradient = SubResource("GradientTexture1D_i0bw2")
+shader_parameter/texture_noise = SubResource("NoiseTexture2D_7l0n1")
 shader_parameter/alpha_scissor_threshold = 0.25
 shader_parameter/transmission = Color(0.619608, 0.541176, 0.101961, 1)
 shader_parameter/secondary_color = Color(0, 0, 0, 1)
@@ -32,6 +35,3 @@ shader_parameter/wind_direction = Vector2(1, -0.5)
 shader_parameter/wind_speed = 0.5
 shader_parameter/wind_strength = 0.15
 shader_parameter/noise_scale = 6.0
-shader_parameter/texture_albedo = ExtResource("2_mbhvd")
-shader_parameter/texture_gradient = SubResource("GradientTexture1D_i0bw2")
-shader_parameter/texture_noise = SubResource("NoiseTexture2D_7l0n1")

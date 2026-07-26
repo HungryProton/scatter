@@ -108,13 +108,11 @@ var chunk_dimensions := Vector3.ONE * 15.0:
 			_dependency_parent.build_completed.disconnect(rebuild)
 			_dependency_parent = null
 
-		var node = get_node_or_null(val)
+		var node: Node = get_node_or_null(val)
 		if not node:
 			return
 
-		var type = node.get_script()
-		var scatter_type = get_script()
-		if type != scatter_type:
+		if not node is ProtonScatter:
 			push_warning("ProtonScatter warning: Please select a ProtonScatter node as a parent dependency.")
 			return
 
@@ -202,7 +200,7 @@ func _exit_tree():
 	_clear_collision_data()
 
 
-func _get_property_list() -> Array:
+func _get_property_list() -> Array[Dictionary]:
 	var list := []
 	list.push_back({
 		name = "modifier_stack",

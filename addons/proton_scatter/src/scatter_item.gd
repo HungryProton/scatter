@@ -179,7 +179,7 @@ var source_data_ready := false
 var _source_resource: Resource
 
 
-func _get_property_list() -> Array:
+func _get_property_list() -> Array[Dictionary]:
 	var list := []
 
 	if source == 0:

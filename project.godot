@@ -21,21 +21,20 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 config/name="ProtonScatter"
 config/tags=PackedStringArray("addon")
 run/main_scene="res://addons/proton_scatter/demos/showcase.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [debug]
 
+gdscript/warnings/directory_rules={
+"res://addons": 1
+}
 gdscript/warnings/untyped_declaration=1
-gdscript/warnings/inferred_declaration=1
 gdscript/warnings/unsafe_property_access=1
 gdscript/warnings/unsafe_method_access=1
 gdscript/warnings/unsafe_cast=1
 gdscript/warnings/unsafe_call_argument=1
 gdscript/warnings/return_value_discarded=1
-gdscript/warnings/directory_rules={
-"res://addons": 1
-}
 gdscript/warnings/missing_await=1
 
 [display]
@@ -46,6 +45,10 @@ window/size/viewport_height=720
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/proton_scatter/plugin.cfg")
+
+[filesystem]
+
+import/blender/enabled=false
 
 [rendering]
 

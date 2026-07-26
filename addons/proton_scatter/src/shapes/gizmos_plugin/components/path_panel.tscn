@@ -1,28 +1,28 @@
-[gd_scene load_steps=7 format=3 uid="uid://vijpujrvtyin"]
+[gd_scene format=3 uid="uid://vijpujrvtyin"]
 
-[ext_resource type="Script" path="res://addons/proton_scatter/src/shapes/gizmos_plugin/components/path_panel.gd" id="1_o7kkg"]
+[ext_resource type="Script" uid="uid://vaenhx03icei" path="res://addons/proton_scatter/src/shapes/gizmos_plugin/components/path_panel.gd" id="1_o7kkg"]
 [ext_resource type="Texture2D" uid="uid://c1t5x34pc4vs5" path="res://addons/proton_scatter/icons/curve_select.svg" id="2_d7o1n"]
 [ext_resource type="ButtonGroup" uid="uid://1xy55037k3k5" path="res://addons/proton_scatter/src/shapes/gizmos_plugin/components/curve_mode_button_group.tres" id="2_sl6yo"]
 [ext_resource type="Texture2D" uid="uid://cmykha5ja17vj" path="res://addons/proton_scatter/icons/curve_create.svg" id="3_l70sn"]
 [ext_resource type="Texture2D" uid="uid://cligdljx1ad5e" path="res://addons/proton_scatter/icons/curve_delete.svg" id="4_b5yum"]
 [ext_resource type="Texture2D" uid="uid://n66mufjib4ds" path="res://addons/proton_scatter/icons/menu.svg" id="6_xiaj2"]
 
-[node name="PathPanel" type="MarginContainer"]
+[node name="PathPanel" type="MarginContainer" unique_id=1857677178]
 offset_right = 108.0
 offset_bottom = 24.0
 size_flags_horizontal = 0
 size_flags_vertical = 4
 script = ExtResource("1_o7kkg")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=2066765550]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer" unique_id=955138227]
 layout_mode = 2
 
-[node name="Select" type="Button" parent="HBoxContainer/HBoxContainer"]
+[node name="Select" type="Button" parent="HBoxContainer/HBoxContainer" unique_id=1178499975]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
@@ -33,7 +33,7 @@ icon = ExtResource("2_d7o1n")
 flat = true
 icon_alignment = 1
 
-[node name="Create" type="Button" parent="HBoxContainer/HBoxContainer"]
+[node name="Create" type="Button" parent="HBoxContainer/HBoxContainer" unique_id=1555854877]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
@@ -43,7 +43,7 @@ icon = ExtResource("3_l70sn")
 flat = true
 icon_alignment = 1
 
-[node name="Delete" type="Button" parent="HBoxContainer/HBoxContainer"]
+[node name="Delete" type="Button" parent="HBoxContainer/HBoxContainer" unique_id=832136515]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
@@ -53,7 +53,7 @@ icon = ExtResource("4_b5yum")
 flat = true
 icon_alignment = 1
 
-[node name="Options" type="Button" parent="HBoxContainer"]
+[node name="Options" type="Button" parent="HBoxContainer" unique_id=2092024530]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
@@ -63,11 +63,11 @@ icon = ExtResource("6_xiaj2")
 flat = true
 icon_alignment = 1
 
-[node name="OptionsPanel" type="PopupPanel" parent="."]
+[node name="OptionsPanel" type="PopupPanel" parent="." unique_id=2063106531]
 unique_name_in_owner = true
 size = Vector2i(229, 179)
 
-[node name="AdvancedOptionsPanel" type="MarginContainer" parent="OptionsPanel"]
+[node name="AdvancedOptionsPanel" type="MarginContainer" parent="OptionsPanel" unique_id=777205189]
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 225.0
@@ -77,48 +77,48 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 metadata/_edit_use_custom_anchors = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="OptionsPanel/AdvancedOptionsPanel"]
+[node name="HBoxContainer" type="HBoxContainer" parent="OptionsPanel/AdvancedOptionsPanel" unique_id=736555907]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer" unique_id=543587651]
 layout_mode = 2
 
-[node name="MirrorAngle" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
+[node name="MirrorAngle" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer" unique_id=855266278]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 button_pressed = true
 text = "Mirror handles angle"
 
-[node name="MirrorLength" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
+[node name="MirrorLength" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer" unique_id=1945005367]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 button_pressed = true
 text = "Mirror handles length"
 
-[node name="ClosedPath" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
+[node name="ClosedPath" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer" unique_id=159962941]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "Closed path"
 
-[node name="LockToPlane" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
+[node name="LockToPlane" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer" unique_id=663372025]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 button_pressed = true
 text = "Lock to plane"
 
-[node name="SnapToColliders" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer"]
+[node name="SnapToColliders" type="CheckButton" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer/VBoxContainer" unique_id=903100589]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "Snap to colliders"
 
-[node name="VSeparator" type="VSeparator" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer"]
+[node name="VSeparator" type="VSeparator" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer" unique_id=1466510437]
 visible = false
 layout_mode = 2
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="OptionsPanel/AdvancedOptionsPanel/HBoxContainer" unique_id=964043502]
 layout_mode = 2
