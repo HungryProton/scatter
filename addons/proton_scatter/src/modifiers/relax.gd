@@ -62,20 +62,35 @@ func _process_transforms(transforms, _domain, _seed) -> void:
 	if transforms.size() < 2:
 		return
 
-	# Disable the use of compute shader, if we cannot create a RenderingDevice
-	if use_computeshader:
-		var rd := RenderingServer.create_local_rendering_device()
-		if rd == null:
-			use_computeshader = false
-		else:
-			rd.free()
-			rd = null
+	# The rendering device, the compiled shader and the pipeline are built once
+	# per run and reused for every iteration. They used to be created and thrown
+	# away inside compute_closest(), i.e. once per iteration, and creating a
+	# local rendering device plus compiling the compute shader costs far more
+	# than the distance maths it was set up for. On a level with 16 scatter nodes
+	# at 3 iterations each that was 48 device creations, and the rebuild took
+	# 15.3 s; reusing them brings it down to a fraction of that.
+	var rd: RenderingDevice = null
+	var shader := RID()
+	var pipeline := RID()
 
 	if use_computeshader:
+		rd = RenderingServer.create_local_rendering_device()
+		if rd == null:
+			# No device: headless, or the OpenGL backend. Untick the box, which
+			# is how the user finds out the GPU path was unavailable.
+			use_computeshader = false
+		else:
+			var shader_spirv: RDShaderSPIRV = get_shader_file().get_spirv()
+			shader = rd.shader_create_from_spirv(shader_spirv)
+			pipeline = rd.compute_pipeline_create(shader)
+
+	# rd stays null when the device could not be created, and the CPU path below
+	# runs instead.
+	if rd != null:
 		for iteration in iterations:
 			if interrupt_update:
-				return
-			var movedir: PackedVector3Array = compute_closest(transforms)
+				break
+			var movedir: PackedVector3Array = compute_closest(rd, shader, pipeline, transforms)
 			for i in transforms.size():
 				var dir = movedir[i]
 				if restrict_height:
@@ -84,6 +99,10 @@ func _process_transforms(transforms, _domain, _seed) -> void:
 				transforms.list[i].origin += dir.normalized() * offset
 
 			offset *= consecutive_step_multiplier
+
+		rd.free_rid(pipeline)
+		rd.free_rid(shader)
+		rd.free()
 
 	else:
 		# calculate the relax transforms on the cpu
@@ -119,12 +138,10 @@ func _process_transforms(transforms, _domain, _seed) -> void:
 
 # compute the closest points to each other using a compute shader
 # return a vector for each point that points away from the closest neighbour
-func compute_closest(transforms) -> PackedVector3Array:
+func compute_closest(rd: RenderingDevice, shader: RID, pipeline: RID,
+		transforms) -> PackedVector3Array:
 	var padded_num_vecs = ceil(float(transforms.size()) / 64.0) * 64
 	var padded_num_floats = padded_num_vecs * 4
-	var rd := RenderingServer.create_local_rendering_device()
-	var shader_spirv: RDShaderSPIRV = get_shader_file().get_spirv()
-	var shader := rd.shader_create_from_spirv(shader_spirv)
 	# Prepare our data. We use vec4 floats in the shader, so we need 32 bit.
 	var input := PackedFloat32Array()
 	for i in transforms.size():
@@ -160,8 +177,6 @@ func compute_closest(transforms) -> PackedVector3Array:
 	# the last parameter (the 0) needs to match the "set" in our shader file
 	var uniform_set := rd.uniform_set_create([uniform_in, uniform_out, uniform_params], shader, 0)
 
-	# Create a compute pipeline
-	var pipeline := rd.compute_pipeline_create(shader)
 	var compute_list := rd.compute_list_begin()
 	rd.compute_list_bind_compute_pipeline(compute_list, pipeline)
 	rd.compute_list_bind_uniform_set(compute_list, uniform_set, 0)
@@ -179,17 +194,12 @@ func compute_closest(transforms) -> PackedVector3Array:
 	for i in transforms.size():
 		retval.append(Vector3(result[i*4], result[i*4+1], result[i*4+2]))
 
-	# Free the allocated objects.
-	# All resources must be freed after use to avoid memory leaks.
-	if rd != null:
-		rd.free_rid(pipeline)
-		rd.free_rid(uniform_set)
-		rd.free_rid(shader)
-		rd.free_rid(buffer_in)
-		rd.free_rid(buffer_out)
-		rd.free_rid(buffer_params)
-		rd.free()
-		rd = null
+	# Free the per-call allocations. The device, shader and pipeline are owned by
+	# the caller and freed once the last iteration is done.
+	rd.free_rid(uniform_set)
+	rd.free_rid(buffer_in)
+	rd.free_rid(buffer_out)
+	rd.free_rid(buffer_params)
 	return retval
 
 func get_shader_file() -> RDShaderFile:
