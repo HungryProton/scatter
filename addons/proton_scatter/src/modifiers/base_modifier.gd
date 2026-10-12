@@ -49,16 +49,22 @@ func process_transforms(transforms: TransformList, domain: Domain, global_seed: 
 	if not domain.get_root().is_inside_tree():
 		return
 
+	# Checked before the editor-only block below: a disabled modifier must be
+	# skipped when the project is running too, not just in the editor. It used to
+	# sit inside that block, so unticking a modifier changed the editor preview
+	# while the exported game kept running it.
+	if not enabled:
+		if Engine.is_editor_hint():
+			_clear_warning()
+			warning_changed.emit()
+		return
+
 	if Engine.is_editor_hint():
 		_clear_warning()
 
 		if deprecated:
 			warning += "This modifier is deprecated.\n"
 			warning += deprecation_message + "\n"
-
-		if not enabled:
-			warning_changed.emit()
-			return
 
 		if domain.is_empty() and not warning_ignore_no_shape:
 			warning += """The Scatter node does not have a shape.
