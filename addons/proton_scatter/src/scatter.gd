@@ -71,6 +71,13 @@ var chunk_dimensions := Vector3.ONE * 15.0:
 			notify_property_list_changed()
 			rebuild.call_deferred()
 
+var draw_order : GPUParticles3D.DrawOrder = GPUParticles3D.DRAW_ORDER_INDEX:
+	set(val):
+		draw_order = val
+		if is_ready:
+			notify_property_list_changed()
+			full_rebuild.call_deferred()
+
 ## If enabled, creates static collision shapes for scattered objects.
 ## Uses the Physics server directly instead of creating actual collision nodes
 @export var keep_static_colliders := false
@@ -208,8 +215,12 @@ func _get_property_list() -> Array[Dictionary]:
 
 	var chunk_usage := PROPERTY_USAGE_NO_EDITOR
 	var dimensions_usage := PROPERTY_USAGE_NO_EDITOR
+	var draw_order_usage := PROPERTY_USAGE_NO_EDITOR
+	
 	if render_mode == 0 or render_mode == 2:
 		chunk_usage = PROPERTY_USAGE_DEFAULT
+		if render_mode == 2:
+			draw_order_usage = PROPERTY_USAGE_DEFAULT
 		if use_chunks:
 			dimensions_usage = PROPERTY_USAGE_DEFAULT
 
@@ -223,6 +234,14 @@ func _get_property_list() -> Array[Dictionary]:
 		name = "Performance/chunk_dimensions",
 		type = TYPE_VECTOR3,
 		usage = dimensions_usage
+	})
+	
+	list.push_back({
+		name = "Performance/draw_order",
+		type = TYPE_INT,
+		hint = PROPERTY_HINT_ENUM,
+		hint_string = "Index,Lifetime,Reverse Lifetime, View Depth",
+		usage = draw_order_usage
 	})
 	return list
 
@@ -263,6 +282,9 @@ func _set(property, value):
 
 	elif property == "Performance/chunk_dimensions":
 		chunk_dimensions = value
+	
+	elif property == "Performance/draw_order":
+		draw_order = value 
 
 	if not Engine.is_editor_hint():
 		return false
@@ -286,6 +308,9 @@ func _get(property):
 
 	elif property == "Performance/chunk_dimensions":
 		return chunk_dimensions
+	
+	elif property == "Performance/draw_order":
+		return draw_order
 
 	return null
 
@@ -574,7 +599,7 @@ func _update_particles_system() -> void:
 
 	for item in items:
 		var count := int(round(float(item.proportion) / total_item_proportion * transforms_count))
-		var particles = ProtonScatterUtil.get_or_create_particles(item)
+		var particles = ProtonScatterUtil.get_or_create_particles(item, draw_order)
 		if not particles:
 			continue
 

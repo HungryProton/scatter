@@ -165,12 +165,13 @@ static func get_or_create_multimesh_chunk(item: ProtonScatterItem,
 	return mmi
 
 
-static func get_or_create_particles(item: ProtonScatterItem) -> GPUParticles3D:
+static func get_or_create_particles(item: ProtonScatterItem, draw_order: GPUParticles3D.DrawOrder) -> GPUParticles3D:
 	var item_root := get_or_create_item_root(item)
 	var particles: GPUParticles3D = item_root.get_node_or_null("GPUParticles3D")
 
 	if not particles:
 		particles = GPUParticles3D.new()
+		particles.set_draw_order(draw_order)
 		particles.set_name("GPUParticles3D")
 		item_root.add_child(particles)
 
