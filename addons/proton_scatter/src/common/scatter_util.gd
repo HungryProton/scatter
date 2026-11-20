@@ -462,24 +462,21 @@ static func get_all_static_bodies_from(node: Node) -> Array[StaticBody3D]:
 
 # Grab every static bodies from the source item and merge them in a single
 # one with multiple collision shapes.
-static func get_collision_data(item: ProtonScatterItem) -> StaticBody3D:
+static func get_collision_data(item: ProtonScatterItem) -> Array[StaticBody3D]:
+	var static_bodies: Array[StaticBody3D] = []
 	var static_body := StaticBody3D.new()
+	static_body.collision_layer = 0
+	static_body.collision_mask = 0
 	var source: Node3D = item.get_item()
 	if not is_instance_valid(source):
-		return static_body
-
+		return static_bodies
+		
 	source.transform = Transform3D()
-
-	for body in get_all_static_bodies_from(source):
-		for child in body.get_children():
-			if child is CollisionShape3D:
-				# Don't use reparent() here or the child transform gets reset.
-				body.remove_child(child)
-				child.owner = null
-				static_body.add_child(child)
-
+	var bodies := get_all_static_bodies_from(source)
+	for body in bodies:
+		body.get_parent().remove_child(body)
 	source.queue_free()
-	return static_body
+	return bodies
 
 
 static func set_owner_recursive(node: Node, new_owner: Node) -> void:
